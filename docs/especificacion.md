@@ -6,6 +6,12 @@ La planilla Requisitos_Sistema_Procesos_v13.xlsx es la fuente de verdad. Este do
 
 Entrega: administración interna de procesos, desde ingreso y configuración hasta creación, revisión, aprobación, consulta, actualización y retiro. Aplican todos los PT de AGENTS.md.
 
+## Entorno técnico de esta especificación
+
+Angular y NestJS con TypeScript; TypeORM con driver Oracle. Oracle AI Database 26ai Free instalado directamente en el computador local, sin Docker, con datos ficticios. Se desarrolla directamente sobre Oracle; no hay una migración desde PostgreSQL o MariaDB. El backend accede con un usuario/esquema de aplicación dedicado, nunca SYS o SYSTEM.
+
+La conexión se configura por ambiente (host, puerto, servicio, usuario y contraseña); los secretos no se versionan. La cuenta Oracle institucional se configurará cuando esté disponible y se comprobará su versión, edición y compatibilidad antes de desplegar. No es un bloqueo de la especificación local ni modifica los requisitos del producto.
+
 ## Requisitos y criterios de aceptación
 
 Los siguientes textos y validaciones se transcriben íntegramente de v13. Una función posterior mencionada por un criterio no se considera implementada por mostrar un campo vacío. Su comprobación se realiza cuando se incorpora la función correspondiente; no impide implementar ahora el resto del requisito. No declarar cumplimiento total antes de verificar todos sus criterios aplicables.
@@ -274,4 +280,4 @@ Son incrementos de implementación de un único alcance aprobado. Los respaldos 
 
 ## Evidencia necesaria
 
-Pruebas de permisos invocando API directamente, transacciones y concurrencia en PostgreSQL, transiciones, permanencia de versión vigente, búsquedas, anonimización sin cambios en auditoría, sesiones y límites de solicitudes. Pruebas funcionales Angular del recorrido completo. Ejecutar validaciones y verificaciones originales, incluidas carga de 20 usuarios, accesibilidad y restauración. No presentar la demo como cumplimiento de integración Google o verificación de producción.
+Pruebas de permisos invocando API directamente, transacciones y concurrencia en Oracle 26ai Free, transiciones, permanencia de versión vigente, búsquedas, anonimización sin cambios en auditoría, sesiones y límites de solicitudes. Pruebas funcionales Angular del recorrido completo. Ejecutar validaciones y verificaciones originales, incluidas carga de 20 usuarios, accesibilidad y restauración. No presentar la demo como cumplimiento de integración Google o verificación de producción.
