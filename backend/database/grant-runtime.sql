@@ -1,4 +1,5 @@
 -- Run as JALLUPACHA_OWNER after applying migrations. Do not run as SYS/SYSTEM.
+-- Also applied by `npm run db:grant` and `db:reset:local` (they parse the GRANT lines below).
 DEFINE app_user = JALLUPACHA_APP
 
 GRANT CREATE SESSION TO &&app_user;

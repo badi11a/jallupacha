@@ -305,22 +305,22 @@ Disponibilidad y respaldo: copia de seguridad diaria que se puede restaurar.
 
 ## Aplicación del alcance
 
-### Propuesta de Release 01 navegable — pendiente de revisión
+### Release 01 — mapa interno y consulta de riesgos
 
-El documento [release01_navegable.md](./release01_navegable.md) propone: (1) árbol interno Macroproceso → Proceso, agrupación por tipo y apertura de ficha (REQ-18/06); (2) registro/consulta de riesgos y administración de listas conforme REQ-10/11/28; (3) exportaciones HTML/JSON autónomas y mapa navegable público conforme REQ-36/17/52; y (4) carga de procesos genéricos para una institución estatal chilena. Incluye el flujo completo de REQ-07 —envío, aprobación y rechazo con motivo y retorno a Borrador— para que solo procesos aprobados lleguen a Vigente. La carga no asigna estados.
+El documento [release01_navegable.md](./release01_navegable.md) define el alcance vigente: aplicación interna autenticada para navegar Macroproceso → Proceso → Ficha, incluyendo procesos Borrador; consulta y registro de riesgos según sus permisos; y carga/restablecimiento local de contenido genérico. No es mapa público ni exportación.
 
-Es una propuesta de alcance, no una declaración de cumplimiento. El versionado e historial completos, la edición y retiro de procesos Vigentes y el descarte de borradores (REQ-09/56), el tratamiento de riesgos y la publicación numerada quedan postergados. Durante este release no se habilita editar un proceso Vigente ni alterar sus datos directamente. El árbol y la ficha existentes son reutilizables, pero eso no prueba por sí solo el cumplimiento íntegro de REQ-18/06.
+Quedan postergados para otro alcance el envío, aprobación o rechazo (REQ-07) y el mapa/exportaciones públicas (REQ-17/36/52). La carga nunca asigna ni simula aprobación y no altera directamente datos de procesos Vigentes. Versionado/historial completos, retiro/descarte (REQ-09/56), tratamiento de riesgos, documentos y relaciones siguen fuera del release.
 
 | Requisito | Alcance y estado |
 | --- | --- |
-| REQ-06 | Se reutiliza la ficha existente. Las funciones de unidades internas y BPMN siguen sin asociación/carga; no declarar completo el requisito por la navegación. |
-| REQ-07 | El release incluye envío, aprobación y rechazo con motivo visible al dueño y retorno a Borrador. El requisito solo se declarará completo tras implementar y verificar todos sus criterios. |
-| REQ-18 | Árbol, agrupación por tipo y contadores forman parte del alcance; no se declaran implementados por esta propuesta. |
-| REQ-09/56 | Versionado/historial completos, edición de Vigentes, retiro y descarte quedan postergados. No editar ni alterar directamente procesos Vigentes en este release. |
-| REQ-10/11/28 | Se incorporan los campos, niveles y reglas de listas transcritos desde v13; la propuesta no declara implementación completa. |
-| REQ-17/36/52 | HTML estático y JSON con la estructura pública permitida; el Administrador genera y los artefactos se consultan sin sesión. Su cumplimiento depende de implementar y verificar todos los criterios. |
+| REQ-06 | Se reutiliza la ficha. El mapa abre la ficha existente y muestra su estado y responsable; unidades internas/BPMN siguen sin asociación o carga. No declarar completo el requisito sin todos sus criterios. |
+| REQ-07 | Postergado: este release no envía, aprueba ni rechaza procesos. |
+| REQ-18 | Mapa interno autenticado, estructura Macroproceso → Proceso, agrupación por tipo y navegación a ficha; incluye Borradores persistidos. Se declara cumplido solo tras implementar y verificar criterios. |
+| REQ-09/56 | Historial/versionado completos, edición de Vigentes, retiro y descarte postergados. |
+| REQ-10/11/28 | Riesgos con descripción, causa, consecuencia, tipo y nivel; niveles y listas administrables según texto v13. Permisos de Gestor, dueño y Consulta respetados. |
+| REQ-17/36/52 | Mapa gráfico/exportación pública postergados, no parte de Release 01. |
 
-Los requisitos fuente REQ-10/11/17/28/36/52 están transcritos arriba a partir de `docs/referencias/Requisitos_Sistema_Procesos_v13.xlsx`. Las decisiones de diseño del release están separadas de ese texto fuente en [release01_navegable.md](./release01_navegable.md). Ningún requisito parcialmente implementado se declara completo.
+Las decisiones técnicas y contratos se detallan en [release01_navegable.md](./release01_navegable.md). Los requisitos fuente permanecen transcritos arriba; no declarar completo ningún requisito parcialmente implementado.
 
 - Acceso: Google Workspace verifica identidad; el sistema asigna perfiles. El entorno local usa exclusivamente datos de prueba para las identidades. Esa sustitución permite probar permisos, pero no satisface REQ-25.
 - Lectura: cualquier usuario autenticado consulta fichas, árbol y búsqueda. No introducir restricciones por estado que REQ-06 no establece.
@@ -351,15 +351,15 @@ Normalizar búsqueda en aplicación y parametrizar consultas; tratar % y _ como 
 
 1. Infraestructura local, perfiles con acceso local, macroprocesos/tipos y auditoría.
 2. Ficha y propietarios de procesos (Incremento 2, sin declarar completos los criterios aún no implementados).
-3. Release 01 propuesto: árbol/ficha, registro y consulta de riesgos con nivel/listas v13, flujo REQ-07 completo, mapa público y exportaciones independientes, y carga de procesos genéricos aprobada.
-4. Alcance posterior: versionado e historial completos, edición/retiro de procesos Vigentes y descarte REQ-09/56, tratamiento de riesgos, publicación numerada, búsqueda, derechos de datos y eventos/alertas, según dependencias y aprobaciones.
+3. Release 01: mapa interno autenticado con Borradores, navegación a ficha, riesgos y carga genérica local. No incluye flujo REQ-07 ni mapa/exportación pública.
+4. Alcance posterior: envío/aprobación/rechazo REQ-07; mapa/exportación pública REQ-17/36/52; versionado e historial completos, edición/retiro de procesos Vigentes y descarte REQ-09/56; tratamiento de riesgos, búsqueda, derechos de datos y eventos/alertas, según dependencias y aprobaciones.
 5. Integración Google y verificaciones de calidad, seguridad y producción de toda la entrega.
 
 Son incrementos de implementación de un único alcance aprobado. Los respaldos y controles de seguridad se incorporan conforme se crea cada componente; no se dejan para un endurecimiento posterior.
 
 ## Evidencia necesaria
 
-Para Release 01: pruebas de árbol/contadores y ficha, permisos de riesgo por perfil mediante API directa, persistencia Oracle/auditoría, envío y aprobación mínimos por transacción, exclusión de procesos no Vigentes, igualdad HTML/JSON/mapa, whitelist/escape, carga idempotente sin suplantar estados, y recorrido Angular accesible. Para la entrega completa: transacciones y concurrencia, versionado/historial, búsquedas, anonimización sin cambios en auditoría, sesiones y límites de solicitudes. Ejecutar validaciones y verificaciones originales, incluidas carga de 20 usuarios, accesibilidad y restauración. No presentar las pruebas locales como cumplimiento de integración Google o verificación de producción. Las verificaciones de producción enumeradas en `release01_navegable.md` permanecen pendientes hasta ejecutarse con evidencia.
+Para Release 01: mapa Macroproceso → Proceso → Ficha incluyendo Borradores; permisos de lectura/registro de riesgos mediante llamadas directas a la API; persistencia Oracle y auditoría; catálogos de riesgo; carga idempotente de procesos/riesgos; comando de reset limitado al esquema local; y recorrido funcional mapa → macroproceso → ficha → riesgos. Verificaciones de producción, instalación desde cero en el ambiente de pruebas, integración Google, carga de 20 usuarios, accesibilidad y restauración permanecen pendientes hasta ejecutarse con evidencia.
 
 ## Presentación del producto — corrección documental C-001 v4
 

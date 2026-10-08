@@ -117,4 +117,6 @@ Registrar el hallazgo, documentos afectados, corrección y evidencia de verifica
 
 No trasladar nombres de modos técnicos, fixtures, credenciales o condiciones del entorno a títulos, menús, botones o registros del producto sin una razón definida en la especificación. Los avisos de seguridad necesarios se mantienen en el lugar indicado, sin repetirse por toda la interfaz.
 
+Al modificar la navegación, rutas o la estructura común de la interfaz, revisar por separado el contenido común (presente en toda ruta autenticada) y el contenido propio de cada ruta, y comprobar que ningún panel o función queda mostrado en una ruta que no le corresponde ni pierde su permiso. La ubicación definida está en docs/arquitectura.md, sección «Interfaz: navegación por rutas».
+
 Antes de cerrar un cambio de interfaz, verificar textos visibles y recorrido funcional, además de pruebas de lógica y seguridad. Antes de cerrar cualquier corrección, revisar que no cambió el alcance ni debilitó controles técnicos.

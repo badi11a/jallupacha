@@ -7,7 +7,12 @@ import { AuthGuard } from '../src/auth/auth.guard';
 import { SessionService } from '../src/auth/session.service';
 import { AuthenticatedUser } from '../src/common/auth.types';
 import { ProcessController } from '../src/process/process.controller';
+import { ProcessMapController } from '../src/process/process-map.controller';
+import { RiskCatalogController } from '../src/risk/risk-catalog.controller';
+import { RiskController } from '../src/risk/risk.controller';
 import { ProcessService } from '../src/process/process.service';
+import { ProcessMapService } from '../src/process/process-map.service';
+import { RiskService } from '../src/risk/risk.service';
 import { UsersController } from '../src/identity/users.controller';
 import { DataSource } from 'typeorm';
 
@@ -23,6 +28,31 @@ describe('process endpoint authorization', () => {
     update: jest.fn(async (id: number) => ({ id })),
     reassignOwner: jest.fn(async (id: number) => ({ id }))
   };
+  const processMap = {
+    getMap: jest.fn(async () => ({
+      macroprocesses: [{
+        id: 1,
+        code: 'MP1',
+        name: 'Misionales',
+        order: 1,
+        processTypes: [{
+          id: 2,
+          name: 'Atención',
+          processes: [{ id: 3, code: 'PR3', name: 'Atención de solicitudes', status: 'Borrador', processTypeId: 2 }]
+        }]
+      }]
+    }))
+  };
+  const risks = {
+    listForProcess: jest.fn(async () => ({ items: [], total: 0, page: 1, limit: 100 })),
+    createForProcess: jest.fn(async (processId: number) => ({ id: 5, processId })),
+    listTypes: jest.fn(async () => ({ items: [] })),
+    listLevels: jest.fn(async () => ({ items: [] })),
+    createType: jest.fn(async () => ({ id: 1, name: 'Operacional', isActive: 1 })),
+    createLevel: jest.fn(async () => ({ id: 1, name: 'Alto', isActive: 1 })),
+    deactivateType: jest.fn(),
+    deactivateLevel: jest.fn()
+  };
   const sessionService = {
     authenticate: jest.fn(async (token?: string) => token === 'valid-session'
       ? { ...activeUser, sessionHash: 'stored-hash', csrfHash: 'stored-csrf-hash' }
@@ -33,9 +63,17 @@ describe('process endpoint authorization', () => {
 
   beforeAll(async () => {
     const moduleRef = await Test.createTestingModule({
-      controllers: [ProcessController, UsersController],
+      controllers: [
+        ProcessController,
+        ProcessMapController,
+        RiskController,
+        RiskCatalogController,
+        UsersController
+      ],
       providers: [
         { provide: ProcessService, useValue: service },
+        { provide: ProcessMapService, useValue: processMap },
+        { provide: RiskService, useValue: risks },
         { provide: DataSource, useValue: dataSource },
         { provide: SessionService, useValue: sessionService },
         { provide: AuditService, useValue: { securityEvent, record: jest.fn() } },
@@ -68,6 +106,57 @@ describe('process endpoint authorization', () => {
     await api.get('/api/processes')
       .set('Cookie', 'jallupacha_session=valid-session')
       .expect(200, { items: [], total: 0, page: 1, limit: 20 });
+  });
+
+  it('serves the nested authenticated map including draft states', async () => {
+    await api.get('/api/process-map').expect(401);
+    const response = await api.get('/api/process-map')
+      .set('Cookie', 'jallupacha_session=valid-session')
+      .expect(200);
+    expect(response.body.macroprocesses[0].processTypes[0].processes[0]).toMatchObject({
+      id: 3,
+      status: 'Borrador'
+    });
+  });
+
+  it('applies risk route profile policies before invoking services', async () => {
+    const headers = {
+      Cookie: 'jallupacha_session=valid-session; jallupacha_csrf=valid-csrf',
+      'X-CSRF-Token': 'valid-csrf'
+    };
+    await api.get('/api/processes/3/risks')
+      .set('Cookie', 'jallupacha_session=valid-session')
+      .expect(403);
+    expect(risks.listForProcess).not.toHaveBeenCalled();
+
+    await api.post('/api/processes/3/risks')
+      .set(headers)
+      .send({
+        description: 'Interrupción del servicio',
+        cause: 'Dependencia no disponible',
+        consequence: 'Atraso en la atención',
+        riskTypeId: 1,
+        riskLevelId: 2
+      })
+      .expect(403);
+    expect(risks.createForProcess).not.toHaveBeenCalled();
+
+    activeUser = { id: 18, profiles: ['RISK_MANAGER'] };
+    await api.post('/api/processes/3/risks')
+      .set(headers)
+      .send({
+        description: 'Interrupción del servicio',
+        cause: 'Dependencia no disponible',
+        consequence: 'Atraso en la atención',
+        riskTypeId: 1,
+        riskLevelId: 2
+      })
+      .expect(201, { id: 5, processId: 3 });
+    expect(risks.createForProcess).toHaveBeenCalledWith(
+      3,
+      expect.objectContaining({ id: 18, profiles: ['RISK_MANAGER'] }),
+      expect.objectContaining({ riskTypeId: 1, riskLevelId: 2 })
+    );
   });
 
   it('denies consultation writes and permits a process owner with CSRF protection', async () => {

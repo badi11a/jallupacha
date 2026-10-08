@@ -1,7 +1,14 @@
-import { Component, provideZoneChangeDetection } from '@angular/core';
+import { ApplicationRef, Component, provideZoneChangeDetection, signal } from '@angular/core';
 import { TestBed } from '@angular/core/testing';
+import { provideRouter } from '@angular/router';
 import {
   UiAppShellComponent,
+  UiBadgeComponent,
+  UiBreadcrumbsComponent,
+  UiCharCounterComponent,
+  UiSectionComponent,
+  charCountState,
+  countCharacters,
   UiDialogService,
   UiDialogValues,
   UiMessageComponent,
@@ -31,13 +38,29 @@ class HostComponent {
   page = 1;
 }
 
+@Component({
+  imports: [UiBadgeComponent, UiBreadcrumbsComponent, UiSectionComponent, UiCharCounterComponent],
+  template: `
+    <ui-badge tone="info">Borrador</ui-badge>
+    <ui-breadcrumbs [items]="[{ label: 'Inicio', link: '/inicio' }, { label: 'Actual' }]" />
+    <ui-section heading="Datos"><p>Contenido</p></ui-section>
+    <ui-char-counter [value]="text()" [max]="10" />
+  `
+})
+class KitPartsComponent {
+  readonly text = signal('abc');
+}
+
 function buttonByText(root: HTMLElement, text: string): HTMLButtonElement {
   return [...root.querySelectorAll('button')].find((button) => button.textContent?.trim() === text) as HTMLButtonElement;
 }
 
 describe('shared/ui', () => {
   beforeEach(() => {
-    TestBed.configureTestingModule({ imports: [HostComponent], providers: [provideZoneChangeDetection()] });
+    TestBed.configureTestingModule({
+      imports: [HostComponent, KitPartsComponent],
+      providers: [provideZoneChangeDetection(), provideRouter([])]
+    });
   });
 
   it('renders the shell with one environment notice, account and logout', () => {
@@ -162,6 +185,74 @@ describe('shared/ui', () => {
     const first = dialogs.confirm({ title: 'Uno', message: 'Primero' });
     void dialogs.confirm({ title: 'Dos', message: 'Segundo' });
     await expect(first).resolves.toBe(false);
+  });
+
+  it('counts characters with the server criterion', () => {
+    expect(countCharacters('  hola  ')).toBe(4);
+    expect(countCharacters('a😀b')).toBe(3);
+    expect(countCharacters('❤️')).toBe(1);
+    expect(countCharacters(null)).toBe(0);
+    expect(charCountState(224, 250)).toBe('ok');
+    expect(charCountState(225, 250)).toBe('near');
+    expect(charCountState(251, 250)).toBe('over');
+  });
+
+  it('renders badges, breadcrumbs and sections accessibly', () => {
+    const view = TestBed.createComponent(KitPartsComponent);
+    view.detectChanges();
+    const root = view.nativeElement as HTMLElement;
+    expect(root.querySelector('ui-badge')?.className).toBe('badge badge-info');
+    const nav = root.querySelector('nav.breadcrumbs') as HTMLElement;
+    expect(nav.getAttribute('aria-label')).toBe('Ubicación');
+    expect(nav.querySelector('a')?.getAttribute('href')).toBe('/inicio');
+    expect(nav.querySelector('[aria-current="page"]')?.textContent).toBe('Actual');
+    const section = root.querySelector('ui-section') as HTMLElement;
+    expect(section.getAttribute('role')).toBe('group');
+    expect(section.querySelector(`#${section.getAttribute('aria-labelledby')}`)?.textContent).toBe('Datos');
+    const counter = root.querySelector('ui-char-counter') as HTMLElement;
+    expect(counter.hidden).toBe(true);
+    view.componentInstance.text.set('x'.repeat(9));
+    view.detectChanges();
+    expect(counter.hidden).toBe(false);
+    expect(counter.textContent?.trim()).toBe('9 / 10');
+  });
+
+  it('moves focus to the main content from the skip link without navigating (C-007 R1)', () => {
+    const fixture = TestBed.createComponent(HostComponent);
+    fixture.detectChanges();
+    const before = location.href;
+    const skip = fixture.nativeElement.querySelector('.skip-link') as HTMLAnchorElement;
+    const click = new MouseEvent('click', { bubbles: true, cancelable: true });
+    skip.dispatchEvent(click);
+    expect(click.defaultPrevented).toBe(true);
+    expect(document.activeElement?.id).toBe('main-content');
+    expect(location.href).toBe(before);
+    fixture.destroy();
+  });
+
+  it('returns focus to the control that opened a dialog once it closes (C-007 R2)', async () => {
+    const fixture = TestBed.createComponent(HostComponent);
+    fixture.detectChanges();
+    const root = fixture.nativeElement as HTMLElement;
+    const opener = buttonByText(root, 'Acción');
+    opener.focus();
+    const dialogs = TestBed.inject(UiDialogService);
+
+    const answer = dialogs.confirm({ title: 'Confirmar', message: '¿Continuar?' });
+    fixture.detectChanges();
+    expect(root.querySelector('dialog')?.contains(document.activeElement)).toBe(true);
+    // Un <dialog> modal real impide enfocar fuera de él: cuando el foco vuelve ya no debe estar abierto.
+    let dialogOpenOnFocus: boolean | null = null;
+    opener.addEventListener('focus', () => (dialogOpenOnFocus = !!root.querySelector('dialog[open]')), { once: true });
+    buttonByText(root, 'Cancelar').click();
+    await answer;
+    fixture.detectChanges();
+    TestBed.inject(ApplicationRef).tick();
+    await fixture.whenStable();
+    expect(root.querySelector('dialog')).toBeNull();
+    expect(document.activeElement).toBe(opener);
+    expect(dialogOpenOnFocus).toBe(false);
+    fixture.destroy();
   });
 
   it('rejects non-integer and overlong values', () => {

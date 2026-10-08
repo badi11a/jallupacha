@@ -64,7 +64,9 @@ export class UiDialogService {
     else request.resolve(typeof result === 'object' ? result : null);
     const opener = this.opener;
     this.opener = null;
-    if (opener?.isConnected) queueMicrotask(() => opener.focus());
+    // `ui-dialog-host` cierra el <dialog> antes de llamar aquí: fuera del estado
+    // modal el navegador permite devolver el foco a quien abrió el diálogo.
+    if (opener?.isConnected) opener.focus();
   }
 
   private open(request: UiDialogRequest): void {

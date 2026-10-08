@@ -1,0 +1,176 @@
+{
+  "schemaVersion": 1,
+  "macroprocesses": [
+    {
+      "name": "Estratégicos",
+      "processes": [
+        {
+          "type": "Planificación",
+          "name": "Planificación institucional",
+          "description": "Organiza la definición de prioridades y objetivos institucionales para el período de gestión.",
+          "objective": "Alinear objetivos, recursos y resultados esperados.",
+          "risk": {
+            "description": "Las prioridades institucionales pueden quedar desalineadas con las necesidades de servicio.",
+            "cause": "La planificación utiliza información incompleta o desactualizada.",
+            "consequence": "Se asignan recursos a iniciativas con bajo aporte a los resultados esperados.",
+            "type": "Estratégico",
+            "level": "Alto"
+          }
+        },
+        {
+          "type": "Seguimiento y evaluación",
+          "name": "Seguimiento de objetivos institucionales",
+          "description": "Consolida avances, indicadores y alertas para apoyar decisiones de gestión.",
+          "objective": "Detectar oportunamente brechas entre los resultados y los objetivos.",
+          "risk": {
+            "description": "Los reportes de avance pueden no reflejar el estado real de los objetivos.",
+            "cause": "Las áreas informan con criterios o períodos de corte distintos.",
+            "consequence": "Las decisiones correctivas se toman tarde o sobre antecedentes inconsistentes.",
+            "type": "Operacional",
+            "level": "Medio"
+          }
+        },
+        {
+          "type": "Planificación",
+          "name": "Gestión de iniciativas institucionales",
+          "description": "Registra, prioriza y coordina iniciativas orientadas a mejorar los servicios y la gestión.",
+          "objective": "Mantener una cartera coherente con las prioridades institucionales.",
+          "risk": {
+            "description": "Iniciativas prioritarias pueden quedar sin seguimiento de hitos y dependencias.",
+            "cause": "No se actualiza oportunamente la información de responsables y plazos.",
+            "consequence": "Se retrasan resultados y se duplican esfuerzos entre áreas.",
+            "type": "Operacional",
+            "level": "Medio"
+          }
+        },
+        {
+          "type": "Seguimiento y evaluación",
+          "name": "Mejora continua de procesos",
+          "description": "Identifica oportunidades de mejora y coordina el seguimiento de sus resultados.",
+          "objective": "Reducir brechas de desempeño mediante acciones de mejora verificables.",
+          "risk": {
+            "description": "Las acciones de mejora pueden no abordar las causas de las brechas detectadas.",
+            "cause": "El análisis de resultados no incorpora a todas las unidades involucradas.",
+            "consequence": "La brecha persiste y consume recursos en acciones de bajo efecto.",
+            "type": "Estratégico",
+            "level": "Bajo"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Misionales",
+      "processes": [
+        {
+          "type": "Atención y servicios",
+          "name": "Atención de solicitudes ciudadanas",
+          "description": "Recibe, registra, deriva y responde solicitudes presentadas por las personas usuarias.",
+          "objective": "Entregar respuestas trazables dentro de los plazos aplicables.",
+          "risk": {
+            "description": "Una solicitud puede quedar sin respuesta o ser derivada a una unidad incorrecta.",
+            "cause": "La clasificación inicial no considera el contenido o los antecedentes recibidos.",
+            "consequence": "Aumentan los tiempos de respuesta y se deteriora la calidad de atención.",
+            "type": "Operacional",
+            "level": "Alto"
+          }
+        },
+        {
+          "type": "Fiscalización y evaluación",
+          "name": "Evaluación de cumplimiento de programas",
+          "description": "Revisa antecedentes de ejecución y resultados de programas institucionales.",
+          "objective": "Identificar brechas de cumplimiento y comunicar hallazgos verificables.",
+          "risk": {
+            "description": "La evaluación puede omitir incumplimientos relevantes.",
+            "cause": "La revisión no cubre todos los criterios o antecedentes disponibles.",
+            "consequence": "Se mantienen brechas que afectan los resultados comprometidos.",
+            "type": "Cumplimiento",
+            "level": "Alto"
+          }
+        },
+        {
+          "type": "Atención y servicios",
+          "name": "Entrega de prestaciones institucionales",
+          "description": "Gestiona la evaluación de requisitos y entrega de prestaciones definidas por la institución.",
+          "objective": "Asegurar decisiones consistentes y trazables durante la entrega.",
+          "risk": {
+            "description": "Personas con antecedentes equivalentes pueden recibir decisiones diferentes.",
+            "cause": "Los criterios de evaluación no se aplican de forma uniforme.",
+            "consequence": "Se afecta la equidad del servicio y aumenta el volumen de revisiones.",
+            "type": "Cumplimiento",
+            "level": "Medio"
+          }
+        },
+        {
+          "type": "Fiscalización y evaluación",
+          "name": "Gestión de reclamos y reconsideraciones",
+          "description": "Analiza reclamos y solicitudes de revisión de decisiones institucionales.",
+          "objective": "Resolver revisiones con antecedentes completos y dentro del plazo aplicable.",
+          "risk": {
+            "description": "Un reclamo puede resolverse sin considerar antecedentes determinantes.",
+            "cause": "Los documentos y registros asociados no se reúnen oportunamente.",
+            "consequence": "La decisión requiere una nueva revisión y se prolonga su resolución.",
+            "type": "Cumplimiento",
+            "level": "Medio"
+          }
+        }
+      ]
+    },
+    {
+      "name": "de Apoyo",
+      "processes": [
+        {
+          "type": "Gestión interna",
+          "name": "Gestión de personas",
+          "description": "Coordina procesos internos de planificación, incorporación y desarrollo de personas.",
+          "objective": "Disponer de capacidades acordes con las necesidades institucionales.",
+          "risk": {
+            "description": "La planificación de capacidades puede no anticipar necesidades críticas.",
+            "cause": "Los cambios de carga de trabajo no se reflejan en la planificación.",
+            "consequence": "Se generan brechas de cobertura o sobrecarga en unidades internas.",
+            "type": "Operacional",
+            "level": "Medio"
+          }
+        },
+        {
+          "type": "Gestión interna",
+          "name": "Gestión de abastecimiento",
+          "description": "Planifica requerimientos, adquisiciones y recepción de bienes y servicios.",
+          "objective": "Atender requerimientos institucionales con oportunidad y trazabilidad.",
+          "risk": {
+            "description": "Un requerimiento puede iniciar una adquisición con especificaciones incompletas.",
+            "cause": "La necesidad y sus criterios de aceptación no se validan con anticipación.",
+            "consequence": "Se reciben bienes o servicios que no resuelven la necesidad prevista.",
+            "type": "Financiero",
+            "level": "Alto"
+          }
+        },
+        {
+          "type": "Gestión interna",
+          "name": "Gestión presupuestaria",
+          "description": "Consolida requerimientos, disponibilidad y seguimiento de la ejecución presupuestaria.",
+          "objective": "Mantener información oportuna para la toma de decisiones financieras.",
+          "risk": {
+            "description": "La ejecución informada puede diferir de los compromisos vigentes.",
+            "cause": "Los registros de compromisos se actualizan con retraso.",
+            "consequence": "Se adoptan decisiones con una estimación incorrecta de disponibilidad.",
+            "type": "Financiero",
+            "level": "Medio"
+          }
+        },
+        {
+          "type": "Tecnología y soporte",
+          "name": "Gestión de plataformas institucionales",
+          "description": "Coordina la operación, soporte y continuidad de las plataformas de trabajo.",
+          "objective": "Mantener disponibles y protegidos los servicios tecnológicos necesarios.",
+          "risk": {
+            "description": "Una plataforma necesaria puede quedar indisponible durante una actividad crítica.",
+            "cause": "La planificación de continuidad no cubre una falla de infraestructura o configuración.",
+            "consequence": "Se interrumpen actividades y se retrasan servicios institucionales.",
+            "type": "Tecnológico",
+            "level": "Alto"
+          }
+        }
+      ]
+    }
+  ]
+}

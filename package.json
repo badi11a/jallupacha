@@ -21,6 +21,7 @@
     "audit:dependencies": "npm audit --audit-level=high",
     "db:migrate": "npm run db:migrate --workspace backend",
     "db:seed": "npm run db:seed --workspace backend",
+    "db:reset:local": "npm run db:reset:local --workspace backend",
     "start:dev": "concurrently --kill-others-on-fail \"npm run start:dev --workspace backend\" \"npm run start:dev --workspace frontend\""
   },
   "devDependencies": {

@@ -5,4 +5,6 @@ export interface LeavesWithConfirmation {
   confirmLeave(): boolean | Promise<boolean>;
 }
 
-export const unsavedChangesGuard: CanDeactivateFn<LeavesWithConfirmation> = (component) => component.confirmLeave();
+// Sin componente (p. ej. el outlet se destruyó al cerrar sesión) no hay cambios que proteger.
+export const unsavedChangesGuard: CanDeactivateFn<LeavesWithConfirmation> = (component) =>
+  component?.confirmLeave() ?? true;

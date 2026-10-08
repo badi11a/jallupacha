@@ -1,10 +1,20 @@
 import { provideHttpClient, withXsrfConfiguration } from '@angular/common/http';
-import { HttpTestingController, provideHttpClientTesting } from '@angular/common/http/testing';
+import { HttpTestingController, TestRequest, provideHttpClientTesting } from '@angular/common/http/testing';
 import { provideZoneChangeDetection } from '@angular/core';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { Router, provideRouter } from '@angular/router';
 import { AppComponent } from './app.component';
 import { routes } from './app.routes';
+
+const ADMIN = { userId: 1, displayName: 'Usuario administrador', email: 'admin@example.test', profiles: ['ADMIN'] };
+const CONSULTATION = { userId: 4, displayName: 'Usuario consulta', email: 'consultation@example.test', profiles: ['CONSULTATION'] };
+const PROCESS = {
+  id: 8, code: 'PR8', name: 'Proceso', macroprocessId: 1, macroprocessName: 'Estratégicos', processTypeId: 2,
+  processTypeName: 'Institucional', ownerUserId: 1, ownerDisplayName: 'Usuario administrador', status: 'Borrador',
+  revision: 1, versionNumber: 1, parentProcessId: null
+};
+// Paneles que C-008 retira de la estructura común.
+const ADMIN_PANELS = /Estructura|Clasificación|Perfiles de usuario|Auditoría reciente/i;
 
 describe('AppComponent', () => {
   let http: HttpTestingController;
@@ -26,6 +36,43 @@ describe('AppComponent', () => {
   });
 
   afterEach(() => http.verify());
+
+  /** Responde todas las peticiones pendientes de las pantallas de procesos con datos mínimos. */
+  function flushScreens(): void {
+    http.match(() => true).forEach((request: TestRequest) => {
+      const url = request.request.urlWithParams;
+      if (url === '/api/process-map') request.flush({ macroprocesses: [] });
+      else if (url.startsWith('/api/processes?')) request.flush({ items: [], total: 0, page: 1, limit: 20 });
+      else if (url.endsWith('/risks?page=1&limit=100')) request.flush({ items: [], total: 0, page: 1, limit: 100 });
+      else if (url === '/api/processes/8') request.flush(PROCESS);
+      else request.flush([]);
+    });
+  }
+
+  async function settle(fixture: ComponentFixture<AppComponent>): Promise<void> {
+    for (let round = 0; round < 4; round++) {
+      fixture.detectChanges();
+      await fixture.whenStable();
+      flushScreens();
+    }
+    fixture.detectChanges();
+  }
+
+  async function render(user: typeof ADMIN, url: string): Promise<ComponentFixture<AppComponent>> {
+    const fixture = TestBed.createComponent(AppComponent);
+    fixture.componentInstance.user = user;
+    fixture.detectChanges();
+    http.expectOne('/api/auth/me').flush({ statusCode: 401 }, { status: 401, statusText: 'Unauthorized' });
+    await fixture.whenStable();
+    http.expectOne('/api/auth/demo/identities').flush([]);
+    await TestBed.inject(Router).navigateByUrl(url);
+    await settle(fixture);
+    return fixture;
+  }
+
+  function navLabels(fixture: ComponentFixture<AppComponent>): string[] {
+    return [...fixture.nativeElement.querySelectorAll('.app-nav a')].map((a: HTMLElement) => a.textContent?.trim() ?? '');
+  }
 
   it('presents the local access screen with neutral user labels and names', async () => {
     const fixture = TestBed.createComponent(AppComponent);
@@ -50,140 +97,68 @@ describe('AppComponent', () => {
     fixture.destroy();
   });
 
-  it('keeps the admin dashboard labels neutral and shows one local-access notice', async () => {
-    const fixture = TestBed.createComponent(AppComponent);
-    fixture.componentInstance.user = {
-      userId: 1,
-      displayName: 'Usuario administrador',
-      email: 'admin@example.test',
-      profiles: ['ADMIN']
-    };
-    fixture.componentInstance.macroprocesses = [
-      { id: 1, code: 'MP1', name: 'Estratégicos', description: null, order: 1, isActive: 1 }
-    ];
-    fixture.componentInstance.processTypes = [{ id: 1, name: 'Institucional', isActive: 1 }];
-    fixture.componentInstance.users = [
-      { id: 1, displayName: 'Usuario administrador', email: 'admin@example.test', isActive: 1, profiles: 'ADMIN' },
-      { id: 2, displayName: 'Usuario consulta', email: 'consultation@example.test', isActive: 1, profiles: 'CONSULTATION' }
-    ];
-    fixture.detectChanges();
-    http.expectOne('/api/auth/me').flush({ statusCode: 401 }, { status: 401, statusText: 'Unauthorized' });
-    await fixture.whenStable();
-    http.expectOne('/api/auth/demo/identities').flush([]);
-    await fixture.whenStable();
-    await flushProcessWorkspaceRequests(http, fixture);
-    await fixture.whenStable();
-    fixture.detectChanges();
-
-    const text = fixture.nativeElement.textContent as string;
-    expect(text).toContain('Perfiles de usuario');
-    expect(text).toContain('Macroprocesos');
-    expect(text).toContain('Tipos de proceso');
-    expect(text).toContain('Auditoría reciente');
-    expect(text).toContain('admin@example.test');
-    expect(text).toContain('consultation@example.test');
-    expect(fixture.nativeElement.querySelectorAll('.environment-notice')).toHaveLength(1);
-    expect(text).toContain('Entorno local: acceso de prueba.');
-    expect(text).not.toMatch(/demo|fictici|simulad|prototipo/i);
+  it('keeps only the common structure around every process screen (C-008 V1)', async () => {
+    const fixture = await render(ADMIN, '/mapa');
+    for (const url of ['/mapa', '/mapa/macroprocesos/1', '/procesos', '/procesos/8', '/procesos/8/riesgos']) {
+      await TestBed.inject(Router).navigateByUrl(url);
+      await settle(fixture);
+      const text = fixture.nativeElement.textContent as string;
+      expect(text, url).not.toMatch(ADMIN_PANELS);
+      expect(fixture.nativeElement.querySelector('.brand'), url).not.toBeNull();
+      expect(text, url).toContain('Usuario administrador · Administrador');
+      expect(fixture.nativeElement.querySelector('.app-nav'), url).not.toBeNull();
+      expect(fixture.nativeElement.querySelectorAll('.environment-notice'), url).toHaveLength(1);
+      expect(text, url).not.toMatch(/demo|fictici|simulad|prototipo/i);
+    }
     fixture.destroy();
   });
 
-  it('asks for confirmation in a dialog before deactivating a catalog entry', async () => {
-    const fixture = await renderAdminDashboard();
-    const root = fixture.nativeElement as HTMLElement;
+  it('offers Perfiles and Auditoría in the navigation only to administrators (C-008 V4)', async () => {
+    const admin = await render(ADMIN, '/mapa');
+    expect(navLabels(admin)).toEqual(['Mapa de procesos', 'Procesos', 'Catálogos', 'Perfiles', 'Auditoría']);
+    expect([...admin.nativeElement.querySelectorAll('.app-nav a')].map((a: HTMLElement) => a.getAttribute('href')))
+      .toEqual(['/mapa', '/procesos', '/administracion/catalogos', '/administracion/perfiles', '/administracion/auditoria']);
+    admin.destroy();
 
-    buttonByText(root, 'Desactivar')!.click();
-    fixture.detectChanges();
-    expect(root.querySelector('dialog')?.textContent).toContain('¿Desactivar el macroproceso «Estratégicos»?');
-    buttonByText(root.querySelector('dialog')!, 'Cancelar')!.click();
-    await fixture.whenStable();
-    fixture.detectChanges();
-    expect(root.querySelector('dialog')).toBeNull();
-    http.expectNone('/api/macroprocesses/1/deactivate');
-
-    buttonByText(root, 'Desactivar')!.click();
-    fixture.detectChanges();
-    buttonByText(root.querySelector('dialog')!, 'Desactivar')!.click();
-    await fixture.whenStable();
-    http.expectOne({ method: 'POST', url: '/api/macroprocesses/1/deactivate' }).flush({});
-    await fixture.whenStable();
-    http.expectOne('/api/macroprocesses').flush([]);
-    http.expectOne('/api/process-types').flush([]);
-    await fixture.whenStable();
-    fixture.detectChanges();
-    expect(root.textContent).toContain('Macroproceso desactivado y auditado.');
-    fixture.destroy();
+    const consultation = await render(CONSULTATION, '/mapa');
+    expect(navLabels(consultation)).toEqual(['Mapa de procesos', 'Procesos', 'Catálogos']);
+    consultation.destroy();
   });
 
-  it('edits a macroprocess through a validated dialog', async () => {
-    const fixture = await renderAdminDashboard();
-    const root = fixture.nativeElement as HTMLElement;
-
-    buttonByText(root, 'Editar')!.click();
-    fixture.detectChanges();
-    const dialog = root.querySelector('dialog') as HTMLDialogElement;
-    const name = dialog.querySelector('#ui-dialog-field-name') as HTMLInputElement;
-    const order = dialog.querySelector('#ui-dialog-field-order') as HTMLInputElement;
-    expect(name.value).toBe('Estratégicos');
-    expect(order.value).toBe('1');
-    order.value = '-1';
-    order.dispatchEvent(new Event('input'));
-    buttonByText(dialog, 'Guardar')!.click();
-    fixture.detectChanges();
-    http.expectNone({ method: 'PATCH', url: '/api/macroprocesses/1' });
-    expect(dialog.textContent).toContain('Ingrese un valor entre 0 y 999999.');
-
-    name.value = '  Estratégicos institucionales ';
-    name.dispatchEvent(new Event('input'));
-    order.value = '2';
-    order.dispatchEvent(new Event('input'));
-    buttonByText(dialog, 'Guardar')!.click();
-    await fixture.whenStable();
-    const request = http.expectOne({ method: 'PATCH', url: '/api/macroprocesses/1' });
-    expect(request.request.body).toEqual({ name: 'Estratégicos institucionales', description: null, order: 2 });
-    request.flush({});
-    await fixture.whenStable();
-    http.expectOne('/api/macroprocesses').flush([]);
-    http.expectOne('/api/process-types').flush([]);
-    await fixture.whenStable();
-    fixture.detectChanges();
-    expect(root.textContent).toContain('Macroproceso actualizado y auditado.');
+  it('navigates home from the brand through the router without reloading (C-008 R10)', async () => {
+    const fixture = await render(ADMIN, '/procesos');
+    const brand = fixture.nativeElement.querySelector('.brand') as HTMLAnchorElement;
+    expect(brand.getAttribute('href')).toBe('/mapa');
+    const click = new MouseEvent('click', { bubbles: true, cancelable: true, button: 0 });
+    brand.dispatchEvent(click);
+    expect(click.defaultPrevented).toBe(true);
+    await settle(fixture);
+    expect(TestBed.inject(Router).url).toBe('/mapa');
     fixture.destroy();
   });
 
   it('closes the session through the router when there are no pending changes', async () => {
-    const fixture = await renderAdminDashboard();
+    const fixture = await render(ADMIN, '/procesos');
     const root = fixture.nativeElement as HTMLElement;
     buttonByText(root, 'Cerrar sesión')!.click();
     await fixture.whenStable();
+    http.match('/api/process-map').forEach((request) => request.flush({ macroprocesses: [] }));
     http.expectOne({ method: 'POST', url: '/api/auth/logout' }).flush({});
     await fixture.whenStable();
     http.expectOne('/api/auth/demo/identities').flush([{ id: 1, displayName: 'Usuario administrador' }]);
     await fixture.whenStable();
     fixture.detectChanges();
-    expect(TestBed.inject(Router).url).toBe('/procesos');
+    expect(TestBed.inject(Router).url).toBe('/mapa');
     expect(root.querySelector('label[for="identity"]')?.textContent).toContain('Usuario de prueba');
     fixture.destroy();
   });
 
   it('keeps the session when leaving an editor with unsaved changes is declined', async () => {
-    const fixture = await renderAdminDashboard();
+    const fixture = await render(ADMIN, '/procesos');
     const root = fixture.nativeElement as HTMLElement;
     const router = TestBed.inject(Router);
     await router.navigateByUrl('/procesos/8/editar');
-    fixture.detectChanges();
-    await fixture.whenStable();
-    http.expectOne('/api/processes/8').flush({
-      id: 8, code: 'PR8', name: 'Proceso', macroprocessId: 1, macroprocessName: 'Estratégicos', processTypeId: 2,
-      processTypeName: 'Institucional', ownerUserId: 1, ownerDisplayName: 'Usuario administrador', status: 'Borrador',
-      revision: 1, versionNumber: 1, parentProcessId: null
-    });
-    await fixture.whenStable();
-    http.expectOne('/api/macroprocesses').flush([]);
-    http.expectOne('/api/process-types').flush([]);
-    http.expectOne('/api/processes?page=1&limit=100').flush({ items: [], total: 0, page: 1, limit: 100 });
-    await fixture.whenStable();
-    fixture.detectChanges();
+    await settle(fixture);
     const name = root.querySelector('#process-name') as HTMLInputElement;
     name.value = 'Cambio pendiente';
     name.dispatchEvent(new Event('input'));
@@ -199,78 +174,8 @@ describe('AppComponent', () => {
     expect(root.textContent).toContain('Cerrar sesión');
     fixture.destroy();
   });
-
-  it('does not show the administrator panels to a consultation user', async () => {
-    const fixture = TestBed.createComponent(AppComponent);
-    fixture.componentInstance.user = {
-      userId: 4,
-      displayName: 'Usuario consulta',
-      email: 'consultation@example.test',
-      profiles: ['CONSULTATION']
-    };
-    fixture.componentInstance.macroprocesses = [
-      { id: 1, code: 'MP1', name: 'Estratégicos', description: null, order: 1, isActive: 1 }
-    ];
-    fixture.detectChanges();
-    http.expectOne('/api/auth/me').flush({ statusCode: 401 }, { status: 401, statusText: 'Unauthorized' });
-    await fixture.whenStable();
-    http.expectOne('/api/auth/demo/identities').flush([]);
-    await fixture.whenStable();
-    await flushProcessWorkspaceRequests(http, fixture);
-    await fixture.whenStable();
-    fixture.detectChanges();
-
-    const text = fixture.nativeElement.textContent as string;
-    expect(text).toContain('Macroprocesos');
-    expect(text).toContain('Tipos de proceso');
-    expect(text).not.toContain('Perfiles de usuario');
-    expect(text).not.toContain('Auditoría reciente');
-    expect(buttonByText(fixture.nativeElement, 'Desactivar')).toBeUndefined();
-    expect(buttonByText(fixture.nativeElement, 'Editar')).toBeUndefined();
-    expect(fixture.nativeElement.querySelectorAll('.environment-notice')).toHaveLength(1);
-    expect(text).not.toMatch(/demo|fictici|simulad|prototipo/i);
-    fixture.destroy();
-  });
-
-  async function renderAdminDashboard(): Promise<ComponentFixture<AppComponent>> {
-    const fixture = TestBed.createComponent(AppComponent);
-    fixture.componentInstance.user = {
-      userId: 1,
-      displayName: 'Usuario administrador',
-      email: 'admin@example.test',
-      profiles: ['ADMIN']
-    };
-    fixture.componentInstance.macroprocesses = [
-      { id: 1, code: 'MP1', name: 'Estratégicos', description: null, order: 1, isActive: 1 }
-    ];
-    fixture.detectChanges();
-    http.expectOne('/api/auth/me').flush({ statusCode: 401 }, { status: 401, statusText: 'Unauthorized' });
-    await fixture.whenStable();
-    http.expectOne('/api/auth/demo/identities').flush([]);
-    await fixture.whenStable();
-    await flushProcessWorkspaceRequests(http, fixture);
-    await fixture.whenStable();
-    fixture.detectChanges();
-    return fixture;
-  }
 });
 
 function buttonByText(root: HTMLElement, text: string): HTMLButtonElement | undefined {
   return [...root.querySelectorAll('button')].find((button) => button.textContent?.trim() === text);
-}
-
-async function flushProcessWorkspaceRequests(
-  http: HttpTestingController,
-  fixture: ComponentFixture<AppComponent>
-): Promise<void> {
-  await TestBed.inject(Router).navigateByUrl('/procesos');
-  fixture.detectChanges();
-  await fixture.whenStable();
-  http.expectOne('/api/processes?page=1&limit=20').flush({
-    items: [],
-    total: 0,
-    page: 1,
-    limit: 20
-  });
-  await fixture.whenStable();
 }

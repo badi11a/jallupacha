@@ -1,5 +1,5 @@
 import { Component, ElementRef, computed, effect, inject, linkedSignal, signal, viewChild } from '@angular/core';
-import { UiDialogField, UiDialogService, validateDialogFields } from './dialog.service';
+import { UiDialogField, UiDialogService, UiDialogValues, validateDialogFields } from './dialog.service';
 
 /** Presenta el diálogo activo de `UiDialogService` con un `<dialog>` modal nativo. */
 @Component({
@@ -34,7 +34,7 @@ import { UiDialogField, UiDialogService, validateDialogFields } from './dialog.s
             }
           }
           <div class="ui-dialog-actions">
-            <button class="text-button" type="button" (click)="dialogs.settle(null)">
+            <button class="text-button" type="button" (click)="finish(null)">
               {{ current.options.cancelLabel ?? 'Cancelar' }}
             </button>
             <button type="submit" [class]="danger() ? 'danger-button' : 'primary-button'">{{ submitLabel() }}</button>
@@ -89,6 +89,16 @@ export class UiDialogHostComponent {
     });
   }
 
+  /** Cierra el <dialog> nativo (fin del estado modal) y entrega el resultado. */
+  protected finish(result: boolean | UiDialogValues | null): void {
+    const element = this.dialog()?.nativeElement;
+    if (element?.open) {
+      if (typeof element.close === 'function') element.close();
+      else element.removeAttribute('open');
+    }
+    this.dialogs.settle(result);
+  }
+
   protected inputId(field: UiDialogField): string {
     return `ui-dialog-field-${field.key}`;
   }
@@ -109,7 +119,7 @@ export class UiDialogHostComponent {
 
   protected cancel(event: Event): void {
     event.preventDefault();
-    this.dialogs.settle(null);
+    this.finish(null);
   }
 
   protected submit(event: Event): void {
@@ -117,13 +127,13 @@ export class UiDialogHostComponent {
     const current = this.request();
     if (!current) return;
     if (current.kind === 'confirm') {
-      this.dialogs.settle(true);
+      this.finish(true);
       return;
     }
     this.submitted.set(true);
     const result = this.validate();
     if (result) {
-      this.dialogs.settle(result);
+      this.finish(result);
       return;
     }
     const firstInvalid = current.options.fields.find((field) => this.errors()[field.key]);

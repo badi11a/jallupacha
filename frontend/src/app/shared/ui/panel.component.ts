@@ -3,8 +3,9 @@ import { Component, input } from '@angular/core';
 let nextPanelId = 0;
 
 /**
- * Sección con encabezado. Las acciones del encabezado se proyectan con el
- * atributo `panelActions`; el resto del contenido va debajo.
+ * Sección con encabezado. Lo que va antes del título (p. ej. migas de pan) se
+ * proyecta con `panelLead`, las acciones del encabezado con `panelActions` y el
+ * resto del contenido va debajo.
  */
 @Component({
   selector: 'ui-panel',
@@ -14,6 +15,7 @@ let nextPanelId = 0;
     '[attr.aria-labelledby]': 'headingId()'
   },
   template: `
+    <ng-content select="[panelLead]" />
     <div class="panel-heading">
       <div>
         @if (eyebrow()) { <p class="eyebrow">{{ eyebrow() }}</p> }

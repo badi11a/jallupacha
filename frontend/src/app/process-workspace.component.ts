@@ -1,10 +1,24 @@
 import { HttpClient, HttpErrorResponse } from '@angular/common/http';
-import { ChangeDetectorRef, Component, DestroyRef, HostListener, OnInit, Signal, inject } from '@angular/core';
+import { ChangeDetectorRef, Component, DestroyRef, ElementRef, HostListener, OnInit, Signal, inject } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, ROUTER_OUTLET_DATA, Router, RouterLink } from '@angular/router';
 import { combineLatest, firstValueFrom } from 'rxjs';
-import { UiDialogService, UiMessageComponent, UiPaginationComponent, UiPanelComponent } from './shared/ui';
+import {
+  UiBadgeComponent,
+  UiBreadcrumb,
+  UiBreadcrumbsComponent,
+  UiCharCountState,
+  UiCharCounterComponent,
+  UiDialogService,
+  UiMessageComponent,
+  UiPaginationComponent,
+  UiPanelComponent,
+  UiSectionComponent,
+  charCountState,
+  countCharacters
+} from './shared/ui';
+import { ProcessOutletData, canReadRisks, processStatusTone } from './access';
 import { LeavesWithConfirmation } from './unsaved-changes.guard';
 
 interface ProcessSummary {
@@ -111,6 +125,24 @@ const TEXT_FIELDS: TextField[] = [
   { key: 'validation', label: 'Validación del proceso', multiline: true, max: 10000 }
 ];
 
+interface EditorSection {
+  title: string;
+  fields: TextField[];
+}
+
+// Mismas secciones que la ficha. La primera incluye además macroproceso, tipo y proceso padre.
+const EDITOR_SECTIONS: EditorSection[] = ([
+  ['Identificación', ['name', 'alias', 'subprocessType']],
+  ['Propósito', ['description', 'objective', 'scope']],
+  ['Organización', ['businessArea', 'involvedParties']],
+  ['Entradas y salidas', ['suppliers', 'inputs', 'outputs', 'clients']],
+  ['Operación', ['criticality', 'automationLevel', 'periodicity', 'startsWhen', 'endsWhen']],
+  ['Desarrollo y diseño', ['developmentPlan', 'operation', 'design', 'validation']]
+] as [string, TextFieldKey[]][]).map(([title, keys]) => ({
+  title,
+  fields: keys.map((key) => TEXT_FIELDS.find((field) => field.key === key)!)
+}));
+
 const EMPTY_DRAFT: ProcessDraft = {
   macroprocessId: null,
   processTypeId: null,
@@ -138,19 +170,22 @@ const EMPTY_DRAFT: ProcessDraft = {
   periodicity: null
 };
 
-export interface ProcessOutletData {
-  userId: number;
-  profiles: string[];
-}
+export type { ProcessOutletData } from './access';
 
 type WorkspaceMode = 'list' | 'detail' | 'edit' | 'create';
 
 @Component({
   selector: 'app-process-workspace',
   standalone: true,
-  imports: [FormsModule, RouterLink, UiMessageComponent, UiPaginationComponent, UiPanelComponent],
+  imports: [
+    FormsModule, RouterLink, UiBadgeComponent, UiBreadcrumbsComponent, UiCharCounterComponent,
+    UiMessageComponent, UiPaginationComponent, UiPanelComponent, UiSectionComponent
+  ],
   template: `
     <ui-panel class="process-panel" headingId="processes-title" [eyebrow]="panelEyebrow" [heading]="panelHeading">
+      @if (breadcrumbs.length) {
+        <ui-breadcrumbs panelLead label="Ubicación en procesos" [items]="breadcrumbs" />
+      }
       @if (mode === 'list') {
         @if (canCreate) {
           <a panelActions class="primary-button" routerLink="/procesos/nuevo">Nuevo proceso</a>
@@ -165,57 +200,94 @@ type WorkspaceMode = 'list' | 'detail' | 'edit' | 'create';
 
       @if (mode === 'list') {
         <div class="table-scroll">
-          <table>
-            <thead><tr><th>Código</th><th>Nombre</th><th>Macroproceso</th><th>Tipo</th><th>Responsable</th><th>Estado</th><th></th></tr></thead>
+          <table class="table-cards" [attr.aria-busy]="busy">
+            <thead><tr><th>Código</th><th>Nombre</th><th>Macroproceso</th><th>Tipo</th><th>Responsable</th><th>Estado</th><th><span class="visually-hidden">Acciones</span></th></tr></thead>
             <tbody>
               @for (process of processes; track process.id) {
                 <tr>
-                  <td>{{ process.code }}</td><td>{{ process.name || 'Sin nombre' }}</td>
-                  <td>{{ process.macroprocessName }}</td><td>{{ process.processTypeName }}</td>
-                  <td>{{ process.ownerDisplayName }}</td><td>{{ process.status }}</td>
-                  <td><a class="text-button" [routerLink]="['/procesos', process.id]">Ver ficha</a></td>
+                  <td data-label="Código">{{ process.code }}</td>
+                  <td data-label="Nombre"><strong>{{ process.name || 'Sin nombre' }}</strong></td>
+                  <td data-label="Macroproceso">{{ process.macroprocessName }}</td>
+                  <td data-label="Tipo">{{ process.processTypeName }}</td>
+                  <td data-label="Responsable">{{ process.ownerDisplayName }}</td>
+                  <td data-label="Estado"><ui-badge [tone]="statusTone(process.status)">{{ process.status }}</ui-badge></td>
+                  <td class="table-cards-full"><a class="text-button" [routerLink]="['/procesos', process.id]">Ver ficha</a></td>
                 </tr>
-              } @empty { <tr><td colspan="7">No hay procesos.</td></tr> }
+              } @empty {
+                <tr><td colspan="7" class="table-cards-full">
+                  @if (busy) {
+                    <span role="status">Cargando procesos…</span>
+                  } @else if (!error) {
+                    <span>No hay procesos.</span>
+                    @if (canCreate) { <span class="helper"> Use «Nuevo proceso» para registrar el primero.</span> }
+                  }
+                </td></tr>
+              }
             </tbody>
           </table>
         </div>
         <ui-pagination [page]="page" [pageSize]="pageSize" [total]="total" itemLabel="procesos"
           [disabled]="busy" (pageChange)="changePage($event)" />
       } @else if (mode === 'detail' && selected) {
-        <dl class="process-details">
-          <dt>Código</dt><dd>{{ selected.code }}</dd>
-          <dt>Nombre</dt><dd>{{ value(selected.name) }}</dd>
-          <dt>Alias</dt><dd>{{ value(selected.alias) }}</dd>
-          <dt>Descripción</dt><dd>{{ value(selected.description) }}</dd>
-          <dt>Objetivo</dt><dd>{{ value(selected.objective) }}</dd>
-          <dt>Alcance</dt><dd>{{ value(selected.scope) }}</dd>
-          <dt>Macroproceso</dt><dd>{{ selected.macroprocessName }}</dd>
-          <dt>Tipo de proceso</dt><dd>{{ selected.processTypeName }}</dd>
-          <dt>Proceso padre</dt><dd>{{ parentLabel(selected.parentProcessId) }}</dd>
-          <dt>Tipo de subproceso</dt><dd>{{ value(selected.subprocessType) }}</dd>
-          <dt>Unidades internas</dt><dd>{{ value(selected.internalUnits) }}</dd>
-          <dt>Área de negocio</dt><dd>{{ value(selected.businessArea) }}</dd>
-          <dt>Responsable</dt><dd>{{ selected.ownerDisplayName }} · ID {{ selected.ownerUserId }}</dd>
-          <dt>Involucrados</dt><dd>{{ value(selected.involvedParties) }}</dd>
-          <dt>Entradas</dt><dd>{{ value(selected.inputs) }}</dd>
-          <dt>Salidas</dt><dd>{{ value(selected.outputs) }}</dd>
-          <dt>Proveedores</dt><dd>{{ value(selected.suppliers) }}</dd>
-          <dt>Clientes</dt><dd>{{ value(selected.clients) }}</dd>
-          <dt>Criticidad</dt><dd>{{ value(selected.criticality) }}</dd>
-          <dt>Grado de automatización</dt><dd>{{ value(selected.automationLevel) }}</dd>
-          <dt>Periodicidad</dt><dd>{{ value(selected.periodicity) }}</dd>
-          <dt>Cuándo inicia</dt><dd>{{ value(selected.startsWhen) }}</dd>
-          <dt>Cuándo termina</dt><dd>{{ value(selected.endsWhen) }}</dd>
-          <dt>Plan de desarrollo</dt><dd>{{ value(selected.developmentPlan) }}</dd>
-          <dt>Operación del proceso</dt><dd>{{ value(selected.operation) }}</dd>
-          <dt>Diseño del proceso</dt><dd>{{ value(selected.design) }}</dd>
-          <dt>Validación del proceso</dt><dd>{{ value(selected.validation) }}</dd>
-          <dt>Estado</dt><dd>{{ selected.status }}</dd>
-          <dt>Modelo del proceso (BPMN)</dt><dd>{{ value(selected.bpmnModel) }}</dd>
-        </dl>
+        <ui-section heading="Identificación">
+          <dl class="process-details">
+            <dt>Código</dt><dd>{{ selected.code }}</dd>
+            <dt>Nombre</dt><dd>{{ value(selected.name) }}</dd>
+            <dt>Alias</dt><dd>{{ value(selected.alias) }}</dd>
+            <dt>Macroproceso</dt><dd>{{ selected.macroprocessName }}</dd>
+            <dt>Tipo de proceso</dt><dd>{{ selected.processTypeName }}</dd>
+            <dt>Proceso padre</dt><dd>{{ parentLabel(selected.parentProcessId) }}</dd>
+            <dt>Tipo de subproceso</dt><dd>{{ value(selected.subprocessType) }}</dd>
+            <dt>Estado</dt><dd><ui-badge [tone]="statusTone(selected.status)">{{ selected.status }}</ui-badge></dd>
+            <dt>Responsable</dt><dd>{{ selected.ownerDisplayName }} · ID {{ selected.ownerUserId }}</dd>
+          </dl>
+        </ui-section>
+        <ui-section heading="Propósito">
+          <dl class="process-details">
+            <dt>Descripción</dt><dd>{{ value(selected.description) }}</dd>
+            <dt>Objetivo</dt><dd>{{ value(selected.objective) }}</dd>
+            <dt>Alcance</dt><dd>{{ value(selected.scope) }}</dd>
+          </dl>
+        </ui-section>
+        <ui-section heading="Organización">
+          <dl class="process-details">
+            <dt>Unidades internas</dt><dd>{{ value(selected.internalUnits) }}</dd>
+            <dt>Área de negocio</dt><dd>{{ value(selected.businessArea) }}</dd>
+            <dt>Involucrados</dt><dd>{{ value(selected.involvedParties) }}</dd>
+          </dl>
+        </ui-section>
+        <ui-section heading="Entradas y salidas">
+          <dl class="process-details">
+            <dt>Proveedores</dt><dd>{{ value(selected.suppliers) }}</dd>
+            <dt>Entradas</dt><dd>{{ value(selected.inputs) }}</dd>
+            <dt>Salidas</dt><dd>{{ value(selected.outputs) }}</dd>
+            <dt>Clientes</dt><dd>{{ value(selected.clients) }}</dd>
+          </dl>
+        </ui-section>
+        <ui-section heading="Operación">
+          <dl class="process-details">
+            <dt>Criticidad</dt><dd>{{ value(selected.criticality) }}</dd>
+            <dt>Grado de automatización</dt><dd>{{ value(selected.automationLevel) }}</dd>
+            <dt>Periodicidad</dt><dd>{{ value(selected.periodicity) }}</dd>
+            <dt>Cuándo inicia</dt><dd>{{ value(selected.startsWhen) }}</dd>
+            <dt>Cuándo termina</dt><dd>{{ value(selected.endsWhen) }}</dd>
+          </dl>
+        </ui-section>
+        <ui-section heading="Desarrollo y diseño">
+          <dl class="process-details">
+            <dt>Plan de desarrollo</dt><dd>{{ value(selected.developmentPlan) }}</dd>
+            <dt>Operación del proceso</dt><dd>{{ value(selected.operation) }}</dd>
+            <dt>Diseño del proceso</dt><dd>{{ value(selected.design) }}</dd>
+            <dt>Validación del proceso</dt><dd>{{ value(selected.validation) }}</dd>
+            <dt>Modelo del proceso (BPMN)</dt><dd>{{ value(selected.bpmnModel) }}</dd>
+          </dl>
+        </ui-section>
         <div class="process-actions">
           @if (canEdit(selected)) {
             <a class="primary-button" [routerLink]="['/procesos', selected.id, 'editar']">Editar borrador</a>
+          }
+          @if (showRisks(selected)) {
+            <a class="text-button" [routerLink]="['/procesos', selected.id, 'riesgos']">Riesgos del proceso</a>
           }
           @if (isAdmin) {
             <button class="text-button" type="button" [disabled]="busy" (click)="beginReassignment()">Reasignar responsable</button>
@@ -235,71 +307,100 @@ type WorkspaceMode = 'list' | 'detail' | 'edit' | 'create';
           </form>
         }
       } @else if (editorReady) {
-        <form class="process-editor" (ngSubmit)="save()">
-          <div class="process-field-grid">
-            <div class="field">
-              <label for="process-macroprocess">Macroproceso</label>
-              <select id="process-macroprocess" name="macroprocessId" [(ngModel)]="draft.macroprocessId" required>
-                <option [ngValue]="null" disabled>Seleccione un macroproceso</option>
-                @for (macro of macroprocesses; track macro.id) {
-                  @if (macro.isActive) { <option [ngValue]="macro.id">{{ macro.name }}</option> }
+        <form class="process-editor has-sticky-actions" novalidate (ngSubmit)="save()">
+          <p class="visually-hidden" aria-live="polite">{{ lengthAnnouncement }}</p>
+          @for (section of editorSections; track section.title; let first = $first) {
+            <ui-section [heading]="section.title">
+              <div class="process-field-grid">
+                @if (first) {
+                  <div class="field">
+                    <label for="process-macroprocess">Macroproceso</label>
+                    <select id="process-macroprocess" name="macroprocessId" [(ngModel)]="draft.macroprocessId" (ngModelChange)="revalidate()"
+                      aria-required="true" [attr.aria-invalid]="fieldErrors['macroprocessId'] ? 'true' : null"
+                      [attr.aria-describedby]="fieldErrors['macroprocessId'] ? 'process-macroprocess-error' : null">
+                      <option [ngValue]="null" disabled>Seleccione un macroproceso</option>
+                      @for (macro of macroprocesses; track macro.id) {
+                        @if (macro.isActive) { <option [ngValue]="macro.id">{{ macro.name }}</option> }
+                      }
+                    </select>
+                    @if (fieldErrors['macroprocessId']) { <p class="field-error" id="process-macroprocess-error">{{ fieldErrors['macroprocessId'] }}</p> }
+                  </div>
+                  <div class="field">
+                    <label for="process-type">Tipo de proceso</label>
+                    <select id="process-type" name="processTypeId" [(ngModel)]="draft.processTypeId" (ngModelChange)="revalidate()"
+                      aria-required="true" [attr.aria-invalid]="fieldErrors['processTypeId'] ? 'true' : null"
+                      [attr.aria-describedby]="fieldErrors['processTypeId'] ? 'process-type-error' : null">
+                      <option [ngValue]="null" disabled>Seleccione un tipo</option>
+                      @for (type of processTypes; track type.id) {
+                        @if (type.isActive) { <option [ngValue]="type.id">{{ type.name }}</option> }
+                      }
+                    </select>
+                    @if (fieldErrors['processTypeId']) { <p class="field-error" id="process-type-error">{{ fieldErrors['processTypeId'] }}</p> }
+                  </div>
+                  <div class="field">
+                    <label for="process-parent">Proceso padre</label>
+                    <select id="process-parent" name="parentProcessId" [(ngModel)]="draft.parentProcessId">
+                      <option [ngValue]="null">Sin proceso padre</option>
+                      @for (parent of parentProcesses; track parent.id) {
+                        @if (!selected || parent.id !== selected.id) {
+                          <option [ngValue]="parent.id">{{ parent.code }} · {{ parent.name }}</option>
+                        }
+                      }
+                    </select>
+                    @if (parentProcesses.length < parentTotal) {
+                      <button class="text-button" type="button" [disabled]="busy || loadingParents" (click)="loadMoreParents()">
+                        {{ loadingParents ? 'Cargando…' : 'Cargar más procesos disponibles' }}
+                      </button>
+                    }
+                  </div>
                 }
-              </select>
-            </div>
-            <div class="field">
-              <label for="process-type">Tipo de proceso</label>
-              <select id="process-type" name="processTypeId" [(ngModel)]="draft.processTypeId" required>
-                <option [ngValue]="null" disabled>Seleccione un tipo</option>
-                @for (type of processTypes; track type.id) {
-                  @if (type.isActive) { <option [ngValue]="type.id">{{ type.name }}</option> }
-                }
-              </select>
-            </div>
-            <div class="field">
-              <label for="process-parent">Proceso padre</label>
-              <select id="process-parent" name="parentProcessId" [(ngModel)]="draft.parentProcessId">
-                <option [ngValue]="null">Sin proceso padre</option>
-                @for (parent of parentProcesses; track parent.id) {
-                  @if (!selected || parent.id !== selected.id) {
-                    <option [ngValue]="parent.id">{{ parent.code }} · {{ parent.name }}</option>
-                  }
-                }
-              </select>
-              @if (parentProcesses.length < parentTotal) {
-                <button class="text-button" type="button" [disabled]="busy || loadingParents" (click)="loadMoreParents()">
-                  {{ loadingParents ? 'Cargando…' : 'Cargar más procesos disponibles' }}
-                </button>
-              }
-            </div>
-            @for (field of textFields; track field.key) {
-              <div class="field" [class.process-field-wide]="field.multiline">
-                <label [for]="'process-' + field.key">{{ field.label }}</label>
-                @if (field.key === 'involvedParties') {
-                  <small>Indique cargos o unidades, no nombres de personas.</small>
-                }
-                @if (field.multiline) {
-                  <textarea [id]="'process-' + field.key" [name]="field.key" [maxlength]="field.max"
-                    [ngModel]="draft[field.key]" (ngModelChange)="setTextField(field.key, $event)" rows="3"></textarea>
-                } @else {
-                  <input [id]="'process-' + field.key" [name]="field.key" [maxlength]="field.max"
-                    [ngModel]="draft[field.key]" (ngModelChange)="setTextField(field.key, $event)">
+                @for (field of section.fields; track field.key) {
+                  <div class="field" [class.process-field-wide]="field.multiline">
+                    <label [for]="'process-' + field.key">{{ field.label }}</label>
+                    @if (field.key === 'involvedParties') {
+                      <small id="process-involvedParties-hint">Indique cargos o unidades, no nombres de personas.</small>
+                    }
+                    @if (field.multiline) {
+                      <textarea [id]="'process-' + field.key" [name]="field.key" rows="3"
+                        [attr.aria-invalid]="fieldErrors[field.key] ? 'true' : null" [attr.aria-describedby]="describedBy(field)"
+                        [ngModel]="draft[field.key]" (ngModelChange)="setTextField(field, $event)"></textarea>
+                    } @else {
+                      <input [id]="'process-' + field.key" [name]="field.key"
+                        [attr.aria-invalid]="fieldErrors[field.key] ? 'true' : null" [attr.aria-describedby]="describedBy(field)"
+                        [ngModel]="draft[field.key]" (ngModelChange)="setTextField(field, $event)">
+                    }
+                    <ui-char-counter [id]="'process-' + field.key + '-count'" [value]="textValue(field.key)" [max]="field.max" />
+                    @if (fieldErrors[field.key]) {
+                      <p class="field-error" [id]="'process-' + field.key + '-error'">{{ fieldErrors[field.key] }}</p>
+                    }
+                  </div>
                 }
               </div>
-            }
+            </ui-section>
+          }
+          <div class="form-actions-sticky">
+            <p class="helper">
+              @if (mode === 'create') {
+                El proceso se asignará a su usuario y se guardará en estado Borrador.
+              } @else if (selected) {
+                Revisión actual: {{ selected.revision }}. El código, responsable y estado son administrados por el sistema.
+              }
+            </p>
+            <button class="primary-button" type="submit" [disabled]="busy">
+              {{ busy ? 'Guardando…' : 'Guardar borrador' }}
+            </button>
           </div>
-          @if (selected) { <p class="helper">Revisión actual: {{ selected.revision }}. El código, responsable y estado son administrados por el sistema.</p> }
-          @if (mode === 'create') { <p class="helper">El proceso se asignará a su usuario y se guardará en estado Borrador.</p> }
-          <button class="primary-button" type="submit" [disabled]="busy || draft.macroprocessId === null || draft.processTypeId === null">
-            {{ busy ? 'Guardando…' : 'Guardar borrador' }}
-          </button>
         </form>
+      } @else if (busy) {
+        <p class="helper" role="status">Cargando…</p>
       }
     </ui-panel>
   `
 })
 export class ProcessWorkspaceComponent implements OnInit, LeavesWithConfirmation {
-  readonly textFields = TEXT_FIELDS;
+  readonly editorSections = EDITOR_SECTIONS;
   private readonly http = inject(HttpClient);
+  private readonly host = inject<ElementRef<HTMLElement>>(ElementRef);
   private readonly changeDetector = inject(ChangeDetectorRef);
   private readonly route = inject(ActivatedRoute);
   private readonly router = inject(Router);
@@ -319,6 +420,8 @@ export class ProcessWorkspaceComponent implements OnInit, LeavesWithConfirmation
   draft: ProcessDraft = { ...EMPTY_DRAFT };
   mode: WorkspaceMode = 'list';
   editorReady = false;
+  fieldErrors: Record<string, string> = {};
+  lengthAnnouncement = '';
   newOwnerId: number | null = null;
   error = '';
   notice = '';
@@ -327,6 +430,8 @@ export class ProcessWorkspaceComponent implements OnInit, LeavesWithConfirmation
   loadingParents = false;
   private parentPage = 0;
   private savedDraft = '';
+  private submitted = false;
+  private lengthStates: Record<string, UiCharCountState> = {};
   // El estado de la navegación solo está disponible mientras se activa la ruta (constructor).
   private readonly navigationNotice = noticeFrom(this.router.currentNavigation()?.extras.state);
   private destroyed = false;
@@ -356,6 +461,20 @@ export class ProcessWorkspaceComponent implements OnInit, LeavesWithConfirmation
     if (this.mode === 'list') return 'Procesos';
     if (this.mode === 'detail') return this.selected ? `${this.selected.code} · ${this.selected.name || 'Sin nombre'}` : 'Procesos';
     return this.mode === 'create' ? 'Nuevo proceso' : 'Editar proceso';
+  }
+
+  get breadcrumbs(): UiBreadcrumb[] {
+    if (this.mode === 'create') return [{ label: 'Procesos', link: '/procesos' }, { label: 'Nuevo proceso' }];
+    if (!this.selected || (this.mode !== 'detail' && this.mode !== 'edit')) return [];
+    // Ubicación jerárquica en el mapa, no el historial de navegación.
+    const path: UiBreadcrumb[] = [
+      { label: 'Mapa de procesos', link: '/mapa' },
+      { label: this.selected.macroprocessName, link: ['/mapa/macroprocesos', this.selected.macroprocessId] }
+    ];
+    const current = `${this.selected.code} · ${this.selected.name || 'Sin nombre'}`;
+    return this.mode === 'detail'
+      ? [...path, { label: current }]
+      : [...path, { label: current, link: ['/procesos', this.selected.id] }, { label: 'Editar' }];
   }
 
   get cancelLink(): (string | number)[] {
@@ -402,11 +521,44 @@ export class ProcessWorkspaceComponent implements OnInit, LeavesWithConfirmation
     });
   }
 
-  setTextField(key: TextFieldKey, value: string | null): void {
-    this.draft = { ...this.draft, [key]: value };
+  readonly statusTone = processStatusTone;
+
+  showRisks(process: ProcessRecord): boolean {
+    return canReadRisks(this.outletData(), process.ownerUserId);
+  }
+
+  textValue(key: TextFieldKey): string | null {
+    const value = this.draft[key];
+    return typeof value === 'string' ? value : null;
+  }
+
+  setTextField(field: TextField, value: string | null): void {
+    this.draft = { ...this.draft, [field.key]: value };
+    this.announceLength(field);
+    this.revalidate();
+  }
+
+  describedBy(field: TextField): string | null {
+    const ids = [
+      field.key === 'involvedParties' ? 'process-involvedParties-hint' : '',
+      this.lengthStates[field.key] !== 'ok' ? `process-${field.key}-count` : '',
+      this.fieldErrors[field.key] ? `process-${field.key}-error` : ''
+    ].filter(Boolean);
+    return ids.length ? ids.join(' ') : null;
+  }
+
+  revalidate(): void {
+    if (this.submitted) this.validateDraft();
   }
 
   async save(): Promise<void> {
+    this.submitted = true;
+    if (!this.validateDraft()) {
+      this.clearMessages();
+      this.changeDetector.detectChanges();
+      this.host.nativeElement.querySelector<HTMLElement>('[aria-invalid="true"]')?.focus();
+      return;
+    }
     await this.run(async () => {
       if (this.draft.macroprocessId === null || this.draft.processTypeId === null) return;
       const fields = Object.fromEntries(TEXT_FIELDS.map((field) => [field.key, this.draft[field.key] || null]));
@@ -507,7 +659,41 @@ export class ProcessWorkspaceComponent implements OnInit, LeavesWithConfirmation
   private startDraft(draft: ProcessDraft): void {
     this.draft = draft;
     this.savedDraft = JSON.stringify(draft);
+    this.fieldErrors = {};
+    this.submitted = false;
+    this.lengthAnnouncement = '';
+    this.lengthStates = Object.fromEntries(TEXT_FIELDS.map((field) => [
+      field.key,
+      charCountState(countCharacters(this.textValue(field.key)), field.max)
+    ]));
     this.editorReady = true;
+  }
+
+  /** Validación de usabilidad con los mismos límites del servidor, que sigue validando todo. */
+  private validateDraft(): boolean {
+    const errors: Record<string, string> = {};
+    if (this.draft.macroprocessId === null) errors['macroprocessId'] = 'Seleccione un macroproceso.';
+    if (this.draft.processTypeId === null) errors['processTypeId'] = 'Seleccione un tipo de proceso.';
+    for (const field of TEXT_FIELDS) {
+      if (countCharacters(this.textValue(field.key)) > field.max) {
+        errors[field.key] = `Use como máximo ${formatCount(field.max)} caracteres.`;
+      }
+    }
+    this.fieldErrors = errors;
+    return Object.keys(errors).length === 0;
+  }
+
+  /** Anuncia solo los cambios de umbral, no cada pulsación. */
+  private announceLength(field: TextField): void {
+    const length = countCharacters(this.textValue(field.key));
+    const state = charCountState(length, field.max);
+    if (state === this.lengthStates[field.key]) return;
+    this.lengthStates[field.key] = state;
+    this.lengthAnnouncement = state === 'over'
+      ? `${field.label}: supera el máximo de ${formatCount(field.max)} caracteres.`
+      : state === 'near'
+        ? `${field.label}: quedan ${formatCount(field.max - length)} caracteres.`
+        : '';
   }
 
   private async prepareEditor(): Promise<void> {
@@ -589,6 +775,10 @@ export class ProcessWorkspaceComponent implements OnInit, LeavesWithConfirmation
     this.error = '';
     this.notice = '';
   }
+}
+
+function formatCount(value: number): string {
+  return value.toLocaleString('es-CL');
 }
 
 function noticeFrom(state: Record<string, unknown> | undefined): string {

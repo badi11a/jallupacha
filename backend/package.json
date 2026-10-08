@@ -9,11 +9,13 @@
   "scripts": {
     "build": "tsc -p tsconfig.build.json",
     "start": "node dist/main.js",
-    "start:dev": "tsx watch --clear-screen=false src/main.ts",
+    "start:dev": "npm run build && concurrently --kill-others \"tsc -p tsconfig.build.json --watch --preserveWatchOutput\" \"node --watch dist/main.js\"",
     "test": "jest --runInBand",
     "test:e2e": "jest --config ./test/jest-e2e.json --runInBand",
     "db:migrate": "ts-node src/database/migrate.ts",
+    "db:grant": "ts-node src/database/grants.ts",
     "db:seed": "ts-node src/database/seed.ts",
+    "db:reset:local": "ts-node src/database/reset-local.ts",
     "docs:openapi": "ts-node src/openapi.ts"
   },
   "dependencies": {

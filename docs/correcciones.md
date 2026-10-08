@@ -99,3 +99,149 @@ Hallazgo confirmado en la interfaz actual: el diálogo «Editar macroproceso» s
 Alcance de esta anotación: registro del defecto para seguimiento SDD; no se corrigió interfaz, API, persistencia ni exportación. La prueba de regresión y la confirmación de la escritura/auditoría Oracle quedan pendientes para la corrección correspondiente.
 
 Verificación manual correcta: listado y proceso PR5 visibles”. La causa original queda como no reproducida y la revisión de código sigue pendiente.
+
+## C-005 — Restablecimiento local sin grants de ejecución: ORA-00942 sobre APP_SESSION (PT-05, PT-14)
+
+Clasificación: defecto de implementación del comando `db:reset:local`; la especificación (grants mínimos, PT-14) no cambia. Comportamiento esperado: tras recrear el esquema desde migraciones, la cuenta de ejecución `JALLUPACHA_APP` accede exactamente a las tablas que necesita la API, sin privilegios adicionales ni acceso a `migrations`.
+
+Diagnóstico con las conexiones reales (propietario `JALLUPACHA_OWNER` y ejecución `JALLUPACHA_APP`): ambas conectan a la misma PDB `FREEPDB1` (servicio `freepdb1`), por lo que no era otra PDB. `APP_SESSION`, `SECURITY_EVENT` y las demás tablas base existían en el propietario: la tabla no estaba ausente. La vista `ALL_TABLES` de la cuenta de ejecución solo mostraba `AUDIT`, `PROCESS`, `PROCESS_RISK`, `PROCESS_VERSION`, `RISK_LEVEL` y `RISK_TYPE`: los grants se perdieron. Causa: el reset elimina las tablas (Oracle elimina sus grants) y las migraciones solo otorgan sobre `AUDIT`, `PROCESS*` y las tablas de riesgo; los grants de las tablas base viven en `backend/database/grant-runtime.sql`, que era un paso manual no invocado. Mi verificación anterior solo contó procesos y riesgos con la cuenta del propietario y no ejercitó la cuenta de ejecución ni las tablas de sesión.
+
+Corrección: nuevo `backend/src/database/grants.ts` y script `db:grant` (propietario, idempotente); lee las líneas `GRANT` de `grant-runtime.sql` como única fuente, solo privilegios de tabla sobre objetos del propietario, y exige `DATABASE_USER` distinto del esquema. `db:reset:local` lo invoca tras las migraciones. No se purgó de nuevo, no se tocaron los 12 procesos/riesgos, no se editaron migraciones ni el historial `migrations`.
+
+Evidencia ejecutada (esquema local, cuenta de ejecución): `npm run db:grant --workspace backend` aplicó 13 grants; la cuenta de ejecución quedó con acceso a las 17 tablas de aplicación (consulta `SELECT … WHERE 1=0` correcta en cada una; `migrations` sigue inaccesible, como corresponde). Con el backend compilado en el puerto 3101: `GET /api/auth/me` sin sesión → 401; inicio de sesión local (identidad 3) → 201; `GET /api/auth/me` → 200; `GET /api/process-map` → 200 con 3 macroprocesos y 12 procesos; ficha → 200; `GET /api/processes/:id/risks?page=1&limit=100` → 200 (1 riesgo); `GET /api/risk-types` y `/api/risk-levels` → 200; cierre de sesión sin CSRF → 403, con CSRF → 204 y la cookie previa deja de autenticar (401). Pruebas: `grants.spec.ts` (2 pruebas) y `release01-map-risks.oracle.e2e-spec.ts` (1 prueba) aprobadas; `npm run build --workspace backend` sin errores.
+
+Pendiente: no se repitió un reset completo con el comando corregido (la purga ya se había usado y no se autorizó otra); la secuencia reset → migraciones → grants queda verificada por partes, no de extremo a extremo. PT-05 sigue verificado solo en el esquema local y PT-14 requiere revisión de configuración antes de producción. La interfaz Angular no se verificó en este cambio.
+
+
+## C-006 — «Riesgos del proceso» muestra «alguna referencia ya no está disponible» (REQ-10/11)
+
+Clasificación: defecto de implementación del entorno de desarrollo; la especificación no cambia. Comportamiento esperado: ficha → listado de riesgos devuelve 200 con `GET /api/processes/:id/risks?page=1&limit=100` para los perfiles autorizados, y el servidor valida todo dato de entrada (PT-08).
+
+Petición que falla y causa: la vista traduce cualquier 400 de su carga a ese mensaje (`messageFor` en `process-risks.component.ts`), de modo que el texto no describe la causa real. El 400 provenía de `GET /api/processes/:id/risks?page=1&limit=100` con cuerpo `Invalid pagination values`, lanzado por `RiskService.validatePagination`. Reproducción con las cuatro identidades locales sobre los 13 procesos: la instancia del puerto 3000 (arrancada con `tsx watch`, script `start:dev`) devolvió 400 en todos los procesos para Administrador, Responsable, Gestor de riesgos y Responsable/Gestor; el backend compilado con `tsc` devolvió 200 (o 403 esperado). `tsx` (esbuild) no emite `emitDecoratorMetadata`, por lo que el `ValidationPipe` global no conoce el tipo del `@Query()` y ni valida ni convierte: `page` y `limit` llegan como texto y fallan `Number.isSafeInteger`. Prueba de alcance: un inicio de sesión con un campo extra respondió 201 en el servidor `tsx` y 400 (`forbidNonWhitelisted`) en el compilado; es decir, en ese modo de desarrollo los DTO quedaban sin validar. No era un problema de datos.
+
+Referencias de la semilla (consulta de solo lectura en Oracle con el propietario): 13 riesgos; 0 sin proceso, 0 sin tipo, 0 sin nivel; 0 asociados a tipos inactivos; 4 claves foráneas en `PROCESS_RISK`; tipos Operacional, Estratégico, Cumplimiento, Tecnológico y Financiero y niveles Bajo, Medio, Alto y Crítico, todos activos; ningún proceso sin riesgo. No se purgó ni se modificó ningún dato, y la semilla no requirió cambios.
+
+Corrección: `backend/package.json` → `start:dev` compila con `tsc --watch` y ejecuta `node --watch dist/main.js`, igual que el modo compilado, restituyendo la validación de DTO sin tocar límites, permisos ni controles. Regresión: `backend/src/dev-runner.spec.ts` (el script de desarrollo usa `tsc` y no `tsx`).
+
+Evidencia ejecutada: con el nuevo `npm run start:dev --workspace backend` en el puerto 3102, ficha → `GET …/risks?page=1&limit=100` dio 200 para Administrador, Gestor de riesgos y Responsable/Gestor en los 13 procesos; 403 para Responsable en procesos ajenos y para Consulta (sin 400); `risk-types`/`risk-levels` 200 salvo 403 para Consulta; `page=abc` → 400 y el campo extra en el inicio de sesión → 400. `dev-runner.spec.ts`: 1 prueba correcta. No se ejecutaron pruebas de interfaz ni de otras áreas.
+
+Pendiente: la instancia del puerto 3000 sigue ejecutando `tsx` hasta que se reinicie con `npm run start:dev` (no se detuvo porque no se inició en esta tarea); el mensaje genérico de la vista para cualquier 400 es una mejora de interfaz distinta, no modificada. Sin commit ni push.
+
+## C-008 — Paneles de catálogos mostrados en todas las rutas (diseño de navegación)
+
+Clasificación: defecto de especificación/diseño. Fuente: sección «Interfaz: navegación por rutas» de `docs/arquitectura.md`, que establecía mantener catálogos y administración en la misma página; REQ-02/REQ-03/REQ-04 no cambian. Se corrige primero el documento; la implementación queda pendiente y no se ha modificado código.
+
+Hallazgo (inspección de `app.component.ts`): los paneles «Estructura / Macroprocesos» y «Clasificación / Tipos de proceso» se renderizan bajo el `router-outlet` en toda ruta autenticada, de modo que aparecen en el mapa, el listado, la ficha y los riesgos, ajenos a esas pantallas. Hoy cualquier perfil lee los catálogos y solo Administrador los modifica (`RequireProfiles` en `catalog.controller.ts`).
+
+Comportamiento esperado: la estructura común contiene marca, cuenta, navegación y el aviso único; «Estructura» y «Clasificación» pertenecen a una pantalla propia (`/administracion/catalogos`) con las mismas funciones y permisos; mapa, listado, ficha y riesgos no los muestran. Documentos actualizados: `docs/arquitectura.md` (tabla y reglas de rutas, verificación) y `AGENTS.md` (revisar contenido común y por ruta al modificar navegación). Los paneles «Perfiles de usuario» y «Auditoría reciente» tienen el mismo problema de ubicación. **Decisión del responsable del producto (2026-10-08):** separar Catálogos, Perfiles y Auditoría en pantallas propias: `/administracion/catalogos`, `/administracion/perfiles` y `/administracion/auditoria`, conservando funciones, API y permisos. La navegación ofrece «Catálogos» a todo perfil, y «Perfiles» y «Auditoría» solo a Administrador; una dirección de administración sin ese perfil muestra el mensaje de autorización existente sin llamar a la API.
+
+**R10, incorporado a C-008** (hallazgo de la revisión PT-03; defecto de implementación): la marca de la barra superior usa `href="/"` y recarga la aplicación completa, perdiendo el estado y omitiendo la protección de cambios sin guardar de la aplicación. Comportamiento esperado: navegar con el router a `/mapa` sin recargar, sujeto a las guardas de ruta.
+
+Verificaciones definidas para la implementación (no ejecutadas):
+
+| # | Comprobación |
+| --- | --- |
+| V1 | Las rutas de procesos (mapa, macroproceso, listado, ficha, riesgos) no contienen `Estructura`, `Clasificación`, `Perfiles de usuario` ni `Auditoría reciente`, y sí marca, cuenta, navegación y un solo aviso de entorno. |
+| V2 | `/administracion/catalogos`, `/administracion/perfiles` y `/administracion/auditoria` muestran solo sus paneles, una vez, con título y foco conforme a C-007; la recarga y el enlace directo funcionan. |
+| V3 | Administrador conserva alta, edición y desactivación de macroprocesos y tipos (con validación y auditoría), la asignación de perfiles (sin modificar el propio) y la consulta de auditoría con «Actualizar»; Consulta, Gestor de riesgos y Dueño leen catálogos sin ver acciones. |
+| V4 | Sin perfil Administrador, la navegación no ofrece «Perfiles» ni «Auditoría» y sus direcciones muestran el mensaje de autorización sin llamar a la API; llamadas directas a las rutas de escritura y de administración sin ese perfil devuelven 403; sin sesión, 401 (PT-07). |
+| V5 | La marca navega a `/mapa` mediante el router: sin recarga y con la protección de cambios sin guardar (R10). |
+| V6 | Sin cambios en API, datos, permisos ni alcance; build y pruebas afectadas del frontend pasan. |
+
+Implementación y evidencia: ver «Implementación y evidencia de C-008», al final de este archivo.
+
+## C-007 — Foco y navegación en la interfaz: enlace de salto, cierre de diálogos y cambios de ruta (Release 01, PT-03)
+
+Clasificación: defectos de implementación del frontend detectados en la revisión PT-03 de interfaz del Release 01 (hallazgos R1–R3 en `docs/release01_navegable.md`). No cambian requisitos, API, permisos ni datos. Fuentes: decisiones de diseño técnico «Interfaz: kit de componentes compartidos» y «Interfaz: navegación por rutas» de `docs/arquitectura.md` (WCAG 2.2 AA como referencia de accesibilidad; REQ-32 sigue pendiente de verificación formal).
+
+| # | Defecto | Comportamiento esperado | Verificación |
+| --- | --- | --- | --- |
+| R1 | «Ir al contenido principal» usa `href="#main-content"`; con `<base href="/">` se resuelve como `/#main-content`, recarga la aplicación y lleva a `/mapa`. | Activarlo con teclado o mouse mueve el foco a `#main-content` sin recargar ni cambiar la ruta, la dirección ni los cambios pendientes. | Prueba de `ui-app-shell` y comprobación con teclado en una ruta profunda. |
+| R2 | Al cerrar un diálogo, el foco cae en `body`: el servicio lo devolvía mientras el `<dialog>` modal seguía en el documento. | Tras cerrar (Escape, Cancelar o confirmar sin navegar), el foco vuelve al control que abrió el diálogo, si sigue en el documento. | Prueba del servicio de diálogos y comprobación con teclado en confirmación y formulario. |
+| R3 | Al cambiar de ruta o de sesión, el foco queda en `body`, no se anuncia la pantalla, el título del documento no cambia y se conserva el desplazamiento anterior. | Cada pantalla tiene título propio. Al cambiar de ruta (no solo de parámetros), el foco va al encabezado del contenido; una navegación nueva empieza arriba y Atrás/Adelante restaura la posición guardada de esa entrada. La carga inicial no mueve el foco. Al iniciar o cerrar sesión, el foco va al encabezado visible. | Pruebas de títulos, foco y desplazamiento por tipo de navegación; comprobación con teclado y Atrás/Adelante. |
+
+Corrección y evidencia: ver «Implementación y evidencia de C-007», a continuación.
+
+### Implementación y evidencia de C-007
+
+Corrección (solo frontend; sin cambios de backend, datos, API ni permisos):
+
+- **R1:** `ui-app-shell` intercepta el clic (o Enter) en «Ir al contenido principal», enfoca `#main-content` sin navegar y lo desplaza a la vista. El `href` se conserva como semántica del enlace.
+- **R2:**
+  - `ui-dialog-host` cierra el `<dialog>` nativo (`close()`), terminando el estado modal, antes de entregar el resultado;
+  - `UiDialogService.settle` devuelve entonces el foco al control que abrió el diálogo, si sigue en el documento;
+  - se descartó devolverlo tras el render, porque dependía del orden de los ciclos de render.
+- **R3:** nuevo `provideUiNavigation({ appName })` en el kit (`shared/ui/navigation.ts`), registrado en `main.ts`:
+  - `UiTitleStrategy`: título «<pantalla> · Sistema de Procesos Institucionales» según el `title` de cada ruta en `app.routes.ts`;
+  - `UiNavigationFocus`: al cambiar de ruta (no solo de parámetros), foco al encabezado del contenido enrutado (`tabindex="-1"`, sin desplazar). Una navegación nueva empieza arriba y Atrás/Adelante restaura la posición guardada de la entrada (con reintentos mientras la pantalla carga). La carga inicial y los cambios de agrupación o página no mueven foco ni desplazamiento. `history.scrollRestoration` pasa a `manual`, porque la restauración nativa competía con la del servicio;
+  - `AppComponent`: título «Acceso · …» sin sesión, título de la pantalla al iniciar sesión y foco en el encabezado visible al iniciar y al cerrar sesión.
+- Los encabezados enfocados por la navegación no muestran contorno (no son controles operables). El contorno de los controles no cambia.
+
+Regresiones agregadas:
+
+- `shared/ui/ui.spec.ts`:
+  - el enlace de salto no cambia la dirección y enfoca `#main-content`;
+  - el foco vuelve al control que abrió el diálogo cuando este ya no está abierto (falla con la implementación anterior).
+- `shared/ui/navigation.spec.ts` (nuevo, con historial simulado y `canceledNavigationResolution: 'computed'`):
+  - títulos;
+  - sin cambios en la carga inicial;
+  - foco en el encabezado enrutado y no en el saludo común, más subida al inicio;
+  - sin cambios ante parámetros;
+  - restauración con Atrás y Adelante en dos ciclos.
+
+Evidencia ejecutada (2026-10-08):
+
+- `npx ng test --watch=false` limitado a las regresiones afectadas (`ui.spec.ts`, `navigation.spec.ts`, `app.component.spec.ts`, `process-workspace.component.spec.ts`, `process-risks.component.spec.ts`): 5 archivos y 42 pruebas aprobadas. Tras el último ajuste de `navigation.ts`: `ui.spec.ts` y `navigation.spec.ts`, 2 archivos y 16 pruebas aprobadas.
+- `npm run build --workspace frontend`: correcto. `git diff --check`: correcto.
+- Comprobación manual en el entorno local, navegador integrado a 360 × 800 px, teclado real, cuentas Gestor de riesgos y Administrador:
+  - **R1:** desde `/mapa/macroprocesos/1`, Shift+Tab hasta el enlace y Enter. La página no se recargó (marcador en `window` intacto), la dirección no cambió y el foco quedó en `#main-content`; el siguiente Tab entró al contenido.
+  - **R2:** en riesgos, con texto sin registrar, Enter en «Volver a la ficha» abrió el diálogo con foco en «Seguir editando». Escape lo cerró, el foco volvió a «Volver a la ficha» con contorno visible y el texto se conservó. Con Administrador, Escape en «Editar macroproceso» y en la confirmación de «Desactivar» devolvió el foco a «Editar» y a «Desactivar»; no se guardó ni desactivó nada.
+  - **R3:**
+    - Ingreso con teclado en una dirección profunda: título de la pantalla y foco en su encabezado.
+    - Cierre de sesión: título «Acceso · …» y foco en «Administración de procesos».
+    - Desde el último proceso de la lista (desplazamiento 758) a su ficha: título «Ficha del proceso · …», desplazamiento 0 y foco en el encabezado.
+    - `history.back()`: desplazamiento 758 restaurado y foco en «Estratégicos».
+    - Desplazar a 300 y `history.forward()`: ficha en 150, la posición guardada al salir.
+    - `history.back()`: 300.
+    - «Salir sin guardar» con teclado: ficha arriba, con el foco en su encabezado.
+  - Atrás/Adelante se dispararon con `history.back()`/`history.forward()`, que generan el mismo `popstate`: los atajos Alt+Izquierda/Derecha no llegan al panel integrado.
+
+Limitaciones: sin lector de pantalla (no se verificó el anuncio del encabezado enfocado); un solo navegador. Algunas capturas de la comprobación fallaron por el panel del navegador; la evidencia es del DOM y del teclado real. La marca de la barra superior (`href="/"`) sigue navegando con recarga completa: es un hallazgo distinto de R1–R3 y no se modificó. Sin commit ni push.
+
+### Implementación y evidencia de C-008
+
+Corrección (solo frontend; sin cambios de backend, datos, API ni permisos):
+
+- **Estructura común** (`app.component.ts`): acceso, cuenta y cierre de sesión, aviso único, saludo y navegación principal. Ya no contiene catálogos, perfiles ni auditoría, ni carga sus datos al iniciar sesión. La navegación ofrece «Mapa de procesos», «Procesos» y «Catálogos» a todo perfil, y «Perfiles» y «Auditoría» solo con perfil Administrador.
+- **Pantallas propias** en `frontend/src/app/administration/` con las funciones, textos, llamadas de API y mensajes previos:
+  - `catalogs.component.ts` en `/administracion/catalogos`: «Estructura»/«Macroprocesos» y «Clasificación»/«Tipos de proceso», con alta, edición por diálogo y desactivación con confirmación solo para Administrador; lectura para los demás perfiles.
+  - `profiles.component.ts` en `/administracion/perfiles`: asignación por casillas; el propio perfil queda deshabilitado; tras cada cambio se relee la sesión mediante `refreshSession`, como antes.
+  - `audit.component.ts` en `/administracion/auditoria`: `GET /api/audit?page=1&limit=50` con «Actualizar».
+
+  Sin perfil Administrador, Perfiles y Auditoría muestran «La acción no está autorizada para este perfil.» sin llamar a la API; un 403 del servidor se presenta igual.
+- **Rutas** con título (`app.routes.ts`): «Catálogos», «Perfiles de usuario» y «Auditoría»; foco y desplazamiento según C-007.
+- **R10:** `ui-app-shell` navega desde la marca con `routerLink` a la ruta de inicio (`/mapa`), sin recarga y sujeto a las guardas de cambios sin guardar.
+- `access.ts` concentra `isAdmin`, los mensajes de administración y `refreshSession` en los datos de sesión del `router-outlet`. Las etiquetas de perfiles pasan a `administration/profiles.ts`.
+
+Pruebas:
+
+- `app.component.spec.ts`, reorganizado:
+  - acceso;
+  - V1: mapa, macroproceso, listado, ficha y riesgos sin «Estructura», «Clasificación», «Perfiles de usuario» ni «Auditoría reciente», con marca, cuenta, navegación y un aviso;
+  - V4: navegación por perfil;
+  - R10/V5: la marca apunta a `/mapa`, evita la recarga y el router llega a `/mapa`;
+  - cierre de sesión con y sin cambios pendientes.
+
+  Las pruebas de V1 y R10 fallarían con la implementación anterior.
+- `administration/administration.spec.ts` (nuevo):
+  - V2: cada pantalla muestra solo sus paneles;
+  - V3: alta, edición validada y desactivación con cancelación; lectura sin acciones para Consulta; asignación de perfiles con el cuerpo exacto del `PUT` y relectura de sesión; auditoría con «Actualizar»;
+  - V4: sin perfil Administrador no se solicitan perfiles ni auditoría, y un 403 del servidor se muestra.
+
+Evidencia ejecutada (2026-10-08):
+
+- `npm run build --workspace frontend`: correcto.
+- `npx ng test --watch=false` limitado a las pruebas afectadas (`app.component.spec.ts`, `administration/administration.spec.ts`, `shared/ui/ui.spec.ts`): 3 archivos y 25 pruebas aprobadas.
+- `git diff --check`: correcto.
+
+No ejecutado: la comprobación con llamadas directas a la API sin perfil Administrador (V4, parte de servidor) no se repitió porque el backend no cambió; sigue cubierta por las pruebas del backend existentes. No se hizo revisión visual ni con teclado en navegador en este cambio. Las pruebas de mapa, procesos, riesgos y navegación no se ejecutaron porque esos componentes no cambiaron; solo se agregaron rutas a `app.routes.ts`. Sin commit ni push.

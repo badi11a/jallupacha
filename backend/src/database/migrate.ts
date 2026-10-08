@@ -4,7 +4,12 @@ import { AppDataSource } from './data-source';
 async function migrate(): Promise<void> {
   try {
     await AppDataSource.initialize();
-    await AppDataSource.runMigrations({ transaction: 'all' });
+    const migrations = await AppDataSource.runMigrations({ transaction: 'all' });
+    if (migrations.length === 0) {
+      console.info('No pending migrations.');
+    } else {
+      console.info(`Applied migrations: ${migrations.map((migration) => migration.name).join(', ')}`);
+    }
   } finally {
     if (AppDataSource.isInitialized) await AppDataSource.destroy();
   }

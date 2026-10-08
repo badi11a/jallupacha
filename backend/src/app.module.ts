@@ -12,7 +12,12 @@ import { UsersController } from './identity/users.controller';
 import { CatalogController } from './structure/catalog.controller';
 import { CatalogService } from './structure/catalog.service';
 import { ProcessController } from './process/process.controller';
+import { ProcessMapController } from './process/process-map.controller';
+import { ProcessMapService } from './process/process-map.service';
 import { ProcessService } from './process/process.service';
+import { RiskCatalogController } from './risk/risk-catalog.controller';
+import { RiskController } from './risk/risk.controller';
+import { RiskService } from './risk/risk.service';
 
 const options = databaseOptions();
 const rateLimit = configuredRateLimit();
@@ -26,7 +31,16 @@ const dataSource = new DataSource(options);
       limit: rateLimit.limit
     }])
   ],
-  controllers: [AuthController, UsersController, CatalogController, AuditController, ProcessController],
+  controllers: [
+    AuthController,
+    UsersController,
+    CatalogController,
+    AuditController,
+    ProcessController,
+    ProcessMapController,
+    RiskController,
+    RiskCatalogController
+  ],
   providers: [
     { provide: DataSource, useValue: dataSource },
     {
@@ -41,6 +55,8 @@ const dataSource = new DataSource(options);
     SessionService,
     CatalogService,
     ProcessService,
+    ProcessMapService,
+    RiskService,
     AuthGuard,
     { provide: APP_GUARD, useClass: ThrottlerGuard },
     { provide: APP_GUARD, useExisting: AuthGuard }

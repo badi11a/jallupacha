@@ -162,6 +162,126 @@ describe('ProcessWorkspaceComponent', () => {
     expect(control('Volver al listado')?.getAttribute('href')).toBe('/procesos');
   });
 
+  it('groups every REQ-06 field of the ficha in sections, empty values included', async () => {
+    await start('/procesos/8', { userId: 9, profiles: ['CONSULTATION'] });
+    await flushDetail();
+
+    const sections = [...fixture.nativeElement.querySelectorAll('ui-section h3')].map((h: HTMLElement) => h.textContent);
+    expect(sections).toEqual(['Identificación', 'Propósito', 'Organización', 'Entradas y salidas', 'Operación', 'Desarrollo y diseño']);
+    const labels = [...fixture.nativeElement.querySelectorAll('.process-details dt')].map((dt: HTMLElement) => dt.textContent?.trim());
+    expect(labels.sort()).toEqual([
+      'Código', 'Nombre', 'Alias', 'Descripción', 'Objetivo', 'Alcance', 'Macroproceso', 'Tipo de proceso',
+      'Proceso padre', 'Tipo de subproceso', 'Unidades internas', 'Área de negocio', 'Responsable', 'Involucrados',
+      'Entradas', 'Salidas', 'Proveedores', 'Clientes', 'Criticidad', 'Grado de automatización', 'Periodicidad',
+      'Cuándo inicia', 'Cuándo termina', 'Plan de desarrollo', 'Operación del proceso', 'Diseño del proceso',
+      'Validación del proceso', 'Estado', 'Modelo del proceso (BPMN)'
+    ].sort());
+    expect(fixture.nativeElement.querySelectorAll('.process-details dd')).toHaveLength(29);
+    expect(text()).toContain('ObjetivoSin información');
+
+    const crumbs = fixture.nativeElement.querySelector('ui-breadcrumbs nav') as HTMLElement;
+    expect(crumbs.getAttribute('aria-label')).toBe('Ubicación en procesos');
+    const links = [...crumbs.querySelectorAll('a')].map((a) => [a.textContent, a.getAttribute('href')]);
+    expect(links).toEqual([['Mapa de procesos', '/mapa'], ['Estratégicos', '/mapa/macroprocesos/1']]);
+    expect(crumbs.querySelector('[aria-current="page"]')?.textContent).toBe('PR8 · Proceso institucional');
+    expect(control('Riesgos del proceso')).toBeUndefined();
+    expect(fixture.nativeElement.querySelector('.process-details ui-badge')?.textContent).toBe('Borrador');
+  });
+
+  it('shows loading, empty and status states in the list', async () => {
+    await start('/procesos', { userId: 7, profiles: ['PROCESS_OWNER'] });
+    expect(text()).toContain('Cargando procesos…');
+    expect(text()).not.toContain('No hay procesos.');
+    http.expectOne('/api/processes?page=1&limit=20').flush(emptyPage);
+    await settle();
+    expect(text()).toContain('No hay procesos.');
+    expect(text()).toContain('Use «Nuevo proceso» para registrar el primero.');
+
+    await router.navigateByUrl('/procesos?pagina=2');
+    await settle();
+    http.expectOne('/api/processes?page=2&limit=20').flush({ ...emptyPage, items: [summary], total: 21, page: 2 });
+    await settle();
+    const badge = fixture.nativeElement.querySelector('tbody ui-badge') as HTMLElement;
+    expect(badge.textContent).toBe('Borrador');
+    expect(badge.classList).toContain('badge-info');
+    expect(fixture.nativeElement.querySelector('td[data-label="Estado"]')).not.toBeNull();
+  });
+
+  it('shows editor errors next to the fields instead of sending an invalid draft', async () => {
+    await start('/procesos/nuevo', { userId: 7, profiles: ['PROCESS_OWNER'] });
+    http.expectOne('/api/macroprocesses').flush(macroprocesses);
+    http.expectOne('/api/process-types').flush(processTypes);
+    http.expectOne('/api/processes?page=1&limit=100').flush(emptyPage);
+    await settle();
+    expect(fixture.nativeElement.querySelector('ui-breadcrumbs [aria-current="page"]')?.textContent).toBe('Nuevo proceso');
+    expect(fixture.nativeElement.querySelectorAll('.process-editor ui-section')).toHaveLength(6);
+    for (const key of ['name', 'alias', 'description', 'objective', 'scope', 'inputs', 'outputs', 'suppliers', 'clients',
+      'involvedParties', 'startsWhen', 'endsWhen', 'developmentPlan', 'operation', 'design', 'validation', 'businessArea',
+      'subprocessType', 'criticality', 'automationLevel', 'periodicity']) {
+      expect(fixture.nativeElement.querySelector(`#process-${key}`)).not.toBeNull();
+    }
+    expect((fixture.nativeElement.querySelector('#process-name') as HTMLInputElement).hasAttribute('maxlength')).toBe(false);
+
+    const name = fixture.nativeElement.querySelector('#process-name') as HTMLInputElement;
+    name.value = 'x'.repeat(251);
+    name.dispatchEvent(new Event('input'));
+    fixture.detectChanges();
+    (fixture.nativeElement.querySelector('.process-editor') as HTMLFormElement)
+      .dispatchEvent(new Event('submit', { bubbles: true, cancelable: true }));
+    await settle();
+    http.expectNone('/api/processes');
+
+    const macro = fixture.nativeElement.querySelector('#process-macroprocess') as HTMLSelectElement;
+    expect(macro.getAttribute('aria-invalid')).toBe('true');
+    expect(document.activeElement).toBe(macro);
+    expect(text()).toContain('Seleccione un macroproceso.');
+    expect(text()).toContain('Seleccione un tipo de proceso.');
+    expect(name.getAttribute('aria-invalid')).toBe('true');
+    expect(name.getAttribute('aria-describedby')).toBe('process-name-count process-name-error');
+    expect(text()).toContain('Use como máximo 250 caracteres.');
+
+    name.value = 'Nombre válido';
+    name.dispatchEvent(new Event('input'));
+    fixture.detectChanges();
+    expect(name.hasAttribute('aria-invalid')).toBe(false);
+    expect(text()).not.toContain('Use como máximo 250 caracteres.');
+  });
+
+  it('shows the character counter only near the limit and announces threshold changes once', async () => {
+    await start('/procesos/nuevo', { userId: 7, profiles: ['PROCESS_OWNER'] });
+    http.expectOne('/api/macroprocesses').flush(macroprocesses);
+    http.expectOne('/api/process-types').flush(processTypes);
+    http.expectOne('/api/processes?page=1&limit=100').flush(emptyPage);
+    await settle();
+
+    const alias = fixture.nativeElement.querySelector('#process-alias') as HTMLInputElement;
+    const counter = fixture.nativeElement.querySelector('#process-alias-count') as HTMLElement;
+    const live = fixture.nativeElement.querySelector('[aria-live="polite"]') as HTMLElement;
+    const type = async (value: string) => {
+      alias.value = value;
+      alias.dispatchEvent(new Event('input'));
+      fixture.detectChanges();
+    };
+
+    await type('Alias breve');
+    expect(counter.hidden).toBe(true);
+    expect(alias.hasAttribute('aria-describedby')).toBe(false);
+    expect(live.textContent?.trim()).toBe('');
+
+    await type('a'.repeat(230));
+    expect(counter.hidden).toBe(false);
+    expect(counter.textContent?.trim()).toBe('230 / 250');
+    expect(alias.getAttribute('aria-describedby')).toBe('process-alias-count');
+    expect(live.textContent?.trim()).toBe('Alias: quedan 20 caracteres.');
+
+    await type('a'.repeat(231));
+    expect(live.textContent?.trim()).toBe('Alias: quedan 20 caracteres.');
+
+    await type('a'.repeat(251));
+    expect(counter.classList).toContain('char-counter-over');
+    expect(live.textContent?.trim()).toBe('Alias: supera el máximo de 250 caracteres.');
+  });
+
   it('keeps the list page in the address', async () => {
     await start('/procesos?pagina=2', { userId: 9, profiles: ['CONSULTATION'] });
     http.expectOne('/api/processes?page=2&limit=20').flush({ ...emptyPage, items: [summary], total: 25, page: 2 });
