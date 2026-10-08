@@ -1,10 +1,10 @@
 # Arquitectura mínima y decisiones
 
-Revisión 2: Oracle 26ai Free local, sin Docker. Incorpora precisiones de seguridad, permisos e instalación reproducible. Sustituye las versiones anteriores.
+Revisión C-001 v4: Oracle 26ai Free local, sin Docker. Distingue producto, entorno y datos de prueba; sustituye las versiones anteriores.
 
 ## Restricciones confirmadas
 
-TypeScript y Angular; backend NestJS; destino on-premise. Prototipo local con datos ficticios. Oracle AI Database 26ai Free instalado directamente en el computador local, sin Docker. Desarrollo directamente sobre Oracle; despliegue posterior en Oracle institucional. Google Workspace no disponible todavía.
+TypeScript y Angular; backend NestJS; destino on-premise. Desarrollo local con datos de prueba. Oracle AI Database 26ai Free instalado directamente en el computador local, sin Docker. Desarrollo directamente sobre Oracle; despliegue posterior en Oracle institucional. Google Workspace no disponible todavía.
 
 ## Componentes
 
@@ -13,12 +13,12 @@ TypeScript y Angular; backend NestJS; destino on-premise. Prototipo local con da
 - Oracle 26ai Free: persistencia, restricciones y transacciones mediante TypeORM.
 - Sesiones: persistidas en Oracle 26ai Free para invalidación y expiración; cookie HttpOnly, SameSite y Secure bajo HTTPS. Proxy HTTPS del despliegue definitivo por concretar.
 
-Angular nunca accede directamente a la base. API y frontend usan el mismo origen mediante proxy de desarrollo. El modo simulado solo escucha en localhost. La base local se utiliza únicamente para desarrollo con datos ficticios y su acceso se restringe al equipo de desarrollo.
+Angular nunca accede directamente a la base. API y frontend usan el mismo origen mediante proxy de desarrollo. El acceso local de desarrollo solo escucha en localhost. La base local se utiliza únicamente para desarrollo con datos de prueba y su acceso se restringe al equipo de desarrollo.
 
 ## Modelo inicial
 
 - Usuario: identificador interno, identidad institucional separada y estado.
-- Identidad: usuario, nombre, correo y asociación al proveedor; exclusivamente ficticios en demo.
+- Identidad: usuario, nombre, correo y asociación al proveedor; de prueba en el entorno local.
 - Perfil y UsuarioPerfil: los cuatro perfiles fijos y asignaciones múltiples con clave única compuesta.
 - ControlAdministradores: una fila usada para serializar mutaciones del perfil Administrador.
 - Macroproceso: identificador, código único inmutable, nombre, descripción, orden y activo.
@@ -42,7 +42,7 @@ No crear tablas de riesgos, documentos, unidades ni relaciones mientras sus func
 - GET/POST /api/process-types; PATCH /api/process-types/:id; POST /api/process-types/:id/deactivate.
 - GET /api/audit, solo Administrador, con paginación limitada.
 
-Lectura de catálogos para usuarios autenticados; creación, edición y desactivación de macroprocesos y tipos solo Administrador. Esta restricción se limita a los catálogos. Demo/session se habilita únicamente bajo los controles documentados. Usar DTO validados y OpenAPI generado, con pruebas de políticas de cada ruta. 400 para entrada inválida, 401 sin autenticación, 403 sin permiso y 409 para conflictos de estado o concurrencia.
+Lectura de catálogos para usuarios autenticados; creación, edición y desactivación de macroprocesos y tipos solo Administrador. Esta restricción se limita a los catálogos. El endpoint /api/auth/demo/session se habilita únicamente bajo los controles documentados. Usar DTO validados y OpenAPI generado, con pruebas de políticas de cada ruta. 400 para entrada inválida, 401 sin autenticación, 403 sin permiso y 409 para conflictos de estado o concurrencia.
 
 - GET/POST /api/processes; GET/PATCH /api/processes/:id; GET /api/processes/:id/history.
 - POST /api/processes/:id/submit, /approve, /reject, /obsolete y /discard-draft, según actor y estado. Enviar ID de versión y revisión técnica en mutaciones.
@@ -62,9 +62,9 @@ Pruebas de restricciones, transacciones, bloqueos y concurrencia se ejecutan en 
 
 ## Ejecución y pruebas
 
-Angular y NestJS se ejecutan con Node.js/npm en el equipo local, conectados a la instalación nativa de Oracle 26ai Free. Documentar instalación, configuración, creación del esquema, aplicación de migraciones y carga de datos ficticios para reproducir el ambiente desde cero. Restablecimiento de demo explícito y restringido al esquema local de pruebas, sin afectar otros esquemas. Docker y Docker Compose no forman parte del entorno acordado. Versiones de runtime y dependencias fijadas al crear el scaffold, lockfile incluido. No cambiar versiones arbitrariamente durante generación con IA.
+Angular y NestJS se ejecutan con Node.js/npm en el equipo local, conectados a la instalación nativa de Oracle 26ai Free. Documentar instalación, configuración, creación del esquema, aplicación de migraciones y carga de datos de prueba para reproducir el ambiente desde cero. Restablecimiento de datos de prueba explícito y restringido al esquema local de pruebas, sin afectar otros esquemas. Docker y Docker Compose no forman parte del entorno acordado. Versiones de runtime y dependencias fijadas al crear el scaffold, lockfile incluido. No cambiar versiones arbitrariamente durante generación con IA.
 
-Pruebas unitarias de reglas, integración Oracle 26ai Free de restricciones/transacciones y concurrencia, API de autorización y pruebas funcionales Angular. CI ejecuta las verificaciones exigidas por PT-03, PT-08, PT-11 y PT-12. No se ha creado ni ejecutado todavía el scaffold o la CI.
+Pruebas unitarias de reglas, integración Oracle 26ai Free de restricciones/transacciones y concurrencia, API de autorización y pruebas funcionales Angular. CI ejecuta las verificaciones exigidas por PT-03, PT-08, PT-11 y PT-12. El incremento 1 está implementado según el informe de Copilot; registrar por separado la evidencia efectiva de CI y pruebas, sin presumir su ejecución.
 
 ## Decisiones postergadas
 
@@ -74,9 +74,9 @@ Versión y edición de Oracle institucional, infraestructura institucional, inte
 
 Sesiones con expiración por inactividad de 30 minutos, cierre explícito e invalidación. Protección CSRF en escrituras, validación de DTO y escape de salida. Límite configurable por origen con 429 sin bloquear a usuarios de otros orígenes; valores concretos de límites se fijan y verifican con la prueba de carga. Cabeceras CSP/HSTS para HTTPS y errores sin detalles internos.
 
-Respaldo diario de base de datos con cuenta específica, ubicación separada y control de acceso/cifrado; restaurar en instancia aislada antes de producción. El prototipo local HTTP no valida REQ-30 ni HSTS. No excluirlos del alcance.
+Respaldo diario de base de datos con cuenta específica, ubicación separada y control de acceso/cifrado; restaurar en instancia aislada antes de producción. El entorno local HTTP no valida REQ-30 ni HSTS. No excluirlos del alcance.
 
-La simulación, el dominio Google pendiente y la versión Oracle institucional son restricciones técnicas registradas, no preguntas abiertas de requisitos. No modificar la planilla.
+La autenticación local, el dominio Google pendiente y la versión Oracle institucional son restricciones técnicas registradas, no preguntas abiertas de requisitos. No modificar la planilla.
 
 ## Cuentas y permisos Oracle
 
@@ -107,25 +107,25 @@ Verificación: una prueba conectada como cuenta de ejecución intenta modificar/
 
 Una persona con varios perfiles obtiene las facultades de cada uno; ser Administrador no convierte automáticamente a la persona en dueño responsable. Todas las comprobaciones se ejecutan en el servidor, incluida pertenencia del ID de versión al proceso. Pruebas directas de API cubren cada ruta con actor autorizado y no autorizado.
 
-## Identidad simulada local
+## Autenticación local local
 
 Desactivada por defecto. Solo se habilita con AUTH_MODE=demo y NODE_ENV=development; rechazar el arranque si AUTH_MODE=demo bajo otro entorno o con dirección de escucha distinta de loopback. Frontend y backend accesibles únicamente en el equipo local; no habilitar túneles ni publicación de este modo.
 
-El selector solo ofrece identidades ficticias precargadas; el servidor comprueba su pertenencia a la semilla y no acepta perfiles enviados por el cliente. Crear sesión de servidor, proteger escrituras contra CSRF, cerrar e invalidar sesión y aplicar 30 minutos de inactividad. Mostrar un único aviso discreto de acceso local, conforme a la sección Product presentation and local authentication.
+El selector solo ofrece identidades de prueba precargadas; el servidor comprueba su pertenencia a la semilla y no acepta perfiles enviados por el cliente. Crear sesión de servidor, proteger escrituras contra CSRF, cerrar e invalidar sesión y aplicar 30 minutos de inactividad. Mostrar un único aviso discreto de acceso local, conforme a la sección Presentación del producto de docs/especificacion.md.
 
 Pruebas automáticas de arranque inválido, identidad ajena a la semilla, perfiles falsificados, cierre y expiración. Este modo no satisface REQ-25 ni se distribuye como autenticación institucional.
 
 ## Instalación reproducible prevista
 
-Implementar y documentar estos pasos al crear el proyecto; todavía no hay scripts ejecutables:
+La implementación debe mantener estos pasos reproducibles y documentar los comandos concretos en docs/instalacion-windows.md:
 
 1. Instalar Oracle 26ai Free local y las versiones fijadas de Node.js y herramientas del proyecto. Registrar versión exacta y requisitos del equipo.
 2. Conectar al servicio/PDB de desarrollo; crear las cuentas propietaria y de ejecución con cuota y permisos mínimos. El script administrativo se ejecuta por un operador autorizado, no por el backend.
 3. Configurar conexión mediante archivo local excluido de Git y proporcionar .env.example sin secretos. Nunca compartir contraseñas en documentación o CI.
 4. Instalar dependencias mediante npm ci y aplicar migraciones con la cuenta propietaria, sin synchronize.
-5. Ejecutar semilla idempotente: cuatro perfiles y macroprocesos Estratégicos, Misionales y de Apoyo en ese orden. La carga demo es explícita y separada, crea usuarios ficticios y Administrador inicial sin sobrescribir cuentas existentes.
-6. Arrancar backend y frontend en loopback. Verificar conexión, sesión demo, permisos y persistencia tras reinicio.
-7. Restablecer únicamente el esquema de prueba/demo bajo un comando explícito con comprobación de ambiente y destino. Nunca restablecer automáticamente al arrancar ni apuntar al esquema institucional.
+5. Ejecutar semilla idempotente: cuatro perfiles y macroprocesos Estratégicos, Misionales y de Apoyo en ese orden. La carga de datos de prueba es explícita y separada, crea usuarios de prueba y Administrador inicial sin sobrescribir cuentas existentes.
+6. Arrancar backend y frontend en loopback. Verificar conexión, sesión local de prueba, permisos y persistencia tras reinicio.
+7. Restablecer únicamente el esquema local de pruebas bajo un comando explícito con comprobación de ambiente y destino. Nunca restablecer automáticamente al arrancar ni apuntar al esquema institucional.
 
 PT-04/PT-05 se verifican reproduciendo estos pasos sobre un esquema limpio. La instalación Oracle local no se borra como parte del restablecimiento.
 
@@ -143,6 +143,6 @@ Crear o cambiar referencias exige catálogos activos. Las versiones históricas 
 
 ## Separación de entorno y presentación — C-001
 
-La configuración y los controles locales se conservan. AUTH_MODE=demo, los endpoints y los marcadores internos no se renombran solo por motivos de presentación. Los textos visibles siguen la sección Presentación del producto en especificacion.md.
+Los identificadores existentes de configuración/API se conservan por compatibilidad; no son textos de presentación. AUTH_MODE=demo, los endpoints y los marcadores internos no se renombran solo por motivos de presentación. Los textos visibles siguen la sección Presentación del producto en especificacion.md.
 
 Ajustar la semilla de nuevas instalaciones con nombres neutros. En instalaciones existentes, cualquier corrección de etiquetas se limita a identidades y registros inequívocamente identificados como semilla de desarrollo; no sobrescribir contenido editado por usuarios, no reiniciar perfiles ni borrar auditoría. Si se cambia un dato persistido, usar el mecanismo correspondiente, mantener idempotencia y registrar la modificación conforme a las reglas de auditoría.

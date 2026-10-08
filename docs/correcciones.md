@@ -14,4 +14,4 @@ Implementación prevista: alinear textos y nombres de semilla con la especificac
 
 Verificación requerida: inspección de todas las pantallas implementadas, prueba de recorrido funcional y regresiones de autorización/sesión/auditoría. Registrar comandos, resultados y revisión en este cambio antes de integrar.
 
-Estado: corrección documental preparada para revisión del responsable; implementación y evidencia pendientes. No declarar el hallazgo resuelto todavía.
+Estado: corrección documental C-001 v4 preparada para revisión del responsable; implementación y evidencia pendientes. No declarar el hallazgo resuelto todavía.

@@ -8,7 +8,7 @@ Entrega: administración interna de procesos, desde ingreso y configuración has
 
 ## Entorno técnico de esta especificación
 
-Angular y NestJS con TypeScript; TypeORM con driver Oracle. Oracle AI Database 26ai Free instalado directamente en el computador local, sin Docker, con datos ficticios. Se desarrolla directamente sobre Oracle; no hay una migración desde PostgreSQL o MariaDB. El backend accede con una cuenta de ejecución dedicada, distinta de la propietaria del esquema y de migraciones; nunca SYS o SYSTEM. Los permisos específicos están en arquitectura.md.
+Angular y NestJS con TypeScript; TypeORM con driver Oracle. Oracle AI Database 26ai Free instalado directamente en el computador local, sin Docker, con datos de prueba. Se desarrolla directamente sobre Oracle; no hay una migración desde PostgreSQL o MariaDB. El backend accede con una cuenta de ejecución dedicada, distinta de la propietaria del esquema y de migraciones; nunca SYS o SYSTEM. Los permisos específicos están en arquitectura.md.
 
 La conexión se configura por ambiente (host, puerto, servicio, usuario y contraseña); los secretos no se versionan. La cuenta Oracle institucional se configurará cuando esté disponible y se comprobará su versión, edición y compatibilidad antes de desplegar. No es un bloqueo de la especificación local ni modifica los requisitos del producto.
 
@@ -244,7 +244,7 @@ Disponibilidad y respaldo: copia de seguridad diaria que se puede restaurar.
 
 ## Aplicación del alcance
 
-- Acceso: Google Workspace verifica identidad; el sistema asigna perfiles. La demo usa exclusivamente identidades ficticias locales. Esa sustitución permite probar permisos, pero no satisface REQ-25.
+- Acceso: Google Workspace verifica identidad; el sistema asigna perfiles. El entorno local usa exclusivamente identidades de prueba locales. Esa sustitución permite probar permisos, pero no satisface REQ-25.
 - Lectura: cualquier usuario autenticado consulta fichas, árbol y búsqueda. No introducir restricciones por estado que REQ-06 no establece.
 - Escritura: dueño sobre procesos propios; administrador sobre cualquiera. La responsabilidad se consulta desde el proceso en cada operación.
 - Estados: Borrador → En revisión → Vigente; rechazo → Borrador con motivo. Vigente → Obsoleto por Administrador. Editar Vigente crea Borrador conservando la versión vigente hasta aprobar el reemplazo. Descartar el Borrador contemplado por REQ-56 lo desactiva, sin borrarlo.
@@ -271,7 +271,7 @@ Normalizar búsqueda en aplicación y parametrizar consultas; tratar % y _ como 
 
 ## Implementación progresiva
 
-1. Infraestructura local, perfiles simulados, macroprocesos/tipos y auditoría.
+1. Infraestructura local, perfiles con acceso local, macroprocesos/tipos y auditoría.
 2. Ficha, propietarios, versiones, revisión, historial y retiro.
 3. Árbol, búsqueda, derechos de datos y eventos/alertas.
 4. Integración Google y verificaciones de calidad y seguridad de toda la entrega.
@@ -280,7 +280,7 @@ Son incrementos de implementación de un único alcance aprobado. Los respaldos 
 
 ## Evidencia necesaria
 
-Pruebas de permisos invocando API directamente, transacciones y concurrencia en Oracle 26ai Free, transiciones, permanencia de versión vigente, búsquedas, anonimización sin cambios en auditoría, sesiones y límites de solicitudes. Pruebas funcionales Angular del recorrido completo. Ejecutar validaciones y verificaciones originales, incluidas carga de 20 usuarios, accesibilidad y restauración. No presentar la demo como cumplimiento de integración Google o verificación de producción.
+Pruebas de permisos invocando API directamente, transacciones y concurrencia en Oracle 26ai Free, transiciones, permanencia de versión vigente, búsquedas, anonimización sin cambios en auditoría, sesiones y límites de solicitudes. Pruebas funcionales Angular del recorrido completo. Ejecutar validaciones y verificaciones originales, incluidas carga de 20 usuarios, accesibilidad y restauración. No presentar las pruebas locales como cumplimiento de integración Google o verificación de producción.
 
 ## Presentación del producto — corrección C-001
 
@@ -288,6 +288,6 @@ El entorno de desarrollo no constituye otro producto. La interfaz presenta Siste
 
 En el acceso local, el selector se llama Usuario de prueba. Mostrar un único aviso discreto en la estructura común de la aplicación: Entorno local: acceso de prueba. No repetir explicaciones en cada pantalla.
 
-No incluir demo, ficticio, simulado o prototipo en títulos, menús, botones o nombres visibles de usuarios/catálogos precargados. Usar nombres neutros, como Usuario administrador y Usuario consulta, y correos example.test. No sustituir por datos reales. Esta regla no elimina mensajes necesarios de validación ni renombra registros que un usuario introdujo voluntariamente.
+No usar terminología de desarrollo, como demo, ficticio, simulado o prototipo en títulos, menús, botones o nombres visibles de usuarios/catálogos precargados. Usar nombres neutros, como Usuario administrador y Usuario consulta, y correos example.test. No sustituir por datos reales. Esta regla no elimina mensajes necesarios de validación ni renombra registros que un usuario introdujo voluntariamente.
 
 Verificación: revisar acceso, perfiles, macroprocesos, tipos y auditoría; comprobar etiquetas y nombres iniciales, un único aviso local, y el recorrido crear tipo → consultar auditoría → rechazar edición sin permiso. Añadir pruebas de interfaz apropiadas. Conservar sesión, CSRF, permisos y restricciones de producción. Las claves internas y los eventos históricos no se cambian por una sustitución global de palabras.
