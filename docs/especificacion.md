@@ -8,7 +8,7 @@ Entrega: administración interna de procesos, desde ingreso y configuración has
 
 ## Entorno técnico de esta especificación
 
-Angular y NestJS con TypeScript; TypeORM con driver Oracle. Oracle AI Database 26ai Free instalado directamente en el computador local, sin Docker, con datos ficticios. Se desarrolla directamente sobre Oracle; no hay una migración desde PostgreSQL o MariaDB. El backend accede con un usuario/esquema de aplicación dedicado, nunca SYS o SYSTEM.
+Angular y NestJS con TypeScript; TypeORM con driver Oracle. Oracle AI Database 26ai Free instalado directamente en el computador local, sin Docker, con datos ficticios. Se desarrolla directamente sobre Oracle; no hay una migración desde PostgreSQL o MariaDB. El backend accede con una cuenta de ejecución dedicada, distinta de la propietaria del esquema y de migraciones; nunca SYS o SYSTEM. Los permisos específicos están en arquitectura.md.
 
 La conexión se configura por ambiente (host, puerto, servicio, usuario y contraseña); los secretos no se versionan. La cuenta Oracle institucional se configurará cuando esté disponible y se comprobará su versión, edición y compatibilidad antes de desplegar. No es un bloqueo de la especificación local ni modifica los requisitos del producto.
 
