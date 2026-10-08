@@ -44,8 +44,8 @@ No crear tablas de riesgos, documentos, unidades ni relaciones mientras sus func
 
 Lectura de catálogos para usuarios autenticados; creación, edición y desactivación de macroprocesos y tipos solo Administrador. Esta restricción se limita a los catálogos. El endpoint /api/auth/demo/session se habilita únicamente bajo los controles documentados. Usar DTO validados y OpenAPI generado, con pruebas de políticas de cada ruta. 400 para entrada inválida, 401 sin autenticación, 403 sin permiso y 409 para conflictos de estado o concurrencia.
 
-- GET/POST /api/processes; GET/PATCH /api/processes/:id; GET /api/processes/:id/history.
-- POST /api/processes/:id/submit, /approve, /reject, /obsolete y /discard-draft, según actor y estado. Enviar ID de versión y revisión técnica en mutaciones.
+- Incremento 2: GET/POST /api/processes; GET/PATCH /api/processes/:id; PATCH /api/processes/:id/owner. La ficha y el listado requieren sesión; mutaciones requieren los perfiles definidos en su contrato.
+- Incrementos posteriores: GET /api/processes/:id/history; POST /api/processes/:id/submit, /approve, /reject, /obsolete y /discard-draft, según actor y estado. Enviar ID de versión y revisión técnica en mutaciones.
 - GET /api/tree y GET /api/search con paginación y límite.
 - GET /api/security-alerts, GET /api/users/:id/personal-data y POST /api/users/:id/anonymize, solo Administrador.
 - GET /api/auth/google y callback para el mecanismo institucional; se implementan cuando exista configuración Google autorizada. Validar identidad y dominio en el servidor.
@@ -65,6 +65,16 @@ Pruebas de restricciones, transacciones, bloqueos y concurrencia se ejecutan en 
 Angular y NestJS se ejecutan con Node.js/npm en el equipo local, conectados a la instalación nativa de Oracle 26ai Free. Documentar instalación, configuración, creación del esquema, aplicación de migraciones y carga de datos de prueba para reproducir el entorno local desde cero. Restablecimiento de datos de prueba explícito y restringido al esquema local de pruebas, sin afectar otros esquemas. Docker y Docker Compose no forman parte del entorno acordado. Las versiones de runtime y dependencias se registran en los manifiestos y el lockfile del proyecto; no cambiarlas arbitrariamente durante generación con IA.
 
 Pruebas unitarias de reglas, integración Oracle 26ai Free de restricciones/transacciones y concurrencia, API de autorización y pruebas funcionales Angular. CI ejecuta las verificaciones exigidas por PT-03, PT-08, PT-11 y PT-12. El incremento 1 está implementado. Registrar por separado la evidencia efectiva de CI y pruebas, sin presumir su ejecución.
+
+## Decisión aprobada de diseño — Incremento 2 (REQ-05/REQ-06)
+
+El documento `incremento02_REQ05_REQ06_v1_1228.md` delimita el incremento aprobado y no modifica la planilla v13. La primera entrega crea una fila `PROCESS` con responsable asignado al creador y una única fila `PROCESS_VERSION` numerada 1 y en estado `Borrador`; `CURRENT_VERSION_ID` apunta a esa versión. El código PR se genera en servidor mediante secuencia Oracle. `REVISION` comienza en 1 y se incrementa en cada edición de ficha o reasignación. Macroproceso y tipo son referencias obligatorias a catálogos activos; los campos opcionales vacíos se persisten como NULL. Los identificadores de propietario, estado y código no se aceptan en la edición de ficha.
+
+La API usa DTO explícitos y una lista paginada sin filtros avanzados. Sesión y perfiles vigentes se verifican por el guard en cada petición. Solo Dueño de proceso y Administrador pueden crear; el responsable con perfil Dueño o Administrador puede editar; solo Administrador puede reasignar a usuario activo con perfil Dueño. La lectura exige autenticación, no un perfil específico. Reasignación es una operación separada. Edición y reasignación exigen revisión optimista; discrepancia devuelve 409. Las escrituras de proceso, versión y auditoría comparten una transacción. Las mutaciones que refieren catálogos bloquean sus filas mientras verifican vigencia; desactivación bloquea la misma fila y consulta procesos activos antes de cambiar el catálogo.
+
+Las referencias padre se almacenan en la versión y se validan contra procesos existentes; su modificación serializa la comprobación de ancestros para rechazar autorreferencias y ciclos. Esta estructura no crea relaciones de unidad ni diagramas. La ficha muestra todos los campos, el estado y el responsable vigente; unidades internas y modelo BPMN se presentan como `Sin información`, sin asociación ni carga. La migración versionada crea solo `PROCESS`, `PROCESS_VERSION`, la secuencia necesaria, restricciones/índices y grants mínimos de ejecución sobre esos objetos. Se mantiene `synchronize: false`.
+
+Este incremento no implementa envío a revisión, aprobación, rechazo, historial visible, retiro, archivos, asociación de unidades, árbol, búsqueda ni filtros avanzados. No añade estados ni permite que el cliente altere código, propietario o estado.
 
 ## Decisiones postergadas
 
@@ -140,6 +150,25 @@ La CI ejecuta comprobaciones estáticas, pruebas independientes de Oracle, SAST,
 Para REQ-04 y REQ-51 contar IDs de proceso distintos: un proceso activo referencia un catálogo si lo usa su versión Vigente o su versión de trabajo activa (Borrador/En revisión). No contar versiones históricas ni procesos Obsoletos o borradores descartados.
 
 Crear o cambiar referencias exige catálogos activos. Las versiones históricas pueden conservar referencias a catálogos desactivados: no se reescribe el historial. Al aprobar, comprobar de nuevo los catálogos de la versión. La desactivación y las mutaciones de referencias comparten bloqueo transaccional para impedir carreras.
+
+## Interfaz: kit de componentes compartidos
+
+Decisión de diseño técnico; no modifica requisitos de v13 ni el alcance funcional. Los elementos de interfaz generales viven en `frontend/src/app/shared/ui/` y se exponen solo mediante `frontend/src/app/shared/ui/index.ts`. Se construyen dentro de esta aplicación y se usan primero aquí; la extracción posterior a una librería Angular reutilizable por otros desarrollos institucionales requiere otra decisión documentada en este archivo, sin cambiar este contrato público.
+
+Contenido de la primera entrega:
+
+- Tokens de diseño como propiedades CSS `--ui-*` (color, tipografía, espaciado, radios, sombras y foco) y estilos base de elementos, botones, formularios, tablas y mensajes. Sin dependencias de terceros.
+- Estructura común `ui-app-shell`: marca, cuenta y cierre de sesión, un único lugar para el aviso de entorno (conforme a “Presentación del producto”), contenido principal y pie.
+- Componentes `ui-panel`, `ui-message`, `ui-pagination` y el servicio de diálogos (`UiDialogService`), que reemplaza `confirm()`/`prompt()` del navegador por un `<dialog>` nativo, modal y accesible, con validación de campos en el cliente.
+
+Reglas de frontera:
+
+- `shared/ui` no importa código de `app/` fuera de su carpeta, no llama a la API y no contiene textos, perfiles ni reglas del dominio de procesos. Todo texto visible del producto se entrega por entradas o contenido proyectado.
+- Los textos predeterminados del kit son etiquetas funcionales neutras en español; no se usa terminología de entorno.
+- El kit no realiza control de acceso. Ocultar o deshabilitar un elemento no sustituye la autorización del servidor (PT-07). La validación del diálogo es de usabilidad; el servidor sigue validando toda entrada (PT-08).
+- Los textos se muestran mediante interpolación de Angular; el kit no usa `innerHTML` ni omite la sanitización.
+
+Verificación: pruebas de componente del kit (`shared/ui/*.spec.ts`) y pruebas funcionales de la aplicación que recorren confirmación y edición mediante diálogo.
 
 ## Separación de entorno y presentación — corrección documental C-001 v4
 

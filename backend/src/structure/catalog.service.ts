@@ -78,10 +78,26 @@ export class CatalogService {
 
   async deactivateMacroprocess(actorId: number, id: number): Promise<void> {
     await this.dataSource.transaction(async (manager) => {
+      const locked = await manager.query(
+        `SELECT ID AS "id" FROM ${qualifiedTable('MACROPROCESS')} WHERE ID = :1 FOR UPDATE`,
+        [id]
+      );
+      if (!locked.length) throw new NotFoundException('Macroprocess not found');
       const repository = manager.getRepository(MacroprocessEntity);
       const row = await repository.findOneBy({ id });
       if (!row) throw new NotFoundException('Macroprocess not found');
       if (row.isActive === 0) throw new ConflictException('Macroprocess is already inactive');
+      const activeProcesses = await manager.query(
+        `SELECT COUNT(*) AS "total"
+         FROM ${qualifiedTable('PROCESS')} P
+         JOIN ${qualifiedTable('PROCESS_VERSION')} V ON V.ID = P.CURRENT_VERSION_ID
+         WHERE P.IS_ACTIVE = 1 AND V.MACROPROCESS_ID = :1`,
+        [id]
+      );
+      const processCount = Number(activeProcesses[0].total);
+      if (processCount > 0) {
+        throw new ConflictException(`Macroprocess has ${processCount} active process(es); move them first`);
+      }
       const before = snapshot(row);
       row.isActive = 0;
       await repository.save(row);
@@ -144,10 +160,26 @@ export class CatalogService {
 
   async deactivateProcessType(actorId: number, id: number): Promise<void> {
     await this.dataSource.transaction(async (manager) => {
+      const locked = await manager.query(
+        `SELECT ID AS "id" FROM ${qualifiedTable('PROCESS_TYPE')} WHERE ID = :1 FOR UPDATE`,
+        [id]
+      );
+      if (!locked.length) throw new NotFoundException('Process type not found');
       const repository = manager.getRepository(ProcessTypeEntity);
       const row = await repository.findOneBy({ id });
       if (!row) throw new NotFoundException('Process type not found');
       if (row.isActive === 0) throw new ConflictException('Process type is already inactive');
+      const activeProcesses = await manager.query(
+        `SELECT COUNT(*) AS "total"
+         FROM ${qualifiedTable('PROCESS')} P
+         JOIN ${qualifiedTable('PROCESS_VERSION')} V ON V.ID = P.CURRENT_VERSION_ID
+         WHERE P.IS_ACTIVE = 1 AND V.PROCESS_TYPE_ID = :1`,
+        [id]
+      );
+      const processCount = Number(activeProcesses[0].total);
+      if (processCount > 0) {
+        throw new ConflictException(`Process type has ${processCount} active process(es); reclassify them first`);
+      }
       const before = snapshot(row);
       row.isActive = 0;
       await repository.save(row);

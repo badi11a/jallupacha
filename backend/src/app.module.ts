@@ -11,6 +11,8 @@ import { databaseOptions, configuredRateLimit } from './common/config';
 import { UsersController } from './identity/users.controller';
 import { CatalogController } from './structure/catalog.controller';
 import { CatalogService } from './structure/catalog.service';
+import { ProcessController } from './process/process.controller';
+import { ProcessService } from './process/process.service';
 
 const options = databaseOptions();
 const rateLimit = configuredRateLimit();
@@ -24,7 +26,7 @@ const dataSource = new DataSource(options);
       limit: rateLimit.limit
     }])
   ],
-  controllers: [AuthController, UsersController, CatalogController, AuditController],
+  controllers: [AuthController, UsersController, CatalogController, AuditController, ProcessController],
   providers: [
     { provide: DataSource, useValue: dataSource },
     {
@@ -38,6 +40,7 @@ const dataSource = new DataSource(options);
     AuditService,
     SessionService,
     CatalogService,
+    ProcessService,
     AuthGuard,
     { provide: APP_GUARD, useClass: ThrottlerGuard },
     { provide: APP_GUARD, useExisting: AuthGuard }

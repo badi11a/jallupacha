@@ -12,7 +12,14 @@ import {
 } from '@nestjs/common';
 import { Inject } from '@nestjs/common';
 import { Request } from 'express';
-import { ApiCookieAuth, ApiHeader, ApiTags } from '@nestjs/swagger';
+import {
+  ApiCookieAuth,
+  ApiForbiddenResponse,
+  ApiHeader,
+  ApiOkResponse,
+  ApiOperation,
+  ApiTags
+} from '@nestjs/swagger';
 import { DataSource } from 'typeorm';
 import { AuditService } from '../audit/audit.service';
 import { CurrentUser, RequireProfiles } from '../common/auth.decorator';
@@ -39,6 +46,36 @@ export class UsersController {
        FROM ${qualifiedTable('APP_USER')} U
        JOIN ${qualifiedTable('USER_IDENTITY')} I ON I.USER_ID = U.ID
        WHERE U.IS_ACTIVE = 1 ORDER BY U.ID`
+    );
+  }
+
+  @Get('process-owners')
+  @ApiOperation({
+    summary: 'Lista cuentas activas con perfil Dueño para reasignación administrativa.',
+    description: 'Requiere perfil ADMIN.'
+  })
+  @ApiOkResponse({
+    schema: {
+      type: 'array',
+      items: {
+        type: 'object',
+        required: ['id', 'displayName'],
+        properties: {
+          id: { type: 'integer' },
+          displayName: { type: 'string' }
+        }
+      }
+    }
+  })
+  @ApiForbiddenResponse({ description: 'Se requiere perfil Administrador.' })
+  async listProcessOwners() {
+    return this.dataSource.query(
+      `SELECT U.ID AS "id", I.DISPLAY_NAME AS "displayName"
+       FROM ${qualifiedTable('APP_USER')} U
+       JOIN ${qualifiedTable('USER_IDENTITY')} I ON I.USER_ID = U.ID
+       JOIN ${qualifiedTable('USER_PROFILE')} UP ON UP.USER_ID = U.ID
+       WHERE U.IS_ACTIVE = 1 AND UP.PROFILE_CODE = 'PROCESS_OWNER'
+       ORDER BY I.DISPLAY_NAME, U.ID`
     );
   }
 

@@ -1,0 +1,63 @@
+/* Tokens de diseño del kit. Las aplicaciones cambian la identidad visual
+   redefiniendo estas propiedades, no editando los componentes. */
+:root {
+  --ui-font-family: "Segoe UI", Arial, sans-serif;
+  --ui-font-size-xs: .72rem;
+  --ui-font-size-sm: .82rem;
+  --ui-font-size-md: .92rem;
+  --ui-font-size-lg: 1.25rem;
+  --ui-font-size-display: clamp(1.8rem, 3vw, 2.5rem);
+  --ui-font-weight-medium: 650;
+  --ui-font-weight-bold: 700;
+
+  --ui-color-text: #172b27;
+  --ui-color-text-muted: #5b6e68;
+  --ui-color-text-subtle: #657770;
+  --ui-color-heading-subtle: #49645a;
+  --ui-color-eyebrow: #52766c;
+  --ui-color-background: #f4f7f5;
+  --ui-color-surface: #ffffff;
+  --ui-color-border: #dfe8e3;
+  --ui-color-border-strong: #bdccc5;
+  --ui-color-divider: #edf1ef;
+  --ui-color-table-border: #e8eeeb;
+
+  --ui-color-brand: #143d35;
+  --ui-color-on-brand: #ffffff;
+  --ui-color-brand-accent: #84b2a2;
+  --ui-color-primary: #17614f;
+  --ui-color-primary-hover: #0d4f40;
+  --ui-color-on-primary: #ffffff;
+  --ui-color-quiet-hover-border: #bed3ca;
+  --ui-color-quiet-hover-background: #f0f6f3;
+  --ui-color-focus: #d9792b;
+
+  --ui-color-info-text: #172b27;
+  --ui-color-info-background: #e8f0ec;
+  --ui-color-success-text: #155a37;
+  --ui-color-success-background: #e6f5eb;
+  --ui-color-error-text: #762d2d;
+  --ui-color-error-background: #fff0ee;
+  --ui-color-danger: #a03a32;
+  --ui-color-danger-hover: #84291f;
+  --ui-color-warning-text: #633d0e;
+  --ui-color-warning-background: #fff7e7;
+  --ui-color-warning-border: #e4c185;
+  --ui-color-status: #7a4b15;
+
+  --ui-space-1: .25rem;
+  --ui-space-2: .5rem;
+  --ui-space-3: .8rem;
+  --ui-space-4: 1rem;
+  --ui-space-5: 1.35rem;
+  --ui-space-6: 2.5rem;
+
+  --ui-radius-sm: 5px;
+  --ui-radius-md: 6px;
+  --ui-radius-lg: 8px;
+  --ui-radius-xl: 12px;
+  --ui-shadow-panel: 0 5px 20px #203c3210;
+  --ui-shadow-dialog: 0 18px 50px #0f2a2440;
+  --ui-control-height: 42px;
+  --ui-content-width: 1180px;
+}

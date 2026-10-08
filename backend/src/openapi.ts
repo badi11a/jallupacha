@@ -25,7 +25,7 @@ async function generateOpenApi(): Promise<void> {
   try {
     const config = new DocumentBuilder()
       .setTitle('Jallupacha API')
-      .setDescription('API interna para el incremento 1. Requiere sesión y perfiles autorizados, salvo endpoints de demo local explícitos.')
+      .setDescription('API institucional de gestión de procesos. Requiere sesión y perfiles autorizados, salvo endpoints de autenticación pública documentados explícitamente.')
       .setVersion('0.1.0')
       .addCookieAuth('jallupacha_session')
       .build();

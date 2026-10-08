@@ -105,6 +105,52 @@
         ]
       }
     },
+    "/users/process-owners": {
+      "get": {
+        "description": "Requiere perfil ADMIN.",
+        "operationId": "UsersController_listProcessOwners",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "required": [
+                      "id",
+                      "displayName"
+                    ],
+                    "properties": {
+                      "id": {
+                        "type": "integer"
+                      },
+                      "displayName": {
+                        "type": "string"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Se requiere perfil Administrador."
+          }
+        },
+        "security": [
+          {
+            "jallupacha_session": []
+          }
+        ],
+        "summary": "Lista cuentas activas con perfil Dueño para reasignación administrativa.",
+        "tags": [
+          "users"
+        ]
+      }
+    },
     "/users/{id}/profiles": {
       "put": {
         "operationId": "UsersController_updateProfiles",
@@ -443,11 +489,284 @@
           "audit"
         ]
       }
+    },
+    "/processes": {
+      "get": {
+        "description": "Requiere sesión; pueden consultar ADMIN, PROCESS_OWNER, RISK_MANAGER y CONSULTATION.",
+        "operationId": "ProcessController_list",
+        "parameters": [
+          {
+            "name": "page",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "minimum": 1,
+              "default": 1,
+              "type": "number"
+            }
+          },
+          {
+            "name": "limit",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "minimum": 1,
+              "maximum": 100,
+              "default": 20,
+              "type": "number"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProcessPageResponseDto"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Sesión requerida."
+          }
+        },
+        "security": [
+          {
+            "jallupacha_session": []
+          }
+        ],
+        "summary": "Lista procesos activos por página, sin filtros avanzados.",
+        "tags": [
+          "processes"
+        ]
+      },
+      "post": {
+        "description": "Requiere perfil ADMIN o PROCESS_OWNER.",
+        "operationId": "ProcessController_create",
+        "parameters": [
+          {
+            "name": "X-CSRF-Token",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateProcessDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProcessResponseDto"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Entrada inválida o referencia no válida."
+          },
+          "403": {
+            "description": "Se requiere perfil Dueño de proceso o Administrador."
+          }
+        },
+        "security": [
+          {
+            "jallupacha_session": []
+          }
+        ],
+        "summary": "Crea un Borrador y asigna el responsable desde la sesión autenticada.",
+        "tags": [
+          "processes"
+        ]
+      }
+    },
+    "/processes/{id}": {
+      "get": {
+        "description": "Requiere sesión; pueden consultar ADMIN, PROCESS_OWNER, RISK_MANAGER y CONSULTATION.",
+        "operationId": "ProcessController_get",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "number"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProcessResponseDto"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Proceso inexistente."
+          }
+        },
+        "security": [
+          {
+            "jallupacha_session": []
+          }
+        ],
+        "summary": "Consulta todos los campos de la ficha y el responsable vigente.",
+        "tags": [
+          "processes"
+        ]
+      },
+      "patch": {
+        "description": "Requiere perfil ADMIN o PROCESS_OWNER y ser responsable actual, salvo ADMIN.",
+        "operationId": "ProcessController_update",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "number"
+            }
+          },
+          {
+            "name": "X-CSRF-Token",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateProcessDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProcessResponseDto"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Entrada inválida o referencia no válida."
+          },
+          "401": {
+            "description": "Sesión requerida."
+          },
+          "403": {
+            "description": "Proceso ajeno o perfil sin permiso."
+          },
+          "404": {
+            "description": "Proceso inexistente."
+          }
+        },
+        "security": [
+          {
+            "jallupacha_session": []
+          }
+        ],
+        "summary": "Edita la ficha de un Borrador con revisión optimista.",
+        "tags": [
+          "processes"
+        ]
+      }
+    },
+    "/processes/{id}/owner": {
+      "patch": {
+        "description": "Requiere perfil ADMIN.",
+        "operationId": "ProcessController_reassignOwner",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "number"
+            }
+          },
+          {
+            "name": "X-CSRF-Token",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ReassignProcessOwnerDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProcessResponseDto"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "La cuenta destino no es un Dueño activo."
+          },
+          "403": {
+            "description": "Se requiere perfil Administrador."
+          },
+          "404": {
+            "description": "Proceso inexistente."
+          }
+        },
+        "security": [
+          {
+            "jallupacha_session": []
+          }
+        ],
+        "summary": "Reasigna el responsable a una cuenta activa con perfil Dueño de proceso.",
+        "tags": [
+          "processes"
+        ]
+      }
     }
   },
   "info": {
     "title": "Jallupacha API",
-    "description": "API interna para el incremento 1. Requiere sesión y perfiles autorizados, salvo endpoints de demo local explícitos.",
+    "description": "API institucional de gestión de procesos. Requiere sesión y perfiles autorizados, salvo endpoints de autenticación pública documentados explícitamente.",
     "version": "0.1.0",
     "contact": {}
   },
@@ -557,6 +876,544 @@
             "maxLength": 120
           }
         }
+      },
+      "ProcessListItemResponseDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "number",
+            "example": 1
+          },
+          "code": {
+            "type": "string",
+            "example": "PR1"
+          },
+          "macroprocessId": {
+            "type": "number"
+          },
+          "macroprocessName": {
+            "type": "string"
+          },
+          "processTypeId": {
+            "type": "number"
+          },
+          "processTypeName": {
+            "type": "string"
+          },
+          "ownerUserId": {
+            "type": "number"
+          },
+          "ownerDisplayName": {
+            "type": "string"
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "Borrador"
+            ]
+          },
+          "revision": {
+            "type": "number",
+            "minimum": 1
+          },
+          "name": {
+            "type": "string",
+            "example": "Sin nombre"
+          }
+        },
+        "required": [
+          "id",
+          "code",
+          "macroprocessId",
+          "macroprocessName",
+          "processTypeId",
+          "processTypeName",
+          "ownerUserId",
+          "ownerDisplayName",
+          "status",
+          "revision",
+          "name"
+        ]
+      },
+      "ProcessPageResponseDto": {
+        "type": "object",
+        "properties": {
+          "items": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ProcessListItemResponseDto"
+            }
+          },
+          "total": {
+            "type": "number"
+          },
+          "page": {
+            "type": "number"
+          },
+          "limit": {
+            "type": "number",
+            "maximum": 100
+          }
+        },
+        "required": [
+          "items",
+          "total",
+          "page",
+          "limit"
+        ]
+      },
+      "CreateProcessDto": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "maxLength": 250,
+            "nullable": true
+          },
+          "alias": {
+            "type": "string",
+            "maxLength": 250,
+            "nullable": true
+          },
+          "description": {
+            "type": "string",
+            "maxLength": 10000,
+            "nullable": true
+          },
+          "objective": {
+            "type": "string",
+            "maxLength": 10000,
+            "nullable": true
+          },
+          "scope": {
+            "type": "string",
+            "maxLength": 10000,
+            "nullable": true
+          },
+          "inputs": {
+            "type": "string",
+            "maxLength": 10000,
+            "nullable": true
+          },
+          "outputs": {
+            "type": "string",
+            "maxLength": 10000,
+            "nullable": true
+          },
+          "suppliers": {
+            "type": "string",
+            "maxLength": 10000,
+            "nullable": true
+          },
+          "clients": {
+            "type": "string",
+            "maxLength": 10000,
+            "nullable": true
+          },
+          "involvedParties": {
+            "type": "string",
+            "maxLength": 10000,
+            "nullable": true
+          },
+          "startsWhen": {
+            "type": "string",
+            "maxLength": 10000,
+            "nullable": true
+          },
+          "endsWhen": {
+            "type": "string",
+            "maxLength": 10000,
+            "nullable": true
+          },
+          "developmentPlan": {
+            "type": "string",
+            "maxLength": 10000,
+            "nullable": true
+          },
+          "operation": {
+            "type": "string",
+            "maxLength": 10000,
+            "nullable": true
+          },
+          "design": {
+            "type": "string",
+            "maxLength": 10000,
+            "nullable": true
+          },
+          "validation": {
+            "type": "string",
+            "maxLength": 10000,
+            "nullable": true
+          },
+          "businessArea": {
+            "type": "string",
+            "maxLength": 250,
+            "nullable": true
+          },
+          "subprocessType": {
+            "type": "string",
+            "maxLength": 250,
+            "nullable": true
+          },
+          "criticality": {
+            "type": "string",
+            "maxLength": 250,
+            "nullable": true
+          },
+          "automationLevel": {
+            "type": "string",
+            "maxLength": 250,
+            "nullable": true
+          },
+          "periodicity": {
+            "type": "string",
+            "maxLength": 250,
+            "nullable": true
+          },
+          "macroprocessId": {
+            "type": "number",
+            "minimum": 1
+          },
+          "processTypeId": {
+            "type": "number",
+            "minimum": 1
+          },
+          "parentProcessId": {
+            "type": "number",
+            "minimum": 1,
+            "nullable": true
+          }
+        },
+        "required": [
+          "macroprocessId",
+          "processTypeId"
+        ]
+      },
+      "ProcessResponseDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "number",
+            "example": 1
+          },
+          "code": {
+            "type": "string",
+            "example": "PR1"
+          },
+          "macroprocessId": {
+            "type": "number"
+          },
+          "macroprocessName": {
+            "type": "string"
+          },
+          "processTypeId": {
+            "type": "number"
+          },
+          "processTypeName": {
+            "type": "string"
+          },
+          "ownerUserId": {
+            "type": "number"
+          },
+          "ownerDisplayName": {
+            "type": "string"
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "Borrador"
+            ]
+          },
+          "revision": {
+            "type": "number",
+            "minimum": 1
+          },
+          "name": {
+            "type": "string",
+            "nullable": true
+          },
+          "versionNumber": {
+            "type": "number"
+          },
+          "parentProcessId": {
+            "type": "number",
+            "nullable": true
+          },
+          "alias": {
+            "type": "string",
+            "nullable": true
+          },
+          "description": {
+            "type": "string",
+            "nullable": true
+          },
+          "objective": {
+            "type": "string",
+            "nullable": true
+          },
+          "scope": {
+            "type": "string",
+            "nullable": true
+          },
+          "inputs": {
+            "type": "string",
+            "nullable": true
+          },
+          "outputs": {
+            "type": "string",
+            "nullable": true
+          },
+          "suppliers": {
+            "type": "string",
+            "nullable": true
+          },
+          "clients": {
+            "type": "string",
+            "nullable": true
+          },
+          "involvedParties": {
+            "type": "string",
+            "nullable": true
+          },
+          "startsWhen": {
+            "type": "string",
+            "nullable": true
+          },
+          "endsWhen": {
+            "type": "string",
+            "nullable": true
+          },
+          "developmentPlan": {
+            "type": "string",
+            "nullable": true
+          },
+          "operation": {
+            "type": "string",
+            "nullable": true
+          },
+          "design": {
+            "type": "string",
+            "nullable": true
+          },
+          "validation": {
+            "type": "string",
+            "nullable": true
+          },
+          "businessArea": {
+            "type": "string",
+            "nullable": true
+          },
+          "subprocessType": {
+            "type": "string",
+            "nullable": true
+          },
+          "criticality": {
+            "type": "string",
+            "nullable": true
+          },
+          "automationLevel": {
+            "type": "string",
+            "nullable": true
+          },
+          "periodicity": {
+            "type": "string",
+            "nullable": true
+          },
+          "internalUnits": {
+            "type": "string",
+            "nullable": true,
+            "description": "Solo lectura en este incremento."
+          },
+          "bpmnModel": {
+            "type": "string",
+            "nullable": true,
+            "description": "Solo lectura en este incremento."
+          }
+        },
+        "required": [
+          "id",
+          "code",
+          "macroprocessId",
+          "macroprocessName",
+          "processTypeId",
+          "processTypeName",
+          "ownerUserId",
+          "ownerDisplayName",
+          "status",
+          "revision",
+          "name",
+          "versionNumber",
+          "parentProcessId",
+          "alias",
+          "description",
+          "objective",
+          "scope",
+          "inputs",
+          "outputs",
+          "suppliers",
+          "clients",
+          "involvedParties",
+          "startsWhen",
+          "endsWhen",
+          "developmentPlan",
+          "operation",
+          "design",
+          "validation",
+          "businessArea",
+          "subprocessType",
+          "criticality",
+          "automationLevel",
+          "periodicity",
+          "internalUnits",
+          "bpmnModel"
+        ]
+      },
+      "UpdateProcessDto": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "maxLength": 250,
+            "nullable": true
+          },
+          "alias": {
+            "type": "string",
+            "maxLength": 250,
+            "nullable": true
+          },
+          "description": {
+            "type": "string",
+            "maxLength": 10000,
+            "nullable": true
+          },
+          "objective": {
+            "type": "string",
+            "maxLength": 10000,
+            "nullable": true
+          },
+          "scope": {
+            "type": "string",
+            "maxLength": 10000,
+            "nullable": true
+          },
+          "inputs": {
+            "type": "string",
+            "maxLength": 10000,
+            "nullable": true
+          },
+          "outputs": {
+            "type": "string",
+            "maxLength": 10000,
+            "nullable": true
+          },
+          "suppliers": {
+            "type": "string",
+            "maxLength": 10000,
+            "nullable": true
+          },
+          "clients": {
+            "type": "string",
+            "maxLength": 10000,
+            "nullable": true
+          },
+          "involvedParties": {
+            "type": "string",
+            "maxLength": 10000,
+            "nullable": true
+          },
+          "startsWhen": {
+            "type": "string",
+            "maxLength": 10000,
+            "nullable": true
+          },
+          "endsWhen": {
+            "type": "string",
+            "maxLength": 10000,
+            "nullable": true
+          },
+          "developmentPlan": {
+            "type": "string",
+            "maxLength": 10000,
+            "nullable": true
+          },
+          "operation": {
+            "type": "string",
+            "maxLength": 10000,
+            "nullable": true
+          },
+          "design": {
+            "type": "string",
+            "maxLength": 10000,
+            "nullable": true
+          },
+          "validation": {
+            "type": "string",
+            "maxLength": 10000,
+            "nullable": true
+          },
+          "businessArea": {
+            "type": "string",
+            "maxLength": 250,
+            "nullable": true
+          },
+          "subprocessType": {
+            "type": "string",
+            "maxLength": 250,
+            "nullable": true
+          },
+          "criticality": {
+            "type": "string",
+            "maxLength": 250,
+            "nullable": true
+          },
+          "automationLevel": {
+            "type": "string",
+            "maxLength": 250,
+            "nullable": true
+          },
+          "periodicity": {
+            "type": "string",
+            "maxLength": 250,
+            "nullable": true
+          },
+          "revision": {
+            "type": "number",
+            "minimum": 1
+          },
+          "macroprocessId": {
+            "type": "number",
+            "minimum": 1
+          },
+          "processTypeId": {
+            "type": "number",
+            "minimum": 1
+          },
+          "parentProcessId": {
+            "type": "number",
+            "minimum": 1,
+            "nullable": true
+          }
+        },
+        "required": [
+          "revision"
+        ]
+      },
+      "ReassignProcessOwnerDto": {
+        "type": "object",
+        "properties": {
+          "ownerUserId": {
+            "type": "number",
+            "minimum": 1
+          },
+          "revision": {
+            "type": "number",
+            "minimum": 1
+          }
+        },
+        "required": [
+          "ownerUserId",
+          "revision"
+        ]
       }
     }
   }

@@ -5,6 +5,8 @@ import { Component, OnInit, inject } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { firstValueFrom } from 'rxjs';
 import { environment } from '../environments/environment';
+import { ProcessWorkspaceComponent } from './process-workspace.component';
+import { UiAppShellComponent, UiDialogService, UiMessageComponent, UiPanelComponent } from './shared/ui';
 
 interface DemoIdentity {
   id: number;
@@ -63,24 +65,19 @@ const PROFILE_CODES = Object.keys(PROFILE_LABELS);
 @Component({
   selector: 'app-root',
   standalone: true,
-  imports: [FormsModule, DatePipe],
+  imports: [FormsModule, DatePipe, ProcessWorkspaceComponent, UiAppShellComponent, UiMessageComponent, UiPanelComponent],
   template: `
-    <header class="topbar">
-      <a class="brand" href="/" aria-label="Sistema de Procesos Institucionales, inicio"><span class="brand-mark">J</span> Sistema de Procesos Institucionales</a>
-      @if (user) {
-        <div class="account">
-          <span>{{ user.displayName }} · {{ profileNames(user.profiles) }}</span>
-          <button class="quiet-button" type="button" (click)="logout()">Cerrar sesión</button>
-        </div>
-      }
-    </header>
-    <main>
+    <ui-app-shell appName="Sistema de Procesos Institucionales" brandMark="J"
+      footerText="Jallupacha · Gestión interna de procesos"
+      [accountLabel]="user ? user.displayName + ' · ' + profileNames(user.profiles) : ''"
+      [environmentNotice]="environment.demoMode && user ? 'Entorno local: acceso de prueba.' : ''"
+      (logout)="logout()">
       @if (environment.demoMode && !user) {
         <section class="login-panel" aria-labelledby="login-title">
           <p class="eyebrow">ENTORNO LOCAL</p>
           <h1 id="login-title">Administración de procesos</h1>
           <p>Acceda con una identidad disponible para utilizar datos de prueba en el entorno local. Este acceso no sustituye la autenticación institucional.</p>
-          @if (error) { <p class="message error" role="alert">{{ error }}</p> }
+          @if (error) { <ui-message kind="error">{{ error }}</ui-message> }
           @if (identities.length) {
             <label for="identity">Usuario de prueba</label>
             <select id="identity" [(ngModel)]="selectedIdentityId">
@@ -93,21 +90,18 @@ const PROFILE_CODES = Object.keys(PROFILE_LABELS);
           }
         </section>
       } @else if (!user) {
-        <p class="message" role="status">El acceso institucional estará disponible cuando exista configuración autorizada.</p>
+        <ui-message>El acceso institucional estará disponible cuando exista configuración autorizada.</ui-message>
       } @else {
-        @if (environment.demoMode) {
-          <p class="environment-notice">Entorno local: acceso de prueba.</p>
-        }
-        @if (error) { <p class="message error" role="alert">{{ error }}</p> }
-        @if (notice) { <p class="message success" role="status">{{ notice }}</p> }
+        @if (error) { <ui-message kind="error">{{ error }}</ui-message> }
+        @if (notice) { <ui-message kind="success">{{ notice }}</ui-message> }
         <section class="welcome">
           <p class="eyebrow">ADMINISTRACIÓN INTERNA</p>
           <h1>Hola, {{ user.displayName }}</h1>
           <p>Catálogos iniciales y perfiles para preparar la gestión de procesos.</p>
         </section>
+        <app-process-workspace [userId]="user.userId" [profiles]="user.profiles"></app-process-workspace>
         <div class="catalog-grid">
-          <section class="panel" aria-labelledby="macro-title">
-            <div class="panel-heading"><div><p class="eyebrow">ESTRUCTURA</p><h2 id="macro-title">Macroprocesos</h2></div></div>
+          <ui-panel eyebrow="ESTRUCTURA" heading="Macroprocesos" headingId="macro-title">
             @if (isAdmin) {
               <form (ngSubmit)="createMacroprocess()" class="inline-form">
                 <label for="macro-name">Nombre</label>
@@ -128,9 +122,8 @@ const PROFILE_CODES = Object.keys(PROFILE_LABELS);
                 </li>
               } @empty { <li>No hay macroprocesos cargados.</li> }
             </ul>
-          </section>
-          <section class="panel" aria-labelledby="types-title">
-            <div class="panel-heading"><div><p class="eyebrow">CLASIFICACIÓN</p><h2 id="types-title">Tipos de proceso</h2></div></div>
+          </ui-panel>
+          <ui-panel eyebrow="CLASIFICACIÓN" heading="Tipos de proceso" headingId="types-title">
             @if (isAdmin) {
               <form (ngSubmit)="createProcessType()" class="inline-form">
                 <label for="type-name">Nombre</label>
@@ -149,12 +142,11 @@ const PROFILE_CODES = Object.keys(PROFILE_LABELS);
                 </li>
               } @empty { <li>Aún no hay tipos de proceso.</li> }
             </ul>
-          </section>
+          </ui-panel>
         </div>
 
         @if (isAdmin) {
-          <section class="panel admin-panel" aria-labelledby="users-title">
-            <div class="panel-heading"><div><p class="eyebrow">ACCESO</p><h2 id="users-title">Perfiles de usuario</h2></div></div>
+          <ui-panel class="admin-panel" eyebrow="ACCESO" heading="Perfiles de usuario" headingId="users-title">
             <p class="helper">Las asignaciones se validan en el servidor. No se permite modificar el propio perfil ni retirar el último Administrador.</p>
             @for (account of users; track account.id) {
               <div class="user-row">
@@ -167,9 +159,9 @@ const PROFILE_CODES = Object.keys(PROFILE_LABELS);
                 </fieldset>
               </div>
             }
-          </section>
-          <section class="panel admin-panel" aria-labelledby="audit-title">
-            <div class="panel-heading"><div><p class="eyebrow">TRAZABILIDAD</p><h2 id="audit-title">Auditoría reciente</h2></div><button class="text-button" type="button" (click)="loadAudit()">Actualizar</button></div>
+          </ui-panel>
+          <ui-panel class="admin-panel" eyebrow="TRAZABILIDAD" heading="Auditoría reciente" headingId="audit-title">
+            <button panelActions class="text-button" type="button" (click)="loadAudit()">Actualizar</button>
             <div class="table-scroll">
               <table>
                 <thead><tr><th>Fecha (UTC)</th><th>Actor ID</th><th>Acción</th><th>Elemento</th><th>Antes / después</th></tr></thead>
@@ -185,11 +177,10 @@ const PROFILE_CODES = Object.keys(PROFILE_LABELS);
                 </tbody>
               </table>
             </div>
-          </section>
+          </ui-panel>
         }
       }
-    </main>
-    <footer>Jallupacha · Gestión interna de procesos</footer>
+    </ui-app-shell>
   `
 })
 export class AppComponent implements OnInit {
@@ -198,6 +189,7 @@ export class AppComponent implements OnInit {
   readonly profileCodes = PROFILE_CODES;
   private readonly http = inject(HttpClient);
   private readonly changeDetector = inject(ChangeDetectorRef);
+  private readonly dialogs = inject(UiDialogService);
   identities: DemoIdentity[] = [];
   user: CurrentUser | null = null;
   macroprocesses: Macroprocess[] = [];
@@ -274,7 +266,13 @@ export class AppComponent implements OnInit {
   }
 
   async deactivateMacroprocess(row: Macroprocess): Promise<void> {
-    if (!confirm(`¿Desactivar el macroproceso «${row.name}»?`)) return;
+    const confirmed = await this.dialogs.confirm({
+      title: 'Desactivar macroproceso',
+      message: `¿Desactivar el macroproceso «${row.name}»?`,
+      confirmLabel: 'Desactivar',
+      tone: 'danger'
+    });
+    if (!confirmed) return;
     await this.perform(async () => {
       await firstValueFrom(this.http.post(`/api/macroprocesses/${row.id}/deactivate`, {}));
       this.notice = 'Macroproceso desactivado y auditado.';
@@ -283,20 +281,19 @@ export class AppComponent implements OnInit {
   }
 
   async editMacroprocess(row: Macroprocess): Promise<void> {
-    const name = prompt('Nombre del macroproceso', row.name);
-    if (name === null) return;
-    const orderInput = prompt('Orden del macroproceso', String(row.order));
-    if (orderInput === null) return;
-    const order = Number(orderInput);
-    if (!Number.isInteger(order) || order < 0 || order > 999999 || !name.trim()) {
-      this.error = 'Ingrese un nombre y un orden válidos.';
-      return;
-    }
+    const values = await this.dialogs.form({
+      title: 'Editar macroproceso',
+      fields: [
+        { key: 'name', label: 'Nombre', value: row.name, required: true, maxLength: 120 },
+        { key: 'order', label: 'Orden', type: 'number', value: row.order, required: true, min: 0, max: 999999 }
+      ]
+    });
+    if (!values) return;
     await this.perform(async () => {
       await firstValueFrom(this.http.patch(`/api/macroprocesses/${row.id}`, {
-        name: name.trim(),
+        name: values['name'],
         description: row.description,
-        order
+        order: values['order']
       }));
       this.notice = 'Macroproceso actualizado y auditado.';
       await this.reloadCatalogs();
@@ -313,7 +310,13 @@ export class AppComponent implements OnInit {
   }
 
   async deactivateProcessType(row: ProcessType): Promise<void> {
-    if (!confirm(`¿Desactivar el tipo «${row.name}»?`)) return;
+    const confirmed = await this.dialogs.confirm({
+      title: 'Desactivar tipo de proceso',
+      message: `¿Desactivar el tipo «${row.name}»?`,
+      confirmLabel: 'Desactivar',
+      tone: 'danger'
+    });
+    if (!confirmed) return;
     await this.perform(async () => {
       await firstValueFrom(this.http.post(`/api/process-types/${row.id}/deactivate`, {}));
       this.notice = 'Tipo de proceso desactivado y auditado.';
@@ -322,14 +325,13 @@ export class AppComponent implements OnInit {
   }
 
   async editProcessType(row: ProcessType): Promise<void> {
-    const name = prompt('Nombre del tipo de proceso', row.name);
-    if (name === null) return;
-    if (!name.trim()) {
-      this.error = 'El nombre no puede estar vacío.';
-      return;
-    }
+    const values = await this.dialogs.form({
+      title: 'Editar tipo de proceso',
+      fields: [{ key: 'name', label: 'Nombre', value: row.name, required: true, maxLength: 120 }]
+    });
+    if (!values) return;
     await this.perform(async () => {
-      await firstValueFrom(this.http.patch(`/api/process-types/${row.id}`, { name: name.trim() }));
+      await firstValueFrom(this.http.patch(`/api/process-types/${row.id}`, { name: values['name'] }));
       this.notice = 'Tipo de proceso actualizado y auditado.';
       await this.reloadCatalogs();
     });
