@@ -29,10 +29,12 @@ Angular nunca accede directamente a la base. API y frontend usan el mismo origen
 - Proceso: ID interno, código único, propietario vigente, referencia a versión vigente y desactivación.
 - VersionProceso: ID, proceso, número de versión, estado, macroproceso, tipo, campos de ficha, revisión técnica, autor/fecha y aprobación o rechazo. Referencias a catálogos con claves foráneas. Datos de historial conservados sin borrar versiones.
 - CambioProceso: versión, fecha, actor interno y cambios sin datos identificativos personales.
+- Riesgo: proceso asociado mediante FK; descripción, causa, consecuencia, referencia a tipo de riesgo y referencia obligatoria a nivel configurable (REQ-10/11). Sin tratamiento ni workflow de riesgos en Release 01.
+- CatalogosRiesgo: tipos y niveles configurables por Administrador, incluyendo inicialmente Bajo, Medio, Alto y Crítico para niveles. Un valor usado se desactiva, no se borra. El catálogo de tipos de documento de REQ-28 también es configurable; no implica incorporar carga/asociación de documentos.
 - EventoSeguridad: fecha, actor interno opcional, referencia separada a IP, evento y resultado. IP anonimizable sin alterar evidencia no identificativa.
 - AlertaSeguridad: usuario interno, intervalo y fecha; visible solo a Administrador.
 
-No crear tablas de riesgos, documentos, unidades ni relaciones mientras sus funciones estén fuera de alcance.
+No crear tablas de documentos, unidades ni relaciones mientras sus funciones estén fuera de alcance. La transcripción literal de REQ-10/11/28 está en `docs/especificacion.md`; las entidades/listas Oracle adicionales se incorporan solo mediante migraciones nuevas y con grants mínimos.
 
 ## Interfaces necesarias
 
@@ -45,8 +47,11 @@ No crear tablas de riesgos, documentos, unidades ni relaciones mientras sus func
 Lectura de catálogos para usuarios autenticados; creación, edición y desactivación de macroprocesos y tipos solo Administrador. Esta restricción se limita a los catálogos. El endpoint /api/auth/demo/session se habilita únicamente bajo los controles documentados. Usar DTO validados y OpenAPI generado, con pruebas de políticas de cada ruta. 400 para entrada inválida, 401 sin autenticación, 403 sin permiso y 409 para conflictos de estado o concurrencia.
 
 - Incremento 2: GET/POST /api/processes; GET/PATCH /api/processes/:id; PATCH /api/processes/:id/owner. La ficha y el listado requieren sesión; mutaciones requieren los perfiles definidos en su contrato.
-- Incrementos posteriores: GET /api/processes/:id/history; POST /api/processes/:id/submit, /approve, /reject, /obsolete y /discard-draft, según actor y estado. Enviar ID de versión y revisión técnica en mutaciones.
-- GET /api/tree y GET /api/search con paginación y límite.
+- Propuesta Incremento 3, pendiente de revisión: GET /api/processes/:id/history y POST /api/processes/:id/obsolete y /discard-draft, según actor y estado. Enviar ID de versión y revisión técnica en mutaciones. El documento `incremento03_ciclo_procesos.md` registra alcance, controles y decisiones por confirmar antes de implementar. Las rutas REQ-07 se asignan al Release 01 y no se duplican aquí.
+- Propuesta Release 01, pendiente de revisión: GET /api/tree autenticado para navegación interna; API interna de registro/consulta de riesgos con políticas explícitas; endpoints de administración de tipos de riesgo, niveles y tipos de documento; envío, aprobación y rechazo conforme REQ-07. La generación de artefactos de exportación requiere autenticación y perfil Administrador.
+- El HTML estático navegable y el JSON se generan desde una proyección pública allowlisted de procesos Vigentes. Los archivos contienen solo nombres de macroprocesos, tipos y procesos Vigentes y su ruta jerárquica; no incluyen riesgos ni ficha completa y, una vez generados, funcionan sin API ni base de datos. Su distribución es de archivos estáticos y no requiere un endpoint anónimo en la API.
+- La carga genérica usa un paquete JSON UTF-8 con esquema versionado y clave de origen idempotente, validado por una operación autenticada de Administrador. Se ejecuta mediante los servicios normales de creación de proceso en Borrador; el paquete no puede establecer estado, responsable ni IDs de base de datos.
+- GET /api/search con paginación y límite, según su requisito y alcance posterior.
 - GET /api/security-alerts, GET /api/users/:id/personal-data y POST /api/users/:id/anonymize, solo Administrador.
 - GET /api/auth/google y callback para el mecanismo institucional; se implementan cuando exista configuración Google autorizada. Validar identidad y dominio en el servidor.
 
@@ -79,6 +84,30 @@ Este incremento no implementa envío a revisión, aprobación, rechazo, historia
 ## Decisiones postergadas
 
 Versión y edición de Oracle institucional, infraestructura institucional, integración Google y dominio permitido, proxy definitivo y almacenamiento de archivos. No afectan a preparar el incremento local, pero las decisiones pertinentes deben documentarse antes de construir cada función o desplegarla.
+
+## Propuesta de diseño — Release 01 navegable (pendiente de revisión)
+
+El documento `release01_navegable.md` define el alcance propuesto. Reutiliza los procesos, catálogos, perfiles, API, ficha y shell existentes; conserva el kit UI compartido descrito arriba. La navegación interna es autenticada. El mapa público se genera como artefacto estático a partir de una lista explícita de campos: nombres de macroprocesos, tipos y procesos Vigentes, además de la ruta derivada de esa jerarquía. La generación solo la solicita un Administrador autenticado; los archivos resultantes se consultan sin sesión y no requieren conexión a API ni base de datos. El HTML presenta agrupaciones y ruta en texto, de modo que el significado no dependa solo del color.
+
+Los riesgos incluyen descripción, causa, consecuencia, tipo y nivel, con FK a proceso y catálogos configurables de tipo/nivel. Los niveles iniciales son Bajo, Medio, Alto y Crítico. El Administrador puede administrar también el catálogo de tipos de documento conforme REQ-28, sin añadir carga/asociación de documentos. El Gestor registra; el dueño ve los riesgos de sus procesos propios; Consulta no los ve. Cada operación aplica autorización en servidor. Riesgos no se serializan en el artefacto público.
+
+El release incluye el flujo de REQ-07: el dueño envía un Borrador con nombre, macroproceso y tipo; el Administrador aprueba o rechaza. Rechazar exige motivo, devuelve a Borrador y deja el motivo visible para el dueño. Aprobar guarda actor y fecha; una aprobación basta. Estado, motivo, auditoría y datos de la versión se escriben en una transacción Oracle; se comprueban estado/revisión en el servidor y no se aceptan cambios de estado proporcionados libremente por el cliente. No hay seed, importación ni escritura directa que asigne Vigente.
+
+REQ-56 está postergado en este release: no se habilita editar ni alterar directamente el contenido de procesos Vigentes, retirarlos como Obsoletos, ni descartar borradores. El versionado e historial completos (REQ-09/56), el tratamiento de riesgos y la publicación numerada también se postergan.
+
+La carga de procesos genéricos para una institución estatal chilena usa JSON UTF-8 con esquema versionado. El paquete lleva claves de origen para idempotencia, nombres/referencias a catálogos existentes y contenido compatible con REQ-06; no contiene datos reales, identidades, estado ni IDs Oracle y no presenta etiquetas de prueba. La operación autenticada valida el paquete y usa los servicios normales de creación en Borrador, sin sobrescribir ediciones ni borrar auditoría.
+
+Las rutas internas y las operaciones de generación/carga siguen autenticadas y autorizadas por perfil vigente. `synchronize: false`, migraciones nuevas y grants Oracle mínimos permanecen obligatorios. Las transacciones son atómicas; salida HTML escapada y JSON serializado como datos. PT y verificaciones de liberación diferidas se detallan en el documento del release.
+
+## Propuesta de diseño — Incremento 3: historial y versiones (REQ-09/REQ-56)
+
+La especificación del incremento 3 está en revisión y no autoriza implementación. El flujo REQ-07 de envío, aprobación y rechazo corresponde al Release 01; el alcance futuro de esta sección se limita al historial REQ-09 y a las capacidades de versiones/retiro/descarte de REQ-56. Se conservan los estados fijos de v13: `Borrador`, `En revisión`, `Vigente` y `Obsoleto`; no se incorporan estados ni pasos de aprobación nuevos.
+
+La implementación deberá versionar una edición de Vigente como Borrador sin sustituir la versión efectiva antes de aprobar. Para ello se propone una referencia explícita a versión efectiva en `PROCESS`, metadatos internos de autor/fecha en `PROCESS_VERSION` y un registro append-only `PROCESS_CHANGE` para diferencias y eventos. `AUDIT` sigue registrando las decisiones administrativas. Cambios de estado, version efectiva, historial y auditoría son una sola transacción Oracle bajo bloqueo de proceso/versión y revisión optimista. El descarte es lógico, sin borrado físico. DDL se introduce mediante migración nueva; nunca editar migraciones aplicadas, modificar historial manualmente ni ejecutar `up()` fuera del comando normal.
+
+La semántica de estado mientras coexisten una Vigente efectiva y otra versión de trabajo, retiro con versión pendiente, reenvío después de rechazo y descarte de esa versión requieren aprobación antes de construir. Las alternativas y aceptación de producto pendientes están detalladas en `incremento03_ciclo_procesos.md`; no asumirlas desde la arquitectura. Se mantiene `synchronize: false`, grants de mínimo privilegio y autorización recalculada en cada solicitud.
+
+La interfaz de este ciclo reutilizará `frontend/src/app/shared/ui/` por su API pública actual. Esta propuesta no reemplaza ni cambia la decisión del kit compartido, su frontera sin reglas de dominio, ni sus componentes y estilos existentes.
 
 ## Modelo de verificación transversal
 
@@ -172,6 +201,6 @@ Verificación: pruebas de componente del kit (`shared/ui/*.spec.ts`) y pruebas f
 
 ## Separación de entorno y presentación — corrección documental C-001 v4
 
-Los identificadores existentes de configuración/API se conservan por compatibilidad; no son textos de presentación. AUTH_MODE=demo, los endpoints y los marcadores internos no se renombran solo por motivos de presentación. Los textos visibles siguen “Presentación del producto”, en docs/especificacion.md.
+Los identificadores existentes de configuración/API se conservan por compatibilidad; no son textos de presentación. AUTH_MODE=demo, los endpoints y los marcadores internos no se renombran solo por motivos de presentación. Los textos visibles siguen la sección Presentación del producto, en [docs/especificacion.md](./especificacion.md).
 
 Ajustar la semilla de nuevas instalaciones con nombres neutros. En instalaciones existentes, cualquier corrección de etiquetas se limita a identidades y registros inequívocamente identificados como semilla de desarrollo; no sobrescribir contenido editado por usuarios, no reiniciar perfiles ni borrar auditoría. Si se cambia un dato persistido, usar el mecanismo correspondiente, mantener idempotencia y registrar la modificación conforme a las reglas de auditoría.
