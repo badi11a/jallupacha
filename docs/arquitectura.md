@@ -111,7 +111,7 @@ Una persona con varios perfiles obtiene las facultades de cada uno; ser Administ
 
 Desactivada por defecto. Solo se habilita con AUTH_MODE=demo y NODE_ENV=development; rechazar el arranque si AUTH_MODE=demo bajo otro entorno o con dirección de escucha distinta de loopback. Frontend y backend accesibles únicamente en el equipo local; no habilitar túneles ni publicación de este modo.
 
-El selector solo ofrece identidades ficticias precargadas; el servidor comprueba su pertenencia a la semilla y no acepta perfiles enviados por el cliente. Crear sesión de servidor, proteger escrituras contra CSRF, cerrar e invalidar sesión y aplicar 30 minutos de inactividad. Mostrar aviso visible de simulación.
+El selector solo ofrece identidades ficticias precargadas; el servidor comprueba su pertenencia a la semilla y no acepta perfiles enviados por el cliente. Crear sesión de servidor, proteger escrituras contra CSRF, cerrar e invalidar sesión y aplicar 30 minutos de inactividad. Mostrar un único aviso discreto de acceso local, conforme a la sección Product presentation and local authentication.
 
 Pruebas automáticas de arranque inválido, identidad ajena a la semilla, perfiles falsificados, cierre y expiración. Este modo no satisface REQ-25 ni se distribuye como autenticación institucional.
 
@@ -140,3 +140,9 @@ La CI ejecuta comprobaciones estáticas, pruebas independientes de Oracle, SAST,
 Para REQ-04 y REQ-51 contar IDs de proceso distintos: un proceso activo referencia un catálogo si lo usa su versión Vigente o su versión de trabajo activa (Borrador/En revisión). No contar versiones históricas ni procesos Obsoletos o borradores descartados.
 
 Crear o cambiar referencias exige catálogos activos. Las versiones históricas pueden conservar referencias a catálogos desactivados: no se reescribe el historial. Al aprobar, comprobar de nuevo los catálogos de la versión. La desactivación y las mutaciones de referencias comparten bloqueo transaccional para impedir carreras.
+
+## Separación de entorno y presentación — C-001
+
+La configuración y los controles locales se conservan. AUTH_MODE=demo, los endpoints y los marcadores internos no se renombran solo por motivos de presentación. Los textos visibles siguen la sección Presentación del producto en especificacion.md.
+
+Ajustar la semilla de nuevas instalaciones con nombres neutros. En instalaciones existentes, cualquier corrección de etiquetas se limita a identidades y registros inequívocamente identificados como semilla de desarrollo; no sobrescribir contenido editado por usuarios, no reiniciar perfiles ni borrar auditoría. Si se cambia un dato persistido, usar el mecanismo correspondiente, mantener idempotencia y registrar la modificación conforme a las reglas de auditoría.

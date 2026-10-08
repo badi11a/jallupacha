@@ -1,0 +1,29 @@
+{
+  "name": "jallupacha",
+  "version": "0.1.0",
+  "private": true,
+  "workspaces": [
+    "backend",
+    "frontend"
+  ],
+  "engines": {
+    "node": "24.15.x",
+    "npm": "11.12.x"
+  },
+  "overrides": {
+    "shell-quote": "1.11.0"
+  },
+  "scripts": {
+    "build": "npm run build --workspace backend && npm run build --workspace frontend",
+    "test": "npm run test --workspace backend",
+    "test:api": "npm run test:e2e --workspace backend",
+    "test:frontend": "npm test --workspace frontend",
+    "audit:dependencies": "npm audit --audit-level=high",
+    "db:migrate": "npm run db:migrate --workspace backend",
+    "db:seed": "npm run db:seed --workspace backend",
+    "start:dev": "concurrently --kill-others-on-fail \"npm run start:dev --workspace backend\" \"npm run start:dev --workspace frontend\""
+  },
+  "devDependencies": {
+    "concurrently": "9.2.4"
+  }
+}

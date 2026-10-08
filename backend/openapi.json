@@ -1,0 +1,563 @@
+{
+  "openapi": "3.0.0",
+  "paths": {
+    "/auth/demo/identities": {
+      "get": {
+        "operationId": "AuthController_demoIdentities",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "authentication"
+        ]
+      }
+    },
+    "/auth/demo/session": {
+      "post": {
+        "operationId": "AuthController_createDemoSession",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/DemoSessionDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "authentication"
+        ]
+      }
+    },
+    "/auth/me": {
+      "get": {
+        "operationId": "AuthController_me",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "jallupacha_session": []
+          }
+        ],
+        "tags": [
+          "authentication"
+        ]
+      }
+    },
+    "/auth/logout": {
+      "post": {
+        "operationId": "AuthController_logout",
+        "parameters": [
+          {
+            "name": "X-CSRF-Token",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "jallupacha_session": []
+          }
+        ],
+        "tags": [
+          "authentication"
+        ]
+      }
+    },
+    "/users": {
+      "get": {
+        "operationId": "UsersController_list",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "jallupacha_session": []
+          }
+        ],
+        "tags": [
+          "users"
+        ]
+      }
+    },
+    "/users/{id}/profiles": {
+      "put": {
+        "operationId": "UsersController_updateProfiles",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "number"
+            }
+          },
+          {
+            "name": "X-CSRF-Token",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateProfilesDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "jallupacha_session": []
+          }
+        ],
+        "tags": [
+          "users"
+        ]
+      }
+    },
+    "/macroprocesses": {
+      "get": {
+        "operationId": "CatalogController_macroprocesses",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "jallupacha_session": []
+          }
+        ],
+        "tags": [
+          "catalogs"
+        ]
+      },
+      "post": {
+        "operationId": "CatalogController_createMacroprocess",
+        "parameters": [
+          {
+            "name": "X-CSRF-Token",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateMacroprocessDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "jallupacha_session": []
+          }
+        ],
+        "tags": [
+          "catalogs"
+        ]
+      }
+    },
+    "/macroprocesses/{id}": {
+      "patch": {
+        "operationId": "CatalogController_updateMacroprocess",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "number"
+            }
+          },
+          {
+            "name": "X-CSRF-Token",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateMacroprocessDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "jallupacha_session": []
+          }
+        ],
+        "tags": [
+          "catalogs"
+        ]
+      }
+    },
+    "/macroprocesses/{id}/deactivate": {
+      "post": {
+        "operationId": "CatalogController_deactivateMacroprocess",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "number"
+            }
+          },
+          {
+            "name": "X-CSRF-Token",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "jallupacha_session": []
+          }
+        ],
+        "tags": [
+          "catalogs"
+        ]
+      }
+    },
+    "/process-types": {
+      "get": {
+        "operationId": "CatalogController_processTypes",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "jallupacha_session": []
+          }
+        ],
+        "tags": [
+          "catalogs"
+        ]
+      },
+      "post": {
+        "operationId": "CatalogController_createProcessType",
+        "parameters": [
+          {
+            "name": "X-CSRF-Token",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ProcessTypeDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "jallupacha_session": []
+          }
+        ],
+        "tags": [
+          "catalogs"
+        ]
+      }
+    },
+    "/process-types/{id}": {
+      "patch": {
+        "operationId": "CatalogController_updateProcessType",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "number"
+            }
+          },
+          {
+            "name": "X-CSRF-Token",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateProcessTypeDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "jallupacha_session": []
+          }
+        ],
+        "tags": [
+          "catalogs"
+        ]
+      }
+    },
+    "/process-types/{id}/deactivate": {
+      "post": {
+        "operationId": "CatalogController_deactivateProcessType",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "number"
+            }
+          },
+          {
+            "name": "X-CSRF-Token",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "jallupacha_session": []
+          }
+        ],
+        "tags": [
+          "catalogs"
+        ]
+      }
+    },
+    "/audit": {
+      "get": {
+        "operationId": "AuditController_list",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "jallupacha_session": []
+          }
+        ],
+        "tags": [
+          "audit"
+        ]
+      }
+    }
+  },
+  "info": {
+    "title": "Jallupacha API",
+    "description": "API interna para el incremento 1. Requiere sesión y perfiles autorizados, salvo endpoints de demo local explícitos.",
+    "version": "0.1.0",
+    "contact": {}
+  },
+  "tags": [],
+  "servers": [],
+  "components": {
+    "securitySchemes": {
+      "cookie": {
+        "type": "apiKey",
+        "in": "cookie",
+        "name": "jallupacha_session"
+      }
+    },
+    "schemas": {
+      "DemoSessionDto": {
+        "type": "object",
+        "properties": {
+          "identityId": {
+            "type": "number",
+            "minimum": 1,
+            "description": "ID of a pre-seeded fictional demo identity"
+          }
+        },
+        "required": [
+          "identityId"
+        ]
+      },
+      "UpdateProfilesDto": {
+        "type": "object",
+        "properties": {
+          "profiles": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "enum": [
+                "ADMIN",
+                "PROCESS_OWNER",
+                "RISK_MANAGER",
+                "CONSULTATION"
+              ]
+            }
+          }
+        },
+        "required": [
+          "profiles"
+        ]
+      },
+      "CreateMacroprocessDto": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "maxLength": 120
+          },
+          "description": {
+            "type": "object",
+            "maxLength": 1000,
+            "nullable": true
+          },
+          "order": {
+            "type": "number",
+            "minimum": 0,
+            "maximum": 999999
+          }
+        },
+        "required": [
+          "name",
+          "order"
+        ]
+      },
+      "UpdateMacroprocessDto": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "maxLength": 120
+          },
+          "description": {
+            "type": "object",
+            "maxLength": 1000,
+            "nullable": true
+          },
+          "order": {
+            "type": "number",
+            "minimum": 0,
+            "maximum": 999999
+          }
+        }
+      },
+      "ProcessTypeDto": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "maxLength": 120
+          }
+        },
+        "required": [
+          "name"
+        ]
+      },
+      "UpdateProcessTypeDto": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "maxLength": 120
+          }
+        }
+      }
+    }
+  }
+}

@@ -281,3 +281,13 @@ Son incrementos de implementación de un único alcance aprobado. Los respaldos 
 ## Evidencia necesaria
 
 Pruebas de permisos invocando API directamente, transacciones y concurrencia en Oracle 26ai Free, transiciones, permanencia de versión vigente, búsquedas, anonimización sin cambios en auditoría, sesiones y límites de solicitudes. Pruebas funcionales Angular del recorrido completo. Ejecutar validaciones y verificaciones originales, incluidas carga de 20 usuarios, accesibilidad y restauración. No presentar la demo como cumplimiento de integración Google o verificación de producción.
+
+## Presentación del producto — corrección C-001
+
+El entorno de desarrollo no constituye otro producto. La interfaz presenta Sistema de Procesos Institucionales y usa etiquetas funcionales normales en español. El modo temporal de autenticación y los datos de prueba son condiciones técnicas, no nombres de funciones ni de personas.
+
+En el acceso local, el selector se llama Usuario de prueba. Mostrar un único aviso discreto en la estructura común de la aplicación: Entorno local: acceso de prueba. No repetir explicaciones en cada pantalla.
+
+No incluir demo, ficticio, simulado o prototipo en títulos, menús, botones o nombres visibles de usuarios/catálogos precargados. Usar nombres neutros, como Usuario administrador y Usuario consulta, y correos example.test. No sustituir por datos reales. Esta regla no elimina mensajes necesarios de validación ni renombra registros que un usuario introdujo voluntariamente.
+
+Verificación: revisar acceso, perfiles, macroprocesos, tipos y auditoría; comprobar etiquetas y nombres iniciales, un único aviso local, y el recorrido crear tipo → consultar auditoría → rechazar edición sin permiso. Añadir pruebas de interfaz apropiadas. Conservar sesión, CSRF, permisos y restricciones de producción. Las claves internas y los eventos históricos no se cambian por una sustitución global de palabras.

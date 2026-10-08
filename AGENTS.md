@@ -6,7 +6,7 @@ La fuente de verdad del producto es Requisitos_Sistema_Procesos_v13.xlsx, sumini
 
 - TypeScript, Angular, NestJS, TypeORM y Oracle AI Database 26ai Free instalado directamente en el equipo local. Sin Docker. Destino definitivo on-premise sobre Oracle institucional; verificar compatibilidad con su versión y edición antes de desplegar.
 - Mantener una aplicación backend. No introducir microservicios, capas o patrones sin necesidad concreta.
-- Prototipo local con datos ficticios. Las identidades simuladas nunca están disponibles en producción.
+- La aplicación es el producto institucional. El entorno local utiliza datos de prueba y autenticación temporal, exclusivamente para desarrollo; no se habilita este acceso en producción. Las condiciones de presentación están en docs/especificacion.md.
 - Todo endpoint requiere autenticación y una política explícita de autorización. Verificar permisos en el servidor y consultar perfiles actuales en cada solicitud.
 - Migraciones versionadas; synchronize: false. Nunca borrar ni alterar una migración ya aplicada.
 - Cada cambio debe referenciar requisitos, incluir verificación apropiada y tener revisión registrada antes de integrarse. La revisión de IA no sustituye la conformidad requerida para producción.
@@ -101,3 +101,19 @@ Los datos almacenados que lo requieran y los respaldos se protegen mediante cont
 Cada componente tiene solo los permisos que necesita; la aplicación usa un usuario de base de datos con mínimos privilegios.
 
 **Verificación:** Revisión de configuración antes de producción.
+
+## Correcciones mediante SDD
+
+Antes de editar comportamiento, clasificar el hallazgo como defecto de implementación, defecto de especificación/diseño o cambio de producto. Identificar la fuente aplicable y escribir el comportamiento esperado con verificaciones concretas.
+
+- Defecto de implementación: conservar la especificación y añadir prueba de regresión apropiada.
+- Defecto de especificación/diseño: corregir primero el documento que define ese comportamiento y revisar la corrección antes de implementarla.
+- Cambio de producto: señalarlo y obtener aprobación antes de ampliar o modificar requisitos.
+
+Registrar el hallazgo, documentos afectados, corrección y evidencia de verificación en el mismo cambio de Git; no crear un sistema paralelo de seguimiento. Un prompt remite a esa base, no sustituye la especificación. No declarar verificado lo que no se ejecutó.
+
+## Separación entre producto y entorno
+
+No trasladar nombres de modos técnicos, fixtures, credenciales o condiciones del entorno a títulos, menús, botones o registros del producto sin una razón definida en la especificación. Los avisos de seguridad necesarios se mantienen en el lugar indicado, sin repetirse por toda la interfaz.
+
+Antes de cerrar un cambio de interfaz, verificar textos visibles y recorrido funcional, además de pruebas de lógica y seguridad. Antes de cerrar cualquier corrección, revisar que no cambió el alcance ni debilitó controles técnicos.

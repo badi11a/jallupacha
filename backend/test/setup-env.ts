@@ -1,0 +1,1 @@
+process.env.ORACLE_SCHEMA ??= 'JALLUPACHA_TEST';
