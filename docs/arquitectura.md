@@ -2,16 +2,16 @@
 
 ## Restricciones confirmadas
 
-TypeScript y Angular; backend NestJS; destino on-premise. Prototipo local con datos ficticios. Oracle AI Database 26ai Free instalado directamente en el computador local, sin Docker. Desarrollo directamente sobre Oracle; despliegue posterior en Oracle institucional. Google Workspace no disponible todavía.
+TypeScript y Angular; backend NestJS; destino on-premise. Prototipo local con datos ficticios. PostgreSQL inicial con futura migración a Oracle. Google Workspace no disponible todavía.
 
 ## Componentes
 
 - Angular: interfaz interna, formularios de perfiles y catálogos, consulta de auditoría.
 - NestJS: una API HTTP JSON bajo /api, autorización y reglas de negocio. Organizar por identidad, estructura y auditoría; no crear servicios distribuidos.
-- Oracle 26ai Free: persistencia, restricciones y transacciones mediante TypeORM.
-- Sesiones: persistidas en Oracle 26ai Free para invalidación y expiración; cookie HttpOnly, SameSite y Secure bajo HTTPS. Proxy HTTPS del despliegue definitivo por concretar.
+- PostgreSQL: persistencia, restricciones y transacciones mediante TypeORM.
+- Sesiones: persistidas en PostgreSQL para invalidación y expiración; cookie HttpOnly, SameSite y Secure bajo HTTPS. Proxy HTTPS del despliegue definitivo por concretar.
 
-Angular nunca accede directamente a la base. API y frontend usan el mismo origen mediante proxy de desarrollo. El modo simulado solo escucha en localhost. La base local se utiliza únicamente para desarrollo con datos ficticios y su acceso se restringe al equipo de desarrollo.
+Angular nunca accede directamente a la base. API y frontend usan el mismo origen mediante proxy de desarrollo. El modo simulado solo escucha en localhost; también los puertos publicados por Docker deben vincularse a 127.0.0.1.
 
 ## Modelo inicial
 
@@ -52,21 +52,17 @@ Lectura de estructura para usuarios autenticados; mutaciones solo Administrador.
 
 TypeORM recomendado para ambos motores; synchronize: false. Migraciones versionadas y cuenta distinta con permisos de cambio de esquema. La cuenta de ejecución no altera esquema ni borra auditoría.
 
-Usar el driver Oracle de TypeORM con node-oracledb. Conexión definida por ambiente mediante host, puerto, servicio, usuario y contraseña; ningún secreto se versiona. Usuario/esquema dedicado para la aplicación, sin usar SYS/SYSTEM. Separar permisos de ejecución y migraciones.
-
-Identificadores numéricos generados por secuencias Oracle. Fechas de eventos en UTC. Valores antes/después como JSON serializado en CLOB, validado en la aplicación. Banderas persistidas con NUMBER(1) y restricción 0/1; no depender del BOOLEAN SQL reciente. Considerar que Oracle trata las cadenas vacías como NULL en validación y consultas. Definir longitudes y nulabilidad explícitas en entidades y migraciones.
-
-Pruebas de restricciones, transacciones, bloqueos y concurrencia se ejecutan en Oracle real. Evitar funciones recientes o exclusivas de edición que no sean necesarias. No asumir compatibilidad con la versión institucional desconocida: antes del despliegue recrear el esquema y ejecutar pruebas contra esa versión. La transferencia a la base institucional usa migraciones versionadas y, si corresponde, un procedimiento explícito de traslado de datos; no copiar automáticamente la base local.
+Evitar extensiones PostgreSQL innecesarias. No asumir equivalencia de tipos, JSON, cadenas vacías, generación de identificadores, bloqueos o SQL entre motores. Representar antes/después como texto JSON si ello evita dependencia de JSONB. El soporte del ORM no es prueba de portabilidad. La versión Oracle y sus pruebas se resuelven antes de migrar.
 
 ## Ejecución y pruebas
 
-Angular y NestJS se ejecutan con Node.js/npm en el equipo local, conectados a la instalación nativa de Oracle 26ai Free. Documentar instalación, configuración, creación del esquema, aplicación de migraciones y carga de datos ficticios para reproducir el ambiente desde cero. Restablecimiento de demo explícito y restringido al esquema local de pruebas, sin afectar otros esquemas. Docker y Docker Compose no forman parte del entorno acordado. Versiones de runtime y dependencias fijadas al crear el scaffold, lockfile incluido. No cambiar versiones arbitrariamente durante generación con IA.
+Docker Compose para PostgreSQL y aplicación, con datos demo y restablecimiento explícito restringido al ambiente local. Versiones de runtime y dependencias fijadas al crear el scaffold, lockfile incluido. No cambiar versiones arbitrariamente durante generación con IA.
 
-Pruebas unitarias de reglas, integración Oracle 26ai Free de restricciones/transacciones y concurrencia, API de autorización y pruebas funcionales Angular. CI ejecuta las verificaciones exigidas por PT-03, PT-08, PT-11 y PT-12. No se ha creado ni ejecutado todavía el scaffold o la CI.
+Pruebas unitarias de reglas, integración PostgreSQL de restricciones/transacciones y concurrencia, API de autorización y pruebas funcionales Angular. CI ejecuta las verificaciones exigidas por PT-03, PT-08, PT-11 y PT-12. No se ha creado ni ejecutado todavía el scaffold o la CI.
 
 ## Decisiones postergadas
 
-Versión y edición de Oracle institucional, infraestructura institucional, integración Google y dominio permitido, proxy definitivo y almacenamiento de archivos. No afectan a preparar el incremento local, pero las decisiones pertinentes deben documentarse antes de construir cada función o desplegarla.
+Versión Oracle, infraestructura institucional, integración Google y dominio permitido, proxy definitivo y almacenamiento de archivos. No afectan a preparar el incremento local, pero las decisiones pertinentes deben documentarse antes de construir cada función o desplegarla.
 
 ## Modelo de verificación transversal
 
@@ -74,4 +70,4 @@ Sesiones con expiración por inactividad de 30 minutos, cierre explícito e inva
 
 Respaldo diario de base de datos con cuenta específica, ubicación separada y control de acceso/cifrado; restaurar en instancia aislada antes de producción. El prototipo local HTTP no valida REQ-30 ni HSTS. No excluirlos del alcance.
 
-La simulación, el dominio Google pendiente y la versión Oracle institucional son restricciones técnicas registradas, no preguntas abiertas de requisitos. No modificar la planilla.
+La simulación, el dominio Google pendiente y la versión Oracle son restricciones técnicas registradas, no preguntas abiertas de requisitos. No modificar la planilla.
