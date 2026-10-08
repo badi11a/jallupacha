@@ -8,7 +8,7 @@ Entrega: administración interna de procesos, desde ingreso y configuración has
 
 ## Entorno técnico de esta especificación
 
-Angular y NestJS con TypeScript; TypeORM con driver Oracle. Oracle AI Database 26ai Free instalado directamente en el computador local, sin Docker, con datos de prueba. Se desarrolla directamente sobre Oracle; no hay una migración desde PostgreSQL o MariaDB. El backend accede con una cuenta de ejecución dedicada, distinta de la propietaria del esquema y de migraciones; nunca SYS o SYSTEM. Los permisos específicos están en arquitectura.md.
+Angular y NestJS con TypeScript; TypeORM con driver Oracle. Oracle AI Database 26ai Free instalado directamente en el equipo local, sin Docker, para el entorno local con datos de prueba. Se desarrolla directamente sobre Oracle; no hay una migración desde PostgreSQL o MariaDB. El backend accede con una cuenta de ejecución dedicada, distinta de la propietaria del esquema y de migraciones; nunca SYS o SYSTEM. Los permisos específicos están en arquitectura.md.
 
 La conexión se configura por ambiente (host, puerto, servicio, usuario y contraseña); los secretos no se versionan. La cuenta Oracle institucional se configurará cuando esté disponible y se comprobará su versión, edición y compatibilidad antes de desplegar. No es un bloqueo de la especificación local ni modifica los requisitos del producto.
 
@@ -244,7 +244,7 @@ Disponibilidad y respaldo: copia de seguridad diaria que se puede restaurar.
 
 ## Aplicación del alcance
 
-- Acceso: Google Workspace verifica identidad; el sistema asigna perfiles. El entorno local usa exclusivamente identidades de prueba locales. Esa sustitución permite probar permisos, pero no satisface REQ-25.
+- Acceso: Google Workspace verifica identidad; el sistema asigna perfiles. El entorno local usa exclusivamente datos de prueba para las identidades. Esa sustitución permite probar permisos, pero no satisface REQ-25.
 - Lectura: cualquier usuario autenticado consulta fichas, árbol y búsqueda. No introducir restricciones por estado que REQ-06 no establece.
 - Escritura: dueño sobre procesos propios; administrador sobre cualquiera. La responsabilidad se consulta desde el proceso en cada operación.
 - Estados: Borrador → En revisión → Vigente; rechazo → Borrador con motivo. Vigente → Obsoleto por Administrador. Editar Vigente crea Borrador conservando la versión vigente hasta aprobar el reemplazo. Descartar el Borrador contemplado por REQ-56 lo desactiva, sin borrarlo.
@@ -282,9 +282,9 @@ Son incrementos de implementación de un único alcance aprobado. Los respaldos 
 
 Pruebas de permisos invocando API directamente, transacciones y concurrencia en Oracle 26ai Free, transiciones, permanencia de versión vigente, búsquedas, anonimización sin cambios en auditoría, sesiones y límites de solicitudes. Pruebas funcionales Angular del recorrido completo. Ejecutar validaciones y verificaciones originales, incluidas carga de 20 usuarios, accesibilidad y restauración. No presentar las pruebas locales como cumplimiento de integración Google o verificación de producción.
 
-## Presentación del producto — corrección C-001
+## Presentación del producto — corrección documental C-001 v4
 
-El entorno de desarrollo no constituye otro producto. La interfaz presenta Sistema de Procesos Institucionales y usa etiquetas funcionales normales en español. El modo temporal de autenticación y los datos de prueba son condiciones técnicas, no nombres de funciones ni de personas.
+El entorno local no constituye otro producto. La interfaz presenta Sistema de Procesos Institucionales y usa etiquetas funcionales normales en español. La autenticación local de desarrollo y los datos de prueba son condiciones técnicas, no nombres de funciones ni de personas.
 
 En el acceso local, el selector se llama Usuario de prueba. Mostrar un único aviso discreto en la estructura común de la aplicación: Entorno local: acceso de prueba. No repetir explicaciones en cada pantalla.
 

@@ -66,7 +66,7 @@ const PROFILE_CODES = Object.keys(PROFILE_LABELS);
   imports: [FormsModule, DatePipe],
   template: `
     <header class="topbar">
-      <a class="brand" href="/" aria-label="Jallupacha, inicio"><span class="brand-mark">J</span> Jallupacha</a>
+      <a class="brand" href="/" aria-label="Sistema de Procesos Institucionales, inicio"><span class="brand-mark">J</span> Sistema de Procesos Institucionales</a>
       @if (user) {
         <div class="account">
           <span>{{ user.displayName }} · {{ profileNames(user.profiles) }}</span>
@@ -79,24 +79,24 @@ const PROFILE_CODES = Object.keys(PROFILE_LABELS);
         <section class="login-panel" aria-labelledby="login-title">
           <p class="eyebrow">ENTORNO LOCAL</p>
           <h1 id="login-title">Administración de procesos</h1>
-          <p>Seleccione una identidad ficticia para probar los perfiles. Esta simulación no es el inicio de sesión institucional.</p>
+          <p>Acceda con una identidad disponible para utilizar datos de prueba en el entorno local. Este acceso no sustituye la autenticación institucional.</p>
           @if (error) { <p class="message error" role="alert">{{ error }}</p> }
           @if (identities.length) {
-            <label for="identity">Identidad de demostración</label>
+            <label for="identity">Usuario de prueba</label>
             <select id="identity" [(ngModel)]="selectedIdentityId">
-              <option [ngValue]="null" disabled>Seleccione una identidad</option>
+              <option [ngValue]="null" disabled>Seleccione un usuario</option>
               @for (identity of identities; track identity.id) {
                 <option [ngValue]="identity.id">{{ identity.displayName }}</option>
               }
             </select>
-            <button class="primary-button" type="button" [disabled]="!selectedIdentityId || busy" (click)="login()">Ingresar a la demo</button>
+            <button class="primary-button" type="button" [disabled]="!selectedIdentityId || busy" (click)="login()">Ingresar</button>
           }
         </section>
       } @else if (!user) {
-        <p class="message" role="status">Google Workspace se habilitará cuando exista configuración institucional autorizada. La demo está desactivada.</p>
+        <p class="message" role="status">El acceso institucional estará disponible cuando exista configuración autorizada.</p>
       } @else {
         @if (environment.demoMode) {
-          <p class="demo-notice"><strong>DEMO LOCAL</strong> · Identidades y datos ficticios. No satisface REQ-25.</p>
+          <p class="environment-notice">Entorno local: acceso de prueba.</p>
         }
         @if (error) { <p class="message error" role="alert">{{ error }}</p> }
         @if (notice) { <p class="message success" role="status">{{ notice }}</p> }
@@ -154,7 +154,7 @@ const PROFILE_CODES = Object.keys(PROFILE_LABELS);
 
         @if (isAdmin) {
           <section class="panel admin-panel" aria-labelledby="users-title">
-            <div class="panel-heading"><div><p class="eyebrow">ACCESO</p><h2 id="users-title">Perfiles de usuarios demo</h2></div></div>
+            <div class="panel-heading"><div><p class="eyebrow">ACCESO</p><h2 id="users-title">Perfiles de usuario</h2></div></div>
             <p class="helper">Las asignaciones se validan en el servidor. No se permite modificar el propio perfil ni retirar el último Administrador.</p>
             @for (account of users; track account.id) {
               <div class="user-row">
@@ -189,7 +189,7 @@ const PROFILE_CODES = Object.keys(PROFILE_LABELS);
         }
       }
     </main>
-    <footer>Jallupacha · Incremento 1 · Gestión interna de procesos</footer>
+    <footer>Jallupacha · Gestión interna de procesos</footer>
   `
 })
 export class AppComponent implements OnInit {
@@ -245,7 +245,7 @@ export class AppComponent implements OnInit {
       await firstValueFrom(this.http.post('/api/auth/demo/session', { identityId: this.selectedIdentityId }));
       this.user = await firstValueFrom(this.http.get<CurrentUser>('/api/auth/me'));
       await this.loadData();
-      this.notice = 'Sesión demo iniciada.';
+      this.notice = 'Sesión iniciada.';
     });
   }
 

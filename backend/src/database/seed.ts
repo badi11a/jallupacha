@@ -23,11 +23,11 @@ const MACROPROCESSES = [
 ];
 
 const DEMO_USERS = [
-  { name: 'Administración Demo', email: 'demo-admin@example.test', profiles: ['ADMIN'] },
-  { name: 'Responsable Demo', email: 'demo-owner@example.test', profiles: ['PROCESS_OWNER'] },
-  { name: 'Riesgos Demo', email: 'demo-risk@example.test', profiles: ['RISK_MANAGER'] },
-  { name: 'Consulta Demo', email: 'demo-reader@example.test', profiles: ['CONSULTATION'] },
-  { name: 'Responsable y Riesgos Demo', email: 'demo-multi@example.test', profiles: ['PROCESS_OWNER', 'RISK_MANAGER'] }
+  { name: 'Usuario administrador', email: 'admin@example.test', legacyEmail: 'demo-admin@example.test', profiles: ['ADMIN'] },
+  { name: 'Usuario responsable', email: 'process-owner@example.test', legacyEmail: 'demo-owner@example.test', profiles: ['PROCESS_OWNER'] },
+  { name: 'Usuario de riesgos', email: 'risk-manager@example.test', legacyEmail: 'demo-risk@example.test', profiles: ['RISK_MANAGER'] },
+  { name: 'Usuario consulta', email: 'consultation@example.test', legacyEmail: 'demo-reader@example.test', profiles: ['CONSULTATION'] },
+  { name: 'Usuario responsable y de riesgos', email: 'process-risk@example.test', legacyEmail: 'demo-multi@example.test', profiles: ['PROCESS_OWNER', 'RISK_MANAGER'] }
 ];
 
 async function seed(): Promise<void> {
@@ -70,9 +70,19 @@ async function seed(): Promise<void> {
       const identities = manager.getRepository(IdentityEntity);
       const demoIdentities = manager.getRepository(DemoIdentityEntity);
       const assignments = manager.getRepository(UserProfileEntity);
+      const hasSeededIdentities = (await demoIdentities.count()) > 0;
       for (const demo of DEMO_USERS) {
-        let identity = await identities.findOneBy({ email: demo.email });
+        let identity = await identities.findOneBy([
+          { email: demo.email },
+          { email: demo.legacyEmail }
+        ]);
+        if (identity && !(await demoIdentities.findOneBy({ userId: identity.userId }))) {
+          identity = null;
+        }
         if (!identity) {
+          if (hasSeededIdentities) {
+            throw new Error('A seeded local identity has an unrecognized email; refusing to create a duplicate.');
+          }
           const user = await users.save(users.create({ isDemo: 1, isActive: 1 }));
           identity = await identities.save(identities.create({
             userId: user.id,

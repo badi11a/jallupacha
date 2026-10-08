@@ -34,7 +34,7 @@ h1, h2, p { margin-top: 0; }
 h1 { margin-bottom: .5rem; font-size: clamp(1.8rem, 3vw, 2.5rem); letter-spacing: -.035em; }
 h2 { margin: 0; font-size: 1.25rem; }
 .welcome > p:last-child { color: #5b6e68; }
-.demo-notice { padding: .8rem 1rem; border: 1px solid #e4c185; border-radius: 8px; color: #633d0e; background: #fff7e7; font-size: .9rem; }
+.environment-notice { padding: .8rem 1rem; border: 1px solid #e4c185; border-radius: 8px; color: #633d0e; background: #fff7e7; font-size: .9rem; }
 .catalog-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 1rem; }
 .panel, .login-panel { padding: 1.35rem; border: 1px solid #dfe8e3; border-radius: 12px; background: white; box-shadow: 0 5px 20px #203c3210; }
 .panel-heading { display: flex; align-items: center; justify-content: space-between; gap: 1rem; margin-bottom: 1.1rem; }

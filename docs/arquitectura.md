@@ -1,10 +1,10 @@
 # Arquitectura mínima y decisiones
 
-Revisión C-001 v4: Oracle 26ai Free local, sin Docker. Distingue producto, entorno y datos de prueba; sustituye las versiones anteriores.
+Revisión documental C-001 v4: Oracle 26ai Free en el entorno local, sin Docker. Distingue producto, entorno local y datos de prueba; sustituye las versiones anteriores.
 
 ## Restricciones confirmadas
 
-TypeScript y Angular; backend NestJS; destino on-premise. Desarrollo local con datos de prueba. Oracle AI Database 26ai Free instalado directamente en el computador local, sin Docker. Desarrollo directamente sobre Oracle; despliegue posterior en Oracle institucional. Google Workspace no disponible todavía.
+TypeScript y Angular; backend NestJS; destino on-premise. El entorno local usa datos de prueba. Oracle AI Database 26ai Free instalado directamente en el computador local, sin Docker. Desarrollo directamente sobre Oracle; despliegue posterior en Oracle institucional. Google Workspace no disponible todavía.
 
 ## Componentes
 
@@ -13,12 +13,12 @@ TypeScript y Angular; backend NestJS; destino on-premise. Desarrollo local con d
 - Oracle 26ai Free: persistencia, restricciones y transacciones mediante TypeORM.
 - Sesiones: persistidas en Oracle 26ai Free para invalidación y expiración; cookie HttpOnly, SameSite y Secure bajo HTTPS. Proxy HTTPS del despliegue definitivo por concretar.
 
-Angular nunca accede directamente a la base. API y frontend usan el mismo origen mediante proxy de desarrollo. El acceso local de desarrollo solo escucha en localhost. La base local se utiliza únicamente para desarrollo con datos de prueba y su acceso se restringe al equipo de desarrollo.
+Angular nunca accede directamente a la base. API y frontend usan el mismo origen mediante proxy de desarrollo. La aplicación del entorno local solo escucha en localhost. La base del entorno local se utiliza únicamente con datos de prueba y su acceso se restringe al equipo de desarrollo.
 
 ## Modelo inicial
 
 - Usuario: identificador interno, identidad institucional separada y estado.
-- Identidad: usuario, nombre, correo y asociación al proveedor; de prueba en el entorno local.
+- Identidad: usuario, nombre, correo y asociación al proveedor; las identidades precargadas son datos de prueba del entorno local.
 - Perfil y UsuarioPerfil: los cuatro perfiles fijos y asignaciones múltiples con clave única compuesta.
 - ControlAdministradores: una fila usada para serializar mutaciones del perfil Administrador.
 - Macroproceso: identificador, código único inmutable, nombre, descripción, orden y activo.
@@ -62,9 +62,9 @@ Pruebas de restricciones, transacciones, bloqueos y concurrencia se ejecutan en 
 
 ## Ejecución y pruebas
 
-Angular y NestJS se ejecutan con Node.js/npm en el equipo local, conectados a la instalación nativa de Oracle 26ai Free. Documentar instalación, configuración, creación del esquema, aplicación de migraciones y carga de datos de prueba para reproducir el ambiente desde cero. Restablecimiento de datos de prueba explícito y restringido al esquema local de pruebas, sin afectar otros esquemas. Docker y Docker Compose no forman parte del entorno acordado. Versiones de runtime y dependencias fijadas al crear el scaffold, lockfile incluido. No cambiar versiones arbitrariamente durante generación con IA.
+Angular y NestJS se ejecutan con Node.js/npm en el equipo local, conectados a la instalación nativa de Oracle 26ai Free. Documentar instalación, configuración, creación del esquema, aplicación de migraciones y carga de datos de prueba para reproducir el entorno local desde cero. Restablecimiento de datos de prueba explícito y restringido al esquema local de pruebas, sin afectar otros esquemas. Docker y Docker Compose no forman parte del entorno acordado. Las versiones de runtime y dependencias se registran en los manifiestos y el lockfile del proyecto; no cambiarlas arbitrariamente durante generación con IA.
 
-Pruebas unitarias de reglas, integración Oracle 26ai Free de restricciones/transacciones y concurrencia, API de autorización y pruebas funcionales Angular. CI ejecuta las verificaciones exigidas por PT-03, PT-08, PT-11 y PT-12. El incremento 1 está implementado según el informe de Copilot; registrar por separado la evidencia efectiva de CI y pruebas, sin presumir su ejecución.
+Pruebas unitarias de reglas, integración Oracle 26ai Free de restricciones/transacciones y concurrencia, API de autorización y pruebas funcionales Angular. CI ejecuta las verificaciones exigidas por PT-03, PT-08, PT-11 y PT-12. El incremento 1 está implementado. Registrar por separado la evidencia efectiva de CI y pruebas, sin presumir su ejecución.
 
 ## Decisiones postergadas
 
@@ -76,7 +76,7 @@ Sesiones con expiración por inactividad de 30 minutos, cierre explícito e inva
 
 Respaldo diario de base de datos con cuenta específica, ubicación separada y control de acceso/cifrado; restaurar en instancia aislada antes de producción. El entorno local HTTP no valida REQ-30 ni HSTS. No excluirlos del alcance.
 
-La autenticación local, el dominio Google pendiente y la versión Oracle institucional son restricciones técnicas registradas, no preguntas abiertas de requisitos. No modificar la planilla.
+La autenticación local de desarrollo, el dominio Google pendiente y la versión Oracle institucional son restricciones técnicas registradas, no preguntas abiertas de requisitos. No modificar la planilla.
 
 ## Cuentas y permisos Oracle
 
@@ -107,13 +107,13 @@ Verificación: una prueba conectada como cuenta de ejecución intenta modificar/
 
 Una persona con varios perfiles obtiene las facultades de cada uno; ser Administrador no convierte automáticamente a la persona en dueño responsable. Todas las comprobaciones se ejecutan en el servidor, incluida pertenencia del ID de versión al proceso. Pruebas directas de API cubren cada ruta con actor autorizado y no autorizado.
 
-## Autenticación local local
+## Autenticación local de desarrollo
 
-Desactivada por defecto. Solo se habilita con AUTH_MODE=demo y NODE_ENV=development; rechazar el arranque si AUTH_MODE=demo bajo otro entorno o con dirección de escucha distinta de loopback. Frontend y backend accesibles únicamente en el equipo local; no habilitar túneles ni publicación de este modo.
+Desactivada por defecto. La autenticación local de desarrollo solo se habilita con AUTH_MODE=demo y NODE_ENV=development; rechazar el arranque si AUTH_MODE=demo bajo otro entorno o con dirección de escucha distinta de loopback. Frontend y backend accesibles únicamente desde el equipo local; no habilitar túneles ni publicar este modo.
 
-El selector solo ofrece identidades de prueba precargadas; el servidor comprueba su pertenencia a la semilla y no acepta perfiles enviados por el cliente. Crear sesión de servidor, proteger escrituras contra CSRF, cerrar e invalidar sesión y aplicar 30 minutos de inactividad. Mostrar un único aviso discreto de acceso local, conforme a la sección Presentación del producto de docs/especificacion.md.
+El selector solo ofrece identidades de prueba precargadas; el servidor comprueba su pertenencia a la semilla y no acepta perfiles enviados por el cliente. Crear sesión de servidor, proteger escrituras contra CSRF, cerrar e invalidar sesión y aplicar 30 minutos de inactividad. Mostrar un único aviso discreto de acceso local, conforme a “Presentación del producto”, en docs/especificacion.md.
 
-Pruebas automáticas de arranque inválido, identidad ajena a la semilla, perfiles falsificados, cierre y expiración. Este modo no satisface REQ-25 ni se distribuye como autenticación institucional.
+Pruebas automáticas de arranque inválido, identidad ajena a la semilla, perfiles falsificados, cierre y expiración. La autenticación local de desarrollo no satisface REQ-25 ni se distribuye como autenticación institucional.
 
 ## Instalación reproducible prevista
 
@@ -141,8 +141,8 @@ Para REQ-04 y REQ-51 contar IDs de proceso distintos: un proceso activo referenc
 
 Crear o cambiar referencias exige catálogos activos. Las versiones históricas pueden conservar referencias a catálogos desactivados: no se reescribe el historial. Al aprobar, comprobar de nuevo los catálogos de la versión. La desactivación y las mutaciones de referencias comparten bloqueo transaccional para impedir carreras.
 
-## Separación de entorno y presentación — C-001
+## Separación de entorno y presentación — corrección documental C-001 v4
 
-Los identificadores existentes de configuración/API se conservan por compatibilidad; no son textos de presentación. AUTH_MODE=demo, los endpoints y los marcadores internos no se renombran solo por motivos de presentación. Los textos visibles siguen la sección Presentación del producto en especificacion.md.
+Los identificadores existentes de configuración/API se conservan por compatibilidad; no son textos de presentación. AUTH_MODE=demo, los endpoints y los marcadores internos no se renombran solo por motivos de presentación. Los textos visibles siguen “Presentación del producto”, en docs/especificacion.md.
 
 Ajustar la semilla de nuevas instalaciones con nombres neutros. En instalaciones existentes, cualquier corrección de etiquetas se limita a identidades y registros inequívocamente identificados como semilla de desarrollo; no sobrescribir contenido editado por usuarios, no reiniciar perfiles ni borrar auditoría. Si se cambia un dato persistido, usar el mecanismo correspondiente, mantener idempotencia y registrar la modificación conforme a las reglas de auditoría.
