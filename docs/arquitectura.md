@@ -199,6 +199,33 @@ Reglas de frontera:
 
 Verificación: pruebas de componente del kit (`shared/ui/*.spec.ts`) y pruebas funcionales de la aplicación que recorren confirmación y edición mediante diálogo.
 
+### Identidad visual y accesibilidad
+
+Decisión de diseño técnico tomada a partir de un prototipo de referencia no obligatorio: se adoptan su paleta (azul marino y azul), sus radios y sus sombras. Su navegación de portal, sus contenidos y sus funciones no implementadas no se adoptan; estas últimas siguen el alcance de la especificación y del release aprobado.
+
+- Tipografía: fuentes del sistema (`system-ui` y equivalentes). No se cargan fuentes ni otros recursos desde orígenes externos, para mantener la CSP restrictiva (PT-10) y no exponer a los usuarios ante terceros. Alojar una fuente propia requiere otra decisión.
+- Accesibilidad de referencia: WCAG 2.2 nivel AA. Los tonos del prototipo que no alcanzan el contraste exigido se oscurecen dentro de la misma familia. El texto base es de 16 px y ningún texto baja de 12 px.
+- Los colores del kit se definen solo como tokens `--ui-color-*` en hexadecimal de 6 dígitos. `npm run check:contrast --workspace frontend` verifica cada combinación usada (texto 4,5:1; bordes de controles y foco 3:1) y falla si alguna no cumple. Una combinación nueva se agrega al script en el mismo cambio que la introduce.
+
+## Interfaz: navegación por rutas
+
+Decisión de diseño técnico; no modifica requisitos, API ni permisos. Cada pantalla de procesos tiene una dirección propia mediante el router de Angular, para que funcionen Atrás y Adelante del navegador, la recarga y los enlaces directos:
+
+| Ruta | Pantalla |
+| --- | --- |
+| `/procesos` (`?pagina=N`) | Listado paginado. `/` redirige aquí. |
+| `/procesos/nuevo` | Creación de borrador |
+| `/procesos/:id` | Ficha |
+| `/procesos/:id/editar` | Edición de borrador |
+| otra | Página no encontrada, con enlace al listado |
+
+- La estructura común, el saludo, los catálogos y la administración se mantienen en la misma página; solo el área de procesos depende de la ruta. Separar esas secciones en rutas propias requiere otra decisión.
+- Una ruta no concede acceso. Sin sesión se muestra el acceso y, al iniciar sesión, se abre la dirección solicitada. Un ID inexistente, no numérico o sin permiso se informa con los mensajes existentes (404/403); el servidor sigue autorizando cada llamada (PT-07). Las acciones visibles siguen calculándose con los perfiles vigentes.
+- Las rutas de edición y creación protegen los cambios sin guardar: se pide confirmación al navegar dentro de la aplicación (enlaces, Atrás o Adelante, cierre de sesión) y el navegador avisa al recargar o cerrar la pestaña. Al cancelar una navegación con Atrás o Adelante, la dirección visible se restablece.
+- La recarga de rutas profundas requiere que quien sirve el frontend responda `index.html` a toda ruta que no sea `/api` ni un archivo existente. En el entorno local lo hace `ng serve`. El proxy del despliegue definitivo, aún por concretar, debe aplicar la misma regla sin interceptar `/api`.
+
+Verificación: pruebas funcionales de rutas (listado, ficha, edición, creación, paginación en la dirección, ID no numérico, ruta desconocida) y de la protección de cambios sin guardar.
+
 ## Separación de entorno y presentación — corrección documental C-001 v4
 
 Los identificadores existentes de configuración/API se conservan por compatibilidad; no son textos de presentación. AUTH_MODE=demo, los endpoints y los marcadores internos no se renombran solo por motivos de presentación. Los textos visibles siguen la sección Presentación del producto, en [docs/especificacion.md](./especificacion.md).

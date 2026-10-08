@@ -1,8 +1,11 @@
 import { HttpClient, HttpErrorResponse } from '@angular/common/http';
-import { ChangeDetectorRef, Component, Input, OnInit, inject } from '@angular/core';
+import { ChangeDetectorRef, Component, DestroyRef, HostListener, OnInit, Signal, inject } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { FormsModule } from '@angular/forms';
-import { firstValueFrom } from 'rxjs';
-import { UiMessageComponent, UiPaginationComponent, UiPanelComponent } from './shared/ui';
+import { ActivatedRoute, ROUTER_OUTLET_DATA, Router, RouterLink } from '@angular/router';
+import { combineLatest, firstValueFrom } from 'rxjs';
+import { UiDialogService, UiMessageComponent, UiPaginationComponent, UiPanelComponent } from './shared/ui';
+import { LeavesWithConfirmation } from './unsaved-changes.guard';
 
 interface ProcessSummary {
   id: number;
@@ -135,20 +138,27 @@ const EMPTY_DRAFT: ProcessDraft = {
   periodicity: null
 };
 
+export interface ProcessOutletData {
+  userId: number;
+  profiles: string[];
+}
+
+type WorkspaceMode = 'list' | 'detail' | 'edit' | 'create';
+
 @Component({
   selector: 'app-process-workspace',
   standalone: true,
-  imports: [FormsModule, UiMessageComponent, UiPaginationComponent, UiPanelComponent],
+  imports: [FormsModule, RouterLink, UiMessageComponent, UiPaginationComponent, UiPanelComponent],
   template: `
     <ui-panel class="process-panel" headingId="processes-title" [eyebrow]="panelEyebrow" [heading]="panelHeading">
       @if (mode === 'list') {
         @if (canCreate) {
-          <button panelActions class="primary-button" type="button" [disabled]="busy" (click)="beginCreate()">Nuevo proceso</button>
+          <a panelActions class="primary-button" routerLink="/procesos/nuevo">Nuevo proceso</a>
         }
-      } @else if (mode === 'detail' && selected) {
-        <button panelActions class="text-button" type="button" (click)="showList()">Volver al listado</button>
+      } @else if (mode === 'detail') {
+        <a panelActions class="text-button" routerLink="/procesos">Volver al listado</a>
       } @else {
-        <button panelActions class="text-button" type="button" (click)="cancelEditor()">Cancelar</button>
+        <a panelActions class="text-button" [routerLink]="cancelLink">Cancelar</a>
       }
       @if (error) { <ui-message kind="error">{{ error }}</ui-message> }
       @if (notice) { <ui-message kind="success">{{ notice }}</ui-message> }
@@ -163,7 +173,7 @@ const EMPTY_DRAFT: ProcessDraft = {
                   <td>{{ process.code }}</td><td>{{ process.name || 'Sin nombre' }}</td>
                   <td>{{ process.macroprocessName }}</td><td>{{ process.processTypeName }}</td>
                   <td>{{ process.ownerDisplayName }}</td><td>{{ process.status }}</td>
-                  <td><button class="text-button" type="button" (click)="open(process.id)">Ver ficha</button></td>
+                  <td><a class="text-button" [routerLink]="['/procesos', process.id]">Ver ficha</a></td>
                 </tr>
               } @empty { <tr><td colspan="7">No hay procesos.</td></tr> }
             </tbody>
@@ -205,7 +215,7 @@ const EMPTY_DRAFT: ProcessDraft = {
         </dl>
         <div class="process-actions">
           @if (canEdit(selected)) {
-            <button class="primary-button" type="button" [disabled]="busy" (click)="beginEdit()">Editar borrador</button>
+            <a class="primary-button" [routerLink]="['/procesos', selected.id, 'editar']">Editar borrador</a>
           }
           @if (isAdmin) {
             <button class="text-button" type="button" [disabled]="busy" (click)="beginReassignment()">Reasignar responsable</button>
@@ -224,7 +234,7 @@ const EMPTY_DRAFT: ProcessDraft = {
             <button class="primary-button" type="submit" [disabled]="busy || newOwnerId === null || newOwnerId === selected.ownerUserId">Guardar responsable</button>
           </form>
         }
-      } @else {
+      } @else if (editorReady) {
         <form class="process-editor" (ngSubmit)="save()">
           <div class="process-field-grid">
             <div class="field">
@@ -287,13 +297,15 @@ const EMPTY_DRAFT: ProcessDraft = {
     </ui-panel>
   `
 })
-export class ProcessWorkspaceComponent implements OnInit {
-  @Input({ required: true }) userId!: number;
-  @Input({ required: true }) profiles: string[] = [];
-
+export class ProcessWorkspaceComponent implements OnInit, LeavesWithConfirmation {
   readonly textFields = TEXT_FIELDS;
   private readonly http = inject(HttpClient);
   private readonly changeDetector = inject(ChangeDetectorRef);
+  private readonly route = inject(ActivatedRoute);
+  private readonly router = inject(Router);
+  private readonly dialogs = inject(UiDialogService);
+  private readonly destroyRef = inject(DestroyRef);
+  private readonly outletData = inject(ROUTER_OUTLET_DATA) as Signal<ProcessOutletData>;
   processes: ProcessSummary[] = [];
   macroprocesses: CatalogOption[] = [];
   processTypes: CatalogOption[] = [];
@@ -305,7 +317,8 @@ export class ProcessWorkspaceComponent implements OnInit {
   total = 0;
   selected: ProcessRecord | null = null;
   draft: ProcessDraft = { ...EMPTY_DRAFT };
-  mode: 'list' | 'detail' | 'edit' | 'create' = 'list';
+  mode: WorkspaceMode = 'list';
+  editorReady = false;
   newOwnerId: number | null = null;
   error = '';
   notice = '';
@@ -313,6 +326,18 @@ export class ProcessWorkspaceComponent implements OnInit {
   reassigning = false;
   loadingParents = false;
   private parentPage = 0;
+  private savedDraft = '';
+  // El estado de la navegación solo está disponible mientras se activa la ruta (constructor).
+  private readonly navigationNotice = noticeFrom(this.router.currentNavigation()?.extras.state);
+  private destroyed = false;
+
+  get userId(): number {
+    return this.outletData().userId;
+  }
+
+  get profiles(): string[] {
+    return this.outletData().profiles;
+  }
 
   get canCreate(): boolean {
     return this.isAdmin || this.profiles.includes('PROCESS_OWNER');
@@ -333,48 +358,48 @@ export class ProcessWorkspaceComponent implements OnInit {
     return this.mode === 'create' ? 'Nuevo proceso' : 'Editar proceso';
   }
 
-  async ngOnInit(): Promise<void> {
-    await this.run(async () => {
-      await Promise.all([this.loadProcesses(), this.loadCatalogs()]);
-      if (this.isAdmin) this.owners = await firstValueFrom(this.http.get<OwnerOption[]>('/api/users/process-owners'));
+  get cancelLink(): (string | number)[] {
+    return this.mode === 'edit' && this.selected ? ['/procesos', this.selected.id] : ['/procesos'];
+  }
+
+  get hasUnsavedChanges(): boolean {
+    return this.editorReady && JSON.stringify(this.draft) !== this.savedDraft;
+  }
+
+  ngOnInit(): void {
+    this.destroyRef.onDestroy(() => (this.destroyed = true));
+    let notice = this.navigationNotice;
+    combineLatest([this.route.data, this.route.paramMap, this.route.queryParamMap])
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe(([data, params, query]) => {
+        void this.load(data['mode'] as WorkspaceMode, params.get('id'), query.get('pagina'), notice);
+        notice = '';
+      });
+  }
+
+  confirmLeave(): boolean | Promise<boolean> {
+    if (!this.hasUnsavedChanges) return true;
+    return this.dialogs.confirm({
+      title: 'Cambios sin guardar',
+      message: 'El borrador tiene cambios sin guardar. ¿Salir sin guardarlos?',
+      confirmLabel: 'Salir sin guardar',
+      cancelLabel: 'Seguir editando',
+      tone: 'danger'
     });
+  }
+
+  @HostListener('window:beforeunload', ['$event'])
+  warnBeforeUnload(event: BeforeUnloadEvent): void {
+    if (!this.hasUnsavedChanges) return;
+    event.preventDefault();
+    event.returnValue = '';
   }
 
   async changePage(page: number): Promise<void> {
-    this.page = page;
-    await this.run(() => this.loadProcesses());
-  }
-
-  async open(id: number): Promise<void> {
-    await this.run(async () => {
-      this.selected = await firstValueFrom(this.http.get<ProcessRecord>(`/api/processes/${id}`));
-      this.reassigning = false;
-      this.mode = 'detail';
-      await this.loadParentProcesses(true);
+    await this.router.navigate([], {
+      relativeTo: this.route,
+      queryParams: { pagina: page > 1 ? page : null }
     });
-  }
-
-  beginCreate(): void {
-    this.clearMessages();
-    this.selected = null;
-    this.draft = { ...EMPTY_DRAFT };
-    this.mode = 'create';
-    void this.prepareEditor();
-  }
-
-  beginEdit(): void {
-    if (!this.selected) return;
-    this.clearMessages();
-    const record = this.selected;
-    this.draft = {
-      ...EMPTY_DRAFT,
-      macroprocessId: record.macroprocessId,
-      processTypeId: record.processTypeId,
-      parentProcessId: record.parentProcessId,
-      ...Object.fromEntries(TEXT_FIELDS.map((field) => [field.key, record[field.key]]))
-    };
-    this.mode = 'edit';
-    void this.prepareEditor();
   }
 
   setTextField(key: TextFieldKey, value: string | null): void {
@@ -391,22 +416,23 @@ export class ProcessWorkspaceComponent implements OnInit {
         processTypeId: this.draft.processTypeId,
         parentProcessId: this.draft.parentProcessId
       };
+      let id: number;
+      let notice: string;
       if (this.mode === 'create') {
-        const created = await firstValueFrom(this.http.post<ProcessRecord>('/api/processes', body));
-        this.selected = await firstValueFrom(this.http.get<ProcessRecord>(`/api/processes/${created.id}`));
-        this.notice = 'Borrador creado.';
+        id = (await firstValueFrom(this.http.post<ProcessRecord>('/api/processes', body))).id;
+        notice = 'Borrador creado.';
       } else if (this.selected) {
         await firstValueFrom(this.http.patch(`/api/processes/${this.selected.id}`, {
           ...body,
           revision: this.selected.revision
         }));
-        this.selected = await firstValueFrom(this.http.get<ProcessRecord>(`/api/processes/${this.selected.id}`));
-        this.notice = 'Borrador actualizado.';
+        id = this.selected.id;
+        notice = 'Borrador actualizado.';
+      } else {
+        return;
       }
-      this.mode = 'detail';
-      this.reassigning = false;
-      this.page = 1;
-      await this.loadProcesses();
+      this.savedDraft = JSON.stringify(this.draft);
+      await this.router.navigate(['/procesos', id], { state: { notice } });
     });
   }
 
@@ -426,7 +452,6 @@ export class ProcessWorkspaceComponent implements OnInit {
       this.selected = await firstValueFrom(this.http.get<ProcessRecord>(`/api/processes/${this.selected!.id}`));
       this.reassigning = false;
       this.notice = 'Responsable actualizado.';
-      await this.loadProcesses();
     });
   }
 
@@ -445,20 +470,44 @@ export class ProcessWorkspaceComponent implements OnInit {
     return parent ? `${parent.code} · ${parent.name}` : `Proceso ${id}`;
   }
 
-  cancelEditor(): void {
-    this.mode = this.selected ? 'detail' : 'list';
-    this.clearMessages();
-  }
-
-  showList(): void {
-    this.mode = 'list';
-    this.selected = null;
-    this.reassigning = false;
-    this.clearMessages();
-  }
-
   async loadMoreParents(): Promise<void> {
     await this.run(() => this.loadParentProcesses(false));
+  }
+
+  private async load(mode: WorkspaceMode, idParam: string | null, pageParam: string | null, notice: string): Promise<void> {
+    this.mode = mode;
+    this.selected = null;
+    this.editorReady = false;
+    this.reassigning = false;
+    await this.run(async () => {
+      if (mode === 'list') {
+        this.page = positiveInteger(pageParam) ?? 1;
+        await this.loadProcesses();
+      } else if (mode === 'create') {
+        if (!this.canCreate) throw new HttpErrorResponse({ status: 403 });
+        await this.prepareEditor();
+        this.startDraft({ ...EMPTY_DRAFT });
+      } else {
+        const id = positiveInteger(idParam);
+        if (id === null) throw new HttpErrorResponse({ status: 404 });
+        this.selected = await firstValueFrom(this.http.get<ProcessRecord>(`/api/processes/${id}`));
+        if (mode === 'edit') {
+          if (!this.canEdit(this.selected)) throw new HttpErrorResponse({ status: 403 });
+          await this.prepareEditor();
+          this.startDraft(draftFrom(this.selected));
+        } else {
+          await this.loadParentProcesses(true);
+          if (this.isAdmin) this.owners = await firstValueFrom(this.http.get<OwnerOption[]>('/api/users/process-owners'));
+        }
+      }
+      this.notice = notice;
+    });
+  }
+
+  private startDraft(draft: ProcessDraft): void {
+    this.draft = draft;
+    this.savedDraft = JSON.stringify(draft);
+    this.editorReady = true;
   }
 
   private async prepareEditor(): Promise<void> {
@@ -532,7 +581,7 @@ export class ProcessWorkspaceComponent implements OnInit {
             : 'No fue posible completar la operación.';
     } finally {
       this.busy = false;
-      this.changeDetector.detectChanges();
+      if (!this.destroyed) this.changeDetector.detectChanges();
     }
   }
 
@@ -540,4 +589,24 @@ export class ProcessWorkspaceComponent implements OnInit {
     this.error = '';
     this.notice = '';
   }
+}
+
+function noticeFrom(state: Record<string, unknown> | undefined): string {
+  return typeof state?.['notice'] === 'string' ? state['notice'] : '';
+}
+
+function positiveInteger(value: string | null): number | null {
+  if (value === null || !/^\d{1,15}$/.test(value)) return null;
+  const number = Number(value);
+  return number > 0 ? number : null;
+}
+
+function draftFrom(record: ProcessRecord): ProcessDraft {
+  return {
+    ...EMPTY_DRAFT,
+    macroprocessId: record.macroprocessId,
+    processTypeId: record.processTypeId,
+    parentProcessId: record.parentProcessId,
+    ...Object.fromEntries(TEXT_FIELDS.map((field) => [field.key, record[field.key]]))
+  };
 }

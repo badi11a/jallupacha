@@ -1,63 +1,74 @@
 /* Tokens de diseño del kit. Las aplicaciones cambian la identidad visual
-   redefiniendo estas propiedades, no editando los componentes. */
+   redefiniendo estas propiedades, no editando los componentes.
+   Colores en hexadecimal de 6 dígitos: scripts/check-contrast.mjs los verifica (WCAG 2.2 AA). */
 :root {
-  --ui-font-family: "Segoe UI", Arial, sans-serif;
-  --ui-font-size-xs: .72rem;
-  --ui-font-size-sm: .82rem;
-  --ui-font-size-md: .92rem;
-  --ui-font-size-lg: 1.25rem;
-  --ui-font-size-display: clamp(1.8rem, 3vw, 2.5rem);
-  --ui-font-weight-medium: 650;
+  /* Fuentes del sistema: sin descargas ni orígenes externos (CSP font-src 'self'). */
+  --ui-font-family: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  --ui-font-family-mono: ui-monospace, "Cascadia Mono", Consolas, "Liberation Mono", monospace;
+  --ui-font-size-base: 1rem;
+  --ui-font-size-xs: .75rem;
+  --ui-font-size-sm: .8125rem;
+  --ui-font-size-md: .9375rem;
+  --ui-font-size-lg: 1.125rem;
+  --ui-font-size-display: clamp(1.6rem, 2.6vw, 1.75rem);
+  --ui-line-height: 1.5;
+  --ui-font-weight-medium: 600;
   --ui-font-weight-bold: 700;
+  --ui-font-weight-heavy: 800;
 
-  --ui-color-text: #172b27;
-  --ui-color-text-muted: #5b6e68;
-  --ui-color-text-subtle: #657770;
-  --ui-color-heading-subtle: #49645a;
-  --ui-color-eyebrow: #52766c;
-  --ui-color-background: #f4f7f5;
+  --ui-color-text: #29283f;
+  --ui-color-text-muted: #55566b;
+  --ui-color-text-subtle: #626477;
+  --ui-color-heading: #22213f;
+  --ui-color-heading-subtle: #55566b;
+  --ui-color-eyebrow: #3f639c;
+  --ui-color-background: #f4f7f9;
   --ui-color-surface: #ffffff;
-  --ui-color-border: #dfe8e3;
-  --ui-color-border-strong: #bdccc5;
-  --ui-color-divider: #edf1ef;
-  --ui-color-table-border: #e8eeeb;
+  --ui-color-surface-accent: #edf3fb;
+  --ui-color-border: #dde2eb;
+  --ui-color-border-strong: #8a93a6;
+  --ui-color-divider: #e8ecf2;
+  --ui-color-table-border: #e8ecf2;
 
-  --ui-color-brand: #143d35;
+  --ui-color-brand: #22213f;
   --ui-color-on-brand: #ffffff;
-  --ui-color-brand-accent: #84b2a2;
-  --ui-color-primary: #17614f;
-  --ui-color-primary-hover: #0d4f40;
+  --ui-color-brand-accent: #789dd1;
+  --ui-color-primary: #3f639c;
+  --ui-color-primary-hover: #2f4b7a;
   --ui-color-on-primary: #ffffff;
-  --ui-color-quiet-hover-border: #bed3ca;
-  --ui-color-quiet-hover-background: #f0f6f3;
-  --ui-color-focus: #d9792b;
+  --ui-color-quiet-hover-border: #c8d0de;
+  --ui-color-quiet-hover-background: #edf3fb;
+  --ui-color-focus: #c4541a;
+  --ui-color-backdrop: rgba(34, 33, 63, .4);
 
-  --ui-color-info-text: #172b27;
-  --ui-color-info-background: #e8f0ec;
-  --ui-color-success-text: #155a37;
-  --ui-color-success-background: #e6f5eb;
-  --ui-color-error-text: #762d2d;
-  --ui-color-error-background: #fff0ee;
-  --ui-color-danger: #a03a32;
-  --ui-color-danger-hover: #84291f;
-  --ui-color-warning-text: #633d0e;
-  --ui-color-warning-background: #fff7e7;
-  --ui-color-warning-border: #e4c185;
-  --ui-color-status: #7a4b15;
+  --ui-color-info-text: #29283f;
+  --ui-color-info-background: #edf3fb;
+  --ui-color-success-text: #277443;
+  --ui-color-success-background: #e4f4e9;
+  --ui-color-error-text: #982d2d;
+  --ui-color-error-background: #fae0e0;
+  --ui-color-danger: #a83232;
+  --ui-color-danger-hover: #7a2626;
+  --ui-color-warning-text: #826513;
+  --ui-color-warning-background: #fff3cd;
+  --ui-color-warning-border: #deb01f;
+  --ui-color-status: #826513;
 
   --ui-space-1: .25rem;
   --ui-space-2: .5rem;
   --ui-space-3: .8rem;
   --ui-space-4: 1rem;
-  --ui-space-5: 1.35rem;
-  --ui-space-6: 2.5rem;
+  --ui-space-5: 1.5rem;
+  --ui-space-6: 2rem;
 
-  --ui-radius-sm: 5px;
-  --ui-radius-md: 6px;
+  --ui-radius-sm: 4px;
+  --ui-radius-md: 7px;
   --ui-radius-lg: 8px;
   --ui-radius-xl: 12px;
-  --ui-shadow-panel: 0 5px 20px #203c3210;
-  --ui-shadow-dialog: 0 18px 50px #0f2a2440;
+  --ui-radius-pill: 999px;
+  --ui-shadow-panel: 0 4px 16px rgba(34, 33, 63, .04);
+  --ui-shadow-raised: 0 2px 5px rgba(34, 33, 63, .12);
+  --ui-shadow-dialog: 0 18px 50px rgba(34, 33, 63, .22);
   --ui-control-height: 42px;
   --ui-content-width: 1180px;
 }

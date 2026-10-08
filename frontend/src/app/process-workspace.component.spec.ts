@@ -1,8 +1,12 @@
 import { provideHttpClient, withXsrfConfiguration } from '@angular/common/http';
 import { HttpTestingController, provideHttpClientTesting } from '@angular/common/http/testing';
-import { provideZoneChangeDetection } from '@angular/core';
+import { Component, provideZoneChangeDetection } from '@angular/core';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-import { ProcessWorkspaceComponent } from './process-workspace.component';
+import { By } from '@angular/platform-browser';
+import { Router, RouterOutlet, provideRouter, withRouterConfig } from '@angular/router';
+import { routes } from './app.routes';
+import { ProcessOutletData, ProcessWorkspaceComponent } from './process-workspace.component';
+import { UiDialogHostComponent } from './shared/ui';
 
 const emptyPage = { items: [], total: 0, page: 1, limit: 20 };
 const summary = {
@@ -45,15 +49,28 @@ const detail = {
   internalUnits: null,
   bpmnModel: null
 };
+const macroprocesses = [{ id: 1, name: 'Estratégicos', isActive: 1 }];
+const processTypes = [{ id: 2, name: 'Institucional', isActive: 1 }];
+
+@Component({
+  imports: [RouterOutlet, UiDialogHostComponent],
+  template: `<router-outlet [routerOutletData]="session" /><ui-dialog-host />`
+})
+class HostComponent {
+  session: ProcessOutletData = { userId: 9, profiles: ['CONSULTATION'] };
+}
 
 describe('ProcessWorkspaceComponent', () => {
   let http: HttpTestingController;
+  let router: Router;
+  let fixture: ComponentFixture<HostComponent>;
 
   beforeEach(() => {
     TestBed.configureTestingModule({
-      imports: [ProcessWorkspaceComponent],
+      imports: [HostComponent],
       providers: [
         provideZoneChangeDetection(),
+        provideRouter(routes, withRouterConfig({ canceledNavigationResolution: 'computed' })),
         provideHttpClient(withXsrfConfiguration({
           cookieName: 'jallupacha_csrf',
           headerName: 'X-CSRF-Token'
@@ -62,166 +79,230 @@ describe('ProcessWorkspaceComponent', () => {
       ]
     });
     http = TestBed.inject(HttpTestingController);
+    router = TestBed.inject(Router);
   });
 
-  afterEach(() => http.verify());
+  afterEach(() => {
+    fixture?.destroy();
+    http.verify();
+  });
 
-  it('shows the paginated list and complete read-only ficha to Consulta', async () => {
-    const fixture = TestBed.createComponent(ProcessWorkspaceComponent);
-    fixture.componentRef.setInput('userId', 9);
-    fixture.componentRef.setInput('profiles', ['CONSULTATION']);
+  async function start(url: string, session: ProcessOutletData): Promise<void> {
+    fixture = TestBed.createComponent(HostComponent);
+    fixture.componentInstance.session = session;
     fixture.detectChanges();
-    http.expectOne('/api/processes?page=1&limit=20').flush({ ...emptyPage, items: [summary], total: 1 });
-    http.expectOne('/api/macroprocesses').flush([]);
-    http.expectOne('/api/process-types').flush([]);
-    await settle(fixture);
-    expect(fixture.componentInstance.processes).toEqual([summary]);
+    await router.navigateByUrl(url);
+    await settle();
+  }
 
-    let text = fixture.nativeElement.textContent as string;
-    expect(text).toContain('PR8');
-    expect(text).toContain('Proceso institucional');
-    expect(text).not.toContain('Nuevo proceso');
+  async function settle(): Promise<void> {
+    await fixture.whenStable();
+    await new Promise<void>((resolve) => setTimeout(resolve, 0));
+    fixture.detectChanges();
+  }
 
-    const openButton = [...fixture.nativeElement.querySelectorAll('button')]
-      .find((button: HTMLButtonElement) => button.textContent?.trim() === 'Ver ficha') as HTMLButtonElement;
-    openButton.click();
-    http.expectOne('/api/processes/8').flush(detail);
-    await settle(fixture);
+  // Sin whenStable: una navegación detenida en una guarda mantiene la aplicación ocupada.
+  async function tick(): Promise<void> {
+    await new Promise<void>((resolve) => setTimeout(resolve, 0));
+    fixture.detectChanges();
+  }
+
+  function workspace(): ProcessWorkspaceComponent {
+    return fixture.debugElement.query(By.directive(ProcessWorkspaceComponent)).componentInstance;
+  }
+
+  function text(): string {
+    return fixture.nativeElement.textContent as string;
+  }
+
+  function control(label: string): HTMLElement | undefined {
+    return [...fixture.nativeElement.querySelectorAll('a, button')]
+      .find((element: HTMLElement) => element.textContent?.trim() === label) as HTMLElement | undefined;
+  }
+
+  async function flushDetail(record = detail): Promise<void> {
+    http.expectOne('/api/processes/8').flush(record);
+    await settle();
     http.expectOne('/api/processes?page=1&limit=100').flush({ ...emptyPage, items: [summary], total: 1, limit: 100 });
-    await settle(fixture);
+    await settle();
+  }
 
-    text = fixture.nativeElement.textContent as string;
-    expect(text).toContain('Responsable actual · ID 7');
-    expect(text).toContain('EstadoBorrador');
-    expect(text).toContain('Modelo del proceso (BPMN)Sin información');
-    expect(text).toContain('Unidades internasSin información');
-    expect(text).not.toContain('Editar borrador');
-    expect(text).not.toContain('Reasignar responsable');
-    fixture.destroy();
+  async function flushEditor(record = detail): Promise<void> {
+    http.expectOne('/api/processes/8').flush(record);
+    await settle();
+    http.expectOne('/api/macroprocesses').flush(macroprocesses);
+    http.expectOne('/api/process-types').flush(processTypes);
+    http.expectOne('/api/processes?page=1&limit=100').flush({ ...emptyPage, items: [summary], total: 1, limit: 100 });
+    await settle();
+  }
+
+  it('shows the paginated list and opens the complete read-only ficha by link for Consulta', async () => {
+    await start('/procesos', { userId: 9, profiles: ['CONSULTATION'] });
+    http.expectOne('/api/processes?page=1&limit=20').flush({ ...emptyPage, items: [summary], total: 1 });
+    await settle();
+    expect(workspace().processes).toEqual([summary]);
+    expect(text()).toContain('PR8');
+    expect(text()).toContain('Proceso institucional');
+    expect(control('Nuevo proceso')).toBeUndefined();
+
+    const openLink = control('Ver ficha') as HTMLAnchorElement;
+    expect(openLink.tagName).toBe('A');
+    expect(openLink.getAttribute('href')).toBe('/procesos/8');
+    openLink.click();
+    await settle();
+    await flushDetail();
+
+    expect(router.url).toBe('/procesos/8');
+    expect(text()).toContain('Responsable actual · ID 7');
+    expect(text()).toContain('EstadoBorrador');
+    expect(text()).toContain('Modelo del proceso (BPMN)Sin información');
+    expect(text()).toContain('Unidades internasSin información');
+    expect(control('Editar borrador')).toBeUndefined();
+    expect(control('Reasignar responsable')).toBeUndefined();
+    expect(control('Volver al listado')?.getAttribute('href')).toBe('/procesos');
   });
 
-  it('lets a process owner start and save an incomplete draft without exposing workflow actions', async () => {
-    const fixture = TestBed.createComponent(ProcessWorkspaceComponent);
-    fixture.componentRef.setInput('userId', 7);
-    fixture.componentRef.setInput('profiles', ['PROCESS_OWNER']);
-    fixture.detectChanges();
+  it('keeps the list page in the address', async () => {
+    await start('/procesos?pagina=2', { userId: 9, profiles: ['CONSULTATION'] });
+    http.expectOne('/api/processes?page=2&limit=20').flush({ ...emptyPage, items: [summary], total: 25, page: 2 });
+    await settle();
+    expect(text()).toContain('Página 2 · 25 procesos');
+
+    (control('Anterior') as HTMLButtonElement).click();
+    await settle();
+    expect(router.url).toBe('/procesos');
+    http.expectOne('/api/processes?page=1&limit=20').flush({ ...emptyPage, items: [summary], total: 25 });
+    await settle();
+    expect(text()).toContain('Página 1 · 25 procesos');
+  });
+
+  it('lets a process owner create an incomplete draft and lands on its ficha', async () => {
+    await start('/procesos', { userId: 7, profiles: ['PROCESS_OWNER'] });
     http.expectOne('/api/processes?page=1&limit=20').flush(emptyPage);
-    http.expectOne('/api/macroprocesses').flush([{ id: 1, name: 'Estratégicos', isActive: 1 }]);
-    http.expectOne('/api/process-types').flush([{ id: 2, name: 'Institucional', isActive: 1 }]);
-    await settle(fixture);
+    await settle();
 
-    const createButton = [...fixture.nativeElement.querySelectorAll('button')]
-      .find((button: HTMLButtonElement) => button.textContent?.trim() === 'Nuevo proceso') as HTMLButtonElement;
-    createButton.click();
-    await settle(fixture);
-    http.expectOne('/api/macroprocesses').flush([{ id: 1, name: 'Estratégicos', isActive: 1 }]);
-    http.expectOne('/api/process-types').flush([{ id: 2, name: 'Institucional', isActive: 1 }]);
+    (control('Nuevo proceso') as HTMLAnchorElement).click();
+    await settle();
+    expect(router.url).toBe('/procesos/nuevo');
+    http.expectOne('/api/macroprocesses').flush(macroprocesses);
+    http.expectOne('/api/process-types').flush(processTypes);
     http.expectOne('/api/processes?page=1&limit=100').flush(emptyPage);
-    await settle(fixture);
+    await settle();
 
-    expect(fixture.nativeElement.textContent).toContain('Nuevo proceso');
-    expect(fixture.nativeElement.textContent).toContain('se guardará en estado Borrador');
-    expect(fixture.nativeElement.textContent).not.toMatch(/Enviar a revisión|Aprobar|Rechazar/i);
+    expect(text()).toContain('Nuevo proceso');
+    expect(text()).toContain('se guardará en estado Borrador');
+    expect(text()).not.toMatch(/Enviar a revisión|Aprobar|Rechazar/i);
     expect(fixture.nativeElement.querySelector('#process-name')).not.toBeNull();
     expect(fixture.nativeElement.querySelector('#process-involvedParties')?.previousElementSibling?.textContent)
       .toContain('no nombres de personas');
 
-    fixture.componentInstance.draft.macroprocessId = 1;
-    fixture.componentInstance.draft.processTypeId = 2;
+    workspace().draft.macroprocessId = 1;
+    workspace().draft.processTypeId = 2;
     fixture.detectChanges();
-    const form = fixture.nativeElement.querySelector('.process-editor') as HTMLFormElement;
-    form.dispatchEvent(new Event('submit', { bubbles: true, cancelable: true }));
+    (fixture.nativeElement.querySelector('.process-editor') as HTMLFormElement)
+      .dispatchEvent(new Event('submit', { bubbles: true, cancelable: true }));
     const createRequest = http.expectOne('/api/processes');
-    expect(createRequest.request.body).toMatchObject({
-      macroprocessId: 1,
-      processTypeId: 2,
-      name: null,
-      parentProcessId: null
-    });
+    expect(createRequest.request.body).toMatchObject({ macroprocessId: 1, processTypeId: 2, name: null, parentProcessId: null });
     createRequest.flush(detail);
-    await settle(fixture);
-    http.expectOne('/api/processes/8').flush(detail);
-    await settle(fixture);
-    http.expectOne('/api/processes?page=1&limit=20').flush(emptyPage);
-    await settle(fixture);
-    expect(fixture.nativeElement.textContent).toContain('Borrador creado.');
-    expect(fixture.nativeElement.textContent).not.toMatch(/Enviar a revisión|Aprobar|Rechazar/i);
-    fixture.destroy();
+    await settle();
+    await flushDetail();
+
+    expect(router.url).toBe('/procesos/8');
+    expect(text()).toContain('Borrador creado.');
+    expect(text()).not.toMatch(/Enviar a revisión|Aprobar|Rechazar/i);
   });
 
-  it('lets the responsible process owner edit a draft and reload the saved ficha', async () => {
-    const fixture = TestBed.createComponent(ProcessWorkspaceComponent);
-    fixture.componentRef.setInput('userId', 7);
-    fixture.componentRef.setInput('profiles', ['PROCESS_OWNER']);
-    fixture.detectChanges();
-    http.expectOne('/api/processes?page=1&limit=20').flush({ ...emptyPage, items: [summary], total: 1 });
-    http.expectOne('/api/macroprocesses').flush([{ id: 1, name: 'Estratégicos', isActive: 1 }]);
-    http.expectOne('/api/process-types').flush([{ id: 2, name: 'Institucional', isActive: 1 }]);
-    await settle(fixture);
+  it('opens the editor by direct address and returns to the saved ficha', async () => {
+    await start('/procesos/8/editar', { userId: 7, profiles: ['PROCESS_OWNER'] });
+    await flushEditor();
+    expect((fixture.nativeElement.querySelector('#process-name') as HTMLInputElement).value).toBe('Proceso institucional');
 
-    [...fixture.nativeElement.querySelectorAll('button')]
-      .find((button: HTMLButtonElement) => button.textContent?.trim() === 'Ver ficha')!.click();
-    http.expectOne('/api/processes/8').flush(detail);
-    await settle(fixture);
-    http.expectOne('/api/processes?page=1&limit=100').flush({ ...emptyPage, items: [summary], total: 1 });
-    await settle(fixture);
-
-    [...fixture.nativeElement.querySelectorAll('button')]
-      .find((button: HTMLButtonElement) => button.textContent?.trim() === 'Editar borrador')!.click();
-    http.expectOne('/api/macroprocesses').flush([{ id: 1, name: 'Estratégicos', isActive: 1 }]);
-    http.expectOne('/api/process-types').flush([{ id: 2, name: 'Institucional', isActive: 1 }]);
-    http.expectOne('/api/processes?page=1&limit=100').flush({ ...emptyPage, items: [summary], total: 1 });
-    await settle(fixture);
-
-    fixture.componentInstance.draft['name'] = 'Proceso actualizado';
+    workspace().draft['name'] = 'Proceso actualizado';
     fixture.detectChanges();
     (fixture.nativeElement.querySelector('.process-editor') as HTMLFormElement)
       .dispatchEvent(new Event('submit', { bubbles: true, cancelable: true }));
     const update = http.expectOne('/api/processes/8');
     expect(update.request.method).toBe('PATCH');
-    expect(update.request.body).toMatchObject({
-      revision: 1,
-      name: 'Proceso actualizado',
-      macroprocessId: 1,
-      processTypeId: 2
-    });
+    expect(update.request.body).toMatchObject({ revision: 1, name: 'Proceso actualizado', macroprocessId: 1, processTypeId: 2 });
     update.flush({ ...detail, revision: 2, name: 'Proceso actualizado' });
-    await settle(fixture);
-    http.expectOne('/api/processes/8').flush({ ...detail, revision: 2, name: 'Proceso actualizado' });
-    await settle(fixture);
-    http.expectOne('/api/processes?page=1&limit=20').flush({ ...emptyPage, items: [summary], total: 1 });
-    await settle(fixture);
+    await settle();
+    await flushDetail({ ...detail, revision: 2, name: 'Proceso actualizado' });
 
-    expect(fixture.nativeElement.textContent).toContain('Borrador actualizado.');
-    expect(fixture.nativeElement.textContent).toContain('Proceso actualizado');
-    expect(fixture.componentInstance.selected?.revision).toBe(2);
-    fixture.destroy();
+    expect(router.url).toBe('/procesos/8');
+    expect(text()).toContain('Borrador actualizado.');
+    expect(text()).toContain('Proceso actualizado');
+    expect(workspace().selected?.revision).toBe(2);
+  });
+
+  it('asks before leaving an editor with unsaved changes', async () => {
+    await start('/procesos/8/editar', { userId: 7, profiles: ['PROCESS_OWNER'] });
+    await flushEditor();
+
+    const name = fixture.nativeElement.querySelector('#process-name') as HTMLInputElement;
+    name.value = 'Cambio pendiente';
+    name.dispatchEvent(new Event('input'));
+    fixture.detectChanges();
+    const unload = new Event('beforeunload', { cancelable: true });
+    window.dispatchEvent(unload);
+    expect(unload.defaultPrevented).toBe(true);
+
+    (control('Cancelar') as HTMLAnchorElement).click();
+    await tick();
+    let dialog = fixture.nativeElement.querySelector('dialog') as HTMLDialogElement;
+    expect(dialog.textContent).toContain('El borrador tiene cambios sin guardar.');
+    ([...dialog.querySelectorAll('button')].find((button) => button.textContent?.trim() === 'Seguir editando')!).click();
+    await settle();
+    expect(router.url).toBe('/procesos/8/editar');
+    expect(workspace().draft['name']).toBe('Cambio pendiente');
+
+    (control('Cancelar') as HTMLAnchorElement).click();
+    await tick();
+    dialog = fixture.nativeElement.querySelector('dialog') as HTMLDialogElement;
+    ([...dialog.querySelectorAll('button')].find((button) => button.textContent?.trim() === 'Salir sin guardar')!).click();
+    await settle();
+    expect(router.url).toBe('/procesos/8');
+    await flushDetail();
+    http.expectNone({ method: 'PATCH', url: '/api/processes/8' });
+  });
+
+  it('leaves an unchanged editor without asking', async () => {
+    await start('/procesos/8/editar', { userId: 7, profiles: ['PROCESS_OWNER'] });
+    await flushEditor();
+    (control('Cancelar') as HTMLAnchorElement).click();
+    await settle();
+    expect(fixture.nativeElement.querySelector('dialog')).toBeNull();
+    expect(router.url).toBe('/procesos/8');
+    await flushDetail();
+  });
+
+  it('does not open the editor by address without permission to edit', async () => {
+    await start('/procesos/8/editar', { userId: 9, profiles: ['CONSULTATION'] });
+    http.expectOne('/api/processes/8').flush(detail);
+    await settle();
+    expect(text()).toContain('La acción no está autorizada para este perfil.');
+    expect(fixture.nativeElement.querySelector('.process-editor')).toBeNull();
+  });
+
+  it('rejects invalid process addresses and unknown sections without calling the API', async () => {
+    await start('/procesos/abc', { userId: 9, profiles: ['CONSULTATION'] });
+    expect(text()).toContain('El proceso solicitado ya no está disponible.');
+
+    await router.navigateByUrl('/otra-seccion');
+    await settle();
+    expect(text()).toContain('Página no encontrada');
+    expect(control('Ir a Procesos')?.getAttribute('href')).toBe('/procesos');
   });
 
   it('lets an administrator reassign a draft and reload its current responsible user', async () => {
-    const fixture = TestBed.createComponent(ProcessWorkspaceComponent);
-    fixture.componentRef.setInput('userId', 1);
-    fixture.componentRef.setInput('profiles', ['ADMIN']);
-    fixture.detectChanges();
-    http.expectOne('/api/processes?page=1&limit=20').flush({ ...emptyPage, items: [summary], total: 1 });
-    http.expectOne('/api/macroprocesses').flush([]);
-    http.expectOne('/api/process-types').flush([]);
-    await settle(fixture);
+    await start('/procesos/8', { userId: 1, profiles: ['ADMIN'] });
+    await flushDetail();
     http.expectOne('/api/users/process-owners').flush([{ id: 9, displayName: 'Nueva responsable' }]);
-    await settle(fixture);
+    await settle();
 
-    [...fixture.nativeElement.querySelectorAll('button')]
-      .find((button: HTMLButtonElement) => button.textContent?.trim() === 'Ver ficha')!.click();
-    http.expectOne('/api/processes/8').flush(detail);
-    await settle(fixture);
-    http.expectOne('/api/processes?page=1&limit=100').flush({ ...emptyPage, items: [summary], total: 1 });
-    await settle(fixture);
-
-    [...fixture.nativeElement.querySelectorAll('button')]
-      .find((button: HTMLButtonElement) => button.textContent?.trim() === 'Reasignar responsable')!.click();
-    await settle(fixture);
-    expect(fixture.nativeElement.textContent).toContain('Nueva responsable · ID 9');
-    fixture.componentInstance.newOwnerId = 9;
+    (control('Reasignar responsable') as HTMLButtonElement).click();
+    await settle();
+    expect(text()).toContain('Nueva responsable · ID 9');
+    workspace().newOwnerId = 9;
     fixture.detectChanges();
     (fixture.nativeElement.querySelector('.process-editor') as HTMLFormElement)
       .dispatchEvent(new Event('submit', { bubbles: true, cancelable: true }));
@@ -229,28 +310,11 @@ describe('ProcessWorkspaceComponent', () => {
     expect(reassignment.request.method).toBe('PATCH');
     expect(reassignment.request.body).toEqual({ ownerUserId: 9, revision: 1 });
     reassignment.flush({ ...detail, ownerUserId: 9, ownerDisplayName: 'Nueva responsable' });
-    await settle(fixture);
-    http.expectOne('/api/processes/8').flush({
-      ...detail,
-      ownerUserId: 9,
-      ownerDisplayName: 'Nueva responsable'
-    });
-    await settle(fixture);
-    http.expectOne('/api/processes?page=1&limit=20').flush({
-      ...emptyPage,
-      items: [{ ...summary, ownerUserId: 9, ownerDisplayName: 'Nueva responsable' }],
-      total: 1
-    });
-    await settle(fixture);
+    await settle();
+    http.expectOne('/api/processes/8').flush({ ...detail, ownerUserId: 9, ownerDisplayName: 'Nueva responsable' });
+    await settle();
 
-    expect(fixture.nativeElement.textContent).toContain('Responsable actualizado.');
-    expect(fixture.nativeElement.textContent).toContain('Nueva responsable · ID 9');
-    fixture.destroy();
+    expect(text()).toContain('Responsable actualizado.');
+    expect(text()).toContain('Nueva responsable · ID 9');
   });
 });
-
-async function settle(fixture: ComponentFixture<ProcessWorkspaceComponent>): Promise<void> {
-  await fixture.whenStable();
-  await new Promise<void>((resolve) => setTimeout(resolve, 0));
-  fixture.detectChanges();
-}

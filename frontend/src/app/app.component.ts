@@ -5,7 +5,7 @@ import { Component, OnInit, inject } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { firstValueFrom } from 'rxjs';
 import { environment } from '../environments/environment';
-import { ProcessWorkspaceComponent } from './process-workspace.component';
+import { Router, RouterOutlet } from '@angular/router';
 import { UiAppShellComponent, UiDialogService, UiMessageComponent, UiPanelComponent } from './shared/ui';
 
 interface DemoIdentity {
@@ -65,7 +65,7 @@ const PROFILE_CODES = Object.keys(PROFILE_LABELS);
 @Component({
   selector: 'app-root',
   standalone: true,
-  imports: [FormsModule, DatePipe, ProcessWorkspaceComponent, UiAppShellComponent, UiMessageComponent, UiPanelComponent],
+  imports: [FormsModule, DatePipe, RouterOutlet, UiAppShellComponent, UiMessageComponent, UiPanelComponent],
   template: `
     <ui-app-shell appName="Sistema de Procesos Institucionales" brandMark="J"
       footerText="Jallupacha · Gestión interna de procesos"
@@ -99,7 +99,7 @@ const PROFILE_CODES = Object.keys(PROFILE_LABELS);
           <h1>Hola, {{ user.displayName }}</h1>
           <p>Catálogos iniciales y perfiles para preparar la gestión de procesos.</p>
         </section>
-        <app-process-workspace [userId]="user.userId" [profiles]="user.profiles"></app-process-workspace>
+        <router-outlet [routerOutletData]="{ userId: user.userId, profiles: user.profiles }" />
         <div class="catalog-grid">
           <ui-panel eyebrow="ESTRUCTURA" heading="Macroprocesos" headingId="macro-title">
             @if (isAdmin) {
@@ -190,6 +190,7 @@ export class AppComponent implements OnInit {
   private readonly http = inject(HttpClient);
   private readonly changeDetector = inject(ChangeDetectorRef);
   private readonly dialogs = inject(UiDialogService);
+  private readonly router = inject(Router);
   identities: DemoIdentity[] = [];
   user: CurrentUser | null = null;
   macroprocesses: Macroprocess[] = [];
@@ -242,6 +243,9 @@ export class AppComponent implements OnInit {
   }
 
   async logout(): Promise<void> {
+    // Salir pasa por las guardas de ruta: protege los cambios sin guardar.
+    // Navegar a la misma dirección se omite y resuelve false, por eso solo se navega si cambia.
+    if (this.router.url !== '/procesos' && !(await this.router.navigateByUrl('/procesos'))) return;
     await this.perform(async () => {
       await firstValueFrom(this.http.post('/api/auth/logout', {}));
       this.user = null;

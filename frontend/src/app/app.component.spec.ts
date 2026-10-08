@@ -2,7 +2,9 @@ import { provideHttpClient, withXsrfConfiguration } from '@angular/common/http';
 import { HttpTestingController, provideHttpClientTesting } from '@angular/common/http/testing';
 import { provideZoneChangeDetection } from '@angular/core';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { Router, provideRouter } from '@angular/router';
 import { AppComponent } from './app.component';
+import { routes } from './app.routes';
 
 describe('AppComponent', () => {
   let http: HttpTestingController;
@@ -12,6 +14,7 @@ describe('AppComponent', () => {
       imports: [AppComponent],
       providers: [
         provideZoneChangeDetection(),
+        provideRouter(routes),
         provideHttpClient(withXsrfConfiguration({
           cookieName: 'jallupacha_csrf',
           headerName: 'X-CSRF-Token'
@@ -68,7 +71,7 @@ describe('AppComponent', () => {
     await fixture.whenStable();
     http.expectOne('/api/auth/demo/identities').flush([]);
     await fixture.whenStable();
-    await flushProcessWorkspaceRequests(http, true, fixture);
+    await flushProcessWorkspaceRequests(http, fixture);
     await fixture.whenStable();
     fixture.detectChanges();
 
@@ -148,6 +151,55 @@ describe('AppComponent', () => {
     fixture.destroy();
   });
 
+  it('closes the session through the router when there are no pending changes', async () => {
+    const fixture = await renderAdminDashboard();
+    const root = fixture.nativeElement as HTMLElement;
+    buttonByText(root, 'Cerrar sesión')!.click();
+    await fixture.whenStable();
+    http.expectOne({ method: 'POST', url: '/api/auth/logout' }).flush({});
+    await fixture.whenStable();
+    http.expectOne('/api/auth/demo/identities').flush([{ id: 1, displayName: 'Usuario administrador' }]);
+    await fixture.whenStable();
+    fixture.detectChanges();
+    expect(TestBed.inject(Router).url).toBe('/procesos');
+    expect(root.querySelector('label[for="identity"]')?.textContent).toContain('Usuario de prueba');
+    fixture.destroy();
+  });
+
+  it('keeps the session when leaving an editor with unsaved changes is declined', async () => {
+    const fixture = await renderAdminDashboard();
+    const root = fixture.nativeElement as HTMLElement;
+    const router = TestBed.inject(Router);
+    await router.navigateByUrl('/procesos/8/editar');
+    fixture.detectChanges();
+    await fixture.whenStable();
+    http.expectOne('/api/processes/8').flush({
+      id: 8, code: 'PR8', name: 'Proceso', macroprocessId: 1, macroprocessName: 'Estratégicos', processTypeId: 2,
+      processTypeName: 'Institucional', ownerUserId: 1, ownerDisplayName: 'Usuario administrador', status: 'Borrador',
+      revision: 1, versionNumber: 1, parentProcessId: null
+    });
+    await fixture.whenStable();
+    http.expectOne('/api/macroprocesses').flush([]);
+    http.expectOne('/api/process-types').flush([]);
+    http.expectOne('/api/processes?page=1&limit=100').flush({ items: [], total: 0, page: 1, limit: 100 });
+    await fixture.whenStable();
+    fixture.detectChanges();
+    const name = root.querySelector('#process-name') as HTMLInputElement;
+    name.value = 'Cambio pendiente';
+    name.dispatchEvent(new Event('input'));
+
+    buttonByText(root, 'Cerrar sesión')!.click();
+    await new Promise<void>((resolve) => setTimeout(resolve, 0));
+    fixture.detectChanges();
+    buttonByText(root.querySelector('dialog')!, 'Seguir editando')!.click();
+    await fixture.whenStable();
+    fixture.detectChanges();
+    http.expectNone('/api/auth/logout');
+    expect(router.url).toBe('/procesos/8/editar');
+    expect(root.textContent).toContain('Cerrar sesión');
+    fixture.destroy();
+  });
+
   it('does not show the administrator panels to a consultation user', async () => {
     const fixture = TestBed.createComponent(AppComponent);
     fixture.componentInstance.user = {
@@ -164,7 +216,7 @@ describe('AppComponent', () => {
     await fixture.whenStable();
     http.expectOne('/api/auth/demo/identities').flush([]);
     await fixture.whenStable();
-    await flushProcessWorkspaceRequests(http, false, fixture);
+    await flushProcessWorkspaceRequests(http, fixture);
     await fixture.whenStable();
     fixture.detectChanges();
 
@@ -196,7 +248,7 @@ describe('AppComponent', () => {
     await fixture.whenStable();
     http.expectOne('/api/auth/demo/identities').flush([]);
     await fixture.whenStable();
-    await flushProcessWorkspaceRequests(http, true, fixture);
+    await flushProcessWorkspaceRequests(http, fixture);
     await fixture.whenStable();
     fixture.detectChanges();
     return fixture;
@@ -209,17 +261,16 @@ function buttonByText(root: HTMLElement, text: string): HTMLButtonElement | unde
 
 async function flushProcessWorkspaceRequests(
   http: HttpTestingController,
-  isAdmin: boolean,
   fixture: ComponentFixture<AppComponent>
 ): Promise<void> {
+  await TestBed.inject(Router).navigateByUrl('/procesos');
+  fixture.detectChanges();
+  await fixture.whenStable();
   http.expectOne('/api/processes?page=1&limit=20').flush({
     items: [],
     total: 0,
     page: 1,
     limit: 20
   });
-  http.expectOne('/api/macroprocesses').flush([]);
-  http.expectOne('/api/process-types').flush([]);
   await fixture.whenStable();
-  if (isAdmin) http.expectOne('/api/users/process-owners').flush([]);
 }
