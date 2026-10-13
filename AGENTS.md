@@ -1,6 +1,6 @@
 # Instrucciones de desarrollo
 
-La fuente de verdad del producto es Requisitos_Sistema_Procesos_v13.xlsx, suministrada por el responsable del producto. No está incorporada al repositorio todavía. No inventar requisitos ni cambiar su alcance sin aprobación. Consultar docs/especificacion.md y docs/arquitectura.md antes de modificar comportamiento.
+La fuente de verdad del producto es Requisitos_Sistema_Procesos_v13.xlsx, suministrada por el responsable del producto. Se encuentra en docs\referencias\Requisitos_Sistema_Procesos_v13.xlsx. No inventar requisitos ni cambiar su alcance sin aprobación. Consultar docs/especificacion.md y docs/arquitectura.md antes de modificar comportamiento.
 
 ## Reglas de trabajo
 

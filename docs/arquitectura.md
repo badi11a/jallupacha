@@ -1,17 +1,17 @@
 # Arquitectura mínima y decisiones
 
-Revisión documental C-001 v4: Oracle 26ai Free en el entorno local, sin Docker. Distingue producto, entorno local y datos de prueba; sustituye las versiones anteriores.
+Revisión documental C-001 v4: Oracle 19c. Distingue producto, entorno local y datos de prueba; sustituye las versiones anteriores.
 
 ## Restricciones confirmadas
 
-TypeScript y Angular; backend NestJS; destino on-premise. El entorno local usa datos de prueba. Oracle AI Database 26ai Free instalado directamente en el computador local, sin Docker. Desarrollo directamente sobre Oracle; despliegue posterior en Oracle institucional. Google Workspace no disponible todavía.
+TypeScript y Angular; backend NestJS; destino on-premise. El entorno local usa datos de prueba. Oracle 19i accesible para las prueba. Desarrollo directamente sobre Oracle; despliegue posterior en Oracle institucional. Google Workspace no disponible todavía.
 
 ## Componentes
 
 - Angular: interfaz interna de perfiles, catálogos, fichas y revisión de procesos, árbol, búsqueda, historial, auditoría y alertas.
 - NestJS: una API HTTP JSON bajo /api, autorización y reglas de negocio. Organizar por identidad, estructura, procesos/versiones, consulta, auditoría y seguridad; no crear servicios distribuidos.
-- Oracle 26ai Free: persistencia, restricciones y transacciones mediante TypeORM.
-- Sesiones: persistidas en Oracle 26ai Free para invalidación y expiración; cookie HttpOnly, SameSite y Secure bajo HTTPS. Proxy HTTPS del despliegue definitivo por concretar.
+- Oracle 19c: persistencia, restricciones y transacciones mediante TypeORM.
+- Sesiones: persistidas en Oracle 19c para invalidación y expiración; cookie HttpOnly, SameSite y Secure bajo HTTPS. Proxy HTTPS del despliegue definitivo por concretar.
 
 Angular nunca accede directamente a la base. API y frontend usan el mismo origen mediante proxy de desarrollo. La aplicación del entorno local solo escucha en localhost. La base del entorno local se utiliza únicamente con datos de prueba y su acceso se restringe al equipo de desarrollo.
 
