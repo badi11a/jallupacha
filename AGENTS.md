@@ -13,6 +13,7 @@ La fuente de verdad del producto es Requisitos_Sistema_Procesos_v13.xlsx, sumini
 - Ejecutar la verificación significativa más pequeña para el comportamiento afectado. Usar pruebas Oracle para persistencia, SQL, grants o transacciones; ampliar o repetir verificaciones solo cuando el impacto o un fallo lo justifique. Mantener PT-03 y ejecutar las verificaciones requeridas para liberar.
 - No declarar cumplida una verificación que no se ejecutó. La autenticación local de desarrollo no cumple REQ-25.
 - No incluir datos reales, secretos ni tokens en código, fixtures o registros.
+- Configuración por variables de entorno según docs/arquitectura.md, «Configuración por ambiente»; mantener `backend/.env.example` actualizado al añadir variables y validarlas en `backend/src/common/config.ts`.
 - No modificar la planilla ni resolver decisiones de producto por cuenta propia.
 
 ## Principios técnicos obligatorios

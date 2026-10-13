@@ -46,6 +46,41 @@ export function validateDemoRuntime(host: string, mode: string, nodeEnv: string)
   }
 }
 
+export interface RuntimeConfig {
+  appEnv: 'local' | 'development' | 'production';
+  host: string;
+  port: number;
+  authMode: string;
+}
+
+// Validates all startup configuration in one place; fails before the app starts.
+export function loadRuntimeConfig(): RuntimeConfig {
+  const appEnv = required('APP_ENV');
+  if (appEnv !== 'local' && appEnv !== 'development' && appEnv !== 'production') {
+    throw new Error('APP_ENV must be local, development or production');
+  }
+  const nodeEnv = required('NODE_ENV');
+  if (nodeEnv !== (appEnv === 'local' ? 'development' : 'production')) {
+    throw new Error('NODE_ENV must be development for APP_ENV=local and production otherwise');
+  }
+  const host = required('HOST');
+  const port = Number(required('PORT'));
+  if (!Number.isInteger(port) || port < 1 || port > 65535) {
+    throw new Error('PORT must be a valid TCP port');
+  }
+  const authMode = required('AUTH_MODE');
+  if (authMode !== 'demo' && authMode !== 'google') {
+    throw new Error('AUTH_MODE must be demo or google');
+  }
+  if (appEnv !== 'local' && (authMode === 'demo' || process.env.DEMO_DATA_ENABLED === 'true')) {
+    throw new Error('Demo authentication and demo data are allowed only when APP_ENV=local');
+  }
+  validateDemoRuntime(host, authMode, nodeEnv);
+  databaseOptions();
+  configuredRateLimit();
+  return { appEnv, host, port, authMode };
+}
+
 export function configuredRateLimit(): { ttl: number; limit: number } {
   const ttl = Number(process.env.API_RATE_LIMIT_TTL_MS ?? 60_000);
   const limit = Number(process.env.API_RATE_LIMIT_MAX ?? 120);

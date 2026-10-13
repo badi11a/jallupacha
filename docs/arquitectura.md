@@ -145,9 +145,24 @@ Verificación: una prueba conectada como cuenta de ejecución intenta modificar/
 
 Una persona con varios perfiles obtiene las facultades de cada uno; ser Administrador no convierte automáticamente a la persona en dueño responsable. Todas las comprobaciones se ejecutan en el servidor, incluida pertenencia del ID de versión al proceso. Pruebas directas de API cubren cada ruta con actor autorizado y no autorizado.
 
+## Configuración por ambiente
+
+Decisión: variables de entorno como único mecanismo, con `dotenv` solo para cargar `backend/.env` en local; las variables del proceso tienen prioridad. No se añaden dependencias, archivos por ambiente ni gestores de secretos. Cubre PT-02, PT-04, PT-11 y PT-14.
+
+| Ambiente | APP_ENV | NODE_ENV | AUTH_MODE | Origen de la configuración |
+|---|---|---|---|---|
+| Local | local | development | demo (loopback) o google | `backend/.env` (excluido de Git) |
+| Desarrollo (servidor compartido) | development | production | google | Variables del proceso/servicio definidas por el administrador |
+| Producción (on-premise) | production | production | google | Variables del proceso/servicio definidas por el administrador |
+
+- `backend/.env.example` es la única plantilla versionada: lista todas las variables sin secretos ni datos institucionales. Cada ambiente usa sus propias cuentas Oracle (ejecución con mínimos privilegios; propietaria solo para migraciones).
+- `loadRuntimeConfig()` en `backend/src/common/config.ts` valida al arrancar `APP_ENV`, `NODE_ENV`, `HOST`, `PORT`, `AUTH_MODE`, conexión Oracle y límites de tasa; el backend no inicia si falta o es inválida alguna. Fuera de `APP_ENV=local` se rechaza `AUTH_MODE=demo` y `DEMO_DATA_ENABLED=true`.
+- Angular no depende del ambiente: usa siempre rutas relativas `/api`, de modo que el mismo artefacto compilado sirve en los tres ambientes. En local, `frontend/proxy.conf.json` redirige `/api` a loopback; en servidores, un proxy inverso del servidor web institucional sirve el frontend y reenvía `/api` al backend (su configuración pertenece a la instalación, no al repositorio).
+- Los secretos se entregan fuera de Git por el administrador de cada ambiente. La CI los detecta conforme a PT-11.
+
 ## Autenticación local de desarrollo
 
-Desactivada por defecto. La autenticación local de desarrollo solo se habilita con AUTH_MODE=demo y NODE_ENV=development; rechazar el arranque si AUTH_MODE=demo bajo otro entorno o con dirección de escucha distinta de loopback. Frontend y backend accesibles únicamente desde el equipo local; no habilitar túneles ni publicar este modo.
+Desactivada por defecto. La autenticación local de desarrollo solo se habilita con AUTH_MODE=demo, APP_ENV=local y NODE_ENV=development;  rechazar el arranque si AUTH_MODE=demo bajo otro entorno o con dirección de escucha distinta de loopback. Frontend y backend accesibles únicamente desde el equipo local; no habilitar túneles ni publicar este modo.
 
 El selector solo ofrece identidades de prueba precargadas; el servidor comprueba su pertenencia a la semilla y no acepta perfiles enviados por el cliente. Crear sesión de servidor, proteger escrituras contra CSRF, cerrar e invalidar sesión y aplicar 30 minutos de inactividad. Mostrar un único aviso discreto de acceso local, conforme a “Presentación del producto”, en docs/especificacion.md.
 

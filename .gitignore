@@ -20,3 +20,12 @@ pnpm-debug.log*
 .env
 .env.*
 !.env.example
+
+# Secrets and credentials
+*.pem
+*.key
+*.pfx
+*.p12
+*.crt
+credentials*.json
+wallet/

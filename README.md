@@ -55,6 +55,18 @@ Direcciones locales por defecto:
 - Frontend: `http://127.0.0.1:4200`
 - Backend: `http://127.0.0.1:3000/api`
 
+## Configuración por ambiente
+
+La configuración se define con variables de entorno (ver [`backend/.env.example`](backend/.env.example) y [arquitectura](docs/arquitectura.md#configuración-por-ambiente)). El backend valida las variables al iniciar y no arranca si faltan. Nunca versionar `.env` ni credenciales.
+
+| Ambiente | APP_ENV / NODE_ENV | Cómo configurar |
+|---|---|---|
+| Local | `local` / `development` | Copiar `backend/.env.example` a `backend/.env` y completar conexión y contraseñas Oracle. `npm run start:dev`. |
+| Desarrollo | `development` / `production` | Definir las variables en el servicio del servidor (con `AUTH_MODE=google`, sin modo demo). `npm ci && npm run build && npm run db:migrate`, luego `npm start --workspace backend`. |
+| Producción | `production` / `production` | Igual que desarrollo, con cuentas y servicio Oracle institucionales entregados por el administrador. Probar antes en desarrollo. |
+
+El frontend compilado (`frontend/dist`) es el mismo para todos los ambientes y llama a `/api` en forma relativa: el servidor web institucional debe servirlo y reenviar `/api` al backend.
+
 ## Verificaciones
 
 ```bash

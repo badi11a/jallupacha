@@ -5,15 +5,10 @@ import { NestFactory } from '@nestjs/core';
 import helmet from 'helmet';
 import { DataSource } from 'typeorm';
 import { AppModule } from './app.module';
-import { validateDemoRuntime } from './common/config';
+import { loadRuntimeConfig } from './common/config';
 
 async function bootstrap(): Promise<void> {
-  const host = process.env.HOST ?? '127.0.0.1';
-  const port = Number(process.env.PORT ?? 3000);
-  validateDemoRuntime(host, process.env.AUTH_MODE ?? 'google', process.env.NODE_ENV ?? 'development');
-  if (!Number.isInteger(port) || port < 1 || port > 65535) {
-    throw new Error('PORT must be a valid TCP port');
-  }
+  const { host, port } = loadRuntimeConfig();
 
   const app = await NestFactory.create(AppModule, { logger: ['error', 'warn'] });
   await app.get(DataSource).initialize();
