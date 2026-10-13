@@ -33,7 +33,7 @@ import { UiDialogHostComponent } from './dialog-host.component';
 })
 export class UiAppShellComponent {
   readonly appName = input.required<string>();
-  /** Activo institucional autorizado; se omite mientras no esté disponible. */
+  /** Optional product logo; omitted when the product does not provide one. */
   readonly brandLogoSrc = input<string>('');
   /** Ruta de inicio; se navega con el router, sin recargar la aplicación. */
   readonly homeHref = input<string>('/');

@@ -48,8 +48,24 @@ const PAIRS = [
 ];
 
 const css = readFileSync(new URL('../src/app/shared/ui/styles/tokens.css', import.meta.url), 'utf8');
+const declarations = Object.fromEntries(
+  [...css.matchAll(/--([a-z-]+):\s*(#[0-9a-fA-F]{6}|var\(--[a-z-]+\))\s*;/g)]
+    .map(([, name, value]) => [name, value])
+);
+
+function resolveColor(name, seen = new Set()) {
+  if (seen.has(name)) return undefined;
+  seen.add(name);
+  const value = declarations[name];
+  if (/^#[0-9a-fA-F]{6}$/.test(value ?? '')) return value;
+  const reference = value?.match(/^var\(--([a-z-]+)\)$/);
+  return reference ? resolveColor(reference[1], seen) : undefined;
+}
+
 const tokens = Object.fromEntries(
-  [...css.matchAll(/--ui-color-([a-z-]+):\s*(#[0-9a-fA-F]{6})\s*;/g)].map(([, name, hex]) => [name, hex])
+  Object.keys(declarations)
+    .filter((name) => name.startsWith('ui-color-'))
+    .map((name) => [name.slice('ui-color-'.length), resolveColor(name)])
 );
 
 function luminance(hex) {

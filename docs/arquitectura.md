@@ -203,7 +203,7 @@ Crear o cambiar referencias exige catálogos activos. Las versiones históricas 
 
 ## Interfaz: kit de componentes compartidos
 
-Decisión de diseño técnico; no modifica requisitos de v13 ni el alcance funcional. Los elementos de interfaz generales viven en `frontend/src/app/shared/ui/` y se exponen solo mediante `frontend/src/app/shared/ui/index.ts`. Se construyen dentro de esta aplicación y se usan primero aquí; la extracción posterior a una librería Angular reutilizable por otros desarrollos institucionales requiere otra decisión documentada en este archivo, sin cambiar este contrato público.
+Decisión de diseño técnico; no modifica requisitos de v13 ni el alcance funcional. Los elementos de interfaz generales viven en `frontend/src/app/shared/ui/` y se exponen solo mediante `frontend/src/app/shared/ui/index.ts`. Se construyen dentro de esta aplicación y se usan primero aquí; la extracción posterior a una librería Angular reutilizable por otras aplicaciones web requiere otra decisión documentada en este archivo, sin cambiar este contrato público.
 
 Contenido de la primera entrega:
 
@@ -222,10 +222,10 @@ Verificación: pruebas de componente del kit (`shared/ui/*.spec.ts`) y pruebas f
 
 ### Identidad visual y accesibilidad
 
-Decisión de diseño técnico aprobada para esta implementación a partir de `docs/design-system.md`, basada en el Manual de Normas Gráficas UTA 2017. La paleta institucional conserva los siete valores oficiales exactos en tokens `--uta-*`; los roles semánticos `--ui-*` usan colores corporativos exactos cuando son apropiados y mantienen colores funcionales para estados que necesitan contraste accesible. Ninguna variante aproximada se identifica como color corporativo.
+Decisión de diseño técnico aprobada para esta implementación a partir de `docs/design-system.md`. El kit mantiene los siete valores HEX exactos de la paleta en tokens `--brand-*`; los roles semánticos `--ui-*` los referencian cuando son adecuados y mantienen colores funcionales para estados que necesitan contraste accesible. La paleta es independiente de marcas o identidades externas.
 
 - Tipografía: `Century Gothic` es la primera opción, seguida de fuentes del sistema como fallback técnico explícito. No se incorporan archivos de fuentes ni se cargan recursos externos sin licencia y autorización comprobadas.
-- La barra común admite un activo de marca institucional autorizado mediante `brandLogoSrc`. No se reconstruye el isologotipo ni se muestra el monograma tipográfico anterior; hasta recibir el original autorizado, se presenta el nombre accesible de la aplicación sin logo. Su área de protección 3x y legibilidad de pantalla deberán verificarse al integrar el activo.
+- La barra común admite opcionalmente la marca propia del producto mediante `brandLogoSrc`; si no se proporciona, se muestra el nombre accesible de la aplicación.
 - Accesibilidad: WCAG 2.2 nivel AA, texto base de 16 px y texto mínimo de 12 px. Contraste y estados funcionales prevalecen sobre el uso decorativo del color; no se altera un valor oficial para corregir contraste.
 - `npm run check:contrast --workspace frontend` verifica cada combinación usada (texto 4,5:1; bordes de controles y foco 3:1) y falla si alguna no cumple. Una combinación nueva se agrega al script en el mismo cambio que la introduce.
 

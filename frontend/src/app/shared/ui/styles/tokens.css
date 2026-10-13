@@ -1,15 +1,15 @@
-/* Tokens de diseño del kit. Las aplicaciones cambian la identidad visual
+/* Tokens de diseño del kit. Las aplicaciones pueden adaptar los roles visuales
    redefiniendo estas propiedades, no editando los componentes.
    Colores en hexadecimal de 6 dígitos: scripts/check-contrast.mjs los verifica (WCAG 2.2 AA). */
 :root {
-  /* Identidad institucional UTA; valores exactos del Manual de Normas Gráficas 2017. */
-  --uta-primary-dark: #22213F;
-  --uta-primary-blue: #678FCA;
-  --uta-primary-yellow: #DEB01F;
-  --uta-secondary-orange: #C9631F;
-  --uta-secondary-ochre: #CE9342;
-  --uta-secondary-indigo: #303880;
-  --uta-secondary-blue: #446BA9;
+  /* Paleta de referencia del sistema de diseño. */
+  --brand-ink: #22213F;
+  --brand-blue: #678FCA;
+  --brand-yellow: #DEB01F;
+  --brand-orange: #C9631F;
+  --brand-ochre: #CE9342;
+  --brand-indigo: #303880;
+  --brand-steel-blue: #446BA9;
 
   /* Century Gothic se usa si está instalada; no se distribuyen fuentes sin licencia. */
   --ui-font-family: "Century Gothic", system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
@@ -28,7 +28,7 @@
   --ui-color-text: #29283f;
   --ui-color-text-muted: #55566b;
   --ui-color-text-subtle: #626477;
-  --ui-color-heading: #22213F;
+  --ui-color-heading: var(--brand-ink);
   --ui-color-heading-subtle: #55566b;
   --ui-color-eyebrow: #3f639c;
   --ui-color-background: #f4f7f9;
@@ -40,15 +40,15 @@
   --ui-color-divider: #e8ecf2;
   --ui-color-table-border: #e8ecf2;
 
-  --ui-color-brand: #22213F;
+  --ui-color-brand: var(--brand-ink);
   --ui-color-on-brand: #ffffff;
-  --ui-color-brand-accent: #678FCA;
-  --ui-color-primary: #303880;
-  --ui-color-primary-hover: #22213F;
+  --ui-color-brand-accent: var(--brand-blue);
+  --ui-color-primary: var(--brand-indigo);
+  --ui-color-primary-hover: var(--brand-ink);
   --ui-color-on-primary: #ffffff;
   --ui-color-quiet-hover-border: #c8d0de;
   --ui-color-quiet-hover-background: #edf3fb;
-  --ui-color-focus: #678FCA;
+  --ui-color-focus: var(--brand-blue);
   --ui-color-backdrop: rgba(34, 33, 63, .4);
 
   --ui-color-info-text: #29283f;
@@ -61,7 +61,7 @@
   --ui-color-danger-hover: #7a2626;
   --ui-color-warning-text: #826513;
   --ui-color-warning-background: #fff3cd;
-  --ui-color-warning-border: #DEB01F;
+  --ui-color-warning-border: var(--brand-yellow);
   --ui-color-status: #826513;
 
   --ui-space-1: .25rem;

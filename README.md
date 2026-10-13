@@ -86,7 +86,7 @@ Las pruebas de integración con Oracle requieren un entorno de base de datos con
 
 - [Especificación funcional](docs/especificacion.md)
 - [Arquitectura y decisiones técnicas](docs/arquitectura.md)
-- [Sistema de diseño institucional UTA](docs/design-system.md)
+- [Sistema de diseño digital](docs/design-system.md)
 - [Instrucciones SDD](AGENTS.md)
 - [Release 01](docs/release01_navegable.md)
 - [Ciclo de procesos pendiente](docs/incremento03_ciclo_procesos.md)

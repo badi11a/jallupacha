@@ -82,9 +82,9 @@ describe('shared/ui', () => {
     expect(root.querySelector('.account')).toBeNull();
     expect(root.querySelector('.environment-notice')).toBeNull();
 
-    fixture.componentInstance.logo = '/assets/uta-isologotipo.svg';
+    fixture.componentInstance.logo = '/assets/product-logo.svg';
     fixture.detectChanges();
-    expect(root.querySelector('.brand-logo')?.getAttribute('src')).toBe('/assets/uta-isologotipo.svg');
+    expect(root.querySelector('.brand-logo')?.getAttribute('src')).toBe('/assets/product-logo.svg');
   });
 
   it('labels panels by their heading and projects actions', () => {

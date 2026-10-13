@@ -123,10 +123,10 @@ Al modificar la navegación, rutas o la estructura común de la interfaz, revisa
 
 Antes de cerrar un cambio de interfaz, verificar textos visibles y recorrido funcional, además de pruebas de lógica y seguridad. Antes de cerrar cualquier corrección, revisar que no cambió el alcance ni debilitó controles técnicos.
 
-## Identidad visual institucional
+## Sistema de diseño visual
 
-- Consultar `docs/design-system.md` para los colores UTA oficiales, tipografía, uso de marca y criterios WCAG 2.2 AA del kit compartido.
-- Mantener los siete tokens `--uta-*` con sus HEX oficiales exactos. Los colores funcionales adicionales son semánticos de interfaz, no variantes corporativas.
-- No incorporar fuentes ni activos de marca sin licencia/autorización comprobadas. No reconstruir isologotipos; si no está disponible el original autorizado, no mostrar un logo.
+- Consultar `docs/design-system.md` para la paleta, tipografía, marca de producto y criterios WCAG 2.2 AA del kit compartido.
+- Mantener los siete tokens `--brand-*` con sus HEX aprobados exactos. Los colores funcionales adicionales son semánticos de interfaz y no forman parte de esa paleta.
+- Mantener la identidad visual propia de cada producto y el sistema independiente de marcas externas. No incorporar fuentes sin licencia comprobada.
 - Mantener fundamentos y componentes genéricos en `frontend/src/app/shared/ui/`; lógica de negocio y navegación específica permanecen en la aplicación.
 - Al verificar cambios visuales, registrar explícitamente contraste, recorrido/textos visibles, revisión visual y pruebas. No declarar completada una comprobación que no se ejecutó.
