@@ -123,6 +123,13 @@ Usar dos cuentas distintas en el servicio/PDB local:
 - Propietaria del esquema: crea objetos y aplica migraciones. Sus credenciales no se usan en el proceso normal del backend.
 - Ejecución: sin objetos propios ni privilegios DDL; recibe CREATE SESSION y permisos específicos sobre objetos del esquema propietario. Referenciar el esquema explícitamente en TypeORM.
 
+Reglas de permisos (fuente única):
+
+- `backend/database/grant-runtime.sql` es la única fuente de permisos sobre objetos de la aplicación (tablas y secuencias; una línea `GRANT` por objeto, solo SELECT/INSERT/UPDATE/DELETE, secuencias solo SELECT). Las migraciones nuevas no contienen `GRANT`: el objeto nuevo se declara en ese archivo en el mismo cambio. Las migraciones 03–05 ya aplicadas conservan sus `GRANT` históricos, coherentes con el archivo, y no se modifican.
+- `npm run db:grant` (cuenta propietaria, idempotente) aplica el archivo y luego compara con `USER_TAB_PRIVS_MADE`; falla si hay permisos faltantes o en exceso (los excesos se revocan manualmente). `db:reset:local` lo invoca tras migrar. Una instalación nueva: migraciones, luego `db:grant`.
+- Los privilegios de sistema (CREATE SESSION) están en `backend/database/grant-system.sql`, aplicado una vez por un operador autorizado; ni `db:grant` ni el backend los otorgan.
+- `grants.spec.ts` verifica que toda tabla/secuencia creada por migraciones o usada por el código tenga permiso, que no haya permisos sobre objetos inexistentes, que las migraciones nuevas no otorguen permisos y que la auditoría sea solo SELECT/INSERT.
+
 La cuenta de ejecución recibe SELECT/INSERT sobre Auditoria, CambioProceso y EventoSeguridad, sin UPDATE/DELETE. Las asociaciones identificativas y las IP se guardan en tablas separadas; estas sí admiten los cambios necesarios para REQ-49. No colocar datos personales identificativos en el contenido inmutable. Otorgar los permisos de actualización de negocio y gestión de sesiones únicamente sobre sus tablas respectivas. No usar SYS/SYSTEM para ejecutar la aplicación.
 
 Verificación: una prueba conectada como cuenta de ejecución intenta modificar/borrar auditoría y recibe rechazo de Oracle; otra comprueba anonimización de identidad e IP sin alterar auditoría/historial. La cuenta propietaria es administrativa y se protege fuera del acceso de la aplicación; la restricción de ejecución no implica inmunidad frente a administradores de base.
@@ -175,7 +182,7 @@ La implementación debe mantener estos pasos reproducibles y documentar los coma
 1. Instalar Oracle Database 19c local y las versiones fijadas de Node.js y herramientas del proyecto. Registrar versión exacta, edición y requisitos del equipo.
 2. Conectar al servicio/PDB de desarrollo; crear las cuentas propietaria y de ejecución con cuota y permisos mínimos. El script administrativo se ejecuta por un operador autorizado, no por el backend.
 3. Configurar conexión mediante archivo local excluido de Git y proporcionar .env.example sin secretos. Nunca compartir contraseñas en documentación o CI.
-4. Instalar dependencias mediante npm ci y aplicar migraciones con la cuenta propietaria, sin synchronize.
+4. Instalar dependencias mediante npm ci y aplicar migraciones con la cuenta propietaria, sin synchronize; luego `npm run db:grant` para los permisos de objetos (CREATE SESSION se otorga antes con grant-system.sql).
 5. Ejecutar semilla idempotente: cuatro perfiles y macroprocesos Estratégicos, Misionales y de Apoyo en ese orden. La carga de datos de prueba es explícita y separada, crea usuarios de prueba y Administrador inicial sin sobrescribir cuentas existentes.
 6. Arrancar backend y frontend en loopback. Verificar conexión, sesión local de prueba, permisos y persistencia tras reinicio.
 7. Restablecer únicamente el esquema local de pruebas bajo un comando explícito con comprobación de ambiente y destino. Nunca restablecer automáticamente al arrancar ni apuntar al esquema institucional.

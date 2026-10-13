@@ -9,6 +9,7 @@ La fuente de verdad del producto es Requisitos_Sistema_Procesos_v13.xlsx, sumini
 - La aplicación es el producto institucional. El entorno local utiliza datos de prueba y autenticación local de desarrollo, exclusivamente para desarrollo; no se habilita este acceso en producción. Consultar “Presentación del producto”, en docs/especificacion.md, para sus condiciones de presentación.
 - Todo endpoint requiere autenticación y una política explícita de autorización. Verificar permisos en el servidor y consultar perfiles actuales en cada solicitud.
 - Migraciones versionadas; synchronize: false. Nunca borrar ni alterar una migración ya aplicada.
+- Permisos Oracle: solo en `backend/database/grant-runtime.sql` (objetos) y `grant-system.sql` (sistema); las migraciones nuevas no otorgan permisos. Ver docs/arquitectura.md, «Cuentas y permisos Oracle».
 - Cada cambio debe referenciar requisitos, incluir verificación apropiada y tener revisión registrada antes de integrarse. La revisión de IA no sustituye la conformidad requerida para producción.
 - Ejecutar la verificación significativa más pequeña para el comportamiento afectado. Usar pruebas Oracle para persistencia, SQL, grants o transacciones; ampliar o repetir verificaciones solo cuando el impacto o un fallo lo justifique. Mantener PT-03 y ejecutar las verificaciones requeridas para liberar.
 - No declarar cumplida una verificación que no se ejecutó. La autenticación local de desarrollo no cumple REQ-25.
