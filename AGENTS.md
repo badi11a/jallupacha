@@ -4,7 +4,7 @@ La fuente de verdad del producto es Requisitos_Sistema_Procesos_v13.xlsx, sumini
 
 ## Reglas de trabajo
 
-- TypeScript, Angular, NestJS, TypeORM y Oracle AI Database 26ai Free instalado directamente en el equipo local. Sin Docker. Destino definitivo on-premise sobre Oracle institucional; verificar compatibilidad con su versión y edición antes de desplegar.
+- TypeScript, Angular, NestJS y TypeORM; Oracle Database 19c es la plataforma oficial para desarrollo, pruebas y producción. Instalación directa en el equipo local, sin Docker. El despliegue es on-premise; verificar versión, edición y compatibilidad de la instalación institucional antes de desplegar.
 - Mantener una aplicación backend. No introducir microservicios, capas o patrones sin necesidad concreta.
 - La aplicación es el producto institucional. El entorno local utiliza datos de prueba y autenticación local de desarrollo, exclusivamente para desarrollo; no se habilita este acceso en producción. Consultar “Presentación del producto”, en docs/especificacion.md, para sus condiciones de presentación.
 - Todo endpoint requiere autenticación y una política explícita de autorización. Verificar permisos en el servidor y consultar perfiles actuales en cada solicitud.

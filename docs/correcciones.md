@@ -127,6 +127,18 @@ Evidencia ejecutada: con el nuevo `npm run start:dev --workspace backend` en el 
 
 Pendiente: la instancia del puerto 3000 sigue ejecutando `tsx` hasta que se reinicie con `npm run start:dev` (no se detuvo porque no se inició en esta tarea); el mensaje genérico de la vista para cualquier 400 es una mejora de interfaz distinta, no modificada. Sin commit ni push.
 
+## C-009 — Plataforma Oracle oficial inconsistente (PT-01, PT-02, PT-03)
+
+Clasificación: defecto de documentación y de plantilla de configuración; no es cambio funcional ni amplía requisitos. Fuentes: decisión de Oracle Database 19c en `docs/especificacion.md`, secciones «Entorno técnico de esta especificación» y persistencia, y PT-01/PT-02. Comportamiento esperado: Oracle Database 19c es la plataforma oficial para desarrollo, pruebas y producción; los parámetros de conexión se proporcionan por ambiente y no se presupone el servicio institucional.
+
+Hallazgo: `AGENTS.md` aún indicaba Oracle AI Database 26ai Free; `docs/arquitectura.md` contenía «Oracle 19i» y describía 26ai Free para instalación y pruebas; `backend/.env.example` presuponía el servicio `freepdb1`. La configuración de `backend/src/common/config.ts` obtiene host, puerto, servicio, esquema y usuarios desde variables de entorno; TypeORM usa `type: 'oracle'`, `serviceName` y `synchronize: false`.
+
+Corrección: se actualizan `AGENTS.md`, `docs/especificacion.md` y `docs/arquitectura.md` para unificar la plataforma 19c y las verificaciones institucionales; `backend/.env.example` deja host y servicio sin valor predeterminado. Se mantienen TypeORM, node-oracledb, las cuentas separadas de ejecución y migraciones, y los grants mínimos. No se modificaron código, dependencias ni migraciones.
+
+Revisión estática de compatibilidad: las migraciones y consultas inspeccionadas usan NUMBER/ VARCHAR2/CLOB, secuencias, columnas IDENTITY, TIMESTAMP WITH TIME ZONE, binds, FOR UPDATE, LISTAGG y paginación OFFSET/FETCH; no se identificó una construcción exclusiva de Oracle 26ai. Las versiones fijadas siguen siendo TypeORM 0.3.31 y node-oracledb 6.9.0. La documentación de TypeORM describe su driver Oracle con node-oracledb; la guía de node-oracledb 6.9 incluye Oracle Database 19c. Referencias: [TypeORM Oracle driver](https://typeorm.io/docs/drivers/oracle/) y [node-oracledb 6.9 installation](https://node-oracledb.readthedocs.io/en/v6.9.0/user_guide/installation.html).
+
+Verificación y pendientes: la búsqueda de las instrucciones, especificación, arquitectura y `.env.example` no encontró referencias a 26ai, 19i ni `freepdb1`. La revisión estática no detectó incompatibilidades conocidas, pero no acredita ejecución en Oracle 19c. No hay instalación o conexión Oracle, `node_modules`, ni ejecutables `node`/`npm` disponibles en este entorno; por tanto, build, pruebas y compatibilidad de ejecución contra 19c quedan pendientes hasta disponer de Oracle 19c. No se declara verificación Oracle ejecutada.
+
 ## C-008 — Paneles de catálogos mostrados en todas las rutas (diseño de navegación)
 
 Clasificación: defecto de especificación/diseño. Fuente: sección «Interfaz: navegación por rutas» de `docs/arquitectura.md`, que establecía mantener catálogos y administración en la misma página; REQ-02/REQ-03/REQ-04 no cambian. Se corrige primero el documento; la implementación queda pendiente y no se ha modificado código.

@@ -8,9 +8,9 @@ Entrega: administración interna de procesos, desde ingreso y configuración has
 
 ## Entorno técnico de esta especificación
 
-Angular y NestJS con TypeScript; TypeORM con driver Oracle. Oracle 19c es base de datos en desarrollo y producción con datos de prueba. Se desarrolla directamente sobre Oracle. El backend accede con una cuenta de ejecución dedicada, distinta de la propietaria del esquema y de migraciones; nunca SYS o SYSTEM. Los permisos específicos están en arquitectura.md.
+Angular y NestJS con TypeScript; TypeORM con driver Oracle. Oracle Database 19c es la plataforma de base de datos oficial para desarrollo, pruebas y producción. Se desarrolla directamente sobre Oracle y las pruebas que requieren persistencia se ejecutan contra Oracle 19c. El backend accede con una cuenta de ejecución dedicada, distinta de la propietaria del esquema y de migraciones; nunca SYS o SYSTEM. Los permisos específicos están en arquitectura.md.
 
-La conexión se configura por ambiente (host, puerto, servicio, usuario y contraseña); los secretos no se versionan. La cuenta Oracle institucional se configurará cuando esté disponible y se comprobará su versión, edición y compatibilidad antes de desplegar. No es un bloqueo de la especificación local ni modifica los requisitos del producto.
+La conexión se configura por ambiente (host, puerto y nombre de servicio Oracle, usuario y contraseña); el nombre del servicio institucional lo determina cada ambiente y no se presupone ni versiona. Los secretos no se versionan. Antes de desplegar se comprobarán en el ambiente institucional la versión 19c, la edición y la compatibilidad. Esta decisión técnica no modifica los requisitos del producto.
 
 ## Requisitos y criterios de aceptación
 

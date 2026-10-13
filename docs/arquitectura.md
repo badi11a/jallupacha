@@ -4,7 +4,7 @@ Revisión documental C-001 v4: Oracle 19c. Distingue producto, entorno local y d
 
 ## Restricciones confirmadas
 
-TypeScript y Angular; backend NestJS; destino on-premise. El entorno local usa datos de prueba. Oracle 19i accesible para las prueba. Desarrollo directamente sobre Oracle; despliegue posterior en Oracle institucional. Google Workspace no disponible todavía.
+TypeScript y Angular; backend NestJS; destino on-premise. Oracle Database 19c es la plataforma oficial en desarrollo, pruebas y producción; el entorno local usa datos de prueba y se conecta directamente a Oracle. Antes de desplegar se comprobarán la versión, edición y compatibilidad de la instalación institucional. Google Workspace no disponible todavía.
 
 ## Componentes
 
@@ -58,19 +58,19 @@ Lectura de catálogos para usuarios autenticados; creación, edición y desactiv
 
 ## Persistencia y compatibilidad
 
-TypeORM con driver Oracle; synchronize: false. Migraciones versionadas y cuenta distinta con permisos de cambio de esquema. La cuenta de ejecución no altera esquema ni borra auditoría.
+TypeORM con driver Oracle; synchronize: false. Migraciones versionadas y cuenta distinta con permisos de cambio de esquema. La cuenta de ejecución no altera esquema ni borra auditoría. La plataforma Oracle objetivo en todos los ambientes es Oracle Database 19c.
 
-Usar el driver Oracle de TypeORM con node-oracledb. Conexión definida por ambiente mediante host, puerto, servicio, usuario y contraseña; ningún secreto se versiona. Usuario/esquema dedicado para la aplicación, sin usar SYS/SYSTEM. Separar permisos de ejecución y migraciones.
+Usar el driver Oracle de TypeORM con node-oracledb. Conexión definida por ambiente mediante host, puerto, nombre de servicio, usuario y contraseña; cada ambiente configura su propio nombre de servicio, que no se presupone ni versiona. Ningún secreto se versiona. Usuario/esquema dedicado para la aplicación, sin usar SYS/SYSTEM. Separar permisos de ejecución y migraciones.
 
 Identificadores numéricos generados por secuencias Oracle. Fechas de eventos en UTC. Valores antes/después como JSON serializado en CLOB, validado en la aplicación. Banderas persistidas con NUMBER(1) y restricción 0/1; no depender del BOOLEAN SQL reciente. Considerar que Oracle trata las cadenas vacías como NULL en validación y consultas. Definir longitudes y nulabilidad explícitas en entidades y migraciones.
 
-Pruebas de restricciones, transacciones, bloqueos y concurrencia se ejecutan en Oracle real. Evitar funciones recientes o exclusivas de edición que no sean necesarias. No asumir compatibilidad con la versión institucional desconocida: antes del despliegue recrear el esquema y ejecutar pruebas contra esa versión. La transferencia a la base institucional usa migraciones versionadas y, si corresponde, un procedimiento explícito de traslado de datos; no copiar automáticamente la base local.
+Pruebas de restricciones, transacciones, bloqueos y concurrencia se ejecutan en Oracle Database 19c real. El DDL y SQL deben mantenerse compatibles con 19c y no depender de funciones exclusivas de otras versiones o ediciones. Antes del despliegue, recrear el esquema y ejecutar pruebas contra la instalación institucional 19c y su edición; registrar versión, edición y resultado. La transferencia a la base institucional usa migraciones versionadas y, si corresponde, un procedimiento explícito de traslado de datos; no copiar automáticamente la base local.
 
 ## Ejecución y pruebas
 
-Angular y NestJS se ejecutan con Node.js/npm en el equipo local, conectados a la instalación nativa de Oracle 26ai Free. Documentar instalación, configuración, creación del esquema, aplicación de migraciones y carga de datos de prueba para reproducir el entorno local desde cero. Restablecimiento de datos de prueba explícito y restringido al esquema local de pruebas, sin afectar otros esquemas. Docker y Docker Compose no forman parte del entorno acordado. Las versiones de runtime y dependencias se registran en los manifiestos y el lockfile del proyecto; no cambiarlas arbitrariamente durante generación con IA.
+Angular y NestJS se ejecutan con Node.js/npm en el equipo local, conectados a Oracle Database 19c. Documentar instalación, configuración, creación del esquema, aplicación de migraciones y carga de datos de prueba para reproducir el entorno local desde cero. Restablecimiento de datos de prueba explícito y restringido al esquema local de pruebas, sin afectar otros esquemas. Docker y Docker Compose no forman parte del entorno acordado. Las versiones de runtime y dependencias se registran en los manifiestos y el lockfile del proyecto; no cambiarlas arbitrariamente durante generación con IA.
 
-Pruebas unitarias de reglas, integración Oracle 26ai Free de restricciones/transacciones y concurrencia, API de autorización y pruebas funcionales Angular. CI ejecuta las verificaciones exigidas por PT-03, PT-08, PT-11 y PT-12. El incremento 1 está implementado. Registrar por separado la evidencia efectiva de CI y pruebas, sin presumir su ejecución.
+Pruebas unitarias de reglas, integración Oracle 19c de restricciones/transacciones y concurrencia, API de autorización y pruebas funcionales Angular. CI ejecuta las verificaciones exigidas por PT-03, PT-08, PT-11 y PT-12. El incremento 1 está implementado. Registrar por separado la evidencia efectiva de CI y pruebas, sin presumir su ejecución.
 
 ## Decisión aprobada de diseño — Incremento 2 (REQ-05/REQ-06)
 
@@ -157,7 +157,7 @@ Pruebas automáticas de arranque inválido, identidad ajena a la semilla, perfil
 
 La implementación debe mantener estos pasos reproducibles y documentar los comandos concretos en docs/instalacion-windows.md:
 
-1. Instalar Oracle 26ai Free local y las versiones fijadas de Node.js y herramientas del proyecto. Registrar versión exacta y requisitos del equipo.
+1. Instalar Oracle Database 19c local y las versiones fijadas de Node.js y herramientas del proyecto. Registrar versión exacta, edición y requisitos del equipo.
 2. Conectar al servicio/PDB de desarrollo; crear las cuentas propietaria y de ejecución con cuota y permisos mínimos. El script administrativo se ejecuta por un operador autorizado, no por el backend.
 3. Configurar conexión mediante archivo local excluido de Git y proporcionar .env.example sin secretos. Nunca compartir contraseñas en documentación o CI.
 4. Instalar dependencias mediante npm ci y aplicar migraciones con la cuenta propietaria, sin synchronize.
