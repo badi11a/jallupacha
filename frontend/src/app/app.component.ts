@@ -32,7 +32,7 @@ interface CurrentUser {
   standalone: true,
   imports: [FormsModule, RouterLink, RouterLinkActive, RouterOutlet, UiAppShellComponent, UiMessageComponent],
   template: `
-    <ui-app-shell appName="Sistema de Procesos Institucionales" brandMark="J" [homeHref]="homeUrl"
+    <ui-app-shell appName="Sistema de Procesos Institucionales" [homeHref]="homeUrl"
       footerText="Jallupacha · Gestión interna de procesos"
       [accountLabel]="user ? user.displayName + ' · ' + profileNames(user.profiles) : ''"
       [environmentNotice]="environment.demoMode && user ? 'Entorno local: acceso de prueba.' : ''"

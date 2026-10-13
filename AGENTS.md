@@ -122,3 +122,11 @@ No trasladar nombres de modos técnicos, fixtures, credenciales o condiciones de
 Al modificar la navegación, rutas o la estructura común de la interfaz, revisar por separado el contenido común (presente en toda ruta autenticada) y el contenido propio de cada ruta, y comprobar que ningún panel o función queda mostrado en una ruta que no le corresponde ni pierde su permiso. La ubicación definida está en docs/arquitectura.md, sección «Interfaz: navegación por rutas».
 
 Antes de cerrar un cambio de interfaz, verificar textos visibles y recorrido funcional, además de pruebas de lógica y seguridad. Antes de cerrar cualquier corrección, revisar que no cambió el alcance ni debilitó controles técnicos.
+
+## Identidad visual institucional
+
+- Consultar `docs/design-system.md` para los colores UTA oficiales, tipografía, uso de marca y criterios WCAG 2.2 AA del kit compartido.
+- Mantener los siete tokens `--uta-*` con sus HEX oficiales exactos. Los colores funcionales adicionales son semánticos de interfaz, no variantes corporativas.
+- No incorporar fuentes ni activos de marca sin licencia/autorización comprobadas. No reconstruir isologotipos; si no está disponible el original autorizado, no mostrar un logo.
+- Mantener fundamentos y componentes genéricos en `frontend/src/app/shared/ui/`; lógica de negocio y navegación específica permanecen en la aplicación.
+- Al verificar cambios visuales, registrar explícitamente contraste, recorrido/textos visibles, revisión visual y pruebas. No declarar completada una comprobación que no se ejecutó.

@@ -222,11 +222,12 @@ Verificación: pruebas de componente del kit (`shared/ui/*.spec.ts`) y pruebas f
 
 ### Identidad visual y accesibilidad
 
-Decisión de diseño técnico tomada a partir de un prototipo de referencia no obligatorio: se adoptan su paleta (azul marino y azul), sus radios y sus sombras. Su navegación de portal, sus contenidos y sus funciones no implementadas no se adoptan; estas últimas siguen el alcance de la especificación y del release aprobado.
+Decisión de diseño técnico aprobada para esta implementación a partir de `docs/design-system.md`, basada en el Manual de Normas Gráficas UTA 2017. La paleta institucional conserva los siete valores oficiales exactos en tokens `--uta-*`; los roles semánticos `--ui-*` usan colores corporativos exactos cuando son apropiados y mantienen colores funcionales para estados que necesitan contraste accesible. Ninguna variante aproximada se identifica como color corporativo.
 
-- Tipografía: fuentes del sistema (`system-ui` y equivalentes). No se cargan fuentes ni otros recursos desde orígenes externos, para mantener la CSP restrictiva (PT-10) y no exponer a los usuarios ante terceros. Alojar una fuente propia requiere otra decisión.
-- Accesibilidad de referencia: WCAG 2.2 nivel AA. Los tonos del prototipo que no alcanzan el contraste exigido se oscurecen dentro de la misma familia. El texto base es de 16 px y ningún texto baja de 12 px.
-- Los colores del kit se definen solo como tokens `--ui-color-*` en hexadecimal de 6 dígitos. `npm run check:contrast --workspace frontend` verifica cada combinación usada (texto 4,5:1; bordes de controles y foco 3:1) y falla si alguna no cumple. Una combinación nueva se agrega al script en el mismo cambio que la introduce.
+- Tipografía: `Century Gothic` es la primera opción, seguida de fuentes del sistema como fallback técnico explícito. No se incorporan archivos de fuentes ni se cargan recursos externos sin licencia y autorización comprobadas.
+- La barra común admite un activo de marca institucional autorizado mediante `brandLogoSrc`. No se reconstruye el isologotipo ni se muestra el monograma tipográfico anterior; hasta recibir el original autorizado, se presenta el nombre accesible de la aplicación sin logo. Su área de protección 3x y legibilidad de pantalla deberán verificarse al integrar el activo.
+- Accesibilidad: WCAG 2.2 nivel AA, texto base de 16 px y texto mínimo de 12 px. Contraste y estados funcionales prevalecen sobre el uso decorativo del color; no se altera un valor oficial para corregir contraste.
+- `npm run check:contrast --workspace frontend` verifica cada combinación usada (texto 4,5:1; bordes de controles y foco 3:1) y falla si alguna no cumple. Una combinación nueva se agrega al script en el mismo cambio que la introduce.
 
 ## Interfaz: navegación por rutas
 

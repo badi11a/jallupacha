@@ -13,7 +13,8 @@ import { UiDialogHostComponent } from './dialog-host.component';
     <a class="skip-link" href="#main-content" (click)="skipToContent($event)">Ir al contenido principal</a>
     <header class="topbar">
       <a class="brand" [routerLink]="homeHref()" [attr.aria-label]="appName() + ', inicio'">
-        <span class="brand-mark" aria-hidden="true">{{ brandMark() }}</span> {{ appName() }}
+        @if (brandLogoSrc()) { <img class="brand-logo" [src]="brandLogoSrc()" alt="" /> }
+        {{ appName() }}
       </a>
       @if (accountLabel()) {
         <div class="account">
@@ -32,7 +33,8 @@ import { UiDialogHostComponent } from './dialog-host.component';
 })
 export class UiAppShellComponent {
   readonly appName = input.required<string>();
-  readonly brandMark = input<string>('');
+  /** Activo institucional autorizado; se omite mientras no esté disponible. */
+  readonly brandLogoSrc = input<string>('');
   /** Ruta de inicio; se navega con el router, sin recargar la aplicación. */
   readonly homeHref = input<string>('/');
   /** Texto de la cuenta activa; sin valor no se muestra el bloque de cuenta. */

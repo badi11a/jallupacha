@@ -20,7 +20,7 @@ import {
 @Component({
   imports: [UiAppShellComponent, UiPanelComponent, UiMessageComponent, UiPaginationComponent],
   template: `
-    <ui-app-shell appName="Aplicación" brandMark="A" footerText="Pie" [accountLabel]="account"
+    <ui-app-shell appName="Aplicación" [brandLogoSrc]="logo" footerText="Pie" [accountLabel]="account"
       [environmentNotice]="notice" (logout)="logouts = logouts + 1">
       <ui-panel eyebrow="SECCIÓN" heading="Listado" headingId="list-title">
         <button panelActions type="button">Acción</button>
@@ -32,6 +32,7 @@ import {
   `
 })
 class HostComponent {
+  logo = '';
   account = 'Persona · Perfil';
   notice = 'Aviso';
   logouts = 0;
@@ -68,6 +69,7 @@ describe('shared/ui', () => {
     fixture.detectChanges();
     const root = fixture.nativeElement as HTMLElement;
     expect(root.querySelector('.brand')?.getAttribute('aria-label')).toBe('Aplicación, inicio');
+    expect(root.querySelector('.brand-logo')).toBeNull();
     expect(root.querySelectorAll('.environment-notice')).toHaveLength(1);
     expect(root.querySelector('.account')?.textContent).toContain('Persona · Perfil');
     buttonByText(root, 'Cerrar sesión').click();
@@ -79,6 +81,10 @@ describe('shared/ui', () => {
     fixture.detectChanges();
     expect(root.querySelector('.account')).toBeNull();
     expect(root.querySelector('.environment-notice')).toBeNull();
+
+    fixture.componentInstance.logo = '/assets/uta-isologotipo.svg';
+    fixture.detectChanges();
+    expect(root.querySelector('.brand-logo')?.getAttribute('src')).toBe('/assets/uta-isologotipo.svg');
   });
 
   it('labels panels by their heading and projects actions', () => {
