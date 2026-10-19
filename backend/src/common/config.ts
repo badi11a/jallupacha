@@ -1,5 +1,6 @@
 import { BadRequestException, InternalServerErrorException } from '@nestjs/common';
 import { OracleConnectionOptions } from 'typeorm/driver/oracle/OracleConnectionOptions';
+import { initializeOracleClient } from './oracle-client';
 
 const required = (name: string): string => {
   const value = process.env[name]?.trim();
@@ -10,6 +11,7 @@ const required = (name: string): string => {
 };
 
 export function databaseOptions(migration = false): OracleConnectionOptions {
+  initializeOracleClient();
   const schema = required('ORACLE_SCHEMA').toUpperCase();
   if (!/^[A-Z][A-Z0-9_$#]{0,29}$/.test(schema)) {
     throw new InternalServerErrorException('Invalid Oracle schema configuration');

@@ -25,9 +25,21 @@ export const MVP_V14_TABLES = [
   'migrations'
 ] as const;
 
+export const MVP_V14_ID_GENERATORS = [
+  { table: 'MACROPROCESS_TYPE', sequence: 'MPT_ID_SEQ', trigger: 'MPT_ID_BI' },
+  { table: 'MACROPROCESS', sequence: 'MP_ID_SEQ', trigger: 'MP_ID_BI' },
+  { table: 'PROCESS_TYPE', sequence: 'PT_ID_SEQ', trigger: 'PT_ID_BI' },
+  { table: 'ORGANIZATIONAL_UNIT', sequence: 'OU_ID_SEQ', trigger: 'OU_ID_BI' },
+  { table: 'PROCESS', sequence: 'PR_ID_SEQ', trigger: 'PR_ID_BI' },
+  { table: 'PROCESS_VERSION', sequence: 'PV_ID_SEQ', trigger: 'PV_ID_BI' },
+  { table: 'PROCESS_RISK', sequence: 'RK_ID_SEQ', trigger: 'RK_ID_BI' },
+  { table: 'PROCESS_RELATION', sequence: 'RL_ID_SEQ', trigger: 'RL_ID_BI' }
+] as const;
+
 export const MVP_V14_SEQUENCES = [
   'PROCESS_CODE_SEQ',
-  'MACROPROCESS_CODE_SEQ'
+  'MACROPROCESS_CODE_SEQ',
+  ...MVP_V14_ID_GENERATORS.map(({ sequence }) => sequence)
 ] as const;
 
 export function requiredOracleIdentifier(name: 'ORACLE_SCHEMA' | 'DATABASE_USER' | 'MIGRATION_USER'): string {

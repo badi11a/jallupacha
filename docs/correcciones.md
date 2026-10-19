@@ -351,3 +351,13 @@ Resultado: la primera ejecución creó el esquema v14 y la carga demostrativa. L
 Prueba Oracle adicional: `backend/test/mvp-v14-install.oracle.e2e-spec.ts` se ejecutó contra el esquema local con opt-in explícito y aprobó sus 7 casos. Comprueba inventario, ausencia de objetos heredados, conteos de semillas y rechazos de nivel de riesgo inválido, autorrelación, segunda unidad responsable, clasificación cruzada y versión actual de otro proceso. Un defecto en el parámetro repetido de la prueba de autorrelación se corrigió antes de la ejecución aprobada.
 
 Límites: aún faltan validación de permisos de runtime, validación de ciclos y pruebas de la API e interfaz v14. Esta evidencia no acredita HTTPS, respaldo/restauración ni la versión exacta del servidor Oracle.
+
+## C-018 — Excepción explícita de cuenta runtime en QA
+
+Clasificación: excepción de operación QA aprobada por el responsable.
+
+Decisión: el ambiente QA vacío usa temporalmente la misma cuenta `PROCESOS` como propietaria de esquema, migración y ejecución del MVP. No se creará una cuenta runtime independiente en esta etapa.
+
+Corrección: la instalación v14 conserva la separación por defecto y solo acepta esa configuración cuando `MVP_V14_ALLOW_OWNER_RUNTIME_FOR_QA=true` se declara explícitamente. En esa excepción omite los `GRANT` al mismo propietario, que Oracle no permite ni necesita.
+
+Límite: esta excepción no se permite implícitamente y no debe trasladarse a producción; antes de producción se debe volver a una cuenta de ejecución con privilegios mínimos.

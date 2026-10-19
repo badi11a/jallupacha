@@ -1,0 +1,3 @@
+# Configuración Oracle Net exclusiva para Jallupacha.
+# La aplicación se conecta a QA con usuario y contraseña de base de datos.
+SQLNET.AUTHENTICATION_SERVICES=(NONE)

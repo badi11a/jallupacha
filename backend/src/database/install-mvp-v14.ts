@@ -20,8 +20,13 @@ function assertMvpV14InstallAllowed(): string {
       `MVP_V14_INSTALL_CONFIRM="${expectedConfirmation}".`
     );
   }
-  if (process.env.DATABASE_USER?.trim().toUpperCase() === schema) {
-    throw new Error('MVP v14 installation requires a runtime database user separate from the schema owner.');
+  const usesOwnerAsRuntime = process.env.DATABASE_USER?.trim().toUpperCase() === schema;
+  const allowsOwnerRuntimeInQa = process.env.MVP_V14_ALLOW_OWNER_RUNTIME_FOR_QA === 'true';
+  if (usesOwnerAsRuntime && !allowsOwnerRuntimeInQa) {
+    throw new Error(
+      'MVP v14 installation requires a runtime database user separate from the schema owner. ' +
+      'For the approved QA exception, set MVP_V14_ALLOW_OWNER_RUNTIME_FOR_QA=true explicitly.'
+    );
   }
   return schema;
 }
@@ -31,17 +36,33 @@ async function installMvpV14(): Promise<void> {
   const source = new DataSource({
     ...databaseOptions(true),
     entities: [],
-    migrations: [MvpV14Initial1770000000000]
+    migrations: []
   } as never);
   try {
     await source.initialize();
     await dropApplicationObjects(source, schema);
-    const migrations = await source.runMigrations({ transaction: 'all' });
-    if (migrations.length !== 1 || migrations[0].name !== 'MvpV14Initial1770000000000') {
-      throw new Error('MVP v14 installation did not apply exactly its initial migration.');
+    const ddlRunner = source.createQueryRunner();
+    try {
+      await ddlRunner.connect();
+      await new MvpV14Initial1770000000000().up(ddlRunner);
+    } finally {
+      await ddlRunner.release();
     }
-    await source.transaction((manager) => seedMvpV14(manager));
-    await applyMvpV14RuntimeGrants(source);
+    const seedRunner = source.createQueryRunner();
+    try {
+      await seedRunner.connect();
+      await seedRunner.startTransaction();
+      await seedMvpV14(seedRunner.manager);
+      await seedRunner.commitTransaction();
+    } catch (error) {
+      if (seedRunner.isTransactionActive) await seedRunner.rollbackTransaction();
+      throw error;
+    } finally {
+      await seedRunner.release();
+    }
+    if (process.env.DATABASE_USER?.trim().toUpperCase() !== schema) {
+      await applyMvpV14RuntimeGrants(source);
+    }
   } finally {
     if (source.isInitialized) await source.destroy();
   }
@@ -54,6 +75,11 @@ async function dropApplicationObjects(source: DataSource, schema: string): Promi
     if (existingTables.has(table)) {
       await source.query(`DROP TABLE "${schema}"."${table}" CASCADE CONSTRAINTS PURGE`);
     }
+  }
+  // TypeORM may have created this internal record in an earlier installer run.
+  // It is not part of the MVP schema and must not survive a clean installation.
+  if (existingTables.has('migrations')) {
+    await source.query(`DROP TABLE "${schema}"."migrations" CASCADE CONSTRAINTS PURGE`);
   }
 
   const sequences: Array<{ sequenceName: string }> = await source.query('SELECT SEQUENCE_NAME AS "sequenceName" FROM USER_SEQUENCES');
