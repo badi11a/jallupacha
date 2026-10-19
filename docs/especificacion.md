@@ -1,4 +1,6 @@
-# Especificación de la primera entrega
+# Especificación de la primera entrega (histórica)
+
+> **No vigente para implementación.** Esta especificación corresponde a la fuente v13 y contiene decisiones que fueron sustituidas. La especificación funcional vigente del MVP es [`mvp_v14.md`](./mvp_v14.md), basada en `Requisitos_Sistema_Procesos_v14.xlsx`.
 
 ## Autoridad y alcance
 

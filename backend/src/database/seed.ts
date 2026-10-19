@@ -28,7 +28,7 @@ const PROFILES = [
 const MACROPROCESSES = [
   { name: 'Estratégicos', order: 1 },
   { name: 'Misionales', order: 2 },
-  { name: 'de Apoyo', order: 3 }
+  { name: 'De apoyo', order: 3 }
 ];
 
 const RISK_TYPES = [

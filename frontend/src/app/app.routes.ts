@@ -1,32 +1,27 @@
 import { Routes } from '@angular/router';
-import { AuditComponent } from './administration/audit.component';
-import { CatalogsComponent } from './administration/catalogs.component';
-import { ProfilesComponent } from './administration/profiles.component';
 import { NotFoundComponent } from './not-found.component';
-import { ProcessMapComponent } from './process-map.component';
-import { ProcessRisksComponent } from './process-risks.component';
-import { ProcessWorkspaceComponent } from './process-workspace.component';
-import { unsavedChangesGuard } from './unsaved-changes.guard';
+import { MvpV14DemoComponent } from './mvp-v14-demo.component';
+import { ProcessDetailComponent } from './process-detail.component';
+import { ProcessFormComponent } from './process-form.component';
+import { ProcessListComponent } from './process-list.component';
+import { ProcessTypesComponent } from './process-types.component';
+import { UnitsComponent } from './units.component';
 
-/** Entrada de la aplicación autenticada (Release 01: mapa interno). */
+/** Página de inicio: mapa de procesos. */
 export const HOME_URL = '/mapa';
 
 /** Nombre visible de la aplicación (marca y títulos de pantalla). */
 export const APP_NAME = 'Sistema de Procesos Institucionales';
 
-// Una ruta no concede acceso: el servidor autoriza cada llamada (docs/arquitectura.md, «navegación por rutas»).
+// MVP v14 de operador único (C-011): sin autenticación ni perfiles; la navegación es la definida en docs/arquitectura_mvp_v14.md.
 export const routes: Routes = [
   { path: '', pathMatch: 'full', redirectTo: 'mapa' },
-  { title: 'Mapa de procesos', path: 'mapa', component: ProcessMapComponent, data: { mode: 'map' } },
-  { title: 'Macroproceso', path: 'mapa/macroprocesos/:id', component: ProcessMapComponent, data: { mode: 'macroprocess' } },
-  { title: 'Procesos', path: 'procesos', component: ProcessWorkspaceComponent, data: { mode: 'list' } },
-  { title: 'Nuevo proceso', path: 'procesos/nuevo', component: ProcessWorkspaceComponent, data: { mode: 'create' }, canDeactivate: [unsavedChangesGuard] },
-  { title: 'Ficha del proceso', path: 'procesos/:id', component: ProcessWorkspaceComponent, data: { mode: 'detail' } },
-  { title: 'Editar proceso', path: 'procesos/:id/editar', component: ProcessWorkspaceComponent, data: { mode: 'edit' }, canDeactivate: [unsavedChangesGuard] },
-  { title: 'Riesgos del proceso', path: 'procesos/:id/riesgos', component: ProcessRisksComponent, canDeactivate: [unsavedChangesGuard] },
-  // Administración (C-008): pantallas propias; Perfiles y Auditoría solo para Administrador (verificado en servidor).
-  { title: 'Catálogos', path: 'administracion/catalogos', component: CatalogsComponent },
-  { title: 'Perfiles de usuario', path: 'administracion/perfiles', component: ProfilesComponent },
-  { title: 'Auditoría', path: 'administracion/auditoria', component: AuditComponent },
+  { title: 'Mapa de procesos', path: 'mapa', component: MvpV14DemoComponent },
+  { title: 'Procesos', path: 'procesos', component: ProcessListComponent },
+  { title: 'Nuevo proceso', path: 'procesos/nuevo', component: ProcessFormComponent },
+  { title: 'Ficha del proceso', path: 'procesos/:id', component: ProcessDetailComponent },
+  { title: 'Editar proceso', path: 'procesos/:id/editar', component: ProcessFormComponent },
+  { title: 'Unidades internas', path: 'unidades', component: UnitsComponent },
+  { title: 'Tipos de proceso', path: 'tipos-de-proceso', component: ProcessTypesComponent },
   { title: 'Página no encontrada', path: '**', component: NotFoundComponent }
 ];

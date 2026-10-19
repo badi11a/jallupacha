@@ -127,6 +127,14 @@ Evidencia ejecutada: con el nuevo `npm run start:dev --workspace backend` en el 
 
 Pendiente: la instancia del puerto 3000 sigue ejecutando `tsx` hasta que se reinicie con `npm run start:dev` (no se detuvo porque no se inició en esta tarea); el mensaje genérico de la vista para cualquier 400 es una mejora de interfaz distinta, no modificada. Sin commit ni push.
 
+## C-010 — Gestión del MVP v14 ausente y restricción de «2 tipos de proceso» ajena a los requisitos (REQ-51, 54, 05, 06, 55, 10, 11, 14, 15, 19)
+
+Clasificación: defecto de implementación (la interfaz y la API solo leían el mapa y la ficha) y defecto de contenido de demostración; no cambia el alcance. Comportamiento esperado: `docs/mvp_v14.md` y `docs/arquitectura_mvp_v14.md` («API del piloto», «Interfaz MVP»). REQ-51 no limita el número de tipos de proceso por macroproceso; el límite de dos provenía de un prompt de contenido y no de los requisitos.
+
+Corrección: servicio, validación y controlador `/api/mvp-v14/*` para tipos de proceso, unidades, procesos, riesgos y relaciones; pantallas Angular de Mapa, Procesos (lista, alta, edición y ficha con riesgos y relaciones), Unidades internas y Tipos de proceso; rutas heredadas de administración retiradas del enrutador. La semilla se amplió a 24 procesos (4 por tipo de proceso). Se documentó el prefijo `/api/mvp-v14/` por colisión con rutas heredadas. Decisiones de producto a confirmar: nombre y clasificación obligatorios; mínimos de «ficha completa» según REQ-05.
+
+Verificación ejecutada: `tsc --noEmit` del backend sin errores; `npm test -- mvp-v14` (8 pruebas correctas); `npm run build` del frontend correcto; pruebas manuales por `curl` contra Oracle (búsqueda sin tildes, rechazo de campos no permitidos, riesgo sin nivel o con nivel inválido, autorrelación y relación duplicada, ciclo de unidades, nombre de unidad duplicado, tipo no perteneciente al macroproceso, desactivar tipo con procesos activos, unidad inexistente, unidad participante repetida); recorrido en navegador: crear tipo de proceso, crear proceso y mostrar el error de riesgo sin nivel. No ejecutado: pruebas Oracle opt-in de gestión (no existen aún), pruebas de interfaz (`ng test`; los specs heredados dependen del login), revisión de contraste WCAG, ni DAST.
+
 ## C-009 — Plataforma Oracle oficial inconsistente (PT-01, PT-02, PT-03)
 
 Clasificación: defecto de documentación y de plantilla de configuración; no es cambio funcional ni amplía requisitos. Fuentes: decisión de Oracle Database 19c en `docs/especificacion.md`, secciones «Entorno técnico de esta especificación» y persistencia, y PT-01/PT-02. Comportamiento esperado: Oracle Database 19c es la plataforma oficial para desarrollo, pruebas y producción; los parámetros de conexión se proporcionan por ambiente y no se presupone el servicio institucional.
@@ -257,3 +265,89 @@ Evidencia ejecutada (2026-10-08):
 - `git diff --check`: correcto.
 
 No ejecutado: la comprobación con llamadas directas a la API sin perfil Administrador (V4, parte de servidor) no se repitió porque el backend no cambió; sigue cubierta por las pruebas del backend existentes. No se hizo revisión visual ni con teclado en navegador en este cambio. Las pruebas de mapa, procesos, riesgos y navegación no se ejecutaron porque esos componentes no cambiaron; solo se agregaron rutas a `app.routes.ts`. Sin commit ni push.
+
+## C-009 — Alineación documental con MVP v14
+
+Clasificación: corrección de especificación/diseño. Fuente: `docs/referencias/Requisitos_Sistema_Procesos_v14.xlsx`, aprobada por el responsable del producto.
+
+Hallazgo: `docs/especificacion.md`, `docs/arquitectura.md` y los documentos de release vigentes hasta este cambio se basaban en v13. Sus reglas de macroprocesos editables, perfil Gestor de riesgos, catálogos configurables de riesgos y aprobación administrativa contradicen v14.
+
+Corrección: se declara `docs/mvp_v14.md` como especificación funcional vigente del MVP, con los 26 requisitos Imprescindibles y sus dependencias. `AGENTS.md` identifica v14 como fuente de verdad y exige consultar la nueva especificación. Los documentos v13 se marcan como históricos; no se modifica código, datos ni API en esta corrección.
+
+Verificación: se compararon los 26 requisitos Imprescindibles de la planilla v14 con `docs/mvp_v14.md`; la fuente local v14 existe en `docs/referencias/`. Pendiente: alinear la arquitectura y los contratos técnicos con v14 antes de cualquier implementación.
+
+## C-010 — Postergación de Google Workspace (REQ-25)
+
+Clasificación: cambio de producto aprobado por el responsable. Fuente: instrucción directa del responsable posterior a v14.
+
+Decisión: REQ-25 no forma parte del MVP actual y queda como candidato a eliminación. Se mantiene transcrito en `docs/mvp_v14.md` para conservar trazabilidad con v14, pero está marcado como postergado y no se declara cumplido.
+
+Límite: el acceso local de desarrollo no reemplaza una autenticación de producción. Antes de desplegar para usuarios reales se debe aprobar un mecanismo de identidad alternativo o eliminar la necesidad de acceso autenticado junto con sus requisitos dependientes.
+
+## C-011 — Piloto de operador único sin autenticación ni perfiles
+
+Clasificación: cambio de producto aprobado por el responsable. Fuente: confirmación explícita del responsable.
+
+Decisión: el MVP se limita a un piloto de operador único, sin inicio de sesión, perfiles, autorización ni auditoría por usuario. Se postergan REQ-25, REQ-26, REQ-27, REQ-07, REQ-09 y REQ-56. Debido a sus dependencias, también se postergan REQ-36, REQ-17 y REQ-52. El MVP conserva 17 requisitos Imprescindibles activos.
+
+Límite: el piloto no declara cumplimiento de controles basados en identidad o rol. Cualquier ampliación a varios usuarios, revisión/validación o publicación del mapa requiere una nueva decisión de producto y diseño técnico antes de implementar.
+
+## C-012 — Arquitectura alineada con MVP v14
+
+Clasificación: corrección de diseño previa a implementación. Fuente: `docs/mvp_v14.md`, C-010 y C-011.
+
+Hallazgo: la arquitectura anterior conservaba contratos basados en autenticación, perfiles, elaborador identificado, auditoría por usuario, catálogos editables de macroprocesos y gestión transversal de riesgos. Esos contratos contradicen el piloto de operador único y los 17 requisitos activos.
+
+Corrección: `docs/arquitectura_mvp_v14.md` define el modelo, reglas de dominio, API, interfaz, operación y verificación del MVP. Declara estructura fija, tipos de proceso acotados por macroproceso, unidades jerárquicas, ficha en Borrador, riesgos integrados a la ficha, relaciones dirigidas y búsqueda normalizada. El cambio no modifica código, base de datos, API en ejecución ni migraciones.
+
+Verificación: se contrastaron los 17 requisitos activos de `docs/mvp_v14.md` contra la matriz de trazabilidad de la nueva arquitectura. La siguiente etapa requiere diseñar y verificar la primera migración antes de implementar comportamiento.
+
+## C-013 — Instalación limpia para el modelo v14
+
+Clasificación: corrección de diseño de instalación, pendiente de implementación. Fuente: instrucción del responsable de que una instalación del MVP elimine los datos y estructuras anteriores.
+
+Hallazgo: `backend/src/database/reset-local.ts` destruye de forma protegida un esquema local, pero después ejecuta las seis migraciones y semillas v13. Esto reconstruye autenticación, perfiles, sesiones, auditoría y el modelo anterior, contrario al piloto v14.
+
+Corrección de diseño: la instalación limpia v14 eliminará únicamente objetos de la aplicación dentro del esquema confirmado y aplicará solo un conjunto inicial versionado v14 y sus permisos. Las migraciones v13 no se eliminan todavía: se mantienen como historial, pero se sacarán del camino de instalación v14. La eliminación física o archivo de esos scripts se hará en un cambio separado, después de verificar que ningún ambiente requiere reconstruirse con v13.
+
+Verificación pendiente: prueba Oracle en un esquema de desarrollo desechable que compruebe el borrado acotado, la ausencia de tablas heredadas, las semillas v14, los permisos de runtime y una segunda ejecución reproducible.
+
+## C-014 — Elaboración sin cuenta de usuario en el piloto
+
+Clasificación: corrección de diseño. Fuente: REQ-05 de `docs/mvp_v14.md` y C-011.
+
+Hallazgo: la primera redacción de la arquitectura excluía por completo el elaborador para evitar una cuenta de usuario. REQ-05, aún activo, exige que quien crea el proceso quede registrado como elaborador y que sea independiente del responsable.
+
+Corrección: la ficha v14 incorpora los campos textuales `elaborador` y `responsable`, ambos como persona o cargo y sin referencia a identidad, sesión o perfil. El elaborador es obligatorio para una ficha completa, pero el borrador puede conservarse incompleto. Esto no incorpora auditoría por usuario ni contradice el piloto de operador único.
+
+Verificación pendiente: pruebas de persistencia y API que comprueben la independencia de ambos campos, el borrador incompleto y la validación de ficha completa.
+
+## C-015 — Carga inicial v14 basada en datos existentes
+
+Clasificación: decisión de datos iniciales aprobada por el responsable. Fuente: instrucción de conservar y poder modificar libremente los datos de ejemplo del repositorio.
+
+Decisión: `generic-content.json` es la base autorizada para la demostración del MVP. Sus tres grupos se normalizan como los macroprocesos iniciales Estratégicos, Misionales y de Apoyo, cada uno bajo el tipo de macroproceso homónimo. Sus doce procesos, tipos, descripciones, objetivos y riesgos se conservan como contenido de ejemplo, desvinculados de usuarios, perfiles y auditoría v13.
+
+Verificación pendiente: instalación limpia en Oracle que cargue exactamente esta jerarquía y los doce procesos/riesgos sin crear identidades, perfiles, sesiones ni datos de auditoría.
+
+## C-016 — Integridad de versión y jerarquías en el esquema v14
+
+Clasificación: defecto de diseño de base de datos detectado en revisión técnica.
+
+Hallazgo: el primer DDL v14 permitía que un proceso apuntara como versión actual a la versión de otro proceso y permitía que un proceso fuera padre de sí mismo. La carga de demostración además usaba un texto de elaborador que no identificaba un cargo de demostración.
+
+Corrección: la referencia a versión actual pasa a ser compuesta por proceso y versión; se prohíbe explícitamente un padre igual al propio proceso; la semilla usa el cargo `Elaborador de demostración`. Los ciclos de unidades de varios niveles se validarán en el servidor, pues una restricción declarativa no puede recorrer un árbol Oracle.
+
+Verificación pendiente: pruebas Oracle negativas para versión de otro proceso y padre propio, y pruebas de API para ciclos de unidades y el campo elaborador.
+
+## C-017 — Ejecución comprobada de instalación limpia v14
+
+Clasificación: evidencia de verificación de instalación.
+
+Ejecución: en el esquema local de desarrollo `JALLUPACHA_OWNER`, el comando `npm run db:install:mvp-v14 --workspace backend` se ejecutó con su confirmación destructiva explícita. La conexión de la cuenta propietaria se comprobó antes con una consulta a `DUAL`.
+
+Resultado: la primera ejecución creó el esquema v14 y la carga demostrativa. La segunda ejecución volvió a destruir y recrear los objetos sin error. Tras ella se verificaron por consulta: 3 tipos de macroproceso, 3 macroprocesos, 6 tipos de proceso, 12 procesos, 12 riesgos, 1 unidad de demostración y 12 asociaciones de unidad responsable. El inventario contiene solo las nueve tablas v14 y el registro TypeORM `migrations`; la consulta explícita de `APP_USER` devolvió que esa tabla ya no existe, como se espera del modelo v14.
+
+Prueba Oracle adicional: `backend/test/mvp-v14-install.oracle.e2e-spec.ts` se ejecutó contra el esquema local con opt-in explícito y aprobó sus 7 casos. Comprueba inventario, ausencia de objetos heredados, conteos de semillas y rechazos de nivel de riesgo inválido, autorrelación, segunda unidad responsable, clasificación cruzada y versión actual de otro proceso. Un defecto en el parámetro repetido de la prueba de autorrelación se corrigió antes de la ejecución aprobada.
+
+Límites: aún faltan validación de permisos de runtime, validación de ciclos y pruebas de la API e interfaz v14. Esta evidencia no acredita HTTPS, respaldo/restauración ni la versión exacta del servidor Oracle.

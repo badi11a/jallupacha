@@ -16,6 +16,7 @@
     "db:grant": "ts-node src/database/grants.ts",
     "db:seed": "ts-node src/database/seed.ts",
     "db:reset:local": "ts-node src/database/reset-local.ts",
+    "db:install:mvp-v14": "ts-node src/database/install-mvp-v14.ts",
     "docs:openapi": "ts-node src/openapi.ts"
   },
   "dependencies": {

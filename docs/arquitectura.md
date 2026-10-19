@@ -1,4 +1,6 @@
-# Arquitectura mínima y decisiones
+# Arquitectura mínima y decisiones (histórica)
+
+> **No vigente para implementar comportamiento del MVP v14.** Contiene contratos y decisiones basados en v13. La fuente funcional vigente es [`mvp_v14.md`](./mvp_v14.md). La arquitectura v14 se alineará antes de realizar cambios de código.
 
 Revisión documental C-001 v4: Oracle 19c. Distingue producto, entorno local y datos de prueba; sustituye las versiones anteriores.
 

@@ -18,6 +18,8 @@ import { ProcessService } from './process/process.service';
 import { RiskCatalogController } from './risk/risk-catalog.controller';
 import { RiskController } from './risk/risk.controller';
 import { RiskService } from './risk/risk.service';
+import { MvpV14Controller } from './mvp-v14/mvp-v14.controller';
+import { MvpV14Service } from './mvp-v14/mvp-v14.service';
 
 const options = databaseOptions();
 const rateLimit = configuredRateLimit();
@@ -39,7 +41,8 @@ const dataSource = new DataSource(options);
     ProcessController,
     ProcessMapController,
     RiskController,
-    RiskCatalogController
+    RiskCatalogController,
+    MvpV14Controller
   ],
   providers: [
     { provide: DataSource, useValue: dataSource },
@@ -58,6 +61,7 @@ const dataSource = new DataSource(options);
     ProcessMapService,
     RiskService,
     AuthGuard,
+    MvpV14Service,
     { provide: APP_GUARD, useClass: ThrottlerGuard },
     { provide: APP_GUARD, useExisting: AuthGuard }
   ]

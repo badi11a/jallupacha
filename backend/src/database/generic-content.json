@@ -5,55 +5,151 @@
       "name": "Estratégicos",
       "processes": [
         {
+          "code": "PR1",
           "type": "Planificación",
           "name": "Planificación institucional",
-          "description": "Organiza la definición de prioridades y objetivos institucionales para el período de gestión.",
-          "objective": "Alinear objetivos, recursos y resultados esperados.",
+          "description": "Definición formal de los lineamientos estratégicos y metas plurianuales de la entidad.",
+          "objective": "Establecer la ruta directriz para el cumplimiento de la misión institucional.",
+          "scope": "Desde la recepción de directrices sectoriales hasta la aprobación del plan estratégico quinquenal.",
+          "responsibleUnit": "Unidad de Planificación",
+          "participantUnits": [
+            "Dirección Ejecutiva"
+          ],
           "risk": {
-            "description": "Las prioridades institucionales pueden quedar desalineadas con las necesidades de servicio.",
-            "cause": "La planificación utiliza información incompleta o desactualizada.",
-            "consequence": "Se asignan recursos a iniciativas con bajo aporte a los resultados esperados.",
+            "description": "Incoherencia entre los objetivos estratégicos y la asignación presupuestaria.",
+            "cause": "Desalineación en las mesas de trabajo sectoriales.",
+            "consequence": "Retraso en la ejecución de metas prioritarias.",
             "type": "Estratégico",
             "level": "Alto"
           }
         },
         {
+          "code": "PR2",
           "type": "Seguimiento y evaluación",
           "name": "Seguimiento de objetivos institucionales",
-          "description": "Consolida avances, indicadores y alertas para apoyar decisiones de gestión.",
-          "objective": "Detectar oportunamente brechas entre los resultados y los objetivos.",
+          "description": "Monitoreo periódico del avance de los indicadores clave de desempeño estratégico.",
+          "objective": "Detectar desviaciones tempranas en el cumplimiento de metas institucionales.",
+          "scope": "Desde el registro de avances parciales hasta la emisión del informe trimestral de gestión.",
+          "responsibleUnit": "Unidad de Control de Gestión",
+          "participantUnits": [
+            "Unidad de Planificación"
+          ],
           "risk": {
-            "description": "Los reportes de avance pueden no reflejar el estado real de los objetivos.",
-            "cause": "Las áreas informan con criterios o períodos de corte distintos.",
-            "consequence": "Las decisiones correctivas se toman tarde o sobre antecedentes inconsistentes.",
-            "type": "Operacional",
-            "level": "Medio"
+            "description": "Inconsistencia de los datos reportados por las distintas unidades ejecutoras.",
+            "cause": "Uso de fuentes de información descentralizadas y no homologadas.",
+            "consequence": "Toma de decisiones directivas basadas en información errónea.",
+            "type": "Estratégico",
+            "level": "Crítico"
           }
         },
         {
+          "code": "PR3",
           "type": "Planificación",
           "name": "Gestión de iniciativas institucionales",
-          "description": "Registra, prioriza y coordina iniciativas orientadas a mejorar los servicios y la gestión.",
-          "objective": "Mantener una cartera coherente con las prioridades institucionales.",
+          "description": "Captura, evaluación y priorización de proyectos y propuestas de mejora para el portafolio.",
+          "objective": "Seleccionar iniciativas viables alineadas con la estrategia institucional.",
+          "scope": "Desde la postulación de la iniciativa hasta su incorporación formal en la cartera.",
+          "responsibleUnit": "Unidad de Proyectos",
+          "participantUnits": [
+            "Unidad de Planificación"
+          ],
           "risk": {
-            "description": "Iniciativas prioritarias pueden quedar sin seguimiento de hitos y dependencias.",
-            "cause": "No se actualiza oportunamente la información de responsables y plazos.",
-            "consequence": "Se retrasan resultados y se duplican esfuerzos entre áreas.",
+            "description": "Subestimación de costos iniciales en las propuestas presentadas.",
+            "cause": "Falta de parámetros estandarizados de estimación presupuestaria.",
+            "consequence": "Sobrecoste en fases avanzadas de desarrollo.",
+            "type": "Financiero",
+            "level": "Medio"
+          }
+        },
+        {
+          "code": "PR4",
+          "type": "Seguimiento y evaluación",
+          "name": "Mejora continua de procesos",
+          "description": "Identificación de oportunidades de optimización y rediseño de flujos de trabajo.",
+          "objective": "Incrementar la eficiencia operativa y la calidad de la respuesta institucional.",
+          "scope": "Desde la detección de cuellos de botella hasta la implementación del proceso optimizado.",
+          "responsibleUnit": "Unidad de Procesos",
+          "participantUnits": [
+            "Unidad de Calidad"
+          ],
+          "risk": {
+            "description": "Resistencia al cambio por parte del personal operativo afectado.",
+            "cause": "Insuficiente gestión del cambio y comunicación previa.",
+            "consequence": "Incumplimiento de los nuevos flujos estandarizados.",
             "type": "Operacional",
             "level": "Medio"
           }
         },
         {
-          "type": "Seguimiento y evaluación",
-          "name": "Mejora continua de procesos",
-          "description": "Identifica oportunidades de mejora y coordina el seguimiento de sus resultados.",
-          "objective": "Reducir brechas de desempeño mediante acciones de mejora verificables.",
+          "code": "PR13",
+          "type": "Planificación",
+          "name": "Formulación de lineamientos estratégicos sectoriales",
+          "description": "Diseño de directrices técnicas y orientaciones operativas para las dependencias.",
+          "objective": "Armonizar las directrices nacionales con la ejecución local.",
+          "scope": "Desde el análisis del marco normativo hasta la publicación de circulares orientadoras.",
+          "responsibleUnit": "Departamento de Estudios",
+          "participantUnits": [],
           "risk": {
-            "description": "Las acciones de mejora pueden no abordar las causas de las brechas detectadas.",
-            "cause": "El análisis de resultados no incorpora a todas las unidades involucradas.",
-            "consequence": "La brecha persiste y consume recursos en acciones de bajo efecto.",
-            "type": "Estratégico",
+            "description": "Ambigüedad en la interpretación de las normativas emitidas.",
+            "cause": "Redacción técnica compleja sin validación previa.",
+            "consequence": "Discrepancias en la aplicación operativa por unidad.",
+            "type": "Cumplimiento",
             "level": "Bajo"
+          }
+        },
+        {
+          "code": "PR14",
+          "type": "Planificación",
+          "name": "Diseño de la cartera de proyectos plurianuales",
+          "description": "Estructuración técnica y financiera del conjunto de proyectos de inversión a mediano plazo.",
+          "objective": "Garantizar la sostenibilidad de las inversiones institucionales en el tiempo.",
+          "scope": "Desde la consolidación de requerimientos hasta la validación de la cartera definitiva.",
+          "responsibleUnit": "Unidad de Inversiones",
+          "participantUnits": [
+            "Unidad de Presupuesto"
+          ],
+          "risk": {
+            "description": "Retraso en la validación técnica de los perfiles de inversión.",
+            "cause": "Demora en la entrega de antecedentes complementarios.",
+            "consequence": "Postergación en la asignación de recursos plurianuales.",
+            "type": "Operacional",
+            "level": "Medio"
+          }
+        },
+        {
+          "code": "PR15",
+          "type": "Seguimiento y evaluación",
+          "name": "Evaluación de desempeño institucional",
+          "description": "Medición anual del cumplimiento global de compromisos de gestión y metas sectoriales.",
+          "objective": "Valorar el rendimiento global de la organización frente a los compromisos adquiridos.",
+          "scope": "Desde la recopilación de antecedentes anuales hasta la entrega del balance de gestión.",
+          "responsibleUnit": "Unidad de Calidad",
+          "participantUnits": [],
+          "risk": {
+            "description": "Disponibilidad tardía de estadísticas consolidadas de las unidades.",
+            "cause": "Procesos manuales de agregación de datos estadísticos.",
+            "consequence": "Emisión fuera de plazo del balance de desempeño.",
+            "type": "Cumplimiento",
+            "level": "Bajo"
+          }
+        },
+        {
+          "code": "PR16",
+          "type": "Seguimiento y evaluación",
+          "name": "Control de gestión de indicadores estratégicos",
+          "description": "Verificación mensual de las métricas asociadas a los productos estratégicos de la institución.",
+          "objective": "Asegurar el cumplimiento de los umbrales de desempeño comprometidos.",
+          "scope": "Desde la extracción de métricas operativas hasta la consolidación del tablero directivo.",
+          "responsibleUnit": "Unidad de Control de Gestión",
+          "participantUnits": [
+            "Unidad de Estadística"
+          ],
+          "risk": {
+            "description": "Omisión en el registro oportuno de variables críticas en los sistemas.",
+            "cause": "Falta de rutinas de carga de datos por parte de los operadores.",
+            "consequence": "Cálculos distorsionados en los indicadores de impacto.",
+            "type": "Tecnológico",
+            "level": "Alto"
           }
         }
       ]
@@ -62,112 +158,302 @@
       "name": "Misionales",
       "processes": [
         {
+          "code": "PR5",
           "type": "Atención y servicios",
           "name": "Atención de solicitudes ciudadanas",
-          "description": "Recibe, registra, deriva y responde solicitudes presentadas por las personas usuarias.",
-          "objective": "Entregar respuestas trazables dentro de los plazos aplicables.",
+          "description": "Recepción, tramitación y respuesta a requerimientos ingresados por la ciudadanía.",
+          "objective": "Otorgar respuestas oportunas y claras a las consultas y requerimientos ciudadanos.",
+          "scope": "Desde el ingreso del requerimiento hasta la notificación de la respuesta final al solicitante.",
+          "responsibleUnit": "Oficina de Informaciones",
+          "participantUnits": [
+            "Unidad de Atención Ciudadana"
+          ],
           "risk": {
-            "description": "Una solicitud puede quedar sin respuesta o ser derivada a una unidad incorrecta.",
-            "cause": "La clasificación inicial no considera el contenido o los antecedentes recibidos.",
-            "consequence": "Aumentan los tiempos de respuesta y se deteriora la calidad de atención.",
+            "description": "Exceedancia de los plazos legales establecidos para la respuesta.",
+            "cause": "Sobrecarga de ingresos en periodos estacionales específicos.",
+            "consequence": "Generación de reclamos formales por demora en la tramitación.",
+            "type": "Cumplimiento",
+            "level": "Medio"
+          }
+        },
+        {
+          "code": "PR6",
+          "type": "Fiscalización y evaluación",
+          "name": "Evaluación de cumplimiento de programas",
+          "description": "Revisión sistemática de la ejecución técnica y financiera de los programas sociales o sectoriales.",
+          "objective": "Verificar el apego a la normativa vigente y el uso eficiente de los recursos asignados.",
+          "scope": "Desde la planificación de la fiscalización hasta la emisión del informe final de hallazgos.",
+          "responsibleUnit": "Unidad de Fiscalización",
+          "participantUnits": [
+            "Unidad de Control"
+          ],
+          "risk": {
+            "description": "Ocultamiento o alteración de registros financieros por parte de entidades fiscalizadas.",
+            "cause": "Falta de atribuciones coercitivas para la incautación inmediata de respaldos físicos.",
+            "consequence": "Invalidez del proceso de fiscalización y pérdida de recursos públicos.",
+            "type": "Cumplimiento",
+            "level": "Crítico"
+          }
+        },
+        {
+          "code": "PR7",
+          "type": "Atención y servicios",
+          "name": "Entrega de prestaciones institucionales",
+          "description": "Gestión de la entrega de beneficios, subsidios o servicios directos a los beneficiarios.",
+          "objective": "Garantizar la entrega correcta y oportuna de las prestaciones asignadas.",
+          "scope": "Desde la validación de requisitos de elegibilidad hasta la entrega efectiva de la prestación.",
+          "responsibleUnit": "Departamento de Prestaciones",
+          "participantUnits": [
+            "Unidad de Beneficios"
+          ],
+          "risk": {
+            "description": "Error en la validación de antecedentes socioeconómicos de postulantes.",
+            "cause": "Verificación manual incompleta de bases de datos externas.",
+            "consequence": "Otorgamiento indebido de prestaciones a personas no elegibles.",
             "type": "Operacional",
             "level": "Alto"
           }
         },
         {
+          "code": "PR8",
           "type": "Fiscalización y evaluación",
-          "name": "Evaluación de cumplimiento de programas",
-          "description": "Revisa antecedentes de ejecución y resultados de programas institucionales.",
-          "objective": "Identificar brechas de cumplimiento y comunicar hallazgos verificables.",
+          "name": "Gestión de reclamos y reconsideraciones",
+          "description": "Tramitación de recursos de reposición, apelaciones y reclamos formales sobre resoluciones.",
+          "objective": "Garantizar el derecho a defensa y revisión de los actos administrativos emitidos.",
+          "scope": "Desde la interposición formal del recurso hasta la notificación de la resolución definitiva.",
+          "responsibleUnit": "Unidad Jurídica",
+          "participantUnits": [
+            "Departamento de Atención"
+          ],
           "risk": {
-            "description": "La evaluación puede omitir incumplimientos relevantes.",
-            "cause": "La revisión no cubre todos los criterios o antecedentes disponibles.",
-            "consequence": "Se mantienen brechas que afectan los resultados comprometidos.",
+            "description": "Incumplimiento de plazos fatales para la emisión de respuestas a recursos.",
+            "cause": "Complejidad técnica en los antecedentes aportados por los recurrentes.",
+            "consequence": "Configuración de silencio administrativo negativo y posibles acciones legales.",
             "type": "Cumplimiento",
             "level": "Alto"
           }
         },
         {
+          "code": "PR17",
           "type": "Atención y servicios",
-          "name": "Entrega de prestaciones institucionales",
-          "description": "Gestiona la evaluación de requisitos y entrega de prestaciones definidas por la institución.",
-          "objective": "Asegurar decisiones consistentes y trazables durante la entrega.",
+          "name": "Gestión de canales de atención presencial y remota",
+          "description": "Administración de la infraestructura y turnos de atención multicanal para la ciudadanía.",
+          "objective": "Mantener canales de comunicación accesibles y fluidos para la comunidad.",
+          "scope": "Desde la apertura de módulos de atención hasta el cierre del registro diario de atenciones.",
+          "responsibleUnit": "Unidad de Atención Ciudadana",
+          "participantUnits": [],
           "risk": {
-            "description": "Personas con antecedentes equivalentes pueden recibir decisiones diferentes.",
-            "cause": "Los criterios de evaluación no se aplican de forma uniforme.",
-            "consequence": "Se afecta la equidad del servicio y aumenta el volumen de revisiones.",
-            "type": "Cumplimiento",
+            "description": "Interrupción prolongada en la atención por fallas de conectividad.",
+            "cause": "Inestabilidad en las líneas de comunicación y equipos de mesón.",
+            "consequence": "Acumulación de público y deterioro en la percepción del servicio.",
+            "type": "Tecnológico",
+            "level": "Bajo"
+          }
+        },
+        {
+          "code": "PR18",
+          "type": "Atención y servicios",
+          "name": "Coordinación de servicios de asistencia especializada",
+          "description": "Articulación de apoyos técnicos especializados para casos complejos derivados a terreno.",
+          "objective": "Facilitar la intervención oportuna de equipos expertos en situaciones específicas.",
+          "scope": "Desde la recepción del caso derivado hasta el cierre del informe de asistencia técnica.",
+          "responsibleUnit": "Departamento Técnico",
+          "participantUnits": [
+            "Unidad de Operaciones en Terreno"
+          ],
+          "risk": {
+            "description": "Disponibilidad insuficiente de personal técnico especializado.",
+            "cause": "Alta demanda simultánea en múltiples zonas geográficas.",
+            "consequence": "Postergación en la atención de casos críticos.",
+            "type": "Operacional",
             "level": "Medio"
           }
         },
         {
+          "code": "PR19",
           "type": "Fiscalización y evaluación",
-          "name": "Gestión de reclamos y reconsideraciones",
-          "description": "Analiza reclamos y solicitudes de revisión de decisiones institucionales.",
-          "objective": "Resolver revisiones con antecedentes completos y dentro del plazo aplicable.",
+          "name": "Fiscalización de normativas sectoriales",
+          "description": "Inspección en terreno de instalaciones y procesos sujetos al control regulatorio de la entidad.",
+          "objective": "Comprobar el cumplimiento de los estándares legales de operación en el sector.",
+          "scope": "Desde la emisión de la orden de visita inspectiva hasta el levantamiento del acta de inspección.",
+          "responsibleUnit": "Unidad de Inspección",
+          "participantUnits": [],
           "risk": {
-            "description": "Un reclamo puede resolverse sin considerar antecedentes determinantes.",
-            "cause": "Los documentos y registros asociados no se reúnen oportunamente.",
-            "consequence": "La decisión requiere una nueva revisión y se prolonga su resolución.",
-            "type": "Cumplimiento",
+            "description": "Negativa de acceso a las instalaciones por parte del sujeto fiscalizado.",
+            "cause": "Ausencia de resguardo policial preventivo en zonas complejas.",
+            "consequence": "Suspensión de la diligencia inspectiva y retraso en el programa.",
+            "type": "Operacional",
             "level": "Medio"
+          }
+        },
+        {
+          "code": "PR20",
+          "type": "Fiscalización y evaluación",
+          "name": "Verificación de estándares de ejecución operativa",
+          "description": "Control de calidad sobre los productos y entregables generados por contratos externos.",
+          "objective": "Asegurar que los servicios tercerizados cumplan con las especificaciones técnicas exigidas.",
+          "scope": "Desde la recepción provisional de entregables hasta la firma del acta de aceptación conforme.",
+          "responsibleUnit": "Unidad de Control Técnico",
+          "participantUnits": [
+            "Unidad de Abastecimiento"
+          ],
+          "risk": {
+            "description": "Aceptación de entregables con desviaciones técnicas menores no detectadas a tiempo.",
+            "cause": "Superficialidad en las pautas de revisión aplicadas por los inspectores.",
+            "consequence": "Deterioro prematuro de los bienes o servicios recibidos.",
+            "type": "Operacional",
+            "level": "Bajo"
           }
         }
       ]
     },
     {
-      "name": "de Apoyo",
+      "name": "De apoyo",
       "processes": [
         {
+          "code": "PR9",
           "type": "Gestión interna",
           "name": "Gestión de personas",
-          "description": "Coordina procesos internos de planificación, incorporación y desarrollo de personas.",
-          "objective": "Disponer de capacidades acordes con las necesidades institucionales.",
+          "description": "Administración del ciclo de vida laboral, remuneraciones y desarrollo del talento humano.",
+          "objective": "Proveer personal idóneo y mantener condiciones laborales óptimas para la institución.",
+          "scope": "Desde el requerimiento de incorporación de personal hasta el cese de funciones.",
+          "responsibleUnit": "Departamento de Recursos Humanos",
+          "participantUnits": [
+            "Unidad de Bienestar"
+          ],
           "risk": {
-            "description": "La planificación de capacidades puede no anticipar necesidades críticas.",
-            "cause": "Los cambios de carga de trabajo no se reflejan en la planificación.",
-            "consequence": "Se generan brechas de cobertura o sobrecarga en unidades internas.",
+            "description": "Demora en la tramitación de nombramientos y pagos de remuneraciones.",
+            "cause": "Concentración de procesos administrativos en pocas manos durante periodos críticos.",
+            "consequence": "Reclamos formales del personal y deterioro del clima laboral.",
             "type": "Operacional",
             "level": "Medio"
           }
         },
         {
+          "code": "PR10",
           "type": "Gestión interna",
           "name": "Gestión de abastecimiento",
-          "description": "Planifica requerimientos, adquisiciones y recepción de bienes y servicios.",
-          "objective": "Atender requerimientos institucionales con oportunidad y trazabilidad.",
+          "description": "Adquisición de bienes, servicios y contratación de suministros para la operatividad institucional.",
+          "objective": "Asegurar el suministro oportuno de insumos bajo criterios de eficiencia y transparencia.",
+          "scope": "Desde la recepción de solicitudes de compra hasta la recepción conforme en bodega.",
+          "responsibleUnit": "Unidad de Abastecimiento",
+          "participantUnits": [
+            "Unidad de Finanzas"
+          ],
           "risk": {
-            "description": "Un requerimiento puede iniciar una adquisición con especificaciones incompletas.",
-            "cause": "La necesidad y sus criterios de aceptación no se validan con anticipación.",
-            "consequence": "Se reciben bienes o servicios que no resuelven la necesidad prevista.",
+            "description": "Declaración desierta de licitaciones públicas por falta de oferentes en el mercado.",
+            "cause": "Bases técnicas restrictivas o precios de referencia desactualizados.",
+            "consequence": "Quiebre de stock de insumos críticos para la operación.",
+            "type": "Financiero",
+            "level": "Bajo"
+          }
+        },
+        {
+          "code": "PR11",
+          "type": "Gestión interna",
+          "name": "Gestión presupuestaria",
+          "description": "Formulación, ejecución, control y modificación del presupuesto anual asignado a la entidad.",
+          "objective": "Optimizar la ejecución financiera cumpliendo con la normativa fiscal vigente.",
+          "scope": "Desde la elaboración del anteproyecto presupuestario hasta la rendición de cuentas final.",
+          "responsibleUnit": "Unidad de Presupuesto",
+          "participantUnits": [
+            "Unidad de Contabilidad"
+          ],
+          "risk": {
+            "description": "Subejecución presupuestaria al cierre del ejercicio fiscal.",
+            "cause": "Retraso en la tramitación de decretos de modificación y compromisos de gasto.",
+            "consequence": "Reducción de la asignación presupuestaria para el periodo siguiente.",
             "type": "Financiero",
             "level": "Alto"
           }
         },
         {
-          "type": "Gestión interna",
-          "name": "Gestión presupuestaria",
-          "description": "Consolida requerimientos, disponibilidad y seguimiento de la ejecución presupuestaria.",
-          "objective": "Mantener información oportuna para la toma de decisiones financieras.",
+          "code": "PR12",
+          "type": "Tecnología y soporte",
+          "name": "Gestión de plataformas institucionales",
+          "description": "Desarrollo, despliegue y operación de los sistemas de información y aplicativos informáticos.",
+          "objective": "Garantizar la disponibilidad y continuidad operativa de los servicios digitales.",
+          "scope": "Desde el análisis de requerimientos tecnológicos hasta el paso a producción y soporte.",
+          "responsibleUnit": "Departamento de Tecnologías",
+          "participantUnits": [
+            "Unidad de Infraestructura"
+          ],
           "risk": {
-            "description": "La ejecución informada puede diferir de los compromisos vigentes.",
-            "cause": "Los registros de compromisos se actualizan con retraso.",
-            "consequence": "Se adoptan decisiones con una estimación incorrecta de disponibilidad.",
-            "type": "Financiero",
+            "description": "Vulnerabilidad en los sistemas ante incidentes de ciberseguridad.",
+            "cause": "Falta de actualización oportuna de parches en servidores y aplicaciones.",
+            "consequence": "Exposición de datos institucionales y caída de servicios en línea.",
+            "type": "Tecnológico",
+            "level": "Alto"
+          }
+        },
+        {
+          "code": "PR21",
+          "type": "Gestión interna",
+          "name": "Administración de infraestructura física",
+          "description": "Mantenimiento, asignación y seguridad de los espacios físicos e inmuebles institucionales.",
+          "objective": "Proveer espacios de trabajo seguros, funcionales y adecuados para las funciones.",
+          "scope": "Desde la recepción de solicitudes de reparación hasta la ejecución de las obras de mantenimiento.",
+          "responsibleUnit": "Unidad de Servicios Generales",
+          "participantUnits": [],
+          "risk": {
+            "description": "Falla imprevista en sistemas críticos de climatización o suministro eléctrico.",
+            "cause": "Falta de mantenimiento preventivo periódico en las instalaciones.",
+            "consequence": "Suspensión temporal de las actividades presenciales en las dependencias.",
+            "type": "Operacional",
             "level": "Medio"
           }
         },
         {
+          "code": "PR22",
           "type": "Tecnología y soporte",
-          "name": "Gestión de plataformas institucionales",
-          "description": "Coordina la operación, soporte y continuidad de las plataformas de trabajo.",
-          "objective": "Mantener disponibles y protegidos los servicios tecnológicos necesarios.",
+          "name": "Soporte técnico y resolución de incidencias tecnológicas",
+          "description": "Atención de requerimientos de hardware, software y conectividad del personal interno.",
+          "objective": "Restaurar la operatividad de los usuarios ante fallas técnicas en sus equipos de trabajo.",
+          "scope": "Desde el reporte de la incidencia en mesa de ayuda hasta el cierre del ticket de atención.",
+          "responsibleUnit": "Mesa de Ayuda TI",
+          "participantUnits": [],
           "risk": {
-            "description": "Una plataforma necesaria puede quedar indisponible durante una actividad crítica.",
-            "cause": "La planificación de continuidad no cubre una falla de infraestructura o configuración.",
-            "consequence": "Se interrumpen actividades y se retrasan servicios institucionales.",
+            "description": "Demora en la reposición de repuestos y equipos de computación dañados.",
+            "cause": "Quiebre de inventario en proveedores de hardware.",
+            "consequence": "Improductividad prolongada del funcionario afectado.",
+            "type": "Operacional",
+            "level": "Bajo"
+          }
+        },
+        {
+          "code": "PR23",
+          "type": "Tecnología y soporte",
+          "name": "Gestión de seguridad de la información institucional",
+          "description": "Definición y aplicación de políticas, respaldos y controles de acceso a los datos corporativos.",
+          "objective": "Proteger la confidencialidad, integridad y disponibilidad de la información de la entidad.",
+          "scope": "Desde la formulación de políticas de seguridad hasta la ejecución de auditorías de acceso.",
+          "responsibleUnit": "Unidad de Seguridad Informática",
+          "participantUnits": [
+            "Departamento de Tecnologías"
+          ],
+          "risk": {
+            "description": "Pérdida de respaldos de información ante fallas en los medios de almacenamiento.",
+            "cause": "Inexistencia de pruebas periódicas de restauración de datos.",
+            "consequence": "Incapacidad de recuperación ante incidentes catastróficos.",
             "type": "Tecnológico",
-            "level": "Alto"
+            "level": "Medio"
+          }
+        },
+        {
+          "code": "PR24",
+          "type": "Tecnología y soporte",
+          "name": "Mantenimiento de infraestructura de redes y comunicaciones",
+          "description": "Administración de enlaces de datos, telefonía IP, equipos de red y seguridad perimetral.",
+          "objective": "Asegurar la conectividad estable y segura entre las distintas dependencias institucionales.",
+          "scope": "Desde el monitoreo continuo de enlaces hasta la resolución de fallas de transmisión.",
+          "responsibleUnit": "Unidad de Redes y Comunicaciones",
+          "participantUnits": [],
+          "risk": {
+            "description": "Corte de fibra óptica externa por obras viales ajenas a la institución.",
+            "cause": "Vulnerabilidad ante daños físicos en las líneas de telecomunicación prestadas por terceros.",
+            "consequence": "Aislamiento temporal de oficinas regionales y pérdida de conectividad.",
+            "type": "Tecnológico",
+            "level": "Bajo"
           }
         }
       ]

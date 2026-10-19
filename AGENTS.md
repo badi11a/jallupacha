@@ -1,20 +1,20 @@
 # Instrucciones de desarrollo
 
-La fuente de verdad del producto es Requisitos_Sistema_Procesos_v13.xlsx, suministrada por el responsable del producto. Se encuentra en docs\referencias\Requisitos_Sistema_Procesos_v13.xlsx. No inventar requisitos ni cambiar su alcance sin aprobación. Consultar docs/especificacion.md y docs/arquitectura.md antes de modificar comportamiento.
+La fuente de verdad del producto es Requisitos_Sistema_Procesos_v14.xlsx, suministrada por el responsable del producto. Se encuentra en docs\referencias\Requisitos_Sistema_Procesos_v14.xlsx. No inventar requisitos ni cambiar su alcance sin aprobación. Consultar `docs/mvp_v14.md` y `docs/arquitectura_mvp_v14.md` antes de modificar comportamiento. Los documentos anteriores de especificación, arquitectura e incrementos son históricos hasta que se alineen explícitamente con v14.
 
 ## Reglas de trabajo
 
 - TypeScript, Angular, NestJS y TypeORM; Oracle Database 19c es la plataforma oficial para desarrollo, pruebas y producción. Instalación directa en el equipo local, sin Docker. El despliegue es on-premise; verificar versión, edición y compatibilidad de la instalación institucional antes de desplegar.
 - Mantener una aplicación backend. No introducir microservicios, capas o patrones sin necesidad concreta.
 - La aplicación es el producto institucional. El entorno local utiliza datos de prueba y autenticación local de desarrollo, exclusivamente para desarrollo; no se habilita este acceso en producción. Consultar “Presentación del producto”, en docs/especificacion.md, para sus condiciones de presentación.
-- Todo endpoint requiere autenticación y una política explícita de autorización. Verificar permisos en el servidor y consultar perfiles actuales en cada solicitud.
+- Fuera del piloto definido en C-011, todo endpoint requiere autenticación y una política explícita de autorización. Verificar permisos en el servidor y consultar perfiles actuales en cada solicitud. El piloto MVP de operador único no incorpora autenticación, perfiles ni autorización; debe limitarse al entorno de piloto y no se declara apto para usuarios reales o producción mientras esta excepción siga vigente.
 - Migraciones versionadas; synchronize: false. Nunca borrar ni alterar una migración ya aplicada.
-- Permisos Oracle: solo en `backend/database/grant-runtime.sql` (objetos) y `grant-system.sql` (sistema); las migraciones nuevas no otorgan permisos. Ver docs/arquitectura.md, «Cuentas y permisos Oracle».
+- Permisos Oracle: solo en `backend/database/grant-runtime.sql` (objetos) y `grant-system.sql` (sistema); las migraciones nuevas no otorgan permisos. Ver `docs/arquitectura_mvp_v14.md`, «Operación e infraestructura».
 - Cada cambio debe referenciar requisitos, incluir verificación apropiada y tener revisión registrada antes de integrarse. La revisión de IA no sustituye la conformidad requerida para producción.
 - Ejecutar la verificación significativa más pequeña para el comportamiento afectado. Usar pruebas Oracle para persistencia, SQL, grants o transacciones; ampliar o repetir verificaciones solo cuando el impacto o un fallo lo justifique. Mantener PT-03 y ejecutar las verificaciones requeridas para liberar.
 - No declarar cumplida una verificación que no se ejecutó. La autenticación local de desarrollo no cumple REQ-25.
 - No incluir datos reales, secretos ni tokens en código, fixtures o registros.
-- Configuración por variables de entorno según docs/arquitectura.md, «Configuración por ambiente»; mantener `backend/.env.example` actualizado al añadir variables y validarlas en `backend/src/common/config.ts`.
+- Configuración por variables de entorno; mantener `backend/.env.example` actualizado al añadir variables y validarlas en `backend/src/common/config.ts`.
 - No modificar la planilla ni resolver decisiones de producto por cuenta propia.
 
 ## Principios técnicos obligatorios
@@ -119,7 +119,7 @@ Registrar el hallazgo, documentos afectados, corrección y evidencia de verifica
 
 No trasladar nombres de modos técnicos, fixtures, credenciales o condiciones del entorno a títulos, menús, botones o registros del producto sin una razón definida en la especificación. Los avisos de seguridad necesarios se mantienen en el lugar indicado, sin repetirse por toda la interfaz.
 
-Al modificar la navegación, rutas o la estructura común de la interfaz, revisar por separado el contenido común (presente en toda ruta autenticada) y el contenido propio de cada ruta, y comprobar que ningún panel o función queda mostrado en una ruta que no le corresponde ni pierde su permiso. La ubicación definida está en docs/arquitectura.md, sección «Interfaz: navegación por rutas».
+Al modificar la navegación, rutas o la estructura común de la interfaz, revisar por separado el contenido común y el contenido propio de cada ruta, y comprobar que ningún panel o función queda mostrado en una ruta que no le corresponde. Para el piloto, la navegación permitida está definida en `docs/arquitectura_mvp_v14.md`, «Interfaz MVP».
 
 Antes de cerrar un cambio de interfaz, verificar textos visibles y recorrido funcional, además de pruebas de lógica y seguridad. Antes de cerrar cualquier corrección, revisar que no cambió el alcance ni debilitó controles técnicos.
 

@@ -60,7 +60,7 @@ Direcciones locales por defecto:
 
 ## Configuración por ambiente
 
-La configuración se define con variables de entorno (ver [`backend/.env.example`](backend/.env.example) y [arquitectura](docs/arquitectura.md#configuración-por-ambiente)). El backend valida las variables al iniciar y no arranca si faltan. Nunca versionar `.env` ni credenciales.
+La configuración se define con variables de entorno (ver [`backend/.env.example`](backend/.env.example)). El backend valida las variables al iniciar y no arranca si faltan. Nunca versionar `.env` ni credenciales.
 
 | Ambiente | APP_ENV / NODE_ENV | Cómo configurar |
 |---|---|---|
@@ -84,14 +84,15 @@ Las pruebas de integración con Oracle requieren un entorno de base de datos con
 
 ## Documentación
 
-- [Especificación funcional](docs/especificacion.md)
-- [Arquitectura y decisiones técnicas](docs/arquitectura.md)
+- [Especificación funcional vigente del MVP v14](docs/mvp_v14.md)
+- [Especificación funcional histórica v13](docs/especificacion.md)
+- [Arquitectura vigente del MVP v14](docs/arquitectura_mvp_v14.md)
 - [Sistema de diseño digital](docs/design-system.md)
 - [Instrucciones SDD](AGENTS.md)
 - [Release 01](docs/release01_navegable.md)
 - [Ciclo de procesos pendiente](docs/incremento03_ciclo_procesos.md)
 
-La fuente de verdad de los requisitos es [`docs/referencias/Requisitos_Sistema_Procesos_v13.xlsx`](docs/referencias/Requisitos_Sistema_Procesos_v13.xlsx). Los cambios funcionales deben respetar las especificaciones, criterios de aceptación y principios de `AGENTS.md`.
+La fuente de verdad de los requisitos es [`docs/referencias/Requisitos_Sistema_Procesos_v14.xlsx`](docs/referencias/Requisitos_Sistema_Procesos_v14.xlsx). La especificación funcional y la arquitectura vigentes del MVP son [`docs/mvp_v14.md`](docs/mvp_v14.md) y [`docs/arquitectura_mvp_v14.md`](docs/arquitectura_mvp_v14.md). Los cambios funcionales deben respetar sus criterios de aceptación y los principios de `AGENTS.md`.
 
 ## Licencia
 
