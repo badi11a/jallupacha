@@ -4,15 +4,10 @@ describe('MVP v14 demonstration content', () => {
   it('maps the authorized example content to the three fixed macroprocess types', () => {
     const content = loadMvpV14Content();
 
-    expect(content).toHaveLength(3);
-    expect(content.map((macroprocess) => macroprocess.typeCode)).toEqual(
-      MVP_V14_MACROPROCESS_TYPES.map((type) => type.code)
+    expect(content).toHaveLength(11);
+    expect([...new Set(content.map((macroprocess) => macroprocess.typeCode))].sort()).toEqual(
+      MVP_V14_MACROPROCESS_TYPES.map((type) => type.code).sort()
     );
-    expect(content.map((macroprocess) => macroprocess.name)).toEqual([
-      'Estratégicos',
-      'Misionales',
-      'De apoyo'
-    ]);
     expect(content.flatMap((macroprocess) => macroprocess.processes)).toHaveLength(24);
   });
 

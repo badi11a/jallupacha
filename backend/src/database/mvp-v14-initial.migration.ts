@@ -9,15 +9,20 @@ export class MvpV14Initial1770000000000 implements MigrationInterface {
     const table = (name: string) => `"${schema}"."${name}"`;
     const sequence = (name: string) => `"${schema}"."${name}"`;
 
+    await queryRunner.query(`CREATE SEQUENCE ${sequence('PROCESS_CODE_SEQ')} START WITH 1 INCREMENT BY 1 NOCACHE NOCYCLE`);
+    for (const generator of MVP_V14_ID_GENERATORS) {
+      await queryRunner.query(`CREATE SEQUENCE ${sequence(generator.sequence)} START WITH 1 INCREMENT BY 1 NOCACHE NOCYCLE`);
+    }
+
     await queryRunner.query(`CREATE TABLE ${table('MACROPROCESS_TYPE')} (
-      ID NUMBER PRIMARY KEY,
+      ID NUMBER DEFAULT ON NULL ${sequence('MPT_ID_SEQ')}.NEXTVAL PRIMARY KEY,
       CODE VARCHAR2(32 CHAR) NOT NULL UNIQUE,
       NAME VARCHAR2(120 CHAR) NOT NULL UNIQUE,
       SORT_ORDER NUMBER(6) NOT NULL UNIQUE,
       IS_ACTIVE NUMBER(1) DEFAULT 1 NOT NULL CHECK (IS_ACTIVE IN (0, 1))
     )`);
     await queryRunner.query(`CREATE TABLE ${table('MACROPROCESS')} (
-      ID NUMBER PRIMARY KEY,
+      ID NUMBER DEFAULT ON NULL ${sequence('MP_ID_SEQ')}.NEXTVAL PRIMARY KEY,
       MACROPROCESS_TYPE_ID NUMBER NOT NULL REFERENCES ${table('MACROPROCESS_TYPE')}(ID),
       CODE VARCHAR2(32 CHAR) NOT NULL UNIQUE,
       NAME VARCHAR2(120 CHAR) NOT NULL,
@@ -28,7 +33,7 @@ export class MvpV14Initial1770000000000 implements MigrationInterface {
       CONSTRAINT UQ_MACROPROCESS_TYPE_ORDER UNIQUE (MACROPROCESS_TYPE_ID, SORT_ORDER)
     )`);
     await queryRunner.query(`CREATE TABLE ${table('PROCESS_TYPE')} (
-      ID NUMBER PRIMARY KEY,
+      ID NUMBER DEFAULT ON NULL ${sequence('PT_ID_SEQ')}.NEXTVAL PRIMARY KEY,
       MACROPROCESS_ID NUMBER NOT NULL REFERENCES ${table('MACROPROCESS')}(ID),
       NAME VARCHAR2(120 CHAR) NOT NULL,
       IS_ACTIVE NUMBER(1) DEFAULT 1 NOT NULL CHECK (IS_ACTIVE IN (0, 1)),
@@ -36,7 +41,7 @@ export class MvpV14Initial1770000000000 implements MigrationInterface {
       CONSTRAINT UQ_PROCESS_TYPE_ID_MACRO UNIQUE (ID, MACROPROCESS_ID)
     )`);
     await queryRunner.query(`CREATE TABLE ${table('ORGANIZATIONAL_UNIT')} (
-      ID NUMBER PRIMARY KEY,
+      ID NUMBER DEFAULT ON NULL ${sequence('OU_ID_SEQ')}.NEXTVAL PRIMARY KEY,
       CODE VARCHAR2(32 CHAR) NOT NULL UNIQUE,
       NAME VARCHAR2(200 CHAR) NOT NULL,
       PARENT_UNIT_ID NUMBER REFERENCES ${table('ORGANIZATIONAL_UNIT')}(ID),
@@ -44,15 +49,14 @@ export class MvpV14Initial1770000000000 implements MigrationInterface {
       CONSTRAINT CK_UNIT_NOT_OWN_PARENT CHECK (PARENT_UNIT_ID IS NULL OR PARENT_UNIT_ID <> ID),
       CONSTRAINT UQ_UNIT_PARENT_NAME UNIQUE (PARENT_UNIT_ID, NAME)
     )`);
-    await queryRunner.query(`CREATE SEQUENCE ${sequence('PROCESS_CODE_SEQ')} START WITH 1 INCREMENT BY 1 NOCACHE NOCYCLE`);
     await queryRunner.query(`CREATE TABLE ${table('PROCESS')} (
-      ID NUMBER PRIMARY KEY,
+      ID NUMBER DEFAULT ON NULL ${sequence('PR_ID_SEQ')}.NEXTVAL PRIMARY KEY,
       CODE VARCHAR2(32 CHAR) NOT NULL UNIQUE,
       CURRENT_VERSION_ID NUMBER,
       IS_ACTIVE NUMBER(1) DEFAULT 1 NOT NULL CHECK (IS_ACTIVE IN (0, 1))
     )`);
     await queryRunner.query(`CREATE TABLE ${table('PROCESS_VERSION')} (
-      ID NUMBER PRIMARY KEY,
+      ID NUMBER DEFAULT ON NULL ${sequence('PV_ID_SEQ')}.NEXTVAL PRIMARY KEY,
       PROCESS_ID NUMBER NOT NULL REFERENCES ${table('PROCESS')}(ID),
       VERSION_NUMBER NUMBER(6) DEFAULT 1 NOT NULL CHECK (VERSION_NUMBER = 1),
       STATUS VARCHAR2(20 CHAR) DEFAULT 'Borrador' NOT NULL CHECK (STATUS = 'Borrador'),
@@ -110,7 +114,7 @@ export class MvpV14Initial1770000000000 implements MigrationInterface {
     await queryRunner.query(`CREATE UNIQUE INDEX "${schema}"."UQ_PROCESS_RESPONSIBLE_UNIT"
       ON ${table('PROCESS_UNIT')}(CASE WHEN ROLE = 'RESPONSABLE' THEN PROCESS_ID END)`);
     await queryRunner.query(`CREATE TABLE ${table('PROCESS_RISK')} (
-      ID NUMBER PRIMARY KEY,
+      ID NUMBER DEFAULT ON NULL ${sequence('RK_ID_SEQ')}.NEXTVAL PRIMARY KEY,
       PROCESS_ID NUMBER NOT NULL REFERENCES ${table('PROCESS')}(ID),
       DESCRIPTION CLOB NOT NULL,
       CAUSE CLOB NOT NULL,
@@ -120,7 +124,7 @@ export class MvpV14Initial1770000000000 implements MigrationInterface {
       CREATED_AT TIMESTAMP WITH TIME ZONE DEFAULT (SYSTIMESTAMP AT TIME ZONE 'UTC') NOT NULL
     )`);
     await queryRunner.query(`CREATE TABLE ${table('PROCESS_RELATION')} (
-      ID NUMBER PRIMARY KEY,
+      ID NUMBER DEFAULT ON NULL ${sequence('RL_ID_SEQ')}.NEXTVAL PRIMARY KEY,
       ORIGIN_PROCESS_ID NUMBER NOT NULL REFERENCES ${table('PROCESS')}(ID),
       DESTINATION_PROCESS_ID NUMBER NOT NULL REFERENCES ${table('PROCESS')}(ID),
       RELATION_TYPE VARCHAR2(20 CHAR) NOT NULL CHECK (RELATION_TYPE IN ('FLUJO', 'DEPENDENCIA', 'COORDINACION')),
@@ -128,18 +132,6 @@ export class MvpV14Initial1770000000000 implements MigrationInterface {
       CONSTRAINT CK_PROCESS_RELATION_NOT_SELF CHECK (ORIGIN_PROCESS_ID <> DESTINATION_PROCESS_ID),
       CONSTRAINT UQ_PROCESS_RELATION UNIQUE (ORIGIN_PROCESS_ID, DESTINATION_PROCESS_ID, RELATION_TYPE)
     )`);
-
-    for (const generator of MVP_V14_ID_GENERATORS) {
-      await queryRunner.query(`CREATE SEQUENCE ${sequence(generator.sequence)} START WITH 1 INCREMENT BY 1 NOCACHE NOCYCLE`);
-      await queryRunner.query(`CREATE OR REPLACE TRIGGER "${schema}"."${generator.trigger}"
-        BEFORE INSERT ON ${table(generator.table)}
-        FOR EACH ROW
-        BEGIN
-          IF :NEW.ID IS NULL THEN
-            SELECT ${sequence(generator.sequence)}.NEXTVAL INTO :NEW.ID FROM DUAL;
-          END IF;
-        END;`);
-    }
 
     await queryRunner.query(`CREATE INDEX "${schema}"."IX_MACRO_TYPE" ON ${table('MACROPROCESS')}(MACROPROCESS_TYPE_ID)`);
     await queryRunner.query(`CREATE INDEX "${schema}"."IX_PTYPE_MACRO" ON ${table('PROCESS_TYPE')}(MACROPROCESS_ID)`);

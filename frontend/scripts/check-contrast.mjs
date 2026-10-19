@@ -8,6 +8,9 @@ const NON_TEXT = 3;
 
 // [primer plano, fondo, mínimo, uso]
 const PAIRS = [
+  ['on-brand', 'map-strategic', TEXT, 'cabecera de procesos estratégicos'],
+  ['on-brand', 'map-mission', TEXT, 'cabecera de procesos misionales'],
+  ['heading', 'map-support', TEXT, 'cabecera de procesos de apoyo'],
   ['text', 'background', TEXT, 'texto general'],
   ['text', 'surface', TEXT, 'texto en paneles'],
   ['heading', 'surface', TEXT, 'títulos'],
@@ -22,6 +25,10 @@ const PAIRS = [
   ['eyebrow', 'surface-accent', TEXT, 'etiqueta de entidad'],
   ['text-muted', 'neutral-background', TEXT, 'insignia neutra'],
   ['primary', 'surface-accent', TEXT, 'insignia informativa'],
+  ['text-subtle', 'surface-accent', TEXT, 'contador de resultados del mapa'],
+  ['primary', 'surface-accent', NON_TEXT, 'foco de navegación activa y búsqueda del mapa'],
+  ['text', 'surface-accent', TEXT, 'propósito destacado de ficha'],
+  ['heading', 'surface-accent', TEXT, 'título de propósito de ficha'],
   ['success-text', 'success-background', TEXT, 'nivel de riesgo bajo'],
   ['warning-text', 'warning-background', TEXT, 'nivel de riesgo medio'],
   ['error-text', 'error-background', TEXT, 'nivel de riesgo alto'],

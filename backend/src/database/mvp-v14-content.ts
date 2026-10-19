@@ -35,6 +35,7 @@ export interface MvpV14MacroprocessContent {
 
 interface LegacyMacroprocessContent {
   name: string;
+  typeCode?: (typeof MVP_V14_MACROPROCESS_TYPES)[number]['code'];
   processes: MvpV14ProcessContent[];
 }
 
@@ -56,7 +57,7 @@ export function loadMvpV14Content(): MvpV14MacroprocessContent[] {
   }
 
   const macroprocesses = value.macroprocesses.map((macroprocess) => {
-    const typeCode = TYPE_CODE_BY_MACROPROCESS_NAME[macroprocess.name];
+    const typeCode = macroprocess.typeCode ?? TYPE_CODE_BY_MACROPROCESS_NAME[macroprocess.name];
     if (!typeCode) {
       throw new Error(`MVP v14 has no macroprocess type mapping for: ${macroprocess.name}`);
     }
@@ -68,9 +69,9 @@ export function loadMvpV14Content(): MvpV14MacroprocessContent[] {
     return { typeCode, name: macroprocess.name, processes: macroprocess.processes };
   });
 
-  if (macroprocesses.length !== MVP_V14_MACROPROCESS_TYPES.length ||
-    new Set(macroprocesses.map((macroprocess) => macroprocess.typeCode)).size !== MVP_V14_MACROPROCESS_TYPES.length) {
-    throw new Error('MVP v14 demonstration content must contain exactly one macroprocess for each fixed type.');
+  const presentTypeCodes = new Set(macroprocesses.map((macroprocess) => macroprocess.typeCode));
+  if (!MVP_V14_MACROPROCESS_TYPES.every((type) => presentTypeCodes.has(type.code))) {
+    throw new Error('MVP v14 demonstration content must cover every fixed macroprocess type.');
   }
 
   const numbers = macroprocesses.flatMap((macroprocess) => macroprocess.processes)
@@ -84,7 +85,9 @@ export function loadMvpV14Content(): MvpV14MacroprocessContent[] {
 function isLegacyContentPackage(value: unknown): value is LegacyContentPackage {
   if (!isRecord(value) || value.schemaVersion !== 1 || !Array.isArray(value.macroprocesses)) return false;
   return value.macroprocesses.every((macroprocess) =>
-    isRecord(macroprocess) && isNonEmptyString(macroprocess.name) && Array.isArray(macroprocess.processes) &&
+    isRecord(macroprocess) && isNonEmptyString(macroprocess.name) &&
+    (macroprocess.typeCode === undefined || typeof macroprocess.typeCode === 'string') &&
+    Array.isArray(macroprocess.processes) &&
     macroprocess.processes.every((process) =>
       isRecord(process) && isNonEmptyString(process.code) && /^PR[1-9][0-9]*$/.test(process.code) &&
       isNonEmptyString(process.type) && isNonEmptyString(process.name) &&

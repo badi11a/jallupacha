@@ -12,6 +12,7 @@ export const RELATION_TYPES = [
 export interface ProcessListItem {
   id: number; code: string; name: string; alias: string | null; status: string; responsible: string | null;
   macroprocessType: string; macroprocess: string; processType: string; responsibleUnit: string | null;
+  riskLevel?: string | null;
 }
 export interface ProcessTypeItem {
   id: number; name: string; isActive: boolean; macroprocessId: number; macroprocessCode: string;
@@ -22,6 +23,11 @@ export interface ProcessUnit { unitId: number; name: string; isActive: boolean; 
 export interface RiskItem { id: number; description: string; cause: string; consequence: string; type: string; level: string; }
 export interface RelationItem { id: number; processId: number; code: string; name: string | null; type: string; description: string; }
 export interface ProcessRef { id: number; code: string; name: string; }
+export interface MapProcess extends ProcessRef { status: string; }
+export interface MapProcessType { id: number; name: string; processes: MapProcess[]; }
+export interface MapMacroprocess { id: number; code: string; name: string; processTypes: MapProcessType[]; }
+export interface MapFamily { id: number; name: string; macroprocesses: MapMacroprocess[]; }
+export interface ProcessMap { macroprocessTypes: MapFamily[]; }
 
 export type FichaKey =
   | 'elaborator' | 'responsible' | 'name' | 'alias' | 'businessArea' | 'subprocessType' | 'criticality' | 'automationLevel'
@@ -94,7 +100,7 @@ export class MvpV14Api {
   private readonly http = inject(HttpClient);
   private readonly base = '/api/mvp-v14';
 
-  map(): Observable<unknown> { return this.http.get(`${this.base}/map`); }
+  map(): Observable<ProcessMap> { return this.http.get<ProcessMap>(`${this.base}/map`); }
   listProcesses(filters: Record<string, string>): Observable<ProcessListItem[]> {
     const params = Object.fromEntries(Object.entries(filters).filter(([, value]) => value !== ''));
     return this.http.get<ProcessListItem[]>(`${this.base}/processes`, { params });

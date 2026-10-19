@@ -258,6 +258,9 @@ export class MvpV14Service {
       if (!Number.isInteger(unitId) || unitId <= 0) throw new BadRequestException('Filtro no válido.');
       conditions.push(`EXISTS (SELECT 1 FROM ${table('PROCESS_UNIT')} PU WHERE PU.PROCESS_ID = P.ID AND PU.UNIT_ID = ${bind(unitId)})`);
     }
+    if (typeof query.riskLevel === 'string' && query.riskLevel.trim() !== '') {
+      conditions.push(`EXISTS (SELECT 1 FROM ${table('PROCESS_RISK')} PR WHERE PR.PROCESS_ID = P.ID AND PR.RISK_LEVEL = ${bind(query.riskLevel.trim())})`);
+    }
     if (typeof query.q === 'string' && query.q.trim() !== '') {
       const term = foldText(query.q.slice(0, 100)).replace(/[\\%_]/g, (char) => `\\${char}`);
       const columns = ['P.CODE', 'V.NAME', 'V.ALIAS', 'V.RESPONSIBLE', 'DBMS_LOB.SUBSTR(V.DESCRIPTION, 2000, 1)'];
@@ -268,7 +271,8 @@ export class MvpV14Service {
         SELECT P.ID AS "id", P.CODE AS "code", V.NAME AS "name", V.ALIAS AS "alias", V.STATUS AS "status",
                V.RESPONSIBLE AS "responsible", MT.NAME AS "macroprocessType", M.NAME AS "macroprocess", PT.NAME AS "processType",
                (SELECT U.NAME FROM ${table('PROCESS_UNIT')} PU JOIN ${table('ORGANIZATIONAL_UNIT')} U ON U.ID = PU.UNIT_ID
-                 WHERE PU.PROCESS_ID = P.ID AND PU.ROLE = 'RESPONSABLE') AS "responsibleUnit"
+                 WHERE PU.PROCESS_ID = P.ID AND PU.ROLE = 'RESPONSABLE') AS "responsibleUnit",
+               (SELECT PR.RISK_LEVEL FROM ${table('PROCESS_RISK')} PR WHERE PR.PROCESS_ID = P.ID AND ROWNUM = 1) AS "riskLevel"
         FROM ${table('PROCESS')} P
         JOIN ${table('PROCESS_VERSION')} V ON V.ID = P.CURRENT_VERSION_ID
         JOIN ${table('MACROPROCESS')} M ON M.ID = V.MACROPROCESS_ID

@@ -1,26 +1,25 @@
-import { Component } from '@angular/core';
-import { RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
-import { APP_NAME, HOME_URL } from './app.routes';
-import { UiAppShellComponent } from './shared/ui';
+import { Component, ElementRef, inject } from '@angular/core';
+import { RouterOutlet } from '@angular/router';
+import { UiDialogHostComponent } from './shared/ui';
 
 @Component({
   selector: 'app-root',
   standalone: true,
-  imports: [RouterLink, RouterLinkActive, RouterOutlet, UiAppShellComponent],
+  imports: [RouterOutlet, UiDialogHostComponent],
   template: `
-    <ui-app-shell [appName]="appName" [homeHref]="homeUrl"
-      footerText="Jallupacha · Gestión interna de procesos">
-      <nav class="app-nav" aria-label="Secciones">
-        <a routerLink="/mapa" routerLinkActive="active" ariaCurrentWhenActive="page">Mapa de procesos</a>
-        <a routerLink="/procesos" routerLinkActive="active" ariaCurrentWhenActive="page">Procesos</a>
-        <a routerLink="/unidades" routerLinkActive="active" ariaCurrentWhenActive="page">Unidades internas</a>
-        <a routerLink="/tipos-de-proceso" routerLinkActive="active" ariaCurrentWhenActive="page">Tipos de proceso</a>
-      </nav>
+    <a class="skip-link" href="#main-content" (click)="focusContent($event)">Ir al contenido principal</a>
+    <main id="main-content" tabindex="-1">
       <router-outlet />
-    </ui-app-shell>
+    </main>
+    <ui-dialog-host />
   `
 })
 export class AppComponent {
-  readonly appName = APP_NAME;
-  readonly homeUrl = HOME_URL;
+  private readonly host = inject<ElementRef<HTMLElement>>(ElementRef);
+  focusContent(event: Event): void {
+    event.preventDefault();
+    const main = this.host.nativeElement.querySelector<HTMLElement>('#main-content');
+    main?.focus({ preventScroll: true });
+    main?.scrollIntoView?.({ block: 'start' });
+  }
 }

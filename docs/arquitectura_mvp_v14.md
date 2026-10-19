@@ -98,6 +98,14 @@ Defecto de diseño corregido: `ProcessController` heredado ya ocupa `/api/proces
 
 ## Interfaz MVP
 
+Por corrección explícita del responsable, la adaptación visual se limita al contenido del mapa y sus vistas interiores. No incluye barra lateral, cabecera superior ni pie de aplicación. Se conserva la navegación contextual y las rutas funcionales existentes; las secciones siguientes no implican un menú global visible.
+
+La referencia visual detallada se adapta mediante dos paneles: resumen con conteos de API y mapa con tres bandas de clasificación, contexto/resultados explicativos y tarjetas de macroprocesos. La búsqueda local del mapa filtra macroprocesos por código/nombre (sin mayúsculas ni tildes), combinada con la clasificación. El enlace Buscar procesos conserva acceso a la búsqueda de fichas del servidor. No se importan datos, marcas, cifras ni tokens del equipo B. Detalle y evidencia en `adaptacion_visual_mvp_v14.md`.
+
+La adaptación visual aprobada del equipo B se documenta en `adaptacion_visual_mvp_v14.md`. Su primera etapa cambia la estructura visual común y las tarjetas del mapa, conservando las rutas, contratos y alcance descritos aquí.
+
+La continuación aprobada incorpora exploración de solo lectura en `/mapa/macroprocesos/:id`, subordinada a Mapa de procesos. Reutiliza la estructura del mapa y la búsqueda existente por macroproceso, tipo y unidad; no agrega una sección principal, escritura de estructura fija ni contrato backend. La ficha reorganiza los campos existentes sin ocultarlos ni introducir riesgo agregado o render BPMN.
+
 La navegación presenta solamente:
 
 1. Mapa de procesos (jerarquía fija y navegación a ficha).

@@ -1,102 +1,72 @@
-import { HttpClient } from '@angular/common/http';
 import { Component, OnInit, inject, signal } from '@angular/core';
 import { RouterLink } from '@angular/router';
-import { UiBadgeComponent, UiMessageComponent, UiPanelComponent, UiSectionComponent } from './shared/ui';
+import { UiDialogService, UiMessageComponent } from './shared/ui';
+import { MvpV14Api, MapFamily, MapMacroprocess } from './mvp-v14-api.service';
 
-interface ProcessItem { id: number; code: string; name: string; status: string; }
-interface ProcessType { id: number; name: string; processes: ProcessItem[]; }
-interface Macroprocess { id: number; code: string; name: string; processTypes: ProcessType[]; }
-interface MacroprocessType { id: number; name: string; macroprocesses: Macroprocess[]; }
+const normalize = (value: string) => value.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase().trim();
+
+const DESCRIPTIONS: Record<string, string> = {
+  'Planificación y Gestión Estratégica': 'Define el rumbo institucional y orienta la planificación, seguimiento y desarrollo de la entidad.',
+  'Aseguramiento Institucional de la Calidad': 'Promueve el aseguramiento de la calidad, la evaluación institucional y los procesos de acreditación.',
+  'Relaciones y Comunicaciones Corporativas': 'Gestiona la identidad institucional, el posicionamiento y la comunicación con sus públicos de interés.',
+  'Gobierno Digital y Tecnologías': 'Impulsa la modernización digital, gobierno de datos y soporte tecnológico de la institución.',
+  'Gestión Jurídica y Cumplimiento Normativo': 'Resguarda la legalidad institucional, los actos oficiales y el cumplimiento normativo aplicable.',
+  'Docencia y Formación de Pregrado y Postgrado': 'Acompaña la trayectoria formativa integral y el desarrollo técnico y profesional de los participantes.',
+  'Investigación, Innovación y Creación': 'Promueve la generación de conocimiento científico, tecnológico, transferencia e innovación.',
+  'Vinculación con el Medio y Extensión': 'Articula a la institución con el entorno mediante vinculación social y colaboración territorial.',
+  'Gestión de Personas y Desarrollo del Talento': 'Gestiona el bienestar, desarrollo profesional y trayectoria de las personas que integran la organización.',
+  'Gestión Financiera y Presupuestaria': 'Administra con probidad y sostenibilidad los recursos presupuestarios, contables y financieros institucionales.',
+  'Gestión de Infraestructura, Campus y Operaciones': 'Administra y mantiene los espacios físicos, servicios generales y operaciones para el funcionamiento de la entidad.'
+};
 
 @Component({
   selector: 'app-process-map',
-  imports: [RouterLink, UiBadgeComponent, UiMessageComponent, UiPanelComponent, UiSectionComponent],
-  styles: [`
-    .map-search { display: flex; flex-wrap: wrap; gap: .75rem; align-items: center; margin-bottom: 1rem; }
-    .map-search input { flex: 1 1 18rem; min-height: 2.5rem; padding: 0 .75rem; border: 1px solid var(--ui-color-border); border-radius: var(--ui-radius-lg); font: inherit; }
-    .macro-grid { display: grid; grid-template-columns: 1fr; gap: 1rem; }
-    .type-columns { display: grid; grid-template-columns: repeat(auto-fit, minmax(18rem, 1fr)); gap: 1rem; align-items: start; }
-    .type-column { min-width: 0; }
-    .type-column h4 { margin-top: 0; padding-bottom: .35rem; border-bottom: 2px solid var(--ui-color-border); }
-    .macro-card { border: 1px solid var(--ui-color-border); border-top: 4px solid var(--ui-color-primary); border-radius: var(--ui-radius-lg); padding: 1rem; background: var(--ui-color-surface, #fff); }
-    .macro-card h3 { margin: 0 0 .5rem; font-size: 1.05rem; }
-    .macro-card h4 { margin: .9rem 0 .35rem; font-size: .9rem; color: var(--ui-color-text-muted); }
-    .macro-card ul { display: grid; gap: .35rem; margin: 0; padding: 0; list-style: none; }
-    .macro-card li { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: .35rem; padding: .45rem .6rem; border: 1px solid var(--ui-color-border); border-radius: var(--ui-radius-lg); }
-    .macro-card a { color: var(--ui-color-primary); font-weight: 600; }
-    .macro-card a:focus-visible { outline: 3px solid var(--ui-color-focus); outline-offset: 2px; }
-  `],
-  template: `
-    <ui-panel headingId="map-title" eyebrow="PROCESOS" heading="Mapa de procesos">
-      <a panelActions class="primary-button" routerLink="/procesos/nuevo">Nuevo proceso</a>
-      @if (error()) { <ui-message kind="error">{{ error() }}</ui-message> }
-      @if (loading()) {
-        <p class="helper" role="status">Cargando información…</p>
-      } @else {
-        <div class="map-search">
-          <label for="map-filter">Buscar proceso</label>
-          <input id="map-filter" type="search" placeholder="Código o nombre" [value]="filter()" (input)="filter.set($any($event.target).value)" />
-          <span class="helper" role="status">{{ visibleCount() }} de {{ totalCount() }} procesos</span>
-        </div>
-        @for (type of filteredMap(); track type.id) {
-          <ui-section [heading]="type.name">
-            <div class="macro-grid">
-              @for (macro of type.macroprocesses; track macro.id) {
-                <article class="macro-card" [attr.aria-label]="macro.name">
-                  <h3>{{ macro.code }} · {{ macro.name }}</h3>
-                  @if (macro.processTypes.length === 0) { <p class="helper">Sin tipos de proceso activos.</p> }
-                  <div class="type-columns">
-                    @for (processType of macro.processTypes; track processType.id) {
-                      <section class="type-column">
-                        <h4>{{ processType.name }}</h4>
-                        <ul>
-                          @for (process of processType.processes; track process.id) {
-                            <li><a [routerLink]="['/procesos', process.id]">{{ process.code }} · {{ process.name }}</a><ui-badge tone="info">{{ process.status }}</ui-badge></li>
-                          } @empty { <li class="helper">Sin procesos.</li> }
-                        </ul>
-                      </section>
-                    }
-                  </div>
-                </article>
-              }
-            </div>
-          </ui-section>
-        } @empty { <p class="helper">Ningún proceso coincide con la búsqueda.</p> }
-      }
-    </ui-panel>
-  `
+  imports: [RouterLink, UiMessageComponent],
+  templateUrl: './mvp-v14-demo.component.html',
+  styleUrl: './mvp-v14-demo.component.css'
 })
 export class MvpV14DemoComponent implements OnInit {
-  private readonly http = inject(HttpClient);
-  readonly map = signal<MacroprocessType[]>([]);
+  private readonly api = inject(MvpV14Api);
+  private readonly dialogs = inject(UiDialogService);
+  readonly map = signal<MapFamily[]>([]);
   readonly loading = signal(true);
   readonly error = signal('');
   readonly filter = signal('');
+  readonly selectedFamily = signal<number | null>(null);
 
-  filteredMap(): MacroprocessType[] {
-    const term = this.filter().trim().toLowerCase();
-    if (!term) return this.map();
-    const match = (p: ProcessItem) => `${p.code} ${p.name}`.toLowerCase().includes(term);
+  filteredMap(): MapFamily[] {
+    const term = normalize(this.filter());
     return this.map()
-      .map((type) => ({ ...type, macroprocesses: type.macroprocesses
-        .map((macro) => ({ ...macro, processTypes: macro.processTypes
-          .map((pt) => ({ ...pt, processes: pt.processes.filter(match) }))
-          .filter((pt) => pt.processes.length > 0) }))
-        .filter((macro) => macro.processTypes.length > 0) }))
-      .filter((type) => type.macroprocesses.length > 0);
+      .filter(family => this.selectedFamily() === null || family.id === this.selectedFamily())
+      .map(family => ({ ...family, macroprocesses: family.macroprocesses.filter(macro => !term || normalize(`${macro.code} ${macro.name}`).includes(term)) }))
+      .filter(family => family.macroprocesses.length > 0);
   }
 
-  totalCount(): number { return this.countProcesses(this.map()); }
-  visibleCount(): number { return this.countProcesses(this.filteredMap()); }
+  familyTone(family: MapFamily): string {
+    const name = normalize(family.name);
+    return name === 'misionales' ? 'mission' : name === 'de apoyo' ? 'support' : 'strategic';
+  }
 
-  private countProcesses(types: MacroprocessType[]): number {
-    return types.reduce((a, t) => a + t.macroprocesses.reduce((b, m) => b + m.processTypes.reduce((c, p) => c + p.processes.length, 0), 0), 0);
+  macroDescription(macro: MapMacroprocess): string {
+    return (macro as { description?: string }).description || DESCRIPTIONS[macro.name] || 'Orientación y desarrollo de los procesos institucionales asociados.';
+  }
+
+  processCount(macro: MapMacroprocess): number { return macro.processTypes.reduce((sum, type) => sum + type.processes.length, 0); }
+  totalCount(): number { return this.map().reduce((sum, family) => sum + family.macroprocesses.reduce((count, macro) => count + this.processCount(macro), 0), 0); }
+  typeCount(): number { return this.map().reduce((sum, family) => sum + family.macroprocesses.reduce((count, macro) => count + macro.processTypes.length, 0), 0); }
+  macroCount(): number { return this.map().reduce((sum, family) => sum + family.macroprocesses.length, 0); }
+  visibleCount(): number { return this.filteredMap().reduce((sum, family) => sum + family.macroprocesses.length, 0); }
+
+  help(): void {
+    void this.dialogs.confirm({ title: 'Cómo explorar el mapa',
+      message: 'Busca un macroproceso por código o nombre, o filtra por su clasificación. Selecciona una tarjeta para consultar sus tipos y procesos. Desde allí puedes abrir cada ficha. Para buscar un proceso directamente, utiliza Buscar procesos.',
+      confirmLabel: 'Entendido', cancelLabel: 'Cerrar' });
   }
 
   ngOnInit(): void {
-    this.http.get<{ macroprocessTypes: MacroprocessType[] }>('/api/mvp-v14/map').subscribe({
-      next: (response) => { this.map.set(response.macroprocessTypes); this.loading.set(false); },
-      error: () => { this.error.set('No fue posible cargar el mapa. Verifique que el backend esté iniciado.'); this.loading.set(false); }
+    this.api.map().subscribe({
+      next: response => { this.map.set(response.macroprocessTypes); this.loading.set(false); },
+      error: () => { this.error.set('No fue posible cargar el mapa. Intenta nuevamente más tarde.'); this.loading.set(false); }
     });
   }
 }

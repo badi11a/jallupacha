@@ -22,15 +22,18 @@ export async function seedMvpV14(manager: EntityManager): Promise<void> {
     typeIds.set(macroprocessType.code, await idFor(manager, table('MACROPROCESS_TYPE'), 'CODE', macroprocessType.code));
   }
 
+  const sortOrderByType = new Map<string, number>();
   for (let index = 0; index < macroprocesses.length; index += 1) {
     const macroprocess = macroprocesses[index];
     const macroprocessTypeId = typeIds.get(macroprocess.typeCode);
     if (!macroprocessTypeId) throw new Error(`Missing seeded macroprocess type: ${macroprocess.typeCode}`);
     const code = `MP${index + 1}`;
+    const sortOrder = (sortOrderByType.get(macroprocess.typeCode) ?? 0) + 1;
+    sortOrderByType.set(macroprocess.typeCode, sortOrder);
     await manager.query(
       `INSERT INTO ${table('MACROPROCESS')} (MACROPROCESS_TYPE_ID, CODE, NAME, SORT_ORDER, IS_ACTIVE)
        VALUES (:1, :2, :3, :4, 1)`,
-      [macroprocessTypeId, code, macroprocess.name, index + 1]
+      [macroprocessTypeId, code, macroprocess.name, sortOrder]
     );
     const macroprocessId = await idFor(manager, table('MACROPROCESS'), 'CODE', code);
     macroprocessIds.set(macroprocess.name, macroprocessId);

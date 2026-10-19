@@ -1,0 +1,69 @@
+<section class="panel map-hero" aria-labelledby="map-title">
+  <p class="eyebrow">Arquitectura de procesos</p>
+  <h1 id="map-title">Mapa de procesos</h1>
+  <p class="map-intro">Representación de los procesos estratégicos, misionales y de apoyo y su organización institucional.</p>
+  @if (!loading() && !error()) {
+    <ul class="map-metrics" aria-label="Resumen de la estructura">
+      @for (family of map(); track family.id) {
+        <li><strong>{{ family.macroprocesses.length }}</strong> {{ family.macroprocesses.length === 1 ? 'macroproceso' : 'macroprocesos' }} · {{ family.name }}</li>
+      }
+      <li><strong>{{ typeCount() }}</strong> tipos de proceso</li>
+      <li><strong>{{ totalCount() }}</strong> procesos</li>
+    </ul>
+  }
+</section>
+
+<section class="panel map-panel" aria-label="Explorar el mapa de procesos">
+  @if (error()) { <ui-message kind="error">{{ error() }}</ui-message> }
+  @if (loading()) { <p class="helper" role="status">Cargando información…</p> }
+  @else if (!error()) {
+    <div class="map-toolbar">
+      <div class="map-search">
+        <span aria-hidden="true" class="search-icon">⌕</span>
+        <label class="visually-hidden" for="map-filter">Buscar macroproceso</label>
+        <input id="map-filter" type="search" placeholder="Buscar macroproceso…" [value]="filter()" (input)="filter.set($any($event.target).value)" />
+      </div>
+      <div class="family-filters" role="group" aria-label="Filtrar por clasificación">
+        <button type="button" [attr.aria-pressed]="selectedFamily() === null" (click)="selectedFamily.set(null)">Todos</button>
+        @for (family of map(); track family.id) {
+          <button type="button" [attr.aria-pressed]="selectedFamily() === family.id" (click)="selectedFamily.set(family.id)">{{ family.name }}</button>
+        }
+      </div>
+      <button type="button" class="help-button" (click)="help()"><span aria-hidden="true">ⓘ</span> Ayuda</button>
+    </div>
+
+    <div class="process-architecture">
+      <aside class="map-context" aria-label="Contexto de entrada">
+        <span class="context-kicker">Contexto</span><span class="context-rule" aria-hidden="true"></span>
+        <p>Necesidades y requerimientos que atienden los procesos.</p>
+        <span class="context-arrow" aria-hidden="true">→</span>
+      </aside>
+      <div class="families">
+        @for (family of filteredMap(); track family.id) {
+          <section class="family" [attr.data-tone]="familyTone(family)" [attr.aria-label]="family.name">
+            <header class="family-label"><h2>Procesos {{ family.name }}</h2></header>
+            <div class="family-cards" [style.grid-template-columns]="'repeat(' + family.macroprocesses.length + ', minmax(0, 1fr))'">
+              @for (macro of family.macroprocesses; track macro.id) {
+                <a class="macro-link" [routerLink]="['/mapa/macroprocesos', macro.id]">
+                  <strong class="macro-title">{{ macro.name }}</strong>
+                  <p class="macro-desc">{{ macroDescription(macro) }}</p>
+                </a>
+              }
+            </div>
+          </section>
+        } @empty {
+          <div class="map-empty"><strong>No se encontraron macroprocesos</strong><p>Prueba con otro nombre o selecciona Todos.</p></div>
+        }
+      </div>
+      <aside class="map-context map-output" aria-label="Resultados de los procesos">
+        <span class="context-arrow" aria-hidden="true">→</span>
+        <span class="context-kicker">Resultados</span><span class="context-rule" aria-hidden="true"></span>
+        <p>Productos y servicios generados por los procesos.</p>
+      </aside>
+    </div>
+    <div class="map-bottom">
+      <p class="helper" role="status">{{ visibleCount() }} de {{ macroCount() }} macroprocesos</p>
+      <div class="map-actions"><a class="text-button" routerLink="/procesos">Buscar procesos</a><a class="text-button" routerLink="/procesos/nuevo">Nuevo proceso</a></div>
+    </div>
+  }
+</section>

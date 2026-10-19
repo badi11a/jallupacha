@@ -6,6 +6,7 @@ import { ProcessFormComponent } from './process-form.component';
 import { ProcessListComponent } from './process-list.component';
 import { ProcessTypesComponent } from './process-types.component';
 import { UnitsComponent } from './units.component';
+import { MacroprocessDetailComponent } from './macroprocess-detail.component';
 
 /** Página de inicio: mapa de procesos. */
 export const HOME_URL = '/mapa';
@@ -17,6 +18,7 @@ export const APP_NAME = 'Sistema de Procesos Institucionales';
 export const routes: Routes = [
   { path: '', pathMatch: 'full', redirectTo: 'mapa' },
   { title: 'Mapa de procesos', path: 'mapa', component: MvpV14DemoComponent },
+  { title: 'Detalle de macroproceso', path: 'mapa/macroprocesos/:id', component: MacroprocessDetailComponent },
   { title: 'Procesos', path: 'procesos', component: ProcessListComponent },
   { title: 'Nuevo proceso', path: 'procesos/nuevo', component: ProcessFormComponent },
   { title: 'Ficha del proceso', path: 'procesos/:id', component: ProcessDetailComponent },

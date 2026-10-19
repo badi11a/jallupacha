@@ -20,7 +20,7 @@ import {
 @Component({
   imports: [UiAppShellComponent, UiPanelComponent, UiMessageComponent, UiPaginationComponent],
   template: `
-    <ui-app-shell appName="Aplicación" [brandLogoSrc]="logo" footerText="Pie" [accountLabel]="account"
+    <ui-app-shell appName="Aplicación" [brandLogoSrc]="logo()" footerText="Pie" [accountLabel]="account"
       [environmentNotice]="notice" (logout)="logouts = logouts + 1">
       <ui-panel eyebrow="SECCIÓN" heading="Listado" headingId="list-title">
         <button panelActions type="button">Acción</button>
@@ -32,7 +32,7 @@ import {
   `
 })
 class HostComponent {
-  logo = '';
+  logo = signal('');
   account = 'Persona · Perfil';
   notice = 'Aviso';
   logouts = 0;
@@ -82,7 +82,7 @@ describe('shared/ui', () => {
     expect(root.querySelector('.account')).toBeNull();
     expect(root.querySelector('.environment-notice')).toBeNull();
 
-    fixture.componentInstance.logo = '/assets/product-logo.svg';
+    fixture.componentInstance.logo.set('/assets/product-logo.svg');
     fixture.detectChanges();
     expect(root.querySelector('.brand-logo')?.getAttribute('src')).toBe('/assets/product-logo.svg');
   });

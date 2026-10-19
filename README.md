@@ -1,99 +1,151 @@
 # Jallupacha
 
-Sistema web institucional para la administración de procesos, macroprocesos y riesgos.
+Sistema web institucional para la gestión, gobierno y administración de procesos, macroprocesos y riesgos institucionales.
+
+---
+
+## Estado actual del proyecto
+
+El proyecto implementa la versión funcional y visual del **MVP v14 de Operador Único** (`C-011`), desarrollada bajo el paradigma **Spec-Driven Development (SDD)** con un kit de componentes desacoplado, tokens semánticos del Sistema de Diseño Digital (SDD) y total conformidad de accesibilidad WCAG 2.2 AA.
+
+### Módulos y vistas operativas
+
+1. **Mapa de Procesos Institucional (`/mapa`)**:
+   - Visualización jerárquica por familias (`Estratégicos`, `Misionales`, `De apoyo`) con bandas de color semánticas estables.
+   - Filtro integrado mediante control segmentado accesible (patrón *radio group* con tokens de radio de 7 px) y buscador reactivo en tiempo real con normalización sin tildes.
+   - Resumen de procesos y tipos por macroproceso, enlaces contextuales a detalle y diálogo de ayuda modal.
+
+2. **Detalle de Macroproceso (`/mapa/macroprocesos/:id`)**:
+   - *Hero Card* con indicadores clave consolidados: tipos de proceso, total de procesos asociados y unidades responsables participantes.
+   - *Widget de distribución de riesgo*: medidor acumulativo calibrado con los 4 niveles de criticidad del sistema (`Bajo`, `Medio`, `Alto`, `Crítico`).
+   - Explorador y filtrado multifacético de procesos por término de búsqueda, tipo de proceso (chips filtrables), unidad responsable y nivel de riesgo.
+
+3. **Ficha de Proceso Homologada (`/procesos/:id`)**:
+   - *Hero Card (Grilla 2 columnas)*: rótulo institucional de proceso, código y nombre, línea decorativa dorada (`--ui-color-map-support`), indicador semántico de estado, descripción del proceso y bloque trío de clasificación (`Tipo de proceso`, `Macroproceso` con enlace navegable y `Unidad responsable`).
+   - *Widget de Nivel de Riesgo*: medidor tipo *gauge* de 4 ranuras que resalta la clasificación activa con su color semántico y leyenda de criticidad (`Bajo`, `Medio`, `Alto`, `Crítico`).
+   - *Propósito del proceso*: tarjeta destacada con acento lateral en `--brand-steel-blue` (`#446BA9`).
+   - *Gobernanza del proceso*: contenedor homologado con grilla de 3 tarjetas:
+     - **Unidad Responsable**: nombre de la unidad líder, función institucional, indicador de actividad y canales de contacto institucional genéricos.
+     - **Responsable del Proceso**: persona o cargo encargado, descripción de gestión operativa, mención del elaborador del proceso y canales de coordinación.
+     - **Unidades Participantes**: colección de píldoras/chips de unidades colaboradoras, estado de actividad y función asignada.
+   - *Ficha técnica completa*: visualización de todos los campos estandarizados (REQ-06), avisos de completitud de campos mínimos y posibles duplicados.
+   - *Gestión interactiva*: operaciones CRUD completas sobre riesgos (descripción, causa, consecuencia, tipo y nivel) y relaciones operativas (`Flujo`, `Dependencia`, `Coordinación`).
+
+4. **Administración y Catálogos (`/procesos`, `/unidades`, `/tipos-de-proceso`)**:
+   - Gestión de procesos, altas, edición y parametrización de unidades organizacionales y tipos de procesos.
+
+---
+
+## Reglas de diseño y datos genéricos
+
+- **Datos estrictamente genéricos (`AGENTS.md`)**: El sistema utiliza exclusivamente datos de demostración neutrales e institucionales ("la entidad", "la institución", "la organización"). No contiene referencias a instituciones particulares, facultades reales ni dominios específicos.
+- **Sistema de diseño y tokens (`tokens.css`, `base.css`)**:
+  - Controles y botones: `--ui-radius-md: 7px`.
+  - Contenedores y tarjetas: `--ui-radius-lg: 8px` / `--ui-radius-xl: 12px`.
+  - Insignias, estados y píldoras: `--ui-radius-pill: 999px`.
+  - Paleta institucional accesible: `--brand-ink` (`#22213F`), `--brand-steel-blue` (`#446BA9`), `--brand-yellow` (`#DEB01F`), `--brand-orange` (`#C9631F`), `--ui-color-danger` (`#A83232`).
+
+---
 
 ## Tecnologías
 
-| Componente | Tecnología |
-|---|---|
-| Frontend | Angular 22, TypeScript |
-| Backend | NestJS 11, Node.js 24 |
-| Base de datos | Oracle Database 19c |
-| Persistencia | TypeORM, node-oracledb |
-| Arquitectura | Monolito modular, API REST |
-| Despliegue objetivo | On-premise |
+| Componente | Tecnología | Descripción |
+|---|---|---|
+| **Frontend** | Angular 19 / 22, TypeScript | Standalone components, signals reactivos, control flow (`@if`, `@for`), kit UI accesible. |
+| **Backend** | NestJS 11, Node.js 24 | Arquitectura modular, validación estricta de esquemas, API RESTful. |
+| **Base de datos** | Oracle Database 19c | Esquema relacional con integridad referencial, secuencias y tipos de datos nativos. |
+| **Persistencia** | TypeORM, node-oracledb | Transacciones ACID, pool de conexiones y migraciones de esquema. |
+| **Accesibilidad** | WCAG 2.2 AA | Verificación automatizada de 44 pares de color en texto y no-texto. |
 
-## Estado del proyecto
-
-Proyecto en desarrollo incremental mediante **Spec-Driven Development (SDD)**.
-
-El piloto incluye funcionalidades de administración de catálogos, perfiles, procesos, fichas, mapa interno, registro de riesgos y auditoría. Las funcionalidades pendientes se incorporan progresivamente según los requisitos aprobados.
-
-La autenticación mediante Google Workspace institucional está postergada. El mecanismo de acceso actual es exclusivamente para desarrollo local: **no debe exponerse a una red ni utilizarse con datos reales**.
+---
 
 ## Estructura del repositorio
 
 ```text
 jallupacha/
-├── backend/          # API, lógica de negocio y persistencia
-├── frontend/         # Aplicación Angular
-├── docs/             # Especificaciones y arquitectura
-├── AGENTS.md         # Instrucciones y principios SDD
-├── package.json      # Scripts y dependencias del proyecto
+├── backend/                  # API NestJS, controladores y servicios
+│   ├── src/database/         # Migraciones, instalador de esquema y semillas genéricas
+│   └── src/mvp-v14/          # Lógica de negocio y endpoints del MVP v14
+├── frontend/                 # Aplicación cliente Angular
+│   ├── scripts/              # Scripts de verificación de contraste WCAG 2.2 AA
+│   └── src/app/
+│       ├── shared/ui/        # Kit de componentes UI reutilizables y tokens de diseño
+│       ├── mvp-v14-demo.*    # Componente del Mapa de Procesos
+│       ├── macroprocess-*    # Componente de Detalle de Macroproceso
+│       └── process-detail.*  # Componente de Ficha y Gobernanza de Proceso
+├── docs/                     # Especificaciones funcionales, arquitectura y diseño
+├── AGENTS.md                 # Principios de desarrollo SDD y regla de datos genéricos
+├── package.json              # Configuración y scripts npm de los workspaces
 └── README.md
 ```
 
-## Desarrollo local
+---
 
-**Requisitos:** Node.js 24, npm 11, Oracle Database 19c y acceso a un esquema Oracle de desarrollo.
+## Puesta en marcha local
 
-```bash
-git clone https://github.com/badi11a/jallupacha.git
-cd jallupacha
-npm ci
-```
+### Requisitos previos
+- Node.js 24 LTS y npm 11.
+- Instancia activa de Oracle Database 19c (o contenedor Oracle Database Free / EE).
+- Variables de entorno configuradas en `backend/.env` (tomando como base `backend/.env.example`).
 
-Configurar `backend/.env` a partir de `backend/.env.example`. Preparar los usuarios y permisos Oracle correspondientes antes de aplicar las migraciones.
+### Instalación y configuración
 
-```bash
-npm run db:migrate
-npm run db:grant
-npm run start:dev
-```
+1. **Instalar dependencias de los workspaces**:
+   ```bash
+   npm ci
+   ```
 
-Los permisos de la cuenta de ejecución se aplican con `db:grant` desde `backend/database/grant-runtime.sql`; `CREATE SESSION` lo otorga un operador autorizado con `backend/database/grant-system.sql`.
+2. **Instalar el esquema y datos genéricos del MVP v14 en Oracle**:
+   ```bash
+   npm run db:install:mvp-v14 --workspace backend
+   ```
+
+3. **Iniciar los servidores de desarrollo**:
+   - Backend (puerto 3000):
+     ```bash
+     npm start:dev --workspace backend
+     ```
+   - Frontend (puerto 4200):
+     ```bash
+     npm start --workspace frontend
+     ```
 
 Direcciones locales por defecto:
+- **Frontend**: [http://127.0.0.1:4200](http://127.0.0.1:4200)
+- **Backend API**: [http://127.0.0.1:3000/api/mvp-v14](http://127.0.0.1:3000/api/mvp-v14)
 
-- Frontend: `http://127.0.0.1:4200`
-- Backend: `http://127.0.0.1:3000/api`
+---
 
-## Configuración por ambiente
+## Aseguramiento de calidad y pruebas automatizadas
 
-La configuración se define con variables de entorno (ver [`backend/.env.example`](backend/.env.example)). El backend valida las variables al iniciar y no arranca si faltan. Nunca versionar `.env` ni credenciales.
-
-| Ambiente | APP_ENV / NODE_ENV | Cómo configurar |
-|---|---|---|
-| Local | `local` / `development` | Copiar `backend/.env.example` a `backend/.env` y completar conexión y contraseñas Oracle. `npm run start:dev`. |
-| Desarrollo | `development` / `production` | Definir las variables en el servicio del servidor (con `AUTH_MODE=google`, sin modo demo). `npm ci && npm run build && npm run db:migrate && npm run db:grant`, luego `npm start --workspace backend`. |
-| Producción | `production` / `production` | Igual que desarrollo, con cuentas y servicio Oracle institucionales entregados por el administrador. Probar antes en desarrollo. |
-
-El frontend compilado (`frontend/dist`) es el mismo para todos los ambientes y llama a `/api` en forma relativa: el servidor web institucional debe servirlo y reenviar `/api` al backend.
-
-## Verificaciones
+El proyecto cuenta con un conjunto exhaustivo de pruebas unitarias, de integración y auditoría de accesibilidad:
 
 ```bash
+# 1. Verificación de contraste de diseño (WCAG 2.2 AA - 44 combinaciones)
+npm run check:contrast --workspace frontend
+
+# 2. Pruebas de interfaz y navegación Angular
+npx ng test --include src/app/mvp-v14-interface.spec.ts --watch=false --workspace frontend
+
+# 3. Pruebas unitarias y de servicios Backend (31 pruebas)
+npm test --workspace backend
+
+# 4. Compilación de producción
 npm run build
-npm test
-npm run test:frontend
-npm run test:api
-npm run audit:dependencies
 ```
 
-Las pruebas de integración con Oracle requieren un entorno de base de datos configurado. Estos comandos se documentan como procedimientos disponibles, no como verificaciones ejecutadas en esta entrega.
+---
 
-## Documentación
+## Documentación del sistema
 
+- [Instrucciones y principios de desarrollo SDD](AGENTS.md)
 - [Especificación funcional vigente del MVP v14](docs/mvp_v14.md)
-- [Especificación funcional histórica v13](docs/especificacion.md)
-- [Arquitectura vigente del MVP v14](docs/arquitectura_mvp_v14.md)
+- [Arquitectura técnica del MVP v14](docs/arquitectura_mvp_v14.md)
+- [Adaptación visual y de navegación del mapa](docs/adaptacion_visual_mvp_v14.md)
 - [Sistema de diseño digital](docs/design-system.md)
-- [Instrucciones SDD](AGENTS.md)
-- [Release 01](docs/release01_navegable.md)
-- [Ciclo de procesos pendiente](docs/incremento03_ciclo_procesos.md)
 
-La fuente de verdad de los requisitos es [`docs/referencias/Requisitos_Sistema_Procesos_v14.xlsx`](docs/referencias/Requisitos_Sistema_Procesos_v14.xlsx). La especificación funcional y la arquitectura vigentes del MVP son [`docs/mvp_v14.md`](docs/mvp_v14.md) y [`docs/arquitectura_mvp_v14.md`](docs/arquitectura_mvp_v14.md). Los cambios funcionales deben respetar sus criterios de aceptación y los principios de `AGENTS.md`.
+---
 
 ## Licencia
 
-Consultar [LICENSE](LICENSE).
+Consultar archivo [LICENSE](LICENSE).

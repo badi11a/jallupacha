@@ -63,6 +63,9 @@
   --ui-color-warning-background: #fff3cd;
   --ui-color-warning-border: var(--brand-yellow);
   --ui-color-status: #826513;
+  --ui-color-map-strategic: var(--brand-ink);
+  --ui-color-map-mission: var(--brand-steel-blue);
+  --ui-color-map-support: var(--brand-yellow);
 
   --ui-space-1: .25rem;
   --ui-space-2: .5rem;

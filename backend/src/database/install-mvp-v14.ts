@@ -76,11 +76,6 @@ async function dropApplicationObjects(source: DataSource, schema: string): Promi
       await source.query(`DROP TABLE "${schema}"."${table}" CASCADE CONSTRAINTS PURGE`);
     }
   }
-  // TypeORM may have created this internal record in an earlier installer run.
-  // It is not part of the MVP schema and must not survive a clean installation.
-  if (existingTables.has('migrations')) {
-    await source.query(`DROP TABLE "${schema}"."migrations" CASCADE CONSTRAINTS PURGE`);
-  }
 
   const sequences: Array<{ sequenceName: string }> = await source.query('SELECT SEQUENCE_NAME AS "sequenceName" FROM USER_SEQUENCES');
   const existingSequences = new Set(sequences.map(({ sequenceName }) => sequenceName));
@@ -93,7 +88,7 @@ installMvpV14().then(
   () => console.info('MVP v14 schema was recreated from its initial migration and demonstration content.'),
   (error: unknown) => {
     console.error('MVP v14 installation failed; no application should be started until the error is resolved.');
-    console.error(error instanceof Error ? error.message : 'Unexpected installation error');
+    console.error(error instanceof Error ? error.stack : error);
     process.exitCode = 1;
   }
 );
