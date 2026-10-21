@@ -10,6 +10,7 @@ import {
   UiBadgeComponent, UiBreadcrumbsComponent, UiDialogService,
   UiMessageComponent, UiSectionComponent, type UiBadgeTone
 } from './shared/ui';
+import { LeavesWithConfirmation } from './unsaved-changes.guard';
 
 const emptyRisk = (): RiskInput => ({ description: '', cause: '', consequence: '', type: '', level: '' });
 const emptyRelation = (): { destinationProcessId: number | null; type: string; description: string } => ({ destinationProcessId: null, type: 'FLUJO', description: '' });
@@ -220,7 +221,7 @@ const emptyRelation = (): { destinationProcessId: number | null; type: string; d
           { label: d.name }
         ]" />
         <div class="top-nav-actions">
-          <a class="primary-button edit-action-btn" [routerLink]="['/procesos', d.id, 'editar']">Editar ficha</a>
+          <a class="quiet-button edit-action-btn" [routerLink]="['/procesos', d.id, 'editar']">Editar</a>
           <button type="button" class="help-btn" (click)="openHelp()" aria-label="Ayuda sobre este proceso">
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
               <circle cx="12" cy="12" r="10"></circle>
@@ -309,12 +310,12 @@ const emptyRelation = (): { destinationProcessId: number | null; type: string; d
           @for (dup of d.possibleDuplicates; track dup.id) { <a [routerLink]="['/procesos', dup.id]">{{ dup.code }} · {{ dup.name }}</a>{{ $last ? '' : ', ' }} }
         </ui-message>
       }
-      @if (d.parent || d.subprocesses.length > 0) {
+      @if (d.parent || (d.subprocesses && d.subprocesses.length > 0)) {
         <div class="hierarchy-card">
           @if (d.parent) {
             <p>Proceso padre: <a [routerLink]="['/procesos', d.parent.id]">{{ d.parent.code }} · {{ d.parent.name }}</a></p>
           }
-          @if (d.subprocesses.length > 0) {
+          @if (d.subprocesses && d.subprocesses.length > 0) {
             <p>Subprocesos:
               @for (sub of d.subprocesses; track sub.id) { <a [routerLink]="['/procesos', sub.id]">{{ sub.code }} · {{ sub.name }}</a>{{ $last ? '' : ', ' }} }
             </p>
@@ -528,7 +529,7 @@ const emptyRelation = (): { destinationProcessId: number | null; type: string; d
     </ng-template>
   `
 })
-export class ProcessDetailComponent implements OnInit {
+export class ProcessDetailComponent implements OnInit, LeavesWithConfirmation {
   private readonly api = inject(MvpV14Api);
   private readonly route = inject(ActivatedRoute);
   private readonly dialogs = inject(UiDialogService);
@@ -631,34 +632,71 @@ export class ProcessDetailComponent implements OnInit {
     });
   }
 
+  private initialRiskSnapshot = '';
+  private initialRelationSnapshot = '';
+
   private afterChange(id: number, message: string): void {
     this.error.set('');
     this.notice.set(message);
-    this.cancelRisk();
-    this.cancelRelation();
+    this.editingRisk.set(null);
+    this.editingRelation.set(null);
     this.load(id, true);
   }
 
   private fail(e: unknown): void { this.notice.set(''); this.error.set(errorMessage(e)); }
 
-  newRisk(): void { this.risk = emptyRisk(); this.editingRisk.set(0); }
+  newRisk(): void {
+    this.risk = emptyRisk();
+    this.initialRiskSnapshot = JSON.stringify(this.risk);
+    this.editingRisk.set(0);
+  }
+
   editRisk(item: RiskInput & { id: number }): void {
     this.risk = { description: item.description, cause: item.cause, consequence: item.consequence, type: item.type, level: item.level };
+    this.initialRiskSnapshot = JSON.stringify(this.risk);
     this.editingRisk.set(item.id);
   }
-  cancelRisk(): void { this.editingRisk.set(null); }
+
+  isRiskDirty(): boolean {
+    if (this.editingRisk() === null) return false;
+    return JSON.stringify(this.risk) !== this.initialRiskSnapshot;
+  }
+
+  async cancelRisk(): Promise<void> {
+    if (this.isRiskDirty()) {
+      const confirmed = await this.dialogs.confirm({
+        title: 'Descartar riesgo',
+        message: 'Hay cambios sin guardar en el riesgo. ¿Deseas descartarlos?',
+        confirmLabel: 'Descartar cambios',
+        cancelLabel: 'Continuar editando',
+        tone: 'danger'
+      });
+      if (!confirmed) return;
+    }
+    this.editingRisk.set(null);
+  }
+
   saveRisk(processId: number): void {
     const target = this.editingRisk();
     const request = target === 0 ? this.api.addRisk(processId, this.risk) : this.api.updateRisk(processId, target as number, this.risk);
     request.subscribe({ next: () => this.afterChange(processId, 'Riesgo guardado.'), error: (e) => this.fail(e) });
   }
-  removeRisk(processId: number, riskId: number): void {
-    if (!confirm('¿Eliminar este riesgo?')) return;
+
+  async removeRisk(processId: number, riskId: number): Promise<void> {
+    const confirmed = await this.dialogs.confirm({
+      title: 'Eliminar riesgo',
+      message: '¿Confirmas la eliminación definitiva de este riesgo?',
+      confirmLabel: 'Eliminar',
+      cancelLabel: 'Cancelar',
+      tone: 'danger'
+    });
+    if (!confirmed) return;
     this.api.deleteRisk(processId, riskId).subscribe({ next: () => this.afterChange(processId, 'Riesgo eliminado.'), error: (e) => this.fail(e) });
   }
 
   newRelation(processId: number): void {
     this.relation = emptyRelation();
+    this.initialRelationSnapshot = JSON.stringify(this.relation);
     this.editingRelation.set(0);
     if (this.destinations().length === 0) {
       this.api.listProcesses({}).subscribe({
@@ -667,11 +705,32 @@ export class ProcessDetailComponent implements OnInit {
       });
     }
   }
+
   editRelation(id: number, type: string, description: string): void {
     this.relation = { destinationProcessId: null, type, description };
+    this.initialRelationSnapshot = JSON.stringify(this.relation);
     this.editingRelation.set(id);
   }
-  cancelRelation(): void { this.editingRelation.set(null); }
+
+  isRelationDirty(): boolean {
+    if (this.editingRelation() === null) return false;
+    return JSON.stringify(this.relation) !== this.initialRelationSnapshot;
+  }
+
+  async cancelRelation(): Promise<void> {
+    if (this.isRelationDirty()) {
+      const confirmed = await this.dialogs.confirm({
+        title: 'Descartar relación',
+        message: 'Hay cambios sin guardar en la relación. ¿Deseas descartarlos?',
+        confirmLabel: 'Descartar cambios',
+        cancelLabel: 'Continuar editando',
+        tone: 'danger'
+      });
+      if (!confirmed) return;
+    }
+    this.editingRelation.set(null);
+  }
+
   saveRelation(processId: number): void {
     const target = this.editingRelation();
     const { destinationProcessId, type, description } = this.relation;
@@ -680,8 +739,31 @@ export class ProcessDetailComponent implements OnInit {
       : this.api.updateRelation(processId, target as number, { type, description });
     request.subscribe({ next: () => this.afterChange(processId, 'Relación guardada.'), error: (e) => this.fail(e) });
   }
-  removeRelation(processId: number, relationId: number): void {
-    if (!confirm('¿Eliminar esta relación?')) return;
+
+  async removeRelation(processId: number, relationId: number): Promise<void> {
+    const confirmed = await this.dialogs.confirm({
+      title: 'Eliminar relación',
+      message: '¿Confirmas la eliminación definitiva de esta relación entre procesos?',
+      confirmLabel: 'Eliminar',
+      cancelLabel: 'Cancelar',
+      tone: 'danger'
+    });
+    if (!confirmed) return;
     this.api.deleteRelation(processId, relationId).subscribe({ next: () => this.afterChange(processId, 'Relación eliminada.'), error: (e) => this.fail(e) });
+  }
+
+  isDirty(): boolean {
+    return this.isRiskDirty() || this.isRelationDirty();
+  }
+
+  async confirmLeave(): Promise<boolean> {
+    if (!this.isDirty()) return true;
+    return await this.dialogs.confirm({
+      title: 'Cambios no guardados',
+      message: 'Hay modificaciones pendientes en el formulario de la ficha. Si sales ahora, se perderán los cambios ingresados.',
+      confirmLabel: 'Descartar cambios',
+      cancelLabel: 'Continuar editando',
+      tone: 'danger'
+    });
   }
 }

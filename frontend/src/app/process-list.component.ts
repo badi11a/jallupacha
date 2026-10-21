@@ -2,11 +2,11 @@ import { Component, OnInit, inject, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { RouterLink } from '@angular/router';
 import { MvpV14Api, ProcessListItem, ProcessTypeItem, UnitItem, errorMessage } from './mvp-v14-api.service';
-import { UiBadgeComponent, UiMessageComponent, UiPanelComponent } from './shared/ui';
+import { UiBadgeComponent, UiBreadcrumbsComponent, UiMessageComponent, UiPanelComponent } from './shared/ui';
 
 @Component({
   selector: 'app-process-list',
-  imports: [FormsModule, RouterLink, UiBadgeComponent, UiMessageComponent, UiPanelComponent],
+  imports: [FormsModule, RouterLink, UiBadgeComponent, UiBreadcrumbsComponent, UiMessageComponent, UiPanelComponent],
   styles: [`
     .filters { display: grid; grid-template-columns: repeat(auto-fit, minmax(14rem, 1fr)); gap: .75rem; align-items: end; margin-bottom: 1rem; }
     .filters label { display: grid; gap: .25rem; font-weight: 600; }
@@ -14,7 +14,10 @@ import { UiBadgeComponent, UiMessageComponent, UiPanelComponent } from './shared
     td a { font-weight: 600; }
   `],
   template: `
+    <ui-breadcrumbs [items]="[{ label: 'Mapa de procesos', link: '/mapa' }, { label: 'Procesos' }]" />
     <ui-panel headingId="processes-title" eyebrow="PROCESOS" heading="Procesos">
+      <a panelActions class="text-button" routerLink="/unidades">Unidades internas</a>
+      <a panelActions class="text-button" routerLink="/tipos-de-proceso">Tipos de proceso</a>
       <a panelActions class="primary-button" routerLink="/procesos/nuevo">Nuevo proceso</a>
       @if (error()) { <ui-message kind="error">{{ error() }}</ui-message> }
       <form class="filters" (ngSubmit)="search()" role="search" aria-label="Buscar procesos">

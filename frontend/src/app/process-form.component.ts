@@ -1,16 +1,17 @@
 import { Component, OnInit, inject, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { ActivatedRoute, Router, RouterLink } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import {
   FICHA_FIELDS, FichaKey, MvpV14Api, ProcessInput, ProcessListItem, ProcessTypeItem, UnitItem, errorMessage
 } from './mvp-v14-api.service';
-import { UiBreadcrumbsComponent, UiMessageComponent, UiPanelComponent, UiSectionComponent } from './shared/ui';
+import { UiBreadcrumbsComponent, UiDialogService, UiMessageComponent, UiPanelComponent, UiSectionComponent } from './shared/ui';
+import { LeavesWithConfirmation } from './unsaved-changes.guard';
 
 interface ParticipantRow { unitId: number | null; function: string; }
 
 @Component({
   selector: 'app-process-form',
-  imports: [FormsModule, RouterLink, UiBreadcrumbsComponent, UiMessageComponent, UiPanelComponent, UiSectionComponent],
+  imports: [FormsModule, UiBreadcrumbsComponent, UiMessageComponent, UiPanelComponent, UiSectionComponent],
   styles: [`
     .form-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(18rem, 1fr)); gap: .9rem 1.5rem; }
     label { display: grid; gap: .25rem; font-weight: 600; }
@@ -30,20 +31,26 @@ interface ParticipantRow { unitId: number | null; function: string; }
         <form (ngSubmit)="save()">
           <ui-section heading="Clasificación">
             <div class="form-grid">
-              <label>Macroproceso (obligatorio)
-                <select name="macro" [(ngModel)]="macroprocessId" (ngModelChange)="processTypeId = null">
+              <label for="field-macro">Macroproceso (obligatorio)
+                <select id="field-macro" name="macro" [(ngModel)]="macroprocessId" (ngModelChange)="processTypeId = null; clearFieldError('macro')" [attr.aria-invalid]="fieldErrors()['macro'] ? true : null" [attr.aria-describedby]="fieldErrors()['macro'] ? 'error-macro' : null">
                   <option [ngValue]="null">Seleccione…</option>
                   @for (macro of macros(); track macro.id) { <option [ngValue]="macro.id">{{ macro.code }} · {{ macro.name }}</option> }
                 </select>
+                @if (fieldErrors()['macro']) {
+                  <p id="error-macro" class="field-error" role="alert">{{ fieldErrors()['macro'] }}</p>
+                }
               </label>
-              <label>Tipo de proceso (obligatorio)
-                <select name="type" [(ngModel)]="processTypeId" [disabled]="macroprocessId === null">
+              <label for="field-type">Tipo de proceso (obligatorio)
+                <select id="field-type" name="type" [(ngModel)]="processTypeId" (ngModelChange)="clearFieldError('type')" [disabled]="macroprocessId === null" [attr.aria-invalid]="fieldErrors()['type'] ? true : null" [attr.aria-describedby]="fieldErrors()['type'] ? 'error-type' : null">
                   <option [ngValue]="null">Seleccione…</option>
                   @for (type of typeOptions(); track type.id) { <option [ngValue]="type.id">{{ type.name }}</option> }
                 </select>
+                @if (fieldErrors()['type']) {
+                  <p id="error-type" class="field-error" role="alert">{{ fieldErrors()['type'] }}</p>
+                }
               </label>
-              <label>Proceso padre (opcional)
-                <select name="parent" [(ngModel)]="parentProcessId">
+              <label for="field-parent">Proceso padre (opcional)
+                <select id="field-parent" name="parent" [(ngModel)]="parentProcessId">
                   <option [ngValue]="null">Sin proceso padre</option>
                   @for (option of parentOptions(); track option.id) { <option [ngValue]="option.id">{{ option.code }} · {{ option.name }}</option> }
                 </select>
@@ -53,17 +60,22 @@ interface ParticipantRow { unitId: number | null; function: string; }
 
           <ui-section heading="Identificación">
             <div class="form-grid">
-              <label class="wide">Nombre (obligatorio)<input name="name" maxlength="250" [(ngModel)]="values['name']" required /></label>
+              <label for="field-name" class="wide">Nombre (obligatorio)
+                <input id="field-name" name="name" maxlength="250" [(ngModel)]="values['name']" (input)="clearFieldError('name')" [attr.aria-invalid]="fieldErrors()['name'] ? true : null" [attr.aria-describedby]="fieldErrors()['name'] ? 'error-name' : null" required />
+                @if (fieldErrors()['name']) {
+                  <p id="error-name" class="field-error" role="alert">{{ fieldErrors()['name'] }}</p>
+                }
+              </label>
               @for (field of shortFields; track field.key) {
-                <label>{{ field.label }}<input [name]="field.key" maxlength="250" [(ngModel)]="values[field.key]" /></label>
+                <label [for]="'field-' + field.key">{{ field.label }}<input [id]="'field-' + field.key" [name]="field.key" maxlength="250" [(ngModel)]="values[field.key]" /></label>
               }
             </div>
           </ui-section>
 
           <ui-section heading="Unidades internas">
             <div class="form-grid">
-              <label>Unidad responsable
-                <select name="responsibleUnit" [(ngModel)]="responsibleUnitId">
+              <label for="field-resp-unit">Unidad responsable
+                <select id="field-resp-unit" name="responsibleUnit" [(ngModel)]="responsibleUnitId">
                   <option [ngValue]="null">Sin unidad responsable</option>
                   @for (unit of units(); track unit.id) { <option [ngValue]="unit.id">{{ unit.name }}{{ unit.isActive ? '' : ' (inactiva)' }}</option> }
                 </select>
@@ -72,13 +84,21 @@ interface ParticipantRow { unitId: number | null; function: string; }
             <h3>Unidades participantes</h3>
             @for (row of participants; track $index) {
               <div class="participant">
-                <label>Unidad
-                  <select [name]="'pu' + $index" [(ngModel)]="row.unitId">
+                <label [for]="'pu' + $index">Unidad (obligatorio)
+                  <select [id]="'pu' + $index" [name]="'pu' + $index" [(ngModel)]="row.unitId" (ngModelChange)="clearFieldError('pu_' + $index)" [attr.aria-invalid]="fieldErrors()['pu_' + $index] ? true : null">
                     <option [ngValue]="null">Seleccione…</option>
                     @for (unit of units(); track unit.id) { <option [ngValue]="unit.id">{{ unit.name }}{{ unit.isActive ? '' : ' (inactiva)' }}</option> }
                   </select>
+                  @if (fieldErrors()['pu_' + $index]) {
+                    <p class="field-error" role="alert">{{ fieldErrors()['pu_' + $index] }}</p>
+                  }
                 </label>
-                <label>Función en el proceso<input [name]="'pf' + $index" maxlength="500" [(ngModel)]="row.function" /></label>
+                <label [for]="'pf' + $index">Función en el proceso (obligatorio)
+                  <input [id]="'pf' + $index" [name]="'pf' + $index" maxlength="500" [(ngModel)]="row.function" (input)="clearFieldError('pf_' + $index)" [attr.aria-invalid]="fieldErrors()['pf_' + $index] ? true : null" />
+                  @if (fieldErrors()['pf_' + $index]) {
+                    <p class="field-error" role="alert">{{ fieldErrors()['pf_' + $index] }}</p>
+                  }
+                </label>
                 <button class="quiet-button" type="button" (click)="removeParticipant($index)">Quitar</button>
               </div>
             }
@@ -89,7 +109,7 @@ interface ParticipantRow { unitId: number | null; function: string; }
             <ui-section [heading]="group">
               <div class="form-grid">
                 @for (field of longFieldsOf(group); track field.key) {
-                  <label class="wide">{{ field.label }}<textarea [name]="field.key" rows="3" maxlength="4000" [(ngModel)]="values[field.key]"></textarea></label>
+                  <label [for]="'field-' + field.key" class="wide">{{ field.label }}<textarea [id]="'field-' + field.key" [name]="field.key" rows="3" maxlength="4000" [(ngModel)]="values[field.key]"></textarea></label>
                 }
               </div>
             </ui-section>
@@ -97,23 +117,27 @@ interface ParticipantRow { unitId: number | null; function: string; }
 
           <div class="actions">
             <button class="primary-button" type="submit" [disabled]="saving()">{{ saving() ? 'Guardando…' : 'Guardar proceso' }}</button>
-            <a class="text-button" [routerLink]="editingId ? ['/procesos', editingId] : ['/procesos']">Cancelar</a>
+            <button class="text-button" type="button" (click)="cancel()">Cancelar</button>
           </div>
         </form>
       }
     </ui-panel>
   `
 })
-export class ProcessFormComponent implements OnInit {
+export class ProcessFormComponent implements OnInit, LeavesWithConfirmation {
   private readonly api = inject(MvpV14Api);
   private readonly route = inject(ActivatedRoute);
   private readonly router = inject(Router);
+  private readonly dialogs = inject(UiDialogService);
+
   readonly types = signal<ProcessTypeItem[]>([]);
   readonly units = signal<Array<UnitItem | { id: number; name: string; isActive: boolean }>>([]);
   readonly processes = signal<ProcessListItem[]>([]);
   readonly loading = signal(true);
   readonly saving = signal(false);
   readonly error = signal('');
+  readonly fieldErrors = signal<Record<string, string>>({});
+
   editingId: number | null = null;
   macroprocessId: number | null = null;
   processTypeId: number | null = null;
@@ -123,6 +147,9 @@ export class ProcessFormComponent implements OnInit {
   values: Record<string, string> = {};
   readonly shortFields = FICHA_FIELDS.filter((field) => !field.long);
   readonly longGroups = [...new Set(FICHA_FIELDS.filter((field) => field.long).map((field) => field.group))];
+
+  private initialSnapshot = '';
+  private savedSuccessfully = false;
 
   longFieldsOf(group: string) { return FICHA_FIELDS.filter((field) => field.long && field.group === group); }
 
@@ -140,6 +167,53 @@ export class ProcessFormComponent implements OnInit {
 
   addParticipant(): void { this.participants = [...this.participants, { unitId: null, function: '' }]; }
   removeParticipant(index: number): void { this.participants = this.participants.filter((_, position) => position !== index); }
+
+  clearFieldError(key: string): void {
+    if (this.fieldErrors()[key]) {
+      const updated = { ...this.fieldErrors() };
+      delete updated[key];
+      this.fieldErrors.set(updated);
+    }
+  }
+
+  private serializeState(): string {
+    return JSON.stringify({
+      macroprocessId: this.macroprocessId,
+      processTypeId: this.processTypeId,
+      parentProcessId: this.parentProcessId,
+      responsibleUnitId: this.responsibleUnitId,
+      participants: this.participants,
+      values: this.values
+    });
+  }
+
+  private takeSnapshot(): void {
+    this.initialSnapshot = this.serializeState();
+  }
+
+  private isDirty(): boolean {
+    if (this.savedSuccessfully || this.saving() || !this.initialSnapshot) return false;
+    return this.serializeState() !== this.initialSnapshot;
+  }
+
+  async confirmLeave(): Promise<boolean> {
+    if (!this.isDirty()) return true;
+    return await this.dialogs.confirm({
+      title: 'Cambios no guardados',
+      message: 'Hay modificaciones pendientes en el formulario. Si sales ahora, se perderán los cambios ingresados.',
+      confirmLabel: 'Descartar cambios',
+      cancelLabel: 'Continuar editando',
+      tone: 'danger'
+    });
+  }
+
+  async cancel(): Promise<void> {
+    if (await this.confirmLeave()) {
+      this.savedSuccessfully = true;
+      const target = this.editingId ? ['/procesos', this.editingId] : ['/procesos'];
+      void this.router.navigate(target);
+    }
+  }
 
   ngOnInit(): void {
     const id = this.route.snapshot.paramMap.get('id');
@@ -165,7 +239,11 @@ export class ProcessFormComponent implements OnInit {
   private failLoad(e: unknown): void { this.error.set(errorMessage(e)); this.loading.set(false); }
 
   private loadExisting(allUnits: UnitItem[]): void {
-    if (this.editingId === null) { this.loading.set(false); return; }
+    if (this.editingId === null) {
+      this.loading.set(false);
+      this.takeSnapshot();
+      return;
+    }
     this.api.process(this.editingId).subscribe({
       next: (detail) => {
         this.macroprocessId = detail.macroprocessId;
@@ -179,20 +257,41 @@ export class ProcessFormComponent implements OnInit {
         const inactive = allUnits.filter((unit) => !unit.isActive && detail.units.some((item) => item.unitId === unit.id) && !known.has(unit.id));
         this.units.set([...this.units(), ...inactive]);
         this.loading.set(false);
+        this.takeSnapshot();
       },
       error: (e) => this.failLoad(e)
     });
   }
 
   save(): void {
-    if (!(this.values['name'] ?? '').trim()) { this.error.set('El nombre es obligatorio.'); return; }
-    if (this.macroprocessId === null || this.processTypeId === null) { this.error.set('El macroproceso y el tipo de proceso son obligatorios.'); return; }
-    if (this.participants.some((row) => row.unitId === null || !row.function.trim())) {
-      this.error.set('Cada unidad participante requiere unidad y función.'); return;
+    const errors: Record<string, string> = {};
+    if (!(this.values['name'] ?? '').trim()) {
+      errors['name'] = 'El nombre es obligatorio.';
     }
+    if (this.macroprocessId === null) {
+      errors['macro'] = 'El macroproceso es obligatorio.';
+    }
+    if (this.processTypeId === null) {
+      errors['type'] = 'El tipo de proceso es obligatorio.';
+    }
+    for (let i = 0; i < this.participants.length; i++) {
+      const row = this.participants[i];
+      if (row.unitId === null) errors[`pu_${i}`] = 'Seleccione una unidad.';
+      if (!row.function.trim()) errors[`pf_${i}`] = 'La función es obligatoria.';
+    }
+
+    if (Object.keys(errors).length > 0) {
+      this.fieldErrors.set(errors);
+      this.error.set('Por favor completa los campos obligatorios indicados.');
+      return;
+    }
+
+    this.fieldErrors.set({});
+    this.error.set('');
+
     const body: ProcessInput = {
-      macroprocessId: this.macroprocessId,
-      processTypeId: this.processTypeId,
+      macroprocessId: this.macroprocessId!,
+      processTypeId: this.processTypeId!,
       parentProcessId: this.parentProcessId,
       responsibleUnitId: this.responsibleUnitId,
       participants: this.participants.map((row) => ({ unitId: row.unitId as number, function: row.function }))
@@ -202,6 +301,7 @@ export class ProcessFormComponent implements OnInit {
     const request = this.editingId === null ? this.api.createProcess(body) : this.api.updateProcess(this.editingId, body);
     request.subscribe({
       next: (result) => {
+        this.savedSuccessfully = true;
         const id = this.editingId ?? (result as { id: number }).id;
         void this.router.navigate(['/procesos', id]);
       },

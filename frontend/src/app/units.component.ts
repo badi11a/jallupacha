@@ -1,11 +1,13 @@
 import { Component, OnInit, inject, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { MvpV14Api, UnitItem, errorMessage } from './mvp-v14-api.service';
-import { UiBadgeComponent, UiMessageComponent, UiPanelComponent } from './shared/ui';
+import { RouterLink } from '@angular/router';
+import { UiBadgeComponent, UiBreadcrumbsComponent, UiDialogService, UiMessageComponent, UiPanelComponent } from './shared/ui';
+import { LeavesWithConfirmation } from './unsaved-changes.guard';
 
 @Component({
   selector: 'app-units',
-  imports: [FormsModule, UiBadgeComponent, UiMessageComponent, UiPanelComponent],
+  imports: [FormsModule, RouterLink, UiBadgeComponent, UiBreadcrumbsComponent, UiMessageComponent, UiPanelComponent],
   styles: [`
     .inline-form { display: grid; grid-template-columns: repeat(auto-fit, minmax(16rem, 1fr)); gap: .75rem; align-items: end; border: 1px solid var(--ui-color-border); border-radius: var(--ui-radius-lg); padding: .9rem; margin-bottom: 1rem; }
     label { display: grid; gap: .25rem; font-weight: 600; }
@@ -13,13 +15,16 @@ import { UiBadgeComponent, UiMessageComponent, UiPanelComponent } from './shared
     .row-actions { display: flex; flex-wrap: wrap; gap: .5rem; }
   `],
   template: `
+    <ui-breadcrumbs [items]="[{ label: 'Mapa de procesos', link: '/mapa' }, { label: 'Unidades internas' }]" />
     <ui-panel headingId="units-title" eyebrow="CATÁLOGO" heading="Unidades internas">
+      <a panelActions class="text-button" routerLink="/procesos">Buscar procesos</a>
+      <a panelActions class="text-button" routerLink="/tipos-de-proceso">Tipos de proceso</a>
       <button panelActions class="primary-button" type="button" (click)="startCreate()">Nueva unidad</button>
       @if (error()) { <ui-message kind="error">{{ error() }}</ui-message> }
       @if (notice()) { <ui-message kind="success">{{ notice() }}</ui-message> }
       @if (editing() !== null) {
         <form class="inline-form" (ngSubmit)="save()" [attr.aria-label]="editing() === 0 ? 'Nueva unidad' : 'Editar unidad'">
-          <label>Nombre<input name="name" maxlength="250" [(ngModel)]="name" required /></label>
+          <label>Nombre (obligatorio)<input name="name" maxlength="250" [(ngModel)]="name" required /></label>
           <label>Unidad superior
             <select name="parent" [(ngModel)]="parentUnitId">
               <option [ngValue]="null">Sin unidad superior</option>
@@ -28,7 +33,7 @@ import { UiBadgeComponent, UiMessageComponent, UiPanelComponent } from './shared
           </label>
           <div class="row-actions">
             <button class="primary-button" type="submit">Guardar unidad</button>
-            <button class="quiet-button" type="button" (click)="editing.set(null)">Cancelar</button>
+            <button class="quiet-button" type="button" (click)="cancel()">Cancelar</button>
           </div>
         </form>
       }
@@ -47,7 +52,7 @@ import { UiBadgeComponent, UiMessageComponent, UiPanelComponent } from './shared
                   <td><ui-badge [tone]="row.unit.isActive ? 'success' : 'neutral'">{{ row.unit.isActive ? 'Activa' : 'Inactiva' }}</ui-badge></td>
                   <td class="row-actions">
                     <button class="quiet-button" type="button" (click)="startEdit(row.unit)">Editar</button>
-                    @if (row.unit.isActive) { <button class="danger-button" type="button" (click)="deactivate(row.unit)">Desactivar</button> }
+                    @if (row.unit.isActive) { <button class="quiet-button" type="button" (click)="deactivate(row.unit)">Desactivar</button> }
                   </td>
                 </tr>
               } @empty { <tr><td colspan="5">No hay unidades registradas.</td></tr> }
@@ -58,8 +63,9 @@ import { UiBadgeComponent, UiMessageComponent, UiPanelComponent } from './shared
     </ui-panel>
   `
 })
-export class UnitsComponent implements OnInit {
+export class UnitsComponent implements OnInit, LeavesWithConfirmation {
   private readonly api = inject(MvpV14Api);
+  private readonly dialogs = inject(UiDialogService);
   readonly units = signal<UnitItem[]>([]);
   readonly loading = signal(true);
   readonly error = signal('');
@@ -67,6 +73,7 @@ export class UnitsComponent implements OnInit {
   readonly editing = signal<number | null>(null);
   name = '';
   parentUnitId: number | null = null;
+  private initialSnapshot = '';
 
   ngOnInit(): void { this.load(); }
 
@@ -99,8 +106,51 @@ export class UnitsComponent implements OnInit {
 
   parentOptions(): UnitItem[] { return this.units().filter((unit) => unit.isActive && unit.id !== this.editing()); }
 
-  startCreate(): void { this.name = ''; this.parentUnitId = null; this.notice.set(''); this.editing.set(0); }
-  startEdit(unit: UnitItem): void { this.name = unit.name; this.parentUnitId = unit.parentUnitId; this.notice.set(''); this.editing.set(unit.id); }
+  startCreate(): void {
+    this.name = '';
+    this.parentUnitId = null;
+    this.notice.set('');
+    this.initialSnapshot = JSON.stringify({ name: '', parentUnitId: null });
+    this.editing.set(0);
+  }
+
+  startEdit(unit: UnitItem): void {
+    this.name = unit.name;
+    this.parentUnitId = unit.parentUnitId;
+    this.notice.set('');
+    this.initialSnapshot = JSON.stringify({ name: unit.name, parentUnitId: unit.parentUnitId });
+    this.editing.set(unit.id);
+  }
+
+  isDirty(): boolean {
+    if (this.editing() === null) return false;
+    return JSON.stringify({ name: this.name.trim(), parentUnitId: this.parentUnitId }) !== this.initialSnapshot;
+  }
+
+  async cancel(): Promise<void> {
+    if (this.isDirty()) {
+      const confirmed = await this.dialogs.confirm({
+        title: 'Descartar cambios',
+        message: 'Hay cambios sin guardar en la unidad. ¿Deseas descartarlos?',
+        confirmLabel: 'Descartar cambios',
+        cancelLabel: 'Continuar editando',
+        tone: 'danger'
+      });
+      if (!confirmed) return;
+    }
+    this.editing.set(null);
+  }
+
+  async confirmLeave(): Promise<boolean> {
+    if (!this.isDirty()) return true;
+    return await this.dialogs.confirm({
+      title: 'Cambios no guardados',
+      message: 'Hay cambios sin guardar en la unidad. Si sales ahora, se perderán los cambios ingresados.',
+      confirmLabel: 'Descartar cambios',
+      cancelLabel: 'Continuar editando',
+      tone: 'danger'
+    });
+  }
 
   save(): void {
     const target = this.editing();
@@ -112,8 +162,15 @@ export class UnitsComponent implements OnInit {
     });
   }
 
-  deactivate(unit: UnitItem): void {
-    if (!confirm(`¿Desactivar la unidad "${unit.name}"? Las asociaciones existentes se conservan.`)) return;
+  async deactivate(unit: UnitItem): Promise<void> {
+    const confirmed = await this.dialogs.confirm({
+      title: 'Desactivar unidad',
+      message: `¿Desactivar la unidad "${unit.name}"? Las asociaciones existentes se conservan.`,
+      confirmLabel: 'Desactivar',
+      cancelLabel: 'Cancelar',
+      tone: 'default'
+    });
+    if (!confirmed) return;
     this.api.deactivateUnit(unit.id).subscribe({
       next: () => { this.error.set(''); this.notice.set('Unidad desactivada.'); this.load(); },
       error: (e) => this.error.set(errorMessage(e))

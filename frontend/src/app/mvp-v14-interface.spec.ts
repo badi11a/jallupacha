@@ -72,6 +72,8 @@ describe('Interfaz MVP v14 — adaptación visual', () => {
     expect(root.querySelectorAll('.macro-link')).toHaveLength(1);
     expect(root.querySelectorAll('.map-hero, .map-panel')).toHaveLength(2);
     expect(root.querySelector('a[href="/procesos"]')?.textContent).toContain('Buscar procesos');
+    expect(root.querySelector('.map-bottom a[href="/unidades"]')).toBeNull();
+    expect(root.querySelector('.map-bottom a[href="/tipos-de-proceso"]')).toBeNull();
     expect(root.textContent).not.toMatch(/533|46 tipos|UTA 2026|Macro Región Andina|Dirección y Desarrollo Estratégico/);
     fixture.destroy();
     http.verify();
@@ -193,8 +195,9 @@ describe('Interfaz MVP v14 — adaptación visual', () => {
     expect(root.textContent).not.toMatch(/Diagrama disponible|Medio-Alto|direccion.planificacion@/);
     expect(root.querySelector('a[href="/mapa/macroprocesos/2"]')).not.toBeNull();
     expect(root.querySelector('a[href="/procesos/4/editar"]')).not.toBeNull();
+    expect(root.querySelector('a[href="/procesos/4/editar"]')?.classList.contains('quiet-button')).toBe(true);
     for (const label of ['Agregar riesgo', 'Agregar relación', 'Editar', 'Eliminar']) {
-      expect([...root.querySelectorAll('button')].some(button => button.textContent?.trim() === label), label).toBe(true);
+      expect([...root.querySelectorAll('button, a')].some(el => el.textContent?.trim() === label), label).toBe(true);
     }
     const addRisk = [...root.querySelectorAll('button')].find(button => button.textContent?.trim() === 'Agregar riesgo')!;
     addRisk.click(); fixture.detectChanges();
@@ -209,6 +212,292 @@ describe('Interfaz MVP v14 — adaptación visual', () => {
     request.flush({});
     http.expectOne('/api/mvp-v14/processes/4').flush(detail); fixture.detectChanges();
     expect(root.textContent).toContain('Riesgo guardado');
+
+    // Confirmación modal accesible para eliminar riesgo (R-07.1)
+    const removeRiskBtn = [...root.querySelectorAll('button')].find(button => button.textContent?.trim() === 'Eliminar')!;
+    removeRiskBtn.click();
+    await fixture.whenStable();
+    fixture.detectChanges();
+    const dialog = root.querySelector('dialog') as HTMLDialogElement;
+    expect(dialog).not.toBeNull();
+    expect(dialog.textContent).toContain('¿Confirmas la eliminación definitiva de este riesgo?');
+    const confirmDelete = [...dialog.querySelectorAll('button')].find(b => b.textContent?.trim() === 'Eliminar')!;
+    expect(confirmDelete.classList.contains('danger-button')).toBe(true);
+    confirmDelete.click();
+    await fixture.whenStable();
+    fixture.detectChanges();
+    const delReq = http.expectOne({ method: 'DELETE', url: '/api/mvp-v14/processes/4/risks/9' });
+    delReq.flush({});
+    http.expectOne('/api/mvp-v14/processes/4').flush(detail);
+    fixture.detectChanges();
+    expect(root.textContent).toContain('Riesgo eliminado');
+
     fixture.destroy(); http.verify();
+  });
+
+  it('valida campos obligatorios in-situ y protege cambios no guardados en el formulario de proceso', async () => {
+    const fixture = TestBed.createComponent(AppComponent);
+    const http = TestBed.inject(HttpTestingController);
+    const router = TestBed.inject(Router);
+    fixture.detectChanges();
+    await router.navigateByUrl('/procesos/nuevo');
+    fixture.detectChanges();
+    http.expectOne('/api/mvp-v14/process-types').flush([
+      { id: 10, name: 'Planificación', macroprocessId: 2, macroprocessCode: 'MP1', macroprocessName: 'Estrategia', processCount: 0, isActive: true }
+    ]);
+    http.expectOne('/api/mvp-v14/units').flush([{ id: 8, name: 'Dirección', isActive: true }]);
+    http.expectOne('/api/mvp-v14/processes').flush([]);
+    fixture.detectChanges();
+    await fixture.whenStable();
+
+    const root = fixture.nativeElement as HTMLElement;
+    // Señalización de obligatoriedad (R-05.4)
+    expect(root.querySelector('label[for="field-name"]')?.textContent).toContain('(obligatorio)');
+    expect(root.querySelector('label[for="field-macro"]')?.textContent).toContain('(obligatorio)');
+    expect(root.querySelector('label[for="field-type"]')?.textContent).toContain('(obligatorio)');
+
+    // Validación in-situ (R-06.1)
+    const submitBtn = [...root.querySelectorAll('button')].find(b => b.textContent?.trim() === 'Guardar proceso')!;
+    submitBtn.click();
+    fixture.detectChanges();
+
+    const nameInput = root.querySelector('#field-name') as HTMLInputElement;
+    expect(nameInput.getAttribute('aria-invalid')).toBe('true');
+    expect(root.querySelector('#error-name')?.textContent).toContain('El nombre es obligatorio');
+
+    // Modificar datos para activar dirty state (R-07.2)
+    nameInput.value = 'Proceso modificado';
+    nameInput.dispatchEvent(new Event('input'));
+    fixture.detectChanges();
+    await fixture.whenStable();
+
+    // Intentar cancelar o navegar fuera debe pedir confirmación modal
+    const cancelBtn = [...root.querySelectorAll('button')].find(b => b.textContent?.trim() === 'Cancelar')!;
+    cancelBtn.click();
+    await fixture.whenStable();
+    fixture.detectChanges();
+
+    const dialog = root.querySelector('dialog') as HTMLDialogElement;
+    expect(dialog).not.toBeNull();
+    expect(dialog.textContent).toContain('Hay modificaciones pendientes en el formulario');
+
+    // Si cancela el diálogo, permanece en la pantalla
+    const stayBtn = [...dialog.querySelectorAll('button')].find(b => b.textContent?.trim() === 'Continuar editando')!;
+    stayBtn.click();
+    await fixture.whenStable();
+    fixture.detectChanges();
+    expect(router.url).toBe('/procesos/nuevo');
+
+    // Si confirma descartar, permite salir
+    cancelBtn.click();
+    await fixture.whenStable();
+    fixture.detectChanges();
+    const discardDialog = root.querySelector('dialog') as HTMLDialogElement;
+    const leaveBtn = [...discardDialog.querySelectorAll('button')].find(b => b.textContent?.trim() === 'Descartar cambios')!;
+    leaveBtn.click();
+    await fixture.whenStable();
+    fixture.detectChanges();
+
+    expect(router.url).toBe('/procesos');
+    http.expectOne('/api/mvp-v14/process-types').flush([]);
+    http.expectOne('/api/mvp-v14/units').flush([]);
+    http.expectOne('/api/mvp-v14/processes').flush([]);
+
+    fixture.destroy(); http.verify();
+  });
+
+  it('muestra botones Desactivar con nivel secundario y confirmación modal en unidades y tipos', async () => {
+    const fixture = TestBed.createComponent(AppComponent);
+    const http = TestBed.inject(HttpTestingController);
+    const router = TestBed.inject(Router);
+    fixture.detectChanges();
+    await router.navigateByUrl('/unidades');
+    fixture.detectChanges();
+    http.expectOne('/api/mvp-v14/units').flush([{ id: 1, name: 'Unidad A', parentUnitId: null, processCount: 0, isActive: true }]);
+    fixture.detectChanges();
+    await fixture.whenStable();
+
+    const root = fixture.nativeElement as HTMLElement;
+    const deactBtn = [...root.querySelectorAll('button')].find(b => b.textContent?.trim() === 'Desactivar')!;
+    expect(deactBtn.classList.contains('quiet-button')).toBe(true);
+    expect(deactBtn.classList.contains('danger-button')).toBe(false);
+
+    // Confirmación modal accesible (R-07.1)
+    deactBtn.click();
+    await fixture.whenStable();
+    fixture.detectChanges();
+    const dialog = root.querySelector('dialog') as HTMLDialogElement;
+    expect(dialog).not.toBeNull();
+    expect(dialog.textContent).toContain('¿Desactivar la unidad "Unidad A"?');
+    const confirmBtn = [...dialog.querySelectorAll('button')].find(b => b.textContent?.trim() === 'Desactivar')!;
+    confirmBtn.click();
+    await fixture.whenStable();
+    fixture.detectChanges();
+
+    const deactReq = http.expectOne({ method: 'PATCH', url: '/api/mvp-v14/units/1/deactivate' });
+    deactReq.flush({});
+    http.expectOne('/api/mvp-v14/units').flush([{ id: 1, name: 'Unidad A', parentUnitId: null, processCount: 0, isActive: false }]);
+    fixture.detectChanges();
+    expect(root.textContent).toContain('Unidad desactivada');
+
+    fixture.destroy(); http.verify();
+  });
+
+  it('permite salir del formulario sin confirmación cuando no existen cambios modificados (R-07.2)', async () => {
+    const fixture = TestBed.createComponent(AppComponent);
+    const http = TestBed.inject(HttpTestingController);
+    const router = TestBed.inject(Router);
+    fixture.detectChanges();
+    await router.navigateByUrl('/procesos/nuevo');
+    fixture.detectChanges();
+    http.expectOne('/api/mvp-v14/process-types').flush([
+      { id: 10, name: 'Planificación', macroprocessId: 2, macroprocessCode: 'MP1', macroprocessName: 'Estrategia', processCount: 0, isActive: true }
+    ]);
+    http.expectOne('/api/mvp-v14/units').flush([{ id: 8, name: 'Dirección', isActive: true }]);
+    http.expectOne('/api/mvp-v14/processes').flush([]);
+    fixture.detectChanges();
+    await fixture.whenStable();
+
+    const root = fixture.nativeElement as HTMLElement;
+    expect(root.querySelector('dialog')).toBeNull();
+
+    // 1. Salir usando el botón "Cancelar" sin haber modificado ningún campo
+    const cancelBtn = [...root.querySelectorAll('button')].find(b => b.textContent?.trim() === 'Cancelar')!;
+    cancelBtn.click();
+    await fixture.whenStable();
+    fixture.detectChanges();
+
+    // Debe navegar a /procesos directamente sin levantar modal de confirmación
+    expect(root.querySelector('dialog')).toBeNull();
+    expect(router.url).toBe('/procesos');
+    http.expectOne('/api/mvp-v14/process-types').flush([]);
+    http.expectOne('/api/mvp-v14/units').flush([]);
+    http.expectOne('/api/mvp-v14/processes').flush([]);
+
+    // 2. Comprobar navegación directa mediante router o migas de pan desde /procesos/nuevo sin cambios
+    await router.navigateByUrl('/procesos/nuevo');
+    fixture.detectChanges();
+    http.expectOne('/api/mvp-v14/process-types').flush([]);
+    http.expectOne('/api/mvp-v14/units').flush([]);
+    http.expectOne('/api/mvp-v14/processes').flush([]);
+    fixture.detectChanges();
+    await fixture.whenStable();
+
+    // Navegar a otra ruta (ej. /mapa): el guard evalúa isDirty() === false y permite la navegación inmediata
+    await router.navigateByUrl('/mapa');
+    await fixture.whenStable();
+    fixture.detectChanges();
+
+    expect(root.querySelector('dialog')).toBeNull();
+    expect(router.url).toBe('/mapa');
+    http.expectOne('/api/mvp-v14/map').flush(MAP);
+
+    fixture.destroy();
+    http.verify();
+  });
+
+  it('protege cambios no guardados en el subformulario de riesgos de la ficha (R-07.2)', async () => {
+    const fixture = TestBed.createComponent(AppComponent);
+    const http = TestBed.inject(HttpTestingController);
+    const router = TestBed.inject(Router);
+    fixture.detectChanges();
+    await router.navigateByUrl('/procesos/4');
+    fixture.detectChanges();
+    const detail = {
+      id: 4, code: 'PR4', name: 'Plan anual', macroprocessId: 2, macroprocess: 'Estrategia', macroprocessType: 'Estratégicos', processType: 'Planificación',
+      status: 'Borrador', completeness: { complete: true, missing: [] }, possibleDuplicates: [],
+      parent: null, subprocesses: [],
+      units: [], risks: [], relations: { outgoing: [], incoming: [] }
+    };
+    http.expectOne('/api/mvp-v14/processes/4').flush(detail);
+    fixture.detectChanges();
+    await fixture.whenStable();
+
+    const root = fixture.nativeElement as HTMLElement;
+
+    // 1. Abrir subformulario de riesgo y cancelar SIN cambios: se cierra sin diálogo
+    const addRisk = [...root.querySelectorAll('button')].find(button => button.textContent?.trim() === 'Agregar riesgo')!;
+    addRisk.click();
+    fixture.detectChanges();
+    expect(root.querySelector('form[aria-label="Nuevo riesgo"]')).not.toBeNull();
+
+    const cancelClean = [...root.querySelectorAll<HTMLButtonElement>('form[aria-label="Nuevo riesgo"] button')].find(b => b.textContent?.trim() === 'Cancelar')!;
+    cancelClean.click();
+    await fixture.whenStable();
+    fixture.detectChanges();
+    expect(root.querySelector('dialog')).toBeNull();
+    expect(root.querySelector('form[aria-label="Nuevo riesgo"]')).toBeNull();
+
+    // 2. Abrir subformulario de riesgo, escribir texto y pulsar Cancelar: requiere confirmación modal
+    const addRisk2 = [...root.querySelectorAll('button')].find(button => button.textContent?.trim() === 'Agregar riesgo')!;
+    addRisk2.click();
+    fixture.detectChanges();
+    const descInput = root.querySelector('form[aria-label="Nuevo riesgo"] textarea[name="description"]') as HTMLTextAreaElement;
+    descInput.value = 'Riesgo con cambios pendientes';
+    descInput.dispatchEvent(new Event('input'));
+    fixture.detectChanges();
+    await fixture.whenStable();
+
+    const cancelDirty = [...root.querySelectorAll<HTMLButtonElement>('form[aria-label="Nuevo riesgo"] button')].find(b => b.textContent?.trim() === 'Cancelar')!;
+    cancelDirty.click();
+    await fixture.whenStable();
+    fixture.detectChanges();
+
+    const dialog = root.querySelector('dialog') as HTMLDialogElement;
+    expect(dialog).not.toBeNull();
+    expect(dialog.textContent).toContain('Hay cambios sin guardar en el riesgo');
+
+    // Confirmar descarte cierra el formulario
+    const discardBtn = [...dialog.querySelectorAll('button')].find(b => b.textContent?.trim() === 'Descartar cambios')!;
+    discardBtn.click();
+    await fixture.whenStable();
+    fixture.detectChanges();
+    expect(root.querySelector('form[aria-label="Nuevo riesgo"]')).toBeNull();
+
+    // 3. Abrir riesgo con cambios e intentar navegar fuera por router: el guard R-07.2 lo intercepta
+    const addRisk3 = [...root.querySelectorAll('button')].find(button => button.textContent?.trim() === 'Agregar riesgo')!;
+    addRisk3.click();
+    fixture.detectChanges();
+    const descInput2 = root.querySelector('form[aria-label="Nuevo riesgo"] textarea[name="description"]') as HTMLTextAreaElement;
+    descInput2.value = 'Riesgo no guardado para navegación';
+    descInput2.dispatchEvent(new Event('input'));
+    fixture.detectChanges();
+    await fixture.whenStable();
+
+    // Iniciar navegación a /mapa: el guard se ejecuta asíncronamente
+    const navPromise = router.navigateByUrl('/mapa');
+    await new Promise(resolve => setTimeout(resolve, 0));
+    fixture.detectChanges();
+
+    const leaveDialog = root.querySelector('dialog') as HTMLDialogElement;
+    expect(leaveDialog).not.toBeNull();
+    expect(leaveDialog.textContent).toContain('Hay modificaciones pendientes en el formulario de la ficha');
+
+    // Continuar editando rechaza la navegación y permanece en la ficha
+    const stayBtn = [...leaveDialog.querySelectorAll('button')].find(b => b.textContent?.trim() === 'Continuar editando')!;
+    stayBtn.click();
+    const navResult = await navPromise;
+    expect(navResult).toBe(false);
+    await fixture.whenStable();
+    fixture.detectChanges();
+    expect(router.url).toBe('/procesos/4');
+
+    // Iniciar navegación a /mapa y confirmar descarte: permite salir al mapa
+    const navPromise2 = router.navigateByUrl('/mapa');
+    await new Promise(resolve => setTimeout(resolve, 0));
+    fixture.detectChanges();
+
+    const leaveDialog2 = root.querySelector('dialog') as HTMLDialogElement;
+    const leaveBtn = [...leaveDialog2.querySelectorAll('button')].find(b => b.textContent?.trim() === 'Descartar cambios')!;
+    leaveBtn.click();
+    const navResult2 = await navPromise2;
+    expect(navResult2).toBe(true);
+    await fixture.whenStable();
+    fixture.detectChanges();
+    expect(router.url).toBe('/mapa');
+    http.expectOne('/api/mvp-v14/map').flush(MAP);
+
+    fixture.destroy();
+    http.verify();
   });
 });

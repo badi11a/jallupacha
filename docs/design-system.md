@@ -75,6 +75,7 @@ Estos siete colores son los valores de referencia aprobados para el kit. Sus có
 ## 6. Referencias internas y trazabilidad
 
 - `AGENTS.md`: reglas de trabajo y restricciones de propiedad intelectual.
+- `docs/marco_estandar_ux_institucional.md`: estándar institucional de UX, arquetipos y consistencia de interfaz.
 - `docs/especificacion.md`: requisitos del producto.
 - `docs/arquitectura.md`: decisiones técnicas.
 - `frontend/src/app/shared/ui/styles/tokens.css`: implementación de tokens.

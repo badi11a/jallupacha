@@ -7,6 +7,7 @@ import { ProcessListComponent } from './process-list.component';
 import { ProcessTypesComponent } from './process-types.component';
 import { UnitsComponent } from './units.component';
 import { MacroprocessDetailComponent } from './macroprocess-detail.component';
+import { unsavedChangesGuard } from './unsaved-changes.guard';
 
 /** Página de inicio: mapa de procesos. */
 export const HOME_URL = '/mapa';
@@ -20,10 +21,10 @@ export const routes: Routes = [
   { title: 'Mapa de procesos', path: 'mapa', component: MvpV14DemoComponent },
   { title: 'Detalle de macroproceso', path: 'mapa/macroprocesos/:id', component: MacroprocessDetailComponent },
   { title: 'Procesos', path: 'procesos', component: ProcessListComponent },
-  { title: 'Nuevo proceso', path: 'procesos/nuevo', component: ProcessFormComponent },
-  { title: 'Ficha del proceso', path: 'procesos/:id', component: ProcessDetailComponent },
-  { title: 'Editar proceso', path: 'procesos/:id/editar', component: ProcessFormComponent },
-  { title: 'Unidades internas', path: 'unidades', component: UnitsComponent },
-  { title: 'Tipos de proceso', path: 'tipos-de-proceso', component: ProcessTypesComponent },
+  { title: 'Nuevo proceso', path: 'procesos/nuevo', component: ProcessFormComponent, canDeactivate: [unsavedChangesGuard] },
+  { title: 'Ficha del proceso', path: 'procesos/:id', component: ProcessDetailComponent, canDeactivate: [unsavedChangesGuard] },
+  { title: 'Editar proceso', path: 'procesos/:id/editar', component: ProcessFormComponent, canDeactivate: [unsavedChangesGuard] },
+  { title: 'Unidades internas', path: 'unidades', component: UnitsComponent, canDeactivate: [unsavedChangesGuard] },
+  { title: 'Tipos de proceso', path: 'tipos-de-proceso', component: ProcessTypesComponent, canDeactivate: [unsavedChangesGuard] },
   { title: 'Página no encontrada', path: '**', component: NotFoundComponent }
 ];
