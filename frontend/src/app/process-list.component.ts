@@ -1,6 +1,7 @@
 import { Component, OnInit, inject, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { RouterLink } from '@angular/router';
+import { AuthService } from './auth.service';
 import { MvpV14Api, ProcessListItem, ProcessTypeItem, UnitItem, errorMessage } from './mvp-v14-api.service';
 import { UiBadgeComponent, UiBreadcrumbsComponent, UiMessageComponent, UiPanelComponent } from './shared/ui';
 
@@ -16,9 +17,15 @@ import { UiBadgeComponent, UiBreadcrumbsComponent, UiMessageComponent, UiPanelCo
   template: `
     <ui-breadcrumbs [items]="[{ label: 'Mapa de procesos', link: '/mapa' }, { label: 'Procesos' }]" />
     <ui-panel headingId="processes-title" eyebrow="PROCESOS" heading="Procesos">
-      <a panelActions class="text-button" routerLink="/unidades">Unidades internas</a>
-      <a panelActions class="text-button" routerLink="/tipos-de-proceso">Tipos de proceso</a>
-      <a panelActions class="primary-button" routerLink="/procesos/nuevo">Nuevo proceso</a>
+      @if (auth.isAdmin()) {
+        <a panelActions class="text-button" routerLink="/unidades">Unidades internas</a>
+      }
+      @if (auth.isAdmin()) {
+        <a panelActions class="text-button" routerLink="/tipos-de-proceso">Tipos de proceso</a>
+      }
+      @if (auth.hasAnyProfile('ADMIN', 'PROCESS_OWNER')) {
+        <a panelActions class="primary-button" routerLink="/procesos/nuevo">Nuevo proceso</a>
+      }
       @if (error()) { <ui-message kind="error">{{ error() }}</ui-message> }
       <form class="filters" (ngSubmit)="search()" role="search" aria-label="Buscar procesos">
         <label>Buscar
@@ -72,6 +79,7 @@ import { UiBadgeComponent, UiBreadcrumbsComponent, UiMessageComponent, UiPanelCo
 })
 export class ProcessListComponent implements OnInit {
   private readonly api = inject(MvpV14Api);
+  readonly auth = inject(AuthService);
   readonly items = signal<ProcessListItem[]>([]);
   readonly types = signal<ProcessTypeItem[]>([]);
   readonly units = signal<UnitItem[]>([]);

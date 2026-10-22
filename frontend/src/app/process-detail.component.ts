@@ -2,6 +2,7 @@ import { NgTemplateOutlet } from '@angular/common';
 import { Component, OnInit, inject, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, RouterLink } from '@angular/router';
+import { AuthService } from './auth.service';
 import {
   FICHA_FIELDS, MvpV14Api, ProcessDetail, ProcessListItem, ProcessUnit,
   RELATION_TYPES, RISK_LEVELS, RiskInput, errorMessage
@@ -221,7 +222,9 @@ const emptyRelation = (): { destinationProcessId: number | null; type: string; d
           { label: d.name }
         ]" />
         <div class="top-nav-actions">
-          <a class="quiet-button edit-action-btn" [routerLink]="['/procesos', d.id, 'editar']">Editar</a>
+          @if (auth.hasAnyProfile('ADMIN', 'PROCESS_OWNER')) {
+            <a class="quiet-button edit-action-btn" [routerLink]="['/procesos', d.id, 'editar']">Editar</a>
+          }
           <button type="button" class="help-btn" (click)="openHelp()" aria-label="Ayuda sobre este proceso">
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
               <circle cx="12" cy="12" r="10"></circle>
@@ -434,10 +437,12 @@ const emptyRelation = (): { destinationProcessId: number | null; type: string; d
               <header><ui-badge [tone]="riskTone(risk.level)">{{ risk.level }}</ui-badge><strong>{{ risk.type }}</strong></header>
               <p>{{ risk.description }}</p>
               <p class="helper"><strong>Causa:</strong> {{ risk.cause }} · <strong>Consecuencia:</strong> {{ risk.consequence }}</p>
-              <div class="item-actions">
-                <button class="quiet-button" type="button" (click)="editRisk(risk)">Editar</button>
-                <button class="danger-button" type="button" (click)="removeRisk(d.id, risk.id)">Eliminar</button>
-              </div>
+              @if (auth.hasAnyProfile('ADMIN', 'PROCESS_OWNER', 'RISK_MANAGER')) {
+                <div class="item-actions">
+                  <button class="quiet-button" type="button" (click)="editRisk(risk)">Editar</button>
+                  <button class="danger-button" type="button" (click)="removeRisk(d.id, risk.id)">Eliminar</button>
+                </div>
+              }
             </article>
           }
         } @empty { <p class="helper">Sin riesgos registrados.</p> }
@@ -447,7 +452,7 @@ const emptyRelation = (): { destinationProcessId: number | null; type: string; d
             <div class="row-actions"><button class="primary-button" type="submit">Agregar riesgo</button>
               <button class="quiet-button" type="button" (click)="cancelRisk()">Cancelar</button></div>
           </form>
-        } @else if (editingRisk() === null) {
+        } @else if (editingRisk() === null && auth.hasAnyProfile('ADMIN', 'PROCESS_OWNER', 'RISK_MANAGER')) {
           <button class="quiet-button" type="button" (click)="newRisk()">Agregar riesgo</button>
         }
       </ui-section>
@@ -467,10 +472,12 @@ const emptyRelation = (): { destinationProcessId: number | null; type: string; d
               <header><ui-badge tone="info">{{ relationLabel(rel.type) }}</ui-badge>
                 <a [routerLink]="['/procesos', rel.processId]">{{ rel.code }} · {{ rel.name }}</a></header>
               <p>{{ rel.description }}</p>
-              <div class="item-actions">
-                <button class="quiet-button" type="button" (click)="editRelation(rel.id, rel.type, rel.description)">Editar</button>
-                <button class="danger-button" type="button" (click)="removeRelation(d.id, rel.id)">Eliminar</button>
-              </div>
+              @if (auth.hasAnyProfile('ADMIN', 'PROCESS_OWNER')) {
+                <div class="item-actions">
+                  <button class="quiet-button" type="button" (click)="editRelation(rel.id, rel.type, rel.description)">Editar</button>
+                  <button class="danger-button" type="button" (click)="removeRelation(d.id, rel.id)">Eliminar</button>
+                </div>
+              }
             </article>
           }
         } @empty { <p class="helper">Sin relaciones salientes.</p> }
@@ -480,7 +487,7 @@ const emptyRelation = (): { destinationProcessId: number | null; type: string; d
             <div class="row-actions"><button class="primary-button" type="submit">Agregar relación</button>
               <button class="quiet-button" type="button" (click)="cancelRelation()">Cancelar</button></div>
           </form>
-        } @else if (editingRelation() === null) {
+        } @else if (editingRelation() === null && auth.hasAnyProfile('ADMIN', 'PROCESS_OWNER')) {
           <button class="quiet-button" type="button" (click)="newRelation(d.id)">Agregar relación</button>
         }
         <h3>Entrantes</h3>
@@ -533,6 +540,7 @@ export class ProcessDetailComponent implements OnInit, LeavesWithConfirmation {
   private readonly api = inject(MvpV14Api);
   private readonly route = inject(ActivatedRoute);
   private readonly dialogs = inject(UiDialogService);
+  readonly auth = inject(AuthService);
   readonly detail = signal<ProcessDetail | null>(null);
   readonly loading = signal(true);
   readonly error = signal('');

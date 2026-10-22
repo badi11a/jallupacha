@@ -2,10 +2,12 @@ import { provideHttpClient } from '@angular/common/http';
 import { HttpTestingController, provideHttpClientTesting } from '@angular/common/http/testing';
 import { Component } from '@angular/core';
 import { TestBed } from '@angular/core/testing';
-import { ActivatedRoute, Router, provideRouter } from '@angular/router';
+import { provideRouter, Router } from '@angular/router';
 import { authGuard, guestGuard } from './auth.guard';
 import { AuthService, USER_STORAGE_KEY } from './auth.service';
 import { LoginComponent } from './login.component';
+import { MvpV14DemoComponent } from './mvp-v14-demo.component';
+import { ProcessListComponent } from './process-list.component';
 
 @Component({ selector: 'app-dummy-protected', standalone: true, template: '<p>Protected content</p>' })
 class DummyProtectedComponent {}
@@ -21,7 +23,7 @@ describe('Autenticación Local Institucional v15 (REQ-25)', () => {
   beforeEach(() => {
     sessionStorage.clear();
     TestBed.configureTestingModule({
-      imports: [LoginComponent, DummyProtectedComponent, DummyPublicComponent],
+      imports: [LoginComponent, DummyProtectedComponent, DummyPublicComponent, MvpV14DemoComponent, ProcessListComponent],
       providers: [
         provideHttpClient(),
         provideHttpClientTesting(),
@@ -182,6 +184,103 @@ describe('Autenticación Local Institucional v15 (REQ-25)', () => {
 
       const el = fixture.nativeElement as HTMLElement;
       expect(el.querySelector('ui-message[kind="error"]')?.textContent).toContain('Credenciales no válidas');
+    });
+  });
+
+  describe('Visibilidad de acciones según perfil institucional (PT-07)', () => {
+    it('oculta acciones de creación a perfil CONSULTATION en el mapa', () => {
+      authService.currentUser.set({
+        userId: 2,
+        displayName: 'Usuario Consulta',
+        email: 'consulta@example.test',
+        profiles: ['CONSULTATION']
+      });
+      const fixture = TestBed.createComponent(MvpV14DemoComponent);
+      fixture.detectChanges();
+      httpMock.expectOne('/api/mvp-v14/map').flush({ macroprocessTypes: [] });
+
+      fixture.componentInstance.map.set([
+        {
+          id: 1,
+          name: 'Estratégicos',
+          macroprocesses: [
+            { id: 10, code: 'MP1', name: 'Macro 1', processTypes: [] }
+          ]
+        }
+      ]);
+      fixture.componentInstance.loading.set(false);
+      fixture.detectChanges();
+
+      const el = fixture.nativeElement as HTMLElement;
+      expect(el.querySelector('a[href="/procesos/nuevo"]')).toBeNull();
+      expect(el.querySelector('a[href="/procesos"]')).not.toBeNull();
+    });
+
+    it('muestra acciones de creación a perfiles PROCESS_OWNER en el mapa', () => {
+      authService.currentUser.set({
+        userId: 1,
+        displayName: 'Usuario Dueño',
+        email: 'owner@example.test',
+        profiles: ['PROCESS_OWNER']
+      });
+      const fixture = TestBed.createComponent(MvpV14DemoComponent);
+      fixture.detectChanges();
+      httpMock.expectOne('/api/mvp-v14/map').flush({ macroprocessTypes: [] });
+
+      fixture.componentInstance.map.set([
+        {
+          id: 1,
+          name: 'Estratégicos',
+          macroprocesses: [
+            { id: 10, code: 'MP1', name: 'Macro 1', processTypes: [] }
+          ]
+        }
+      ]);
+      fixture.componentInstance.loading.set(false);
+      fixture.detectChanges();
+
+      const el = fixture.nativeElement as HTMLElement;
+      expect(el.querySelector('a[href="/procesos/nuevo"]')).not.toBeNull();
+    });
+
+    it('oculta administración de catálogos y creación a CONSULTATION en listado de procesos', () => {
+      authService.currentUser.set({
+        userId: 2,
+        displayName: 'Usuario Consulta',
+        email: 'consulta@example.test',
+        profiles: ['CONSULTATION']
+      });
+      const fixture = TestBed.createComponent(ProcessListComponent);
+      fixture.detectChanges();
+      httpMock.expectOne('/api/mvp-v14/process-types').flush([]);
+      httpMock.expectOne('/api/mvp-v14/units').flush([]);
+      httpMock.expectOne('/api/mvp-v14/processes').flush([]);
+      fixture.detectChanges();
+
+      const el = fixture.nativeElement as HTMLElement;
+      expect(el.querySelector('a[href="/procesos/nuevo"]')).toBeNull();
+      expect(el.querySelector('a[href="/unidades"]')).toBeNull();
+      expect(el.querySelector('a[href="/tipos-de-proceso"]')).toBeNull();
+    });
+
+    it('muestra administración de catálogos y creación a ADMIN en listado de procesos', () => {
+      authService.currentUser.set({
+        userId: 1,
+        displayName: 'Usuario Administrador',
+        email: 'admin@example.test',
+        profiles: ['ADMIN']
+      });
+      const fixture = TestBed.createComponent(ProcessListComponent);
+      fixture.detectChanges();
+      httpMock.expectOne('/api/mvp-v14/process-types').flush([]);
+      httpMock.expectOne('/api/mvp-v14/units').flush([]);
+      httpMock.expectOne('/api/mvp-v14/processes').flush([]);
+      fixture.detectChanges();
+
+      const el = fixture.nativeElement as HTMLElement;
+      expect(el.querySelector('a[href="/procesos/nuevo"]')).not.toBeNull();
+      expect(el.querySelector('a[href="/unidades"]')).not.toBeNull();
+      expect(el.querySelector('a[href="/tipos-de-proceso"]')).not.toBeNull();
     });
   });
 });

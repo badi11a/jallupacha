@@ -530,3 +530,31 @@ Verificación:
 - Pruebas frontend (`npm run test:frontend`): 4 suites, 33 pruebas aprobadas al 100%.
 - Pruebas backend (`npm test`): 9 suites, 39 pruebas aprobadas al 100%.
 - Compilación de la solución (`npm run build`): compilación limpia en TypeScript backend y Angular frontend (código de salida 0).
+
+
+## C-025 — Visibilidad de Acciones y Controles por Perfil Institucional (PT-07, REQ-26)
+
+Clasificación: implementación de arquitectura y requisitos v15. Fuente: PT-07, REQ-26 en `docs/especificacion_v15.md` y Sección 5 de `docs/arquitectura_v15.md`.
+
+Hallazgo:
+1. En las vistas de mapa (`MvpV14DemoComponent`), listado de procesos (`ProcessListComponent`) y ficha de proceso (`ProcessDetailComponent`), los botones de creación, edición y administración se desplegaban de forma incondicional, sin reflejar los perfiles vigentes del usuario autenticado (`ADMIN`, `PROCESS_OWNER`, `RISK_MANAGER`, `CONSULTATION`).
+2. Se requería condicionar la visibilidad de las acciones según los perfiles activos del usuario autenticado mediante `AuthService`, asegurando que perfiles de solo consulta (`CONSULTATION`) no visualicen acciones de modificación o creación.
+
+Corrección:
+- **Mapa de procesos (`MvpV14DemoComponent`):**
+  - Se inyectó `AuthService` y se condicionó la acción «Nuevo proceso» exclusivamente a usuarios con perfiles `ADMIN` o `PROCESS_OWNER`.
+- **Listado de procesos (`ProcessListComponent`):**
+  - Se inyectó `AuthService` y se condicionaron las acciones administrativas de catálogo («Unidades internas» y «Tipos de proceso») a usuarios con perfil `ADMIN`, y la acción «Nuevo proceso» a perfiles `ADMIN` o `PROCESS_OWNER`.
+- **Ficha técnica de proceso (`ProcessDetailComponent`):**
+  - Se inyectó `AuthService` y se condicionó la acción «Editar» proceso a usuarios con perfiles `ADMIN` o `PROCESS_OWNER`.
+  - Las acciones sobre riesgos («Agregar riesgo», «Editar» y «Eliminar») se reservaron para los perfiles `ADMIN`, `PROCESS_OWNER` o `RISK_MANAGER`.
+  - Las acciones sobre relaciones («Agregar relación», «Editar» y «Eliminar») se reservaron para los perfiles `ADMIN` o `PROCESS_OWNER`.
+  - Para usuarios con perfil `CONSULTATION`, la pantalla ofrece una vista de solo lectura sin controles operativos no autorizados.
+- **Pruebas automatizadas (`auth.spec.ts`):**
+  - Se incorporaron 4 pruebas unitarias que comprueban que el perfil `CONSULTATION` no visualiza botones de creación ni catálogos, mientras que los perfiles autorizados (`ADMIN`, `PROCESS_OWNER`) disponen de sus respectivas acciones.
+
+Verificación:
+- Pruebas frontend (`npm run test:frontend`): 4 suites, 37 pruebas aprobadas al 100%.
+- Pruebas backend (`npm test`): 9 suites, 39 pruebas aprobadas al 100%.
+- Pruebas de integración de backend (`npm run test:e2e --workspace backend -- authorization.e2e-spec.ts demo-session.e2e-spec.ts`): 2 suites, 11 pruebas aprobadas.
+- Compilación de la solución (`npm run build`): compilación TypeScript y Angular limpia (código de salida 0).

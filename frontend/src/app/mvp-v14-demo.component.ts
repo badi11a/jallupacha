@@ -1,5 +1,6 @@
 import { Component, OnInit, inject, signal } from '@angular/core';
 import { RouterLink } from '@angular/router';
+import { AuthService } from './auth.service';
 import { UiDialogService, UiMessageComponent } from './shared/ui';
 import { MvpV14Api, MapFamily, MapMacroprocess } from './mvp-v14-api.service';
 
@@ -28,6 +29,7 @@ const DESCRIPTIONS: Record<string, string> = {
 export class MvpV14DemoComponent implements OnInit {
   private readonly api = inject(MvpV14Api);
   private readonly dialogs = inject(UiDialogService);
+  readonly auth = inject(AuthService);
   readonly map = signal<MapFamily[]>([]);
   readonly loading = signal(true);
   readonly error = signal('');
