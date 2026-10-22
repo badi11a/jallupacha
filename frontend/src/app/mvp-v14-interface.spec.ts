@@ -15,10 +15,22 @@ const MAP = { macroprocessTypes: [{ id: 1, name: 'Estratégicos', macroprocesses
 const ITEM = { id: 4, code: 'PR4', name: 'Plan anual', processType: 'Planificación', status: 'Borrador', responsibleUnit: 'Dirección' };
 
 describe('Interfaz MVP v14 — adaptación visual', () => {
-  beforeEach(() => TestBed.configureTestingModule({
-    imports: [AppComponent],
-    providers: [provideZoneChangeDetection(), provideRouter(routes), provideHttpClient(), provideHttpClientTesting()]
-  }));
+  beforeEach(() => {
+    sessionStorage.setItem('jallupacha_user', JSON.stringify({
+      userId: 1,
+      displayName: 'Usuario Administrador',
+      email: 'admin@example.test',
+      profiles: ['ADMIN']
+    }));
+    return TestBed.configureTestingModule({
+      imports: [AppComponent],
+      providers: [provideZoneChangeDetection(), provideRouter(routes), provideHttpClient(), provideHttpClientTesting()]
+    });
+  });
+
+  afterEach(() => {
+    sessionStorage.clear();
+  });
 
   it('conserva las rutas sin cabecera, menú lateral ni pie de aplicación', async () => {
     const fixture = TestBed.createComponent(AppComponent);

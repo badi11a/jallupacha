@@ -499,3 +499,34 @@ Verificación:
 - Pruebas de integración de autorización y sesiones (`npm run test:e2e --workspace backend -- authorization.e2e-spec.ts demo-session.e2e-spec.ts`): 2 suites, 11 pruebas aprobadas.
 - Pruebas de frontend (`npm run test:frontend`): 3 suites, 25 pruebas aprobadas.
 - Compilación completa de la solución (`npm run build`): compilación TypeScript backend y Angular frontend limpias (código de salida 0).
+
+
+## C-024 — Implementación de Autenticación Local Institucional v15 en Frontend (REQ-25, R-04, PT-07)
+
+Clasificación: implementación de arquitectura y requisitos v15. Fuente: REQ-25 en `docs/especificacion_v15.md`, Sección 5 de `docs/arquitectura_v15.md` y `docs/marco_estandar_ux_institucional.md`.
+
+Hallazgo:
+1. El frontend operaba bajo la navegación mono-operador de la fase histórica de transición sin pantalla de acceso institucional, sin servicio de gestión de identidad ni guardas de ruta.
+2. Se requería un servicio cliente de autenticación con estado reactivo de usuario y perfiles (`AuthService`), una guarda de navegación institucional (`authGuard` y `guestGuard`), y una pantalla de inicio de sesión (`LoginComponent`) alineada con las directrices de diseño limpio institucional y con conservación de datos ante errores (R-04).
+
+Corrección:
+- **Servicio de autenticación (`AuthService`):**
+  - Creado en `frontend/src/app/auth.service.ts` utilizando señales reactivas de Angular (`currentUser`, `isAuthenticated`, `profiles`, `isAdmin`, `isProcessOwner`, `isValidator`, `isRiskManager`, `isConsultation`).
+  - Métodos `login(email, password)` consumiendo `POST /api/auth/login` con credenciales de cookie, persistencia en `sessionStorage` para restaurar el estado ante recargas, y `logout()` consumiendo `POST /api/auth/logout` con revocación en servidor y limpieza del almacenamiento local.
+- **Guardas de navegación (`authGuard` y `guestGuard`):**
+  - Creados en `frontend/src/app/auth.guard.ts`. `authGuard` bloquea el acceso a todas las rutas institucionales si no hay sesión activa y redirige a `/login` preservando `returnUrl`. `guestGuard` evita que usuarios ya autenticados ingresen a la pantalla de login, redirigiéndolos automáticamente a `/mapa`.
+- **Componente de acceso institucional (`LoginComponent`):**
+  - Creado en `frontend/src/app/login.component.ts`.
+  - Diseñado según el estándar institucional y el sistema de diseño (`.login-panel` en `styles.css`), sin elementos superfluos, cabeceras falsas ni duplicación de logotipos corporativos.
+  - Accesibilidad WCAG 2.2 AA: etiquetas semánticas vinculadas por `id`, atributos `autocomplete` estándar, botones con estado visual deshabilitado mientras se procesa la solicitud, y mensajes de error anunciados vía `UiMessageComponent` (`role="alert"`).
+  - Cumplimiento de regla R-04: Ante rechazo del servidor («Credenciales no válidas»), el formulario conserva intacto el correo ingresado por el usuario, limpiando únicamente el campo de contraseña sensible.
+- **Rutas de la aplicación (`app.routes.ts`):**
+  - Registro de `/login` con `guestGuard` y protección de todas las rutas de negocio (`/mapa`, `/mapa/macroprocesos/:id`, `/procesos`, `/procesos/nuevo`, `/procesos/:id`, `/procesos/:id/editar`, `/unidades`, `/tipos-de-proceso`) mediante `authGuard`.
+- **Pruebas automatizadas (`auth.spec.ts`):**
+  - 8 pruebas cubriendo inicio de sesión, almacenamiento seguro, cierre de sesión, guardas de activación y conservación de datos en formulario.
+  - Adaptación de `mvp-v14-interface.spec.ts` para proveer sesión autenticada en pruebas de interfaz.
+
+Verificación:
+- Pruebas frontend (`npm run test:frontend`): 4 suites, 33 pruebas aprobadas al 100%.
+- Pruebas backend (`npm test`): 9 suites, 39 pruebas aprobadas al 100%.
+- Compilación de la solución (`npm run build`): compilación limpia en TypeScript backend y Angular frontend (código de salida 0).
