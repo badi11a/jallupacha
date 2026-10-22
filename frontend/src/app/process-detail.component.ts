@@ -222,8 +222,57 @@ const emptyRelation = (): { destinationProcessId: number | null; type: string; d
           { label: d.name }
         ]" />
         <div class="top-nav-actions">
-          @if (auth.hasAnyProfile('ADMIN', 'PROCESS_OWNER')) {
+          @if (d.status === 'Borrador' && auth.hasAnyProfile('ADMIN', 'PROCESS_OWNER')) {
             <a class="quiet-button edit-action-btn" [routerLink]="['/procesos', d.id, 'editar']">Editar</a>
+            <button
+              type="button"
+              class="primary-button"
+              [disabled]="submitting() || !d.completeness.complete"
+              (click)="submitForReview(d.id)"
+              [title]="!d.completeness.complete ? 'Complete los campos obligatorios antes de enviar a revisión' : 'Enviar ficha a validación técnica'"
+            >
+              Enviar a revisión
+            </button>
+          }
+          @if (d.status === 'En revisión' && auth.hasAnyProfile('ADMIN', 'VALIDATOR')) {
+            <button
+              type="button"
+              class="primary-button"
+              [disabled]="submitting()"
+              (click)="approveProcess(d.id)"
+            >
+              Aprobar proceso
+            </button>
+            <button
+              type="button"
+              class="quiet-button"
+              [disabled]="submitting()"
+              (click)="startReject()"
+            >
+              Rechazar con observaciones
+            </button>
+          }
+          @if (d.status === 'Vigente') {
+            @if (auth.hasAnyProfile('ADMIN', 'PROCESS_OWNER')) {
+              <button
+                type="button"
+                class="quiet-button"
+                [disabled]="submitting()"
+                (click)="createNewVersion(d.id)"
+              >
+                Nueva versión (v{{ (d.versionNumber || 1) + 1 }})
+              </button>
+            }
+            @if (auth.isAdmin()) {
+              <button
+                type="button"
+                class="quiet-button"
+                [disabled]="submitting()"
+                (click)="retireProcess(d.id)"
+              >
+                Retirar proceso
+              </button>
+            }
           }
           <button type="button" class="help-btn" (click)="openHelp()" aria-label="Ayuda sobre este proceso">
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
@@ -236,14 +285,53 @@ const emptyRelation = (): { destinationProcessId: number | null; type: string; d
         </div>
       </div>
 
+      @if (rejecting()) {
+        <section class="inline-form" aria-labelledby="reject-title">
+          <h2 id="reject-title" style="margin: 0; font-size: 1rem;">Observaciones de rechazo técnico (obligatorio)</h2>
+          <label>Motivo u observaciones técnicas
+            <textarea
+              name="rejectionReason"
+              rows="3"
+              placeholder="Indique las observaciones técnicas para devolver el proceso a borrador..."
+              [(ngModel)]="rejectionReason"
+              required
+            ></textarea>
+          </label>
+          <div class="row-actions">
+            <button
+              type="button"
+              class="primary-button"
+              [disabled]="submitting() || !rejectionReason.trim()"
+              (click)="submitReject(d.id)"
+            >
+              Confirmar rechazo
+            </button>
+            <button type="button" class="quiet-button" (click)="cancelReject()">Cancelar</button>
+          </div>
+        </section>
+      }
+      @if (d.status === 'En revisión') {
+        <ui-message kind="info">
+          Este proceso se encuentra <strong>En revisión técnica</strong> por el Validador. La edición de campos queda bloqueada hasta su resolución.
+        </ui-message>
+      }
+      @if (d.status === 'Obsoleto') {
+        <ui-message kind="info">
+          Esta versión del proceso se encuentra formalmente <strong>Obsoleta</strong> y ha sido retirada de la operación activa.
+        </ui-message>
+      }
+
       <header class="hero-card" aria-labelledby="process-title">
         <div class="hero-main">
           <span class="hero-eyebrow">PROCESO</span>
           <h1 id="process-title" class="hero-title">{{ d.name }}</h1>
           <div class="accent-bar" aria-hidden="true"></div>
           <div class="hero-status">
-            <span class="status-dot" aria-hidden="true"></span>
-            <span>{{ d.status }} · Código: {{ d.code }}</span>
+            <ui-badge [tone]="statusTone(d.status)">{{ d.status }}</ui-badge>
+            <span>v{{ d.versionNumber || 1 }} · Código: {{ d.code }}</span>
+            @if (d.versions && d.versions.length > 1) {
+              <span class="helper">({{ d.versions.length }} versiones registradas)</span>
+            }
           </div>
           <p class="hero-desc">{{ d.description || 'Sin descripción registrada.' }}</p>
 
@@ -760,8 +848,139 @@ export class ProcessDetailComponent implements OnInit, LeavesWithConfirmation {
     this.api.deleteRelation(processId, relationId).subscribe({ next: () => this.afterChange(processId, 'Relación eliminada.'), error: (e) => this.fail(e) });
   }
 
+  readonly submitting = signal(false);
+  readonly rejecting = signal(false);
+  rejectionReason = '';
+
+  statusTone(status: string): UiBadgeTone {
+    switch (status) {
+      case 'Vigente': return 'success';
+      case 'En revisión': return 'info';
+      case 'Borrador': return 'warning';
+      case 'Obsoleto': return 'neutral';
+      default: return 'neutral';
+    }
+  }
+
+  async submitForReview(id: number): Promise<void> {
+    const ok = await this.dialogs.confirm({
+      title: 'Enviar a revisión',
+      message: '¿Desea enviar este proceso a revisión técnica por el Validador? La ficha no podrá modificarse mientras permanezca en revisión.',
+      confirmLabel: 'Enviar a revisión',
+      cancelLabel: 'Volver a la ficha'
+    });
+    if (!ok) return;
+    this.submitting.set(true);
+    this.api.submitProcess(id).subscribe({
+      next: () => {
+        this.submitting.set(false);
+        this.notice.set('Proceso enviado a revisión exitosamente.');
+        this.load(id, true);
+      },
+      error: (e) => {
+        this.submitting.set(false);
+        this.error.set(errorMessage(e));
+      }
+    });
+  }
+
+  async approveProcess(id: number): Promise<void> {
+    const ok = await this.dialogs.confirm({
+      title: 'Aprobar proceso',
+      message: '¿Está seguro de aprobar este proceso y declararlo como versión Vigente institucional?',
+      confirmLabel: 'Aprobar y publicar',
+      cancelLabel: 'Cancelar'
+    });
+    if (!ok) return;
+    this.submitting.set(true);
+    this.api.approveProcess(id).subscribe({
+      next: () => {
+        this.submitting.set(false);
+        this.notice.set('El proceso ha sido aprobado y publicado como versión Vigente.');
+        this.load(id, true);
+      },
+      error: (e) => {
+        this.submitting.set(false);
+        this.error.set(errorMessage(e));
+      }
+    });
+  }
+
+  startReject(): void {
+    this.rejecting.set(true);
+    this.rejectionReason = '';
+  }
+
+  cancelReject(): void {
+    this.rejecting.set(false);
+    this.rejectionReason = '';
+  }
+
+  submitReject(id: number): void {
+    if (!this.rejectionReason.trim()) return;
+    this.submitting.set(true);
+    this.api.rejectProcess(id, this.rejectionReason.trim()).subscribe({
+      next: () => {
+        this.submitting.set(false);
+        this.rejecting.set(false);
+        this.rejectionReason = '';
+        this.notice.set('El proceso fue devuelto a estado Borrador con las observaciones técnicas registradas.');
+        this.load(id, true);
+      },
+      error: (e) => {
+        this.submitting.set(false);
+        this.error.set(errorMessage(e));
+      }
+    });
+  }
+
+  async createNewVersion(id: number): Promise<void> {
+    const ok = await this.dialogs.confirm({
+      title: 'Crear nueva versión',
+      message: 'Se creará un nuevo borrador como siguiente versión del proceso, conservando los datos de la versión vigente. ¿Desea continuar?',
+      confirmLabel: 'Crear nueva versión',
+      cancelLabel: 'Cancelar'
+    });
+    if (!ok) return;
+    this.submitting.set(true);
+    this.api.newVersion(id).subscribe({
+      next: (res) => {
+        this.submitting.set(false);
+        this.notice.set(`Nueva versión ${res.versionNumber} creada en estado Borrador.`);
+        this.load(id, true);
+      },
+      error: (e) => {
+        this.submitting.set(false);
+        this.error.set(errorMessage(e));
+      }
+    });
+  }
+
+  async retireProcess(id: number): Promise<void> {
+    const ok = await this.dialogs.confirm({
+      title: 'Retirar proceso',
+      message: '¿Está seguro de retirar este proceso? La versión vigente pasará a estado Obsoleto.',
+      confirmLabel: 'Retirar proceso',
+      cancelLabel: 'Cancelar',
+      tone: 'danger'
+    });
+    if (!ok) return;
+    this.submitting.set(true);
+    this.api.retireProcess(id).subscribe({
+      next: () => {
+        this.submitting.set(false);
+        this.notice.set('El proceso ha sido formalmente retirado a estado Obsoleto.');
+        this.load(id, true);
+      },
+      error: (e) => {
+        this.submitting.set(false);
+        this.error.set(errorMessage(e));
+      }
+    });
+  }
+
   isDirty(): boolean {
-    return this.isRiskDirty() || this.isRelationDirty();
+    return this.isRiskDirty() || this.isRelationDirty() || (this.rejecting() && this.rejectionReason.trim() !== '');
   }
 
   async confirmLeave(): Promise<boolean> {

@@ -74,6 +74,9 @@ export type ProcessDetail = {
   relations: { outgoing: RelationItem[]; incoming: RelationItem[] };
   completeness: { complete: boolean; missing: string[] };
   possibleDuplicates: ProcessRef[];
+  versionNumber?: number;
+  revision?: number;
+  versions?: Array<{ id: number; versionNumber: number; status: string; revision: number }>;
 } & Record<FichaKey, string | null>;
 
 export interface RiskInput { description: string; cause: string; consequence: string; type: string; level: string; }
@@ -108,6 +111,11 @@ export class MvpV14Api {
   process(id: number): Observable<ProcessDetail> { return this.http.get<ProcessDetail>(`${this.base}/processes/${id}`); }
   createProcess(body: ProcessInput): Observable<{ id: number; code: string }> { return this.http.post<{ id: number; code: string }>(`${this.base}/processes`, body); }
   updateProcess(id: number, body: ProcessInput): Observable<unknown> { return this.http.patch(`${this.base}/processes/${id}`, body); }
+  submitProcess(id: number): Observable<{ id: number; status: string }> { return this.http.post<{ id: number; status: string }>(`${this.base}/processes/${id}/submit`, {}); }
+  approveProcess(id: number): Observable<{ id: number; status: string }> { return this.http.post<{ id: number; status: string }>(`${this.base}/processes/${id}/approve`, {}); }
+  rejectProcess(id: number, reason: string): Observable<{ id: number; status: string; reason: string }> { return this.http.post<{ id: number; status: string; reason: string }>(`${this.base}/processes/${id}/reject`, { reason }); }
+  newVersion(id: number): Observable<{ id: number; status: string; versionNumber: number }> { return this.http.post<{ id: number; status: string; versionNumber: number }>(`${this.base}/processes/${id}/new-version`, {}); }
+  retireProcess(id: number): Observable<{ id: number; status: string }> { return this.http.post<{ id: number; status: string }>(`${this.base}/processes/${id}/retire`, {}); }
 
   addRisk(processId: number, body: RiskInput): Observable<unknown> { return this.http.post(`${this.base}/processes/${processId}/risks`, body); }
   updateRisk(processId: number, riskId: number, body: RiskInput): Observable<unknown> { return this.http.patch(`${this.base}/processes/${processId}/risks/${riskId}`, body); }

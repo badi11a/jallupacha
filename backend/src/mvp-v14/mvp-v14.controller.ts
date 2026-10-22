@@ -1,6 +1,7 @@
 import { Body, Controller, Delete, Get, HttpCode, Param, ParseIntPipe, Patch, Post, Query } from '@nestjs/common';
 import { DataSource } from 'typeorm';
-import { Public } from '../common/auth.decorator';
+import { CurrentUser, Public } from '../common/auth.decorator';
+import { AuthenticatedUser } from '../common/auth.types';
 import { qualifiedTable } from '../common/database';
 import { MvpV14Service } from './mvp-v14.service';
 
@@ -87,6 +88,35 @@ export class MvpV14Controller {
   @Patch('processes/:id')
   updateProcess(@Param('id', ParseIntPipe) id: number, @Body() body: unknown): Promise<unknown> {
     return this.service.updateProcess(id, body);
+  }
+
+  @Post('processes/:id/submit')
+  submitProcess(@Param('id', ParseIntPipe) id: number, @CurrentUser() actor?: AuthenticatedUser): Promise<unknown> {
+    return this.service.submitProcess(id, actor);
+  }
+
+  @Post('processes/:id/approve')
+  approveProcess(@Param('id', ParseIntPipe) id: number, @CurrentUser() actor?: AuthenticatedUser): Promise<unknown> {
+    return this.service.approveProcess(id, actor);
+  }
+
+  @Post('processes/:id/reject')
+  rejectProcess(
+    @Param('id', ParseIntPipe) id: number,
+    @Body() body: { reason?: string },
+    @CurrentUser() actor?: AuthenticatedUser
+  ): Promise<unknown> {
+    return this.service.rejectProcess(id, body?.reason ?? '', actor);
+  }
+
+  @Post('processes/:id/new-version')
+  newVersion(@Param('id', ParseIntPipe) id: number, @CurrentUser() actor?: AuthenticatedUser): Promise<unknown> {
+    return this.service.newVersion(id, actor);
+  }
+
+  @Post('processes/:id/retire')
+  retireProcess(@Param('id', ParseIntPipe) id: number, @CurrentUser() actor?: AuthenticatedUser): Promise<unknown> {
+    return this.service.retireProcess(id, actor);
   }
 
   @Post('processes/:id/risks')

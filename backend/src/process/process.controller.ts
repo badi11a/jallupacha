@@ -33,7 +33,7 @@ import {
 } from './process.dto';
 import { ProcessService } from './process.service';
 
-const USERS = ['ADMIN', 'PROCESS_OWNER', 'RISK_MANAGER', 'CONSULTATION'] as const;
+const USERS = ['ADMIN', 'PROCESS_OWNER', 'VALIDATOR', 'RISK_MANAGER', 'CONSULTATION'] as const;
 
 @Controller('processes')
 @ApiTags('processes')

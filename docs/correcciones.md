@@ -590,3 +590,41 @@ Verificación:
 - Pruebas frontend (`npm run test:frontend`): 5 suites, 44 pruebas aprobadas al 100%.
 - Pruebas unitarias de backend (`npm test`): 10 suites, 44 pruebas aprobadas al 100%.
 - Compilación de la solución (`npm run build`): compilación TypeScript backend y Angular frontend limpia (código de salida 0).
+
+
+## C-027 — Ciclo de Vida y Validación de Procesos (REQ-07, REQ-09, REQ-56 v15)
+
+Clasificación: implementación de arquitectura y requisitos v15. Fuente: REQ-07, REQ-09, REQ-56 en `docs/especificacion_v15.md`, Sección 3 y 4.2 de `docs/arquitectura_v15.md` y `docs/marco_estandar_ux_institucional.md`.
+
+Hallazgo:
+1. El backend carecía de las transiciones completas del ciclo de vida de procesos (`Borrador` $\rightarrow$ `En revisión` $\rightarrow$ `Vigente` $\rightarrow$ `Histórico / Obsoleto`) especificadas en la Sección 3 de la especificación v15.
+2. No existía la verificación de completitud previa al envío a validación (REQ-05), la segregación de funciones entre elaborador y revisor técnico (REQ-07/REQ-26), el versionamiento formal con archivo de versiones vigentes anteriores (REQ-09/REQ-56), ni el retiro formal del proceso.
+3. En el frontend (`ProcessDetailComponent`), no existían los controles de flujo para enviar a revisión, aprobar, rechazar con observaciones obligatorias, crear nueva versión o retirar el proceso, ni la visualización del estado mediante insignias (`UiBadgeComponent`) y número de versión.
+
+Corrección:
+- **Backend (`mvp-v14.service.ts`, `mvp-v14.controller.ts`, `process.controller.ts`):**
+  - Implementación de `submitProcess(id)`: valida estado `Borrador`, evalúa completitud de campos mínimos y unidad responsable activa (REQ-05), transiciona a `En revisión` e incrementa la revisión con auditoría.
+  - Implementación de `approveProcess(id)`: valida estado `En revisión`, comprueba segregación de funciones (el validador debe ser persona distinta de quien elaboró el proceso, salvo administrador), archiva la versión vigente anterior como `Obsoleto` y declara vigente la versión actual con auditoría.
+  - Implementación de `rejectProcess(id, reason)`: valida estado `En revisión`, motivo obligatorio de rechazo y segregación de funciones; retorna el proceso a `Borrador` anexando las observaciones técnicas al campo `validation` con auditoría.
+  - Implementación de `newVersion(id)`: a partir de una versión `Vigente`, clona la ficha en un nuevo registro de `PROCESS_VERSION` con `versionNumber = versionNumber + 1`, estado `Borrador` y revisión 1, apuntando `CURRENT_VERSION_ID` al nuevo borrador.
+  - Implementación de `retireProcess(id)`: reservado a administradores, transiciona un proceso `Vigente` a `Obsoleto`.
+  - Inclusión de `VALIDATOR` en los perfiles de lectura de `ProcessController`.
+  - Creación de 10 pruebas unitarias en `backend/src/mvp-v14/mvp-v14.lifecycle.spec.ts`.
+- **Servicio y Cliente frontend (`mvp-v14-api.service.ts`):**
+  - Métodos `submitProcess`, `approveProcess`, `rejectProcess`, `newVersion` y `retireProcess`.
+  - Inclusión de `versionNumber`, `revision` e historial de `versions` en `ProcessDetail`.
+- **Interfaz de usuario (`ProcessDetailComponent`):**
+  - Barra superior de acciones dinámicas según perfil y estado del proceso:
+    - En `Borrador`: botones «Editar» y «Enviar a revisión» (con verificación de completitud) para `ADMIN` y `PROCESS_OWNER`.
+    - En `En revisión`: botones «Aprobar proceso» y «Rechazar con observaciones» para `ADMIN` y `VALIDATOR`.
+    - En `Vigente`: «Nueva versión (v+1)» para `ADMIN` y `PROCESS_OWNER`, y «Retirar proceso» para `ADMIN`.
+  - Formulario desplegable accesible de observaciones obligatorias de rechazo técnico con confirmación modal.
+  - Insignia semántica de estado (`statusTone`) con versión actual e indicador de total de versiones registradas.
+  - Protección de cambios no guardados en el formulario de rechazo mediante `isDirty()`.
+- **Pruebas automatizadas frontend (`process-lifecycle.spec.ts`):**
+  - 7 pruebas unitarias cubriendo envío a revisión, aprobación por validador, rechazo con observaciones, creación de nueva versión, retiro a obsoleto y protecciones de cambios pendientes.
+
+Verificación:
+- Pruebas frontend (`npm run test:frontend`): 6 suites, 51 pruebas aprobadas al 100%.
+- Pruebas unitarias backend (`npm test`): 11 suites, 54 pruebas aprobadas al 100%.
+- Compilación de la solución (`npm run build`): compilación TypeScript y Angular limpia (código de salida 0).
