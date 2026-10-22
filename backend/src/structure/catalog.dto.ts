@@ -3,6 +3,12 @@ import { IsInt, IsOptional, IsString, Max, MaxLength, Min, MinLength } from 'cla
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 
 export class CreateMacroprocessDto {
+  @ApiPropertyOptional({ minimum: 1 })
+  @IsOptional()
+  @IsInt()
+  @Min(1)
+  macroprocessTypeId?: number;
+
   @ApiProperty({ maxLength: 120 })
   @Transform(({ value }) => typeof value === 'string' ? value.trim() : value)
   @IsString()
@@ -33,7 +39,6 @@ export class UpdateMacroprocessDto {
   @MaxLength(120)
   name?: string;
 
-  
   @ApiPropertyOptional({ maxLength: 1000, nullable: true })
   @IsOptional()
   @Transform(({ value }) => typeof value === 'string' ? value.trim() : value)
@@ -50,6 +55,12 @@ export class UpdateMacroprocessDto {
 }
 
 export class ProcessTypeDto {
+  @ApiPropertyOptional({ minimum: 1 })
+  @IsOptional()
+  @IsInt()
+  @Min(1)
+  macroprocessId?: number;
+
   @ApiProperty({ maxLength: 120 })
   @Transform(({ value }) => typeof value === 'string' ? value.trim() : value)
   @IsString()
@@ -59,6 +70,12 @@ export class ProcessTypeDto {
 }
 
 export class UpdateProcessTypeDto {
+  @ApiPropertyOptional({ minimum: 1 })
+  @IsOptional()
+  @IsInt()
+  @Min(1)
+  macroprocessId?: number;
+
   @ApiPropertyOptional({ maxLength: 120 })
   @IsOptional()
   @Transform(({ value }) => typeof value === 'string' ? value.trim() : value)
@@ -66,4 +83,35 @@ export class UpdateProcessTypeDto {
   @MinLength(1)
   @MaxLength(120)
   name?: string;
+}
+
+export class CreateUnitDto {
+  @ApiProperty({ maxLength: 200 })
+  @Transform(({ value }) => typeof value === 'string' ? value.trim() : value)
+  @IsString()
+  @MinLength(1)
+  @MaxLength(200)
+  name!: string;
+
+  @ApiPropertyOptional({ minimum: 1, nullable: true })
+  @IsOptional()
+  @IsInt()
+  @Min(1)
+  parentUnitId?: number | null;
+}
+
+export class UpdateUnitDto {
+  @ApiPropertyOptional({ maxLength: 200 })
+  @IsOptional()
+  @Transform(({ value }) => typeof value === 'string' ? value.trim() : value)
+  @IsString()
+  @MinLength(1)
+  @MaxLength(200)
+  name?: string;
+
+  @ApiPropertyOptional({ minimum: 1, nullable: true })
+  @IsOptional()
+  @IsInt()
+  @Min(1)
+  parentUnitId?: number | null;
 }

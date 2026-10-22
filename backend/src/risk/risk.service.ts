@@ -43,12 +43,10 @@ export class RiskService {
         `SELECT R.ID AS "id", R.PROCESS_ID AS "processId",
                 R.DESCRIPTION AS "description", R.CAUSE AS "cause",
                 R.CONSEQUENCE AS "consequence",
-                R.RISK_TYPE_ID AS "riskTypeId", RT.NAME AS "riskTypeName",
-                R.RISK_LEVEL_ID AS "riskLevelId", RL.NAME AS "riskLevelName",
+                R.RISK_TYPE AS "riskType", R.RISK_TYPE AS "riskTypeName",
+                R.RISK_LEVEL AS "riskLevel", R.RISK_LEVEL AS "riskLevelName",
                 R.CREATED_AT AS "createdAt"
          FROM ${qualifiedTable('PROCESS_RISK')} R
-         JOIN ${qualifiedTable('RISK_TYPE')} RT ON RT.ID = R.RISK_TYPE_ID
-         JOIN ${qualifiedTable('RISK_LEVEL')} RL ON RL.ID = R.RISK_LEVEL_ID
          WHERE R.PROCESS_ID = :1
          ORDER BY R.ID
          OFFSET :2 ROWS FETCH NEXT :3 ROWS ONLY`,
@@ -80,17 +78,28 @@ export class RiskService {
       );
       if (!processRows.length) throw new NotFoundException('Process not found');
 
-      const riskType = await this.lockActiveListValue(manager, 'RISK_TYPE', input.riskTypeId);
-      const riskLevel = await this.lockActiveListValue(manager, 'RISK_LEVEL', input.riskLevelId);
+      let typeName = input.type ?? input.riskType;
+      if (!typeName && input.riskTypeId) {
+        const riskType = await this.lockActiveListValue(manager, 'RISK_TYPE', input.riskTypeId);
+        typeName = riskType.name;
+      }
+      if (!typeName) throw new BadRequestException('Tipo de riesgo es obligatorio');
+
+      let levelName = input.level ?? input.riskLevel;
+      if (!levelName && input.riskLevelId) {
+        const riskLevel = await this.lockActiveListValue(manager, 'RISK_LEVEL', input.riskLevelId);
+        levelName = riskLevel.name;
+      }
+      if (!levelName) throw new BadRequestException('Nivel de riesgo es obligatorio');
+
       const repository = manager.getRepository(RiskEntity);
       const saved = await repository.save(repository.create({
         processId,
         description: input.description,
         cause: input.cause,
         consequence: input.consequence,
-        riskTypeId: input.riskTypeId,
-        riskLevelId: input.riskLevelId,
-        createdByUserId: actor.id
+        riskType: typeName,
+        riskLevel: levelName
       }));
       await this.audit.record({
         actorUserId: actor.id,
@@ -102,8 +111,8 @@ export class RiskService {
           description: saved.description,
           cause: saved.cause,
           consequence: saved.consequence,
-          riskTypeId: saved.riskTypeId,
-          riskLevelId: saved.riskLevelId
+          riskType: saved.riskType,
+          riskLevel: saved.riskLevel
         }
       }, manager);
       return {
@@ -112,10 +121,12 @@ export class RiskService {
         description: saved.description,
         cause: saved.cause,
         consequence: saved.consequence,
-        riskTypeId: saved.riskTypeId,
-        riskTypeName: riskType.name,
-        riskLevelId: saved.riskLevelId,
-        riskLevelName: riskLevel.name,
+        riskType: saved.riskType,
+        riskTypeName: saved.riskType,
+        riskTypeId: input.riskTypeId ?? null,
+        riskLevel: saved.riskLevel,
+        riskLevelName: saved.riskLevel,
+        riskLevelId: input.riskLevelId ?? null,
         createdAt: saved.createdAt
       };
     });
@@ -146,14 +157,13 @@ export class RiskService {
   }
 
   private async assertCanReadProcessRisks(processId: number, actor: AuthenticatedUser): Promise<void> {
-    const rows: Array<{ ownerUserId: number | string }> = await this.dataSource.query(
-      `SELECT OWNER_USER_ID AS "ownerUserId" FROM ${qualifiedTable('PROCESS')}
+    const rows: Array<{ id: number | string }> = await this.dataSource.query(
+      `SELECT ID AS "id" FROM ${qualifiedTable('PROCESS')}
        WHERE ID = :1 AND IS_ACTIVE = 1`,
       [processId]
     );
     if (!rows.length) throw new NotFoundException('Process not found');
-    if (actor.profiles.includes('ADMIN') || actor.profiles.includes('RISK_MANAGER')) return;
-    if (actor.profiles.includes('PROCESS_OWNER') && Number(rows[0].ownerUserId) === actor.id) return;
+    if (actor.profiles.includes('ADMIN') || actor.profiles.includes('PROCESS_OWNER') || actor.profiles.includes('RISK_MANAGER')) return;
     throw new ForbiddenException();
   }
 

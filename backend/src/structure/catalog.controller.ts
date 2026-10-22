@@ -13,9 +13,11 @@ import { AuthenticatedUser } from '../common/auth.types';
 import { ApiCookieAuth, ApiHeader, ApiTags } from '@nestjs/swagger';
 import {
   CreateMacroprocessDto,
+  CreateUnitDto,
   ProcessTypeDto,
   UpdateMacroprocessDto,
-  UpdateProcessTypeDto
+  UpdateProcessTypeDto,
+  UpdateUnitDto
 } from './catalog.dto';
 import { CatalogService } from './catalog.service';
 
@@ -26,6 +28,12 @@ const USERS = ['ADMIN', 'PROCESS_OWNER', 'RISK_MANAGER', 'CONSULTATION'] as cons
 @ApiCookieAuth('jallupacha_session')
 export class CatalogController {
   constructor(@Inject(CatalogService) private readonly catalogs: CatalogService) {}
+
+  @Get('macroprocess-types')
+  @RequireProfiles(...USERS)
+  macroprocessTypes() {
+    return this.catalogs.listMacroprocessTypes();
+  }
 
   @Get('macroprocesses')
   @RequireProfiles(...USERS)
@@ -86,8 +94,56 @@ export class CatalogController {
   @Post('process-types/:id/deactivate')
   @ApiHeader({ name: 'X-CSRF-Token', required: true })
   @RequireProfiles('ADMIN')
-  async deactivateProcessType(@CurrentUser() user: AuthenticatedUser, @Param('id', ParseIntPipe) id: number) {
+  async deactivateProcessTypePost(@CurrentUser() user: AuthenticatedUser, @Param('id', ParseIntPipe) id: number) {
     await this.catalogs.deactivateProcessType(user.id, id);
+    return { deactivated: true };
+  }
+
+  @Patch('process-types/:id/deactivate')
+  @ApiHeader({ name: 'X-CSRF-Token', required: true })
+  @RequireProfiles('ADMIN')
+  async deactivateProcessTypePatch(@CurrentUser() user: AuthenticatedUser, @Param('id', ParseIntPipe) id: number) {
+    await this.catalogs.deactivateProcessType(user.id, id);
+    return { deactivated: true };
+  }
+
+  @Get('units')
+  @RequireProfiles(...USERS)
+  units() {
+    return this.catalogs.listUnits();
+  }
+
+  @Post('units')
+  @ApiHeader({ name: 'X-CSRF-Token', required: true })
+  @RequireProfiles('ADMIN')
+  createUnit(@CurrentUser() user: AuthenticatedUser, @Body() body: CreateUnitDto) {
+    return this.catalogs.createUnit(user.id, body);
+  }
+
+  @Patch('units/:id')
+  @ApiHeader({ name: 'X-CSRF-Token', required: true })
+  @RequireProfiles('ADMIN')
+  updateUnit(
+    @CurrentUser() user: AuthenticatedUser,
+    @Param('id', ParseIntPipe) id: number,
+    @Body() body: UpdateUnitDto
+  ) {
+    return this.catalogs.updateUnit(user.id, id, body);
+  }
+
+  @Post('units/:id/deactivate')
+  @ApiHeader({ name: 'X-CSRF-Token', required: true })
+  @RequireProfiles('ADMIN')
+  async deactivateUnitPost(@CurrentUser() user: AuthenticatedUser, @Param('id', ParseIntPipe) id: number) {
+    await this.catalogs.deactivateUnit(user.id, id);
+    return { deactivated: true };
+  }
+
+  @Patch('units/:id/deactivate')
+  @ApiHeader({ name: 'X-CSRF-Token', required: true })
+  @RequireProfiles('ADMIN')
+  async deactivateUnitPatch(@CurrentUser() user: AuthenticatedUser, @Param('id', ParseIntPipe) id: number) {
+    await this.catalogs.deactivateUnit(user.id, id);
     return { deactivated: true };
   }
 }

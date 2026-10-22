@@ -183,6 +183,62 @@ export class ProcessFieldsDto {
   @MaxLength(250)
   @plainText
   periodicity?: string | null;
+
+  @ApiPropertyOptional({ type: String, maxLength: 250, nullable: true })
+  @IsOptional()
+  @trimText
+  @IsString()
+  @MaxLength(250)
+  @plainText
+  elaborator?: string | null;
+
+  @ApiPropertyOptional({ type: String, maxLength: 250, nullable: true })
+  @IsOptional()
+  @trimText
+  @IsString()
+  @MaxLength(250)
+  @plainText
+  responsible?: string | null;
+
+  @ApiPropertyOptional({ type: String, maxLength: 10000, nullable: true })
+  @IsOptional()
+  @trimText
+  @IsString()
+  @MaxLength(10000)
+  @plainText
+  documents?: string | null;
+
+  @ApiPropertyOptional({ type: String, maxLength: 10000, nullable: true })
+  @IsOptional()
+  @trimText
+  @IsString()
+  @MaxLength(10000)
+  @plainText
+  systemsUsed?: string | null;
+
+  @ApiPropertyOptional({ type: String, maxLength: 10000, nullable: true })
+  @IsOptional()
+  @trimText
+  @IsString()
+  @MaxLength(10000)
+  @plainText
+  indicators?: string | null;
+
+  @ApiPropertyOptional({ type: String, maxLength: 10000, nullable: true })
+  @IsOptional()
+  @trimText
+  @IsString()
+  @MaxLength(10000)
+  @plainText
+  improvementOpportunities?: string | null;
+
+  @ApiPropertyOptional({ type: String, maxLength: 10000, nullable: true })
+  @IsOptional()
+  @trimText
+  @IsString()
+  @MaxLength(10000)
+  @plainText
+  bpmnModelReference?: string | null;
 }
 
 export class CreateProcessDto extends ProcessFieldsDto {
@@ -386,6 +442,27 @@ export class ProcessResponseDto extends ProcessCommonResponseDto {
 
   @ApiProperty({ type: String, nullable: true })
   periodicity!: string | null;
+
+  @ApiProperty({ type: String, nullable: true })
+  elaborator!: string | null;
+
+  @ApiProperty({ type: String, nullable: true })
+  responsible!: string | null;
+
+  @ApiProperty({ type: String, nullable: true })
+  documents!: string | null;
+
+  @ApiProperty({ type: String, nullable: true })
+  systemsUsed!: string | null;
+
+  @ApiProperty({ type: String, nullable: true })
+  indicators!: string | null;
+
+  @ApiProperty({ type: String, nullable: true })
+  improvementOpportunities!: string | null;
+
+  @ApiProperty({ type: String, nullable: true })
+  bpmnModelReference!: string | null;
 
   @ApiProperty({ type: String, nullable: true, description: 'Solo lectura en este incremento.' })
   internalUnits!: null;

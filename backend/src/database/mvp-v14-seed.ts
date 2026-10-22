@@ -22,10 +22,16 @@ export async function seedMvpV14(manager: EntityManager): Promise<void> {
     { code: 'RISK_MANAGER', name: 'Gestor de riesgos' }
   ];
   for (const profile of profiles) {
-    await manager.query(
-      `INSERT INTO ${table('APP_PROFILE')} (CODE, NAME) VALUES (:1, :2)`,
-      [profile.code, profile.name]
+    const existing: IdRow[] = await manager.query(
+      `SELECT CODE AS "id" FROM ${table('APP_PROFILE')} WHERE CODE = :1`,
+      [profile.code]
     );
+    if (!existing.length) {
+      await manager.query(
+        `INSERT INTO ${table('APP_PROFILE')} (CODE, NAME) VALUES (:1, :2)`,
+        [profile.code, profile.name]
+      );
+    }
   }
 
   for (const macroprocessType of MVP_V14_MACROPROCESS_TYPES) {

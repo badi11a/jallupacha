@@ -402,4 +402,34 @@ Verificación:
 - 31 pruebas unitarias de backend en Jest aprobadas (`npm test`).
 - 25 pruebas unitarias de frontend en Vitest aprobadas (`npm run test:frontend`).
 
+## C-021 — Unificación de servicios y entidades TypeORM con el modelo institucional v14 (Pilar 2)
+
+Clasificación: defecto de implementación y diseño arquitectónico. Fuente: REQ-05, REQ-06, REQ-15, REQ-16, REQ-51, REQ-54, REQ-55.
+
+Hallazgo:
+1. El backend presentaba duplicidad y fragmentación: un módulo `mvp-v14` paralelo con consultas SQL crudas y sin políticas de autenticación, conviviendo con entidades TypeORM (`ProcessEntity`, `RiskEntity`, `CatalogService`, `ProcessService`) desactualizadas que asumían estructuras obsoletas de v13 (`OWNER_USER_ID`, llaves foráneas numéricas a catálogos de riesgo).
+2. Faltaban entidades TypeORM para tablas clave del modelo institucional: `MacroprocessTypeEntity`, `OrganizationalUnitEntity`, `ProcessUnitEntity`, `ProcessRelationEntity`.
+3. Incompatibilidad de tipos en `ProcessService`, `RiskService` y `seed.ts` al alinear las entidades con el esquema real de Oracle 19c.
+4. Omisión de grants para `MACROPROCESS_TYPE`, `ORGANIZATIONAL_UNIT`, `PROCESS_UNIT` y `PROCESS_RELATION` en `grant-runtime.sql`, detectada por la regla de paridad de `grants.spec.ts`.
+
+Corrección:
+- Se crearon las entidades TypeORM: `MacroprocessTypeEntity`, `OrganizationalUnitEntity`, `ProcessUnitEntity`, `ProcessRelationEntity`.
+- Se modernizaron las entidades existentes: `MacroprocessEntity` (con `macroprocessTypeId`), `ProcessTypeEntity` (con `macroprocessId`), `ProcessEntity` (eliminado `ownerUserId`, alineado a `PROCESS`), `ProcessVersionEntity` (incorporados los 26 campos de REQ-06), `RiskEntity` (con `riskType` y `riskLevel` como cadenas de v14).
+- Se registró la migración `1770000000000-InitialMvpV14.ts` bajo `backend/src/database/migrations/` para descubrimiento automático de TypeORM y compatibilidad con `grants.spec.ts`.
+- Se actualizaron los permisos de ejecución en `backend/database/grant-runtime.sql` otorgando privilegios mínimos sobre las nuevas tablas.
+- Se refactorizaron los servicios y controladores institucionales:
+  - `ProcessService` y `ProcessController`: soporte completo de la ficha de 26 campos, control de acceso institucional con perfiles `ADMIN` y `PROCESS_OWNER`, concurrencia optimista y auditoría.
+  - `CatalogService` y `CatalogController`: administración de macroprocesos, tipos de macroproceso, tipos de proceso vinculados a macroprocesos (REQ-51) y unidades organizacionales con validación jerárquica y prevención de ciclos (REQ-54).
+  - `RiskService` y `RiskController`: gestión de riesgos vinculados a procesos (REQ-15/16).
+  - `seed.ts`: unificado para sembrar usuarios de demo e identidades junto al contenido institucional de procesos de v14 (`seedMvpV14`).
+- Se mantuvo compatibilidad con `/api/mvp-v14/*` en `MvpV14Controller` para no romper pruebas ni el frontend existente durante la transición.
+
+Verificación:
+- Verificación de grants (`npm test -- src/database/grants.spec.ts`): 10 pruebas aprobadas.
+- Pruebas unitarias de backend (`npm test`): 8 suites, 31 pruebas aprobadas.
+- Pruebas e2e de autorización, sesiones y procesos (`npm run test:e2e -- authorization.e2e-spec.ts processes.e2e-spec.ts demo-session.e2e-spec.ts`): 3 suites, 19 pruebas aprobadas.
+- Pruebas de interfaz frontend (`npm run test:frontend`): 3 suites, 25 pruebas aprobadas.
+- Chequeo de tipos estricto (`npx tsc --noEmit`): 0 errores en frontend y backend.
+
+
 
