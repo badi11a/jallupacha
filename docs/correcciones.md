@@ -659,3 +659,35 @@ Verificación:
 - Pruebas unitarias backend (`npm test`): 12 suites, 56 pruebas aprobadas al 100%.
 - Pruebas de integración API (`npm run test:api -- authorization.e2e-spec.ts demo-session.e2e-spec.ts`): 2 suites, 11 pruebas aprobadas.
 - Compilación de la solución (`npm run build`): compilación TypeScript y Angular limpia (código de salida 0).
+
+
+## C-029 — Navegación e Identidad Institucional para Entorno Multiusuario (STD-UX-001, PT-07, PT-09)
+
+Clasificación: corrección de arquitectura de navegación e interfaz (UX/UI). Fuente: STD-UX-001 (R-01.1, R-01.4) en `docs/marco_estandar_ux_institucional.md`, `docs/design-system.md` y `docs/arquitectura_v15.md`.
+
+Hallazgo:
+1. Al superar el piloto de operador único (C-011) e integrar autenticación multiusuario con Argon2id (v15), el usuario autenticado que aterrizaba en `/mapa` no disponía de ninguna indicación de su sesión (nombre visible, perfil activo, botón para cerrar sesión), ni de una vía visible para acceder a los módulos de administración (`/usuarios`, `/auditoria`).
+2. Los accesos administrativos estaban confinados dentro de las acciones contextuales de un catálogo secundario (`/procesos`), forzando al usuario a desplazarse fuera del flujo principal y vulnerando la regla R-01.4 de STD-UX-001 («Queda prohibido utilizar el pie como menú o barra de navegación principal de la aplicación o para saltar arbitrariamente entre módulos independientes»).
+3. No existía un control accesible en la interfaz para cerrar sesión de forma universal en todas las pantallas (PT-09).
+
+Corrección:
+- **Cabecera Institucional Global en `AppComponent` (`app.component.ts`):**
+  - Se implementó una cabecera institucional accesible (`<header class="app-header" role="banner">`), ligera y fija que se renderiza condicionalmente para usuarios autenticados (`@if (auth.isAuthenticated())`).
+  - **Identidad de producto:** Enlace con la marca «Gestión de Procesos» vinculado a `/mapa`.
+  - **Navegación Primaria Estable (R-01.1):** Menú con enlaces directos a `Mapa` (`/mapa`) y `Procesos` (`/procesos`), con resaltado semántico de ruta activa (`routerLinkActive="active"`). Para usuarios con perfil `ADMIN`, expone accesos directos a `Usuarios` (`/usuarios`), `Auditoría` (`/auditoria`), `Unidades` (`/unidades`) y `Tipos de proceso` (`/tipos-de-proceso`).
+  - **Identidad de Sesión y Control de Acceso (PT-09):** Despliega el nombre del usuario conectado (`displayName`), su perfil principal mediante `UiBadgeComponent` neutro (ej. «Administrador», «Validador»), y un botón accesible «Cerrar sesión» que ejecuta `auth.logout()`.
+- **Accesibilidad y tokens de diseño (`design-system.md`):**
+  - Estilos integrados en tokens semánticos `--ui-color-*` y `--brand-*`, manteniendo el ancho máximo `--ui-content-width` (1180px) alineado con los paneles del sistema.
+  - Verificación de contraste WCAG 2.2 AA (44 combinaciones aprobadas).
+- **Atajos contextuales en Mapa (`mvp-v14-demo.component.html`):**
+  - Se añadieron enlaces contextuales a «Usuarios» y «Auditoría» en la barra de acciones inferior para administradores.
+- **Alineación de pruebas de regresión (`mvp-v14-interface.spec.ts` y nuevo `app.component.spec.ts`):**
+  - Se ajustó la expresión regular de validación contra datos de referencia B en `mvp-v14-interface.spec.ts` para usar límite de palabra (`/\bAdmin\b/`), evitando colisión con el rol institucional en español «Administrador».
+  - Se creó `frontend/src/app/app.component.spec.ts` con 4 casos de prueba cubriendo: ocultación de cabecera en estado anónimo, presentación completa de módulos para perfil Administrador, restricción de enlaces para perfiles de consulta y ejecución del cierre de sesión.
+
+Verificación:
+- Pruebas frontend (`npm run test:frontend`): 8 suites, 60 pruebas unitarias aprobadas al 100%.
+- Pruebas de contraste (`npm run check:contrast --workspace frontend`): 44 combinaciones conformes con WCAG 2.2 AA.
+- Pruebas unitarias backend (`npm test`): 12 suites, 56 pruebas aprobadas al 100%.
+- Pruebas de integración API (`npm run test:api -- authorization.e2e-spec.ts demo-session.e2e-spec.ts`): 2 suites, 11 pruebas aprobadas.
+- Compilación de producción (`npm run build`): backend y frontend compilan limpiamente sin errores ni advertencias.

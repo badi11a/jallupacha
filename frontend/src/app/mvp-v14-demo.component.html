@@ -65,6 +65,10 @@
       <p class="helper" role="status">{{ visibleCount() }} de {{ macroCount() }} macroprocesos</p>
       <div class="map-actions">
         <a class="text-button" routerLink="/procesos">Buscar procesos</a>
+        @if (auth.isAdmin()) {
+          <a class="text-button" routerLink="/usuarios">Usuarios</a>
+          <a class="text-button" routerLink="/auditoria">Auditoría</a>
+        }
         @if (auth.hasAnyProfile('ADMIN', 'PROCESS_OWNER')) {
           <a class="text-button" routerLink="/procesos/nuevo">Nuevo proceso</a>
         }

@@ -50,7 +50,7 @@ describe('Interfaz MVP v14 — adaptación visual', () => {
       expect(root.querySelector('main router-outlet')).not.toBeNull();
       expect(root.querySelector('#map-filter') !== null).toBe(path === '/mapa');
       expect(root.querySelector('.account')).toBeNull();
-      expect(root.textContent).not.toMatch(/Admin|Cambiar Sede|Favoritos|533|En revisión/);
+      expect(root.textContent).not.toMatch(/\bAdmin\b|Cambiar Sede|Favoritos|533|En revisión/);
     }
     fixture.destroy();
     http.verify();
@@ -83,7 +83,7 @@ describe('Interfaz MVP v14 — adaptación visual', () => {
     }
     expect(root.querySelectorAll('.macro-link')).toHaveLength(1);
     expect(root.querySelectorAll('.map-hero, .map-panel')).toHaveLength(2);
-    expect(root.querySelector('a[href="/procesos"]')?.textContent).toContain('Buscar procesos');
+    expect(root.querySelector('.map-bottom a[href="/procesos"]')?.textContent).toContain('Buscar procesos');
     expect(root.querySelector('.map-bottom a[href="/unidades"]')).toBeNull();
     expect(root.querySelector('.map-bottom a[href="/tipos-de-proceso"]')).toBeNull();
     expect(root.textContent).not.toMatch(/533|46 tipos|UTA 2026|Macro Región Andina|Dirección y Desarrollo Estratégico/);
