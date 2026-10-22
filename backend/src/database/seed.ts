@@ -2,7 +2,9 @@ import 'dotenv/config';
 import { DataSource } from 'typeorm';
 import { databaseOptions, validateDemoRuntime } from '../common/config';
 import { qualifiedTable } from '../common/database';
+import { hashPassword } from '../common/security';
 import { DemoIdentityEntity } from '../identity/demo-identity.entity';
+import { LocalCredentialEntity } from '../identity/local-credential.entity';
 import { IdentityEntity } from '../identity/identity.entity';
 import { ProfileEntity } from '../identity/profile.entity';
 import { UserProfileEntity } from '../identity/user-profile.entity';
@@ -99,6 +101,17 @@ export async function seed(): Promise<void> {
           for (const profileCode of demo.profiles) {
             await assignments.insert({ userId: identity.userId, profileCode });
           }
+        }
+        const localCredentials = manager.getRepository(LocalCredentialEntity);
+        const existingCred = await localCredentials.findOneBy({ userId: identity.userId });
+        if (!existingCred) {
+          const defaultPasswordHash = await hashPassword('ClaveDemo2026!');
+          await localCredentials.insert({
+            userId: identity.userId,
+            passwordHash: defaultPasswordHash,
+            failedAttempts: 0,
+            lockedUntil: null
+          });
         }
       }
 

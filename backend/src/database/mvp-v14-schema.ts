@@ -9,6 +9,7 @@ export const MVP_V14_TABLES = [
   'MACROPROCESS',
   'MACROPROCESS_TYPE',
   // Tablas del modelo institucional de identidad, acceso y auditoria
+  'LOCAL_CREDENTIAL',
   'SECURITY_EVENT_IP',
   'SECURITY_EVENT',
   'APP_SESSION',

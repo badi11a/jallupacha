@@ -462,3 +462,40 @@ Verificación:
 
 
 
+
+
+## C-023 — Implementación de Autenticación Local Institucional v15 en Backend (REQ-25, PT-06, PT-08, PT-09)
+
+Clasificación: implementación de arquitectura y requisitos v15. Fuente: REQ-25 en `docs/especificacion_v15.md` y Sección 2 de `docs/arquitectura_v15.md`.
+
+Hallazgo:
+1. El backend carecía del mecanismo de autenticación local institucional para intranet definido en v15 (REQ-25), dependiendo del endpoint de demo previo.
+2. Se requería la persistencia de credenciales locales (`LOCAL_CREDENTIAL`), hashing robusto de contraseñas con derivación resistente a fuerza bruta (OWASP ASVS Nivel 2), política de bloqueo automático tras 5 intentos fallidos por 15 minutos, mitigación de enumeración de cuentas y sesiones seguras con expiración por inactividad de 30 minutos (PT-09).
+
+Corrección:
+- **Modelo y migración de datos:**
+  - Se creó la migración `backend/src/database/migrations/1770000000001-CreateLocalCredential.ts` definiendo la tabla `LOCAL_CREDENTIAL` (`USER_ID`, `PASSWORD_HASH`, `FAILED_ATTEMPTS`, `LOCKED_UNTIL`, `PASSWORD_UPDATED_AT`).
+  - Se registró `LOCAL_CREDENTIAL` en `backend/src/database/mvp-v14-schema.ts` (`MVP_V14_TABLES`) y en el orden de limpieza de `backend/src/database/reset-local.ts`.
+  - Se configuró el privilegio runtime mínimo en `backend/database/grant-runtime.sql`: `GRANT SELECT, INSERT, UPDATE ON LOCAL_CREDENTIAL TO &&app_user;`.
+  - Se creó la entidad TypeORM `backend/src/identity/local-credential.entity.ts`.
+- **Criptografía y seguridad:**
+  - Se implementaron las funciones `hashPassword` y `verifyPassword` en `backend/src/common/security.ts` utilizando la función nativa `node:crypto.scrypt` (N=16384, r=8, p=1, salt aleatorio de 16 bytes y comparación en tiempo constante `timingSafeEqual`).
+- **Endpoint y lógica de autenticación:**
+  - Se creó el DTO `backend/src/auth/login.dto.ts` con validación estricta (`@IsEmail`, `@MinLength(8)`, `@MaxLength(128)`, sanitización y normalización en minúsculas).
+  - Se implementó `POST /api/auth/login` en `backend/src/auth/auth.controller.ts`:
+    - Mensaje neutral unificado ante fallos: *"Credenciales no válidas"* (mitigación contra enumeración de usuarios).
+    - Verificación de cuenta activa (`IS_ACTIVE = 1`) y estado de bloqueo temporal (`LOCKED_UNTIL > now`).
+    - Bloqueo automático por 15 minutos al alcanzar 5 intentos fallidos consecutivos.
+    - Registro de auditoría de seguridad en `SECURITY_EVENT` y `SECURITY_EVENT_IP` para cada intento (`LOGIN`, resultado `SUCCESS` o `REJECTED`).
+    - Al autenticar con éxito: restablecimiento del contador a 0, generación de sesión segura en `APP_SESSION` y emisión de cookies `jallupacha_session` (`HttpOnly`, `SameSite=Strict`) y `jallupacha_csrf`.
+- **Semilla de datos institucional:**
+  - Se actualizó `backend/src/database/seed.ts` para sembrar credenciales locales por defecto (`ClaveDemo2026!`) para todas las identidades semilla.
+- **Pruebas automatizadas:**
+  - Se creó la suite completa `backend/src/auth/auth.controller.spec.ts` con 7 casos que verifican: inicio exitoso, rechazo de correo inexistente, rechazo de cuenta inactiva, incremento de intentos ante contraseña incorrecta, bloqueo temporal a los 5 fallos, rechazo inmediato de cuenta bloqueada y validación de esquema DTO.
+
+Verificación:
+- Pruebas unitarias de seguridad y backend (`npm test`): 9 suites, 39 pruebas aprobadas al 100%.
+- Pruebas de grants de base de datos (`src/database/grants.spec.ts`): 10 pruebas aprobadas.
+- Pruebas de integración de autorización y sesiones (`npm run test:e2e --workspace backend -- authorization.e2e-spec.ts demo-session.e2e-spec.ts`): 2 suites, 11 pruebas aprobadas.
+- Pruebas de frontend (`npm run test:frontend`): 3 suites, 25 pruebas aprobadas.
+- Compilación completa de la solución (`npm run build`): compilación TypeScript backend y Angular frontend limpias (código de salida 0).
