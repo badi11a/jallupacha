@@ -18,6 +18,7 @@
     "db:check:qa": "ts-node src/database/check-qa-connection.ts",
     "db:reset:local": "ts-node src/database/reset-local.ts",
     "db:install:mvp-v14": "ts-node src/database/install-mvp-v14.ts",
+    "db:reconcile": "ts-node src/database/reconcile-migrations.ts",
     "docs:openapi": "ts-node src/openapi.ts"
   },
   "dependencies": {
