@@ -8,8 +8,7 @@ export const MVP_V14_TABLES = [
   'PROCESS_TYPE',
   'MACROPROCESS',
   'MACROPROCESS_TYPE',
-  // Objects exclusively owned by the retired v13 model. They are included so
-  // a clean v14 installation never leaves identity, session or audit data.
+  // Tablas del modelo institucional de identidad, acceso y auditoria
   'SECURITY_EVENT_IP',
   'SECURITY_EVENT',
   'APP_SESSION',
@@ -19,9 +18,9 @@ export const MVP_V14_TABLES = [
   'USER_IDENTITY',
   'APP_PROFILE',
   'APP_USER',
+  'ADMIN_CONTROL',
   'RISK_TYPE',
   'RISK_LEVEL',
-  'ADMIN_CONTROL',
   'migrations'
 ] as const;
 

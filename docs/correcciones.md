@@ -384,3 +384,22 @@ Verificación:
 - Compilación de producción de frontend completada exitosamente sin advertencias de presupuesto (`npm run build --workspace frontend`).
 - 44 combinaciones de color verificadas conforme a WCAG 2.2 AA (`npm run check:contrast --workspace frontend`).
 
+## C-020 — Desbloqueo de base de datos e integración de identidad institucional (Pilar 1)
+
+Clasificación: corrección de diseño de base de datos. Fuente: desbloqueo de REQ-07, REQ-56 y reincorporación de REQ-25, REQ-26, REQ-27.
+
+Hallazgo:
+1. La tabla `PROCESS_VERSION` contenía restricciones forzadas del MVP que impedían el avance del ciclo de vida del proceso: `CHECK (VERSION_NUMBER = 1)` y `CHECK (STATUS = 'Borrador')`.
+2. Las tablas de identidad, usuarios, perfiles, sesiones y auditoría se encontraban aisladas y fuera del esquema activo por la excepción mono-operador C-011.
+
+Corrección:
+- Se liberaron las restricciones de `PROCESS_VERSION`: `VERSION_NUMBER >= 1` y `STATUS IN ('Borrador', 'En revisión', 'Vigente', 'Obsoleto')`.
+- Se integraron al esquema DDL principal y a sus permisos las tablas institucionales: `APP_USER`, `USER_IDENTITY`, `APP_PROFILE`, `USER_PROFILE`, `DEMO_IDENTITY`, `ADMIN_CONTROL`, `APP_SESSION`, `AUDIT`, `SECURITY_EVENT`, `SECURITY_EVENT_IP`.
+- Se incorporaron a las semillas del sistema los perfiles obligatorios: `ADMIN`, `PROCESS_OWNER`, `VALIDATOR`, `CONSULTATION`, `RISK_MANAGER`.
+- Se actualizaron los permisos de ejecución en `mvp-v14-grants.ts` para cubrir todas las tablas de identidad y procesos.
+
+Verificación:
+- 31 pruebas unitarias de backend en Jest aprobadas (`npm test`).
+- 25 pruebas unitarias de frontend en Vitest aprobadas (`npm run test:frontend`).
+
+

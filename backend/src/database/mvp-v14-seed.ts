@@ -14,6 +14,20 @@ export async function seedMvpV14(manager: EntityManager): Promise<void> {
   const macroprocessIds = new Map<string, number>();
   const processTypeIds = new Map<string, number>();
 
+  const profiles = [
+    { code: 'ADMIN', name: 'Administrador' },
+    { code: 'PROCESS_OWNER', name: 'Dueño de proceso' },
+    { code: 'VALIDATOR', name: 'Revisor/Validador' },
+    { code: 'CONSULTATION', name: 'Consulta' },
+    { code: 'RISK_MANAGER', name: 'Gestor de riesgos' }
+  ];
+  for (const profile of profiles) {
+    await manager.query(
+      `INSERT INTO ${table('APP_PROFILE')} (CODE, NAME) VALUES (:1, :2)`,
+      [profile.code, profile.name]
+    );
+  }
+
   for (const macroprocessType of MVP_V14_MACROPROCESS_TYPES) {
     await manager.query(
       `INSERT INTO ${table('MACROPROCESS_TYPE')} (CODE, NAME, SORT_ORDER, IS_ACTIVE) VALUES (:1, :2, :3, 1)`,
