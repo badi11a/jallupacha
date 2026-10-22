@@ -1,11 +1,11 @@
-import { ApplicationRef, Component, provideZoneChangeDetection, signal } from '@angular/core';
+import { ApplicationRef, Component, ElementRef, inject, provideZoneChangeDetection, signal } from '@angular/core';
 import { TestBed } from '@angular/core/testing';
 import { provideRouter } from '@angular/router';
 import {
-  UiAppShellComponent,
   UiBadgeComponent,
   UiBreadcrumbsComponent,
   UiCharCounterComponent,
+  UiDialogHostComponent,
   UiSectionComponent,
   charCountState,
   countCharacters,
@@ -18,25 +18,30 @@ import {
 } from './index';
 
 @Component({
-  imports: [UiAppShellComponent, UiPanelComponent, UiMessageComponent, UiPaginationComponent],
+  imports: [UiPanelComponent, UiMessageComponent, UiPaginationComponent, UiDialogHostComponent],
   template: `
-    <ui-app-shell appName="Aplicación" [brandLogoSrc]="logo()" footerText="Pie" [accountLabel]="account"
-      [environmentNotice]="notice" (logout)="logouts = logouts + 1">
+    <a class="skip-link" href="#main-content" (click)="skipToContent($event)">Ir al contenido principal</a>
+    <main id="main-content" tabindex="-1">
       <ui-panel eyebrow="SECCIÓN" heading="Listado" headingId="list-title">
         <button panelActions type="button">Acción</button>
         <ui-message kind="error">Falló</ui-message>
         <ui-message kind="success">Listo</ui-message>
         <ui-pagination [page]="page" [pageSize]="10" [total]="25" itemLabel="registros" (pageChange)="page = $event" />
       </ui-panel>
-    </ui-app-shell>
+    </main>
+    <ui-dialog-host />
   `
 })
 class HostComponent {
-  logo = signal('');
-  account = 'Persona · Perfil';
-  notice = 'Aviso';
-  logouts = 0;
+  private readonly host = inject<ElementRef<HTMLElement>>(ElementRef);
   page = 1;
+
+  skipToContent(event: Event): void {
+    event.preventDefault();
+    const main = this.host.nativeElement.querySelector<HTMLElement>('#main-content');
+    main?.focus({ preventScroll: true });
+    main?.scrollIntoView?.({ block: 'start' });
+  }
 }
 
 @Component({
@@ -62,29 +67,6 @@ describe('shared/ui', () => {
       imports: [HostComponent, KitPartsComponent],
       providers: [provideZoneChangeDetection(), provideRouter([])]
     });
-  });
-
-  it('renders the shell with one environment notice, account and logout', () => {
-    const fixture = TestBed.createComponent(HostComponent);
-    fixture.detectChanges();
-    const root = fixture.nativeElement as HTMLElement;
-    expect(root.querySelector('.brand')?.getAttribute('aria-label')).toBe('Aplicación, inicio');
-    expect(root.querySelector('.brand-logo')).toBeNull();
-    expect(root.querySelectorAll('.environment-notice')).toHaveLength(1);
-    expect(root.querySelector('.account')?.textContent).toContain('Persona · Perfil');
-    buttonByText(root, 'Cerrar sesión').click();
-    expect(fixture.componentInstance.logouts).toBe(1);
-    expect(root.querySelector('footer')?.textContent).toContain('Pie');
-
-    fixture.componentInstance.account = '';
-    fixture.componentInstance.notice = '';
-    fixture.detectChanges();
-    expect(root.querySelector('.account')).toBeNull();
-    expect(root.querySelector('.environment-notice')).toBeNull();
-
-    fixture.componentInstance.logo.set('/assets/product-logo.svg');
-    fixture.detectChanges();
-    expect(root.querySelector('.brand-logo')?.getAttribute('src')).toBe('/assets/product-logo.svg');
   });
 
   it('labels panels by their heading and projects actions', () => {

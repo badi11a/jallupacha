@@ -39,7 +39,7 @@ export type UiDialogRequest =
 
 /**
  * Diálogos modales de la aplicación. Requiere un `ui-dialog-host` en la
- * estructura común (incluido en `ui-app-shell`). Solo hay un diálogo activo:
+ * estructura común (incluido en `app.component`). Solo hay un diálogo activo:
  * abrir otro cancela el anterior.
  */
 @Injectable({ providedIn: 'root' })
