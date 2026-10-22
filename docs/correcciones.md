@@ -441,6 +441,7 @@ Hallazgo:
 3. Se requiere un mecanismo de autenticación 100% autónomo y seguro dentro de la intranet, descartando Google Workspace y formalizando la versión 15 (v15) del producto, manteniendo la base de datos oficial en Oracle Database 19c.
 
 Corrección:
+- Se generó la planilla oficial `docs/referencias/Requisitos_Sistema_Procesos_v15.xlsx` con la actualización aprobada de REQ-25 para intranet, conservando la versión 14 como antecedente histórico.
 - Se elaboró la especificación funcional completa en `docs/especificacion_v15.md`:
   - Se redefinió REQ-25: Autenticación Local Institucional con credenciales corporativas (correo y contraseña protegida mediante hashing Argon2id bajo OWASP ASVS v4 Nivel 2).
   - Se reactivó formalmente el modelo institucional multiusuario: perfiles `ADMIN`, `PROCESS_OWNER`, `VALIDATOR`, `RISK_MANAGER` y `CONSULTATION` (REQ-26), auditoría inmutable de acciones (REQ-27), ciclo de vida completo de procesos (REQ-07, REQ-09, REQ-56) y estructura jerárquica de unidades (REQ-54).

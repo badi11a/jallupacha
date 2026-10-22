@@ -4,7 +4,7 @@
 
 La especificación de la versión 15 (v15) define el producto institucional para su operación en la red interna (intranet) bajo un modelo multiusuario y control de acceso basado en perfiles. 
 
-Toma como línea base funcional la planilla `docs/referencias/Requisitos_Sistema_Procesos_v14.xlsx`, incorporando formalmente la decisión de arquitectura autorizada por el responsable del producto:
+Toma como línea base funcional la planilla `docs/referencias/Requisitos_Sistema_Procesos_v15.xlsx` (actualizada desde la versión 14), incorporando formalmente la decisión de arquitectura autorizada por el responsable del producto:
 1. **Sustitución de REQ-25 (Autenticación externa Google Workspace por Autenticación Local Institucional):** Debido a que la aplicación opera en un entorno de red privada institucional (intranet) sin salida obligatoria a Internet ni interconexión inmediata a servicios de terceros, la autenticación se realiza de forma autónoma y segura mediante credenciales locales gestionadas por la entidad (correo institucional y contraseña con hashing robusto Argon2id). El diseño queda preparado para conectarse a directorios corporativos internos (como LDAP o Active Directory) cuando la infraestructura de red lo habilite.
 2. **Superación del piloto de operador único (C-011):** Se restablece el modelo institucional multiusuario pleno, reactivando los requisitos de identidad, perfiles, auditoría de usuario y ciclo de vida de procesos que habían sido transitoriamente postergados durante el piloto.
 
