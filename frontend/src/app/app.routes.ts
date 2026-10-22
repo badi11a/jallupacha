@@ -1,4 +1,5 @@
 import { Routes } from '@angular/router';
+import { AuditComponent } from './audit.component';
 import { authGuard, guestGuard } from './auth.guard';
 import { LoginComponent } from './login.component';
 import { MacroprocessDetailComponent } from './macroprocess-detail.component';
@@ -31,5 +32,6 @@ export const routes: Routes = [
   { title: 'Unidades internas', path: 'unidades', component: UnitsComponent, canActivate: [authGuard], canDeactivate: [unsavedChangesGuard] },
   { title: 'Tipos de proceso', path: 'tipos-de-proceso', component: ProcessTypesComponent, canActivate: [authGuard], canDeactivate: [unsavedChangesGuard] },
   { title: 'Gestión de usuarios y perfiles', path: 'usuarios', component: UsersComponent, canActivate: [authGuard], canDeactivate: [unsavedChangesGuard] },
+  { title: 'Bitácora de auditoría inmutable', path: 'auditoria', component: AuditComponent, canActivate: [authGuard] },
   { title: 'Página no encontrada', path: '**', component: NotFoundComponent }
 ];

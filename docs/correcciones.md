@@ -628,3 +628,34 @@ Verificación:
 - Pruebas frontend (`npm run test:frontend`): 6 suites, 51 pruebas aprobadas al 100%.
 - Pruebas unitarias backend (`npm test`): 11 suites, 54 pruebas aprobadas al 100%.
 - Compilación de la solución (`npm run build`): compilación TypeScript y Angular limpia (código de salida 0).
+
+
+## C-028 — Consulta de Bitácora de Auditoría Inmutable (REQ-27 v15, PT-07)
+
+Clasificación: implementación de arquitectura y requisitos v15. Fuente: REQ-27 en `docs/especificacion_v15.md`, Sección 3 y 4 de `docs/arquitectura_v15.md` y `docs/marco_estandar_ux_institucional.md`.
+
+Hallazgo:
+1. El backend contaba con registro de auditoría (`AuditService.record`), pero su consulta (`AuditController.list`) no incluía los datos del usuario actor (nombre y correo institucional mediante cruce con `USER_IDENTITY`), ni filtros por tipo de entidad o acción.
+2. El frontend no disponía de la pantalla ni del servicio para que los usuarios con perfil `ADMIN` pudieran inspeccionar cronológicamente la bitácora de auditoría inmutable, verificar acciones administrativas, cambios de estado y modificaciones antes/después (REQ-27).
+
+Corrección:
+- **Backend (`audit.service.ts`, `audit.controller.ts`):**
+  - Se modificó `AuditService.list` para realizar una consulta paginada sobre la tabla `AUDIT` con `LEFT JOIN` a `USER_IDENTITY`, resolviendo `actorDisplayName` y `actorEmail`.
+  - Se añadieron parámetros opcionales de filtrado por `entityType` y `action`, con orden cronológico descendente (`ORDER BY ID DESC`).
+  - En `AuditController`, se incorporaron los parámetros `@Query('entityType')` y `@Query('action')`, asegurando restricción de acceso exclusiva a `ADMIN` (`RequireProfiles('ADMIN')`).
+  - Creación de pruebas unitarias en `backend/src/audit/audit.controller.spec.ts`.
+- **Servicio y Componente frontend (`audit.service.ts`, `audit.component.ts`):**
+  - Creado `AuditApiService` en `frontend/src/app/audit.service.ts` con llamada tipada a `GET /api/audit`.
+  - Creado `AuditComponent` en `frontend/src/app/audit.component.ts` con filtros por tipo de entidad y acción, tabla cronológica accesible con insignias de acción (`UiBadgeComponent`), visualización del usuario actor o sistema, formato de fecha UTC y visor desplegable de diferencias (*diff*) antes/después con JSON legible.
+  - Paginación dinámica accesible con controles de página anterior y siguiente.
+- **Rutas y navegación (`app.routes.ts`, `process-list.component.ts`):**
+  - Registro de la ruta `/auditoria` protegida por `authGuard`.
+  - Inclusión de enlaces hacia `/auditoria` en el panel de acciones de `ProcessListComponent`, `UsersComponent` y en la cabecera de auditoría.
+- **Pruebas automatizadas frontend (`audit.spec.ts`):**
+  - 5 pruebas unitarias verificando carga inicial, presentación de actores y sistema, despliegue del visor de cambios antes/después, filtrado por entidad/acción, paginación y manejo de errores.
+
+Verificación:
+- Pruebas frontend (`npm run test:frontend`): 7 suites, 56 pruebas aprobadas al 100%.
+- Pruebas unitarias backend (`npm test`): 12 suites, 56 pruebas aprobadas al 100%.
+- Pruebas de integración API (`npm run test:api -- authorization.e2e-spec.ts demo-session.e2e-spec.ts`): 2 suites, 11 pruebas aprobadas.
+- Compilación de la solución (`npm run build`): compilación TypeScript y Angular limpia (código de salida 0).

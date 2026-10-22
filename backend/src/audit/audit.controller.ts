@@ -13,11 +13,13 @@ export class AuditController {
   @Get()
   list(
     @Query('page', new ParseIntPipe({ optional: true })) page = 1,
-    @Query('limit', new ParseIntPipe({ optional: true })) limit = 50
+    @Query('limit', new ParseIntPipe({ optional: true })) limit = 50,
+    @Query('entityType') entityType?: string,
+    @Query('action') action?: string
   ) {
     const currentPage = Math.max(1, page);
     const pageSize = Math.min(100, Math.max(1, limit));
-    return this.audit.list(currentPage, pageSize).then(({ items, total }) => ({
+    return this.audit.list(currentPage, pageSize, { entityType, action }).then(({ items, total }) => ({
       items,
       page: currentPage,
       limit: pageSize,

@@ -21,6 +21,9 @@ import { UiBadgeComponent, UiBreadcrumbsComponent, UiMessageComponent, UiPanelCo
         <a panelActions class="text-button" routerLink="/usuarios">Usuarios</a>
       }
       @if (auth.isAdmin()) {
+        <a panelActions class="text-button" routerLink="/auditoria">Auditoría</a>
+      }
+      @if (auth.isAdmin()) {
         <a panelActions class="text-button" routerLink="/unidades">Unidades internas</a>
       }
       @if (auth.isAdmin()) {
