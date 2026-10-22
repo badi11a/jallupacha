@@ -431,5 +431,33 @@ Verificación:
 - Pruebas de interfaz frontend (`npm run test:frontend`): 3 suites, 25 pruebas aprobadas.
 - Chequeo de tipos estricto (`npx tsc --noEmit`): 0 errores en frontend y backend.
 
+## C-022 — Formalización de la Versión 15 (v15): Autenticación Local Institucional para Intranet y Reactivación Multiusuario
+
+Clasificación: cambio de especificación técnica y arquitectura autorizado por el responsable del producto. Fuente: decisión de producto para despliegue en intranet (sustitución de REQ-25 y superación del piloto mono-operador C-011).
+
+Hallazgo:
+1. El requisito original REQ-25 en la planilla v14 exigía autenticación exclusiva mediante Google Workspace institucional (OAuth 2.0).
+2. El responsable del producto confirmó que la aplicación se desplegará en una red privada interna (intranet) sin conexión saliente a Internet y sin interconexión disponible con sistemas externos en la fase actual.
+3. Se requiere un mecanismo de autenticación 100% autónomo y seguro dentro de la intranet, descartando Google Workspace y formalizando la versión 15 (v15) del producto, manteniendo la base de datos oficial en Oracle Database 19c.
+
+Corrección:
+- Se elaboró la especificación funcional completa en `docs/especificacion_v15.md`:
+  - Se redefinió REQ-25: Autenticación Local Institucional con credenciales corporativas (correo y contraseña protegida mediante hashing Argon2id bajo OWASP ASVS v4 Nivel 2).
+  - Se reactivó formalmente el modelo institucional multiusuario: perfiles `ADMIN`, `PROCESS_OWNER`, `VALIDATOR`, `RISK_MANAGER` y `CONSULTATION` (REQ-26), auditoría inmutable de acciones (REQ-27), ciclo de vida completo de procesos (REQ-07, REQ-09, REQ-56) y estructura jerárquica de unidades (REQ-54).
+  - Se documentó la arquitectura extensible de identidad (`USER_IDENTITY.PROVIDER = 'LOCAL'`), preparada para admitir directorios corporativos internos (LDAP/Active Directory/SAML) cuando la infraestructura institucional lo habilite.
+- Se elaboró la arquitectura técnica de la versión 15 en `docs/arquitectura_v15.md`:
+  - Definición de la tabla `LOCAL_CREDENTIAL` con control de intentos fallidos (bloqueo por 15 minutos tras 5 intentos) y registro en `SECURITY_EVENT`.
+  - Mecanismo de sesión con tokens criptográficos de 64 caracteres en `APP_SESSION`, expiración por inactividad a los 30 minutos (PT-09) y protección CSRF mediante cabecera `X-CSRF-Token`.
+  - Mantenimiento de Oracle Database 19c como motor de base de datos oficial.
+  - Contratos unificados de API REST (`/api/auth/*`, `/api/processes/*`, `/api/catalogs/*`, `/api/units/*`, `/api/process-map`).
+- Se actualizaron las instrucciones de desarrollo en `AGENTS.md` para consagrar la versión 15 como la fuente normativa y de arquitectura activa del proyecto.
+
+Verificación:
+- Coherencia técnica de la documentación revisada contra los principios técnicos PT-01, PT-02, PT-06, PT-07, PT-08 y PT-09.
+- Estructura de requisitos alineada con la trazabilidad histórica de `docs/referencias/Requisitos_Sistema_Procesos_v14.xlsx`.
+- 31 pruebas unitarias backend y 25 pruebas frontend aprobadas (`npm test`, `npm run test:frontend`).
+- Chequeo de tipos estricto sin errores (`npx tsc --noEmit`).
+
+
 
 
