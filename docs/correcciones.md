@@ -558,3 +558,35 @@ Verificación:
 - Pruebas backend (`npm test`): 9 suites, 39 pruebas aprobadas al 100%.
 - Pruebas de integración de backend (`npm run test:e2e --workspace backend -- authorization.e2e-spec.ts demo-session.e2e-spec.ts`): 2 suites, 11 pruebas aprobadas.
 - Compilación de la solución (`npm run build`): compilación TypeScript y Angular limpia (código de salida 0).
+
+
+## C-026 — Administración de Usuarios y Perfiles Institucionales (REQ-26 v15, PT-07)
+
+Clasificación: implementación de arquitectura y requisitos v15. Fuente: REQ-26 en `docs/especificacion_v15.md`, Sección 2 y 4 de `docs/arquitectura_v15.md` y `docs/marco_estandar_ux_institucional.md`.
+
+Hallazgo:
+1. En el backend, el tipo `ProfileCode` y el DTO `UpdateProfilesDto` no incluían el perfil `VALIDATOR` definido en la especificación v15 para la separación de funciones entre elaboradores y revisores (REQ-07/REQ-26).
+2. El frontend carecía de la pantalla y servicio de administración de usuarios y asignación de perfiles (`UsersComponent` y `UsersService`), requerida para el perfil `ADMIN`.
+3. Se requería implementar la ruta `/usuarios` protegida por `authGuard`, con edición accesible de perfiles institucionales (`ADMIN`, `PROCESS_OWNER`, `VALIDATOR`, `RISK_MANAGER`, `CONSULTATION`), protección de cambios no guardados mediante `LeavesWithConfirmation` y `unsavedChangesGuard`, bloqueo de auto-modificación de perfiles en interfaz acorde a la política de servidor (PT-07), y manejo neutral de excepciones de concurrencia y retención del último administrador.
+
+Corrección:
+- **Backend (`auth.types.ts`, `profile.dto.ts`):**
+  - Se incorporó `VALIDATOR` en `ProfileCode` y en la lista validada `PROFILES` de `UpdateProfilesDto`.
+  - Se crearon pruebas unitarias en `backend/src/identity/users.controller.spec.ts` verificando listado, reasignación, rechazo 403 ante auto-modificación, auditoría de cambio y conflicto 409 al intentar remover el último perfil Administrador.
+- **Servicio frontend (`UsersService`):**
+  - Creado en `frontend/src/app/users.service.ts` con métodos `list()` (`GET /api/users`) y `updateProfiles(id, profiles)` (`PUT /api/users/:id/profiles`).
+- **Componente de administración (`UsersComponent`):**
+  - Creado en `frontend/src/app/users.component.ts`.
+  - Presenta listado accesible de cuentas institucionales con insignias de perfil (`UiBadgeComponent`) e identificación del usuario conectado impidiendo su auto-modificación.
+  - Editor interactivo accesible con selección múltiple de perfiles institucionales.
+  - Implementación de `LeavesWithConfirmation` (`confirmLeave()`, `isDirty()`) y diálogo modal accesible (`UiDialogService.confirm`) antes de descartar modificaciones pendientes.
+- **Rutas y navegación (`app.routes.ts`, `process-list.component.ts`):**
+  - Incorporada la ruta `/usuarios` con guardia de activación y guarda de salida.
+  - Añadido enlace de acceso directo en el listado de procesos para administradores.
+- **Pruebas automatizadas (`users.spec.ts`):**
+  - 7 pruebas unitarias verificando carga, protección de auto-edición, activación de editor, guardado, validación de al menos un perfil, manejo de errores de backend y confirmación de cambios pendientes.
+
+Verificación:
+- Pruebas frontend (`npm run test:frontend`): 5 suites, 44 pruebas aprobadas al 100%.
+- Pruebas unitarias de backend (`npm test`): 10 suites, 44 pruebas aprobadas al 100%.
+- Compilación de la solución (`npm run build`): compilación TypeScript backend y Angular frontend limpia (código de salida 0).

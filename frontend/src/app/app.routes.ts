@@ -9,6 +9,7 @@ import { ProcessFormComponent } from './process-form.component';
 import { ProcessListComponent } from './process-list.component';
 import { ProcessTypesComponent } from './process-types.component';
 import { UnitsComponent } from './units.component';
+import { UsersComponent } from './users.component';
 import { unsavedChangesGuard } from './unsaved-changes.guard';
 
 /** Página de inicio: mapa de procesos. */
@@ -29,5 +30,6 @@ export const routes: Routes = [
   { title: 'Editar proceso', path: 'procesos/:id/editar', component: ProcessFormComponent, canActivate: [authGuard], canDeactivate: [unsavedChangesGuard] },
   { title: 'Unidades internas', path: 'unidades', component: UnitsComponent, canActivate: [authGuard], canDeactivate: [unsavedChangesGuard] },
   { title: 'Tipos de proceso', path: 'tipos-de-proceso', component: ProcessTypesComponent, canActivate: [authGuard], canDeactivate: [unsavedChangesGuard] },
+  { title: 'Gestión de usuarios y perfiles', path: 'usuarios', component: UsersComponent, canActivate: [authGuard], canDeactivate: [unsavedChangesGuard] },
   { title: 'Página no encontrada', path: '**', component: NotFoundComponent }
 ];

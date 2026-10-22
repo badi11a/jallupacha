@@ -1,6 +1,6 @@
 import { Request } from 'express';
 
-export type ProfileCode = 'ADMIN' | 'PROCESS_OWNER' | 'RISK_MANAGER' | 'CONSULTATION';
+export type ProfileCode = 'ADMIN' | 'PROCESS_OWNER' | 'VALIDATOR' | 'RISK_MANAGER' | 'CONSULTATION';
 
 export interface AuthenticatedUser {
   id: number;
