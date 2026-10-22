@@ -42,3 +42,9 @@ Desktop.ini
 *.crt
 credentials*.json
 wallet/
+
+# Archivos locales de credenciales y cuentas de prueba
+CUENTAS_LOCALES.md
+credenciales_locales.md
+*.local.md
+docs/credenciales_locales.md
