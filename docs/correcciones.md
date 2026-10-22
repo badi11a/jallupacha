@@ -361,3 +361,26 @@ Decisión: el ambiente QA vacío usa temporalmente la misma cuenta `PROCESOS` co
 Corrección: la instalación v14 conserva la separación por defecto y solo acepta esa configuración cuando `MVP_V14_ALLOW_OWNER_RUNTIME_FOR_QA=true` se declara explícitamente. En esa excepción omite los `GRANT` al mismo propietario, que Oracle no permite ni necesita.
 
 Límite: esta excepción no se permite implícitamente y no debe trasladarse a producción; antes de producción se debe volver a una cuenta de ejecución con privilegios mínimos.
+
+## C-019 — Purga de especificación errónea de cabecera/cuenta y componentes huérfanos
+
+Clasificación: corrección de defecto de especificación y limpieza de código muerto. Fuente: instrucción de producto y saneamiento técnico.
+
+Hallazgo:
+1. `UiAppShellComponent` incorporaba una barra superior (`topbar`) con logotipo institucional, bloque de identificación de usuario (`account`) y botón de cerrar sesión (`logout`), lo cual fue identificado como una especificación errónea que debía depurarse de la interfaz.
+2. Existían componentes y vistas huérfanas en el frontend no vinculadas al router (`process-workspace`, `process-map` v13, `process-risks`, `access.ts` y el módulo `administration/` con `audit`, `catalogs`, `profiles`), así como pruebas unitarias desalineadas (`app.component.spec.ts`).
+
+Corrección:
+- Se eliminó `UiAppShellComponent` de `frontend/src/app/shared/ui/app-shell.component.ts` y de su exportación pública en `index.ts`.
+- Se eliminaron las reglas CSS correspondientes (`.topbar`, `.brand`, `.brand-logo`, `.account`, `.app-footer`) en `base.css`.
+- Se eliminaron todos los componentes y archivos huérfanos mencionados de `frontend/src/app/`.
+- Se adaptó `ui.spec.ts` para validar componentes del kit UI de forma autónoma con `UiDialogHostComponent` integrado en su arnés de prueba.
+- Se configuró `angular.json` para descubrimiento dinámico global de pruebas (`src/**/*.spec.ts`).
+- Se actualizó `docs/catalogo-componentes.md` retirando `UiAppShellComponent` y registrando el anfitrión de diálogos en `app.component.ts`.
+
+Verificación:
+- 25 pruebas unitarias de frontend aprobadas en Vitest (`npm run test:frontend`).
+- 31 pruebas unitarias de backend aprobadas en Jest (`npm test`).
+- Compilación de producción de frontend completada exitosamente sin advertencias de presupuesto (`npm run build --workspace frontend`).
+- 44 combinaciones de color verificadas conforme a WCAG 2.2 AA (`npm run check:contrast --workspace frontend`).
+

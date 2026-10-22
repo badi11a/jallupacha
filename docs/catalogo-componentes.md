@@ -16,11 +16,10 @@
 
 | API pública | Selector o uso | Propósito y contrato principal |
 | --- | --- | --- |
-| `UiAppShellComponent` | `<ui-app-shell>` | Estructura con encabezado, contenido, cuenta, aviso de entorno, pie y alojamiento de diálogos. Requiere `appName`; acepta `homeHref`, `brandLogoSrc` opcional para marca propia autorizada, datos de cuenta y evento `logout`. |
 | `UiBadgeComponent` | `<ui-badge>` | Etiqueta de estado con texto visible; `tone`: `neutral`, `info`, `success`, `warning`, `danger`, `critical`. |
 | `UiBreadcrumbsComponent` | `<ui-breadcrumbs>` | Ruta de navegación; requiere `items` con `label` y `link` opcional; el último ítem se marca como página actual. |
 | `UiCharCounterComponent` | `<ui-char-counter>` | Contador cercano al límite; requiere `max`, admite `value`. El conteo elimina espacios de extremos y usa un criterio alineado con la validación actual del backend. |
-| `UiDialogHostComponent` | `<ui-dialog-host>` | Presenta el diálogo activo. Ya está incluido en `UiAppShellComponent`; evitar duplicarlo. |
+| `UiDialogHostComponent` | `<ui-dialog-host>` | Presenta el diálogo activo. Se aloja a nivel raíz en `app.component.ts`; evitar duplicarlo. |
 | `UiDialogService` | `confirm()`, `form()` | Confirmaciones y formularios modales con campos `text` o `number`; devuelve promesas. Un diálogo activo a la vez. |
 | `UiMessageComponent` | `<ui-message>` | Mensajes `info`, `success` o `error`; los errores usan `role=alert`. |
 | `UiPaginationComponent` | `<ui-pagination>` | Paginación anterior/siguiente; requiere `page`, `pageSize`, `total`; emite `pageChange`. |
@@ -50,4 +49,4 @@
 
 ## 6. Verificación
 
-Inventario realizado mediante lectura estática del repositorio. No se ejecutaron compilación, pruebas, revisión visual ni validación de accesibilidad porque el entorno local no está disponible. Registrar esas verificaciones cuando exista un entorno apto.
+Inventario actualizado tras la purga de `UiAppShellComponent`. Verificado con pruebas unitarias frontend (`npm run test:frontend`) y verificación de compilación (`npm run build --workspace frontend`).
