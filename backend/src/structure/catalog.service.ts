@@ -5,7 +5,7 @@ import {
   NotFoundException
 } from '@nestjs/common';
 import { Inject } from '@nestjs/common';
-import { DataSource, EntityManager } from 'typeorm';
+import { DataSource, EntityManager, IsNull } from 'typeorm';
 import { AuditService } from '../audit/audit.service';
 import { MacroprocessTypeEntity } from './macroprocess-type.entity';
 import { MacroprocessEntity } from './macroprocess.entity';
@@ -240,7 +240,7 @@ export class CatalogService {
         if (!parent) throw new BadRequestException('Parent unit does not exist or is inactive');
       }
 
-      const duplicate = await repository.findOneBy({ parentUnitId, name: input.name });
+      const duplicate = await repository.findOneBy({ parentUnitId: parentUnitId ?? IsNull(), name: input.name });
       if (duplicate) throw new ConflictException('A unit with this name already exists under the parent unit');
 
       const tempCode = `TMP${Date.now().toString(36)}${Math.random().toString(36).slice(2, 8)}`.slice(0, 32).toUpperCase();
@@ -278,7 +278,7 @@ export class CatalogService {
       }
 
       const finalName = input.name ?? row.name;
-      const duplicate = await repository.findOneBy({ parentUnitId, name: finalName });
+      const duplicate = await repository.findOneBy({ parentUnitId: parentUnitId ?? IsNull(), name: finalName });
       if (duplicate && duplicate.id !== id) {
         throw new ConflictException('A unit with this name already exists under the parent unit');
       }
