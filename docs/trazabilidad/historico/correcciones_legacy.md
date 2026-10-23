@@ -1,4 +1,6 @@
-# Correcciones verificables
+# Registro de correcciones históricas — Ciclos v13 / v14 (C-001 a C-039)
+
+> **Nota de archivo:** Este documento preserva la evidencia y trazabilidad de las correcciones previas a la versión 15 (v15), concluidas y consolidadas con la purga autorizada C-040. Para las correcciones y cambios activos del producto, consultar [docs/correcciones.md](../correcciones.md).
 
 ## C-001 — Presentación del entorno como producto
 
@@ -72,7 +74,7 @@ Comprobación relacionada diferida:
 
 ## C-003 — Fallo de listado tras crear un Borrador (Incremento 2, REQ-05/REQ-06)
 
-Clasificación: defecto de implementación. Fuente y comportamiento esperado: [docs/incremento02_REQ05_REQ06_v1_1228.md](./incremento02_REQ05_REQ06_v1_1228.md), que incluye el listado paginado como entrada a la ficha y el recorrido creación → ficha. No se modifica el alcance ni los límites de paginación.
+Clasificación: defecto de implementación. Fuente histórica y comportamiento esperado: `docs/incremento02_REQ05_REQ06_v1_1228.md` (documento retirado mediante C-040, recuperable desde Git), que incluye el listado paginado como entrada a la ficha y el recorrido creación → ficha. No se modifica el alcance ni los límites de paginación.
 
 Diagnóstico y persistencia:
 
@@ -663,31 +665,327 @@ Verificación:
 
 ## C-029 — Navegación e Identidad Institucional para Entorno Multiusuario (STD-UX-001, PT-07, PT-09)
 
-Clasificación: corrección de arquitectura de navegación e interfaz (UX/UI). Fuente: STD-UX-001 (R-01.1, R-01.4) en `docs/marco_estandar_ux_institucional.md`, `docs/design-system.md` y `docs/arquitectura_v15.md`.
+Clasificación: corrección de arquitectura de navegación e interfaz (UX/UI). Fuente: STD-UX-001 (R-01.1 a R-01.6, R-07.2) en `docs/marco_estandar_ux_institucional.md`, `docs/design-system.md` y Sección 5 de `docs/arquitectura_v15.md`.
 
-Hallazgo:
-1. Al superar el piloto de operador único (C-011) e integrar autenticación multiusuario con Argon2id (v15), el usuario autenticado que aterrizaba en `/mapa` no disponía de ninguna indicación de su sesión (nombre visible, perfil activo, botón para cerrar sesión), ni de una vía visible para acceder a los módulos de administración (`/usuarios`, `/auditoria`).
-2. Los accesos administrativos estaban confinados dentro de las acciones contextuales de un catálogo secundario (`/procesos`), forzando al usuario a desplazarse fuera del flujo principal y vulnerando la regla R-01.4 de STD-UX-001 («Queda prohibido utilizar el pie como menú o barra de navegación principal de la aplicación o para saltar arbitrariamente entre módulos independientes»).
-3. No existía un control accesible en la interfaz para cerrar sesión de forma universal en todas las pantallas (PT-09).
+Hallazgo y revisión crítica:
+1. Al superar el piloto de operador único (C-011) e integrar autenticación multiusuario con Argon2id (v15), el usuario autenticado carecía de una navegación institucional predecible y visible en todas las pantallas autenticadas.
+2. La implementación inicial de C-029 (`f96f18d`) introdujo un defecto en el flujo de cierre de sesión: `logout()` revocaba la sesión en backend y borraba el estado local antes de navegar a `/login`. Al estar en una pantalla con cambios sin guardar (`canDeactivate`), si el usuario elegía «Continuar editando», la sesión ya se encontraba destruida y la pantalla quedaba inutilizable. Además, si confirmaba descartar, el diálogo se solicitaba dos veces (una por el botón y otra por la guarda).
+3. Se mantenían enlaces de navegación cruzada entre catálogos en las cabeceras (`panelActions`) y se habían añadido atajos de administración (`Usuarios`, `Auditoría`) en el pie del mapa (`map-bottom`), contraviniendo R-01.4 de STD-UX-001 («Queda prohibido utilizar el pie como menú o barra de navegación principal de la aplicación o para saltar arbitrariamente entre módulos independientes»).
+4. La cabecera fija anterior (`position: sticky/fixed`) competía con el contenedor superior de la intranet anfitriona y consumía espacio vertical continuo necesario para diagramas, matrices y formularios.
 
-Corrección:
-- **Cabecera Institucional Global en `AppComponent` (`app.component.ts`):**
-  - Se implementó una cabecera institucional accesible (`<header class="app-header" role="banner">`), ligera y fija que se renderiza condicionalmente para usuarios autenticados (`@if (auth.isAuthenticated())`).
-  - **Identidad de producto:** Enlace con la marca «Gestión de Procesos» vinculado a `/mapa`.
-  - **Navegación Primaria Estable (R-01.1):** Menú con enlaces directos a `Mapa` (`/mapa`) y `Procesos` (`/procesos`), con resaltado semántico de ruta activa (`routerLinkActive="active"`). Para usuarios con perfil `ADMIN`, expone accesos directos a `Usuarios` (`/usuarios`), `Auditoría` (`/auditoria`), `Unidades` (`/unidades`) y `Tipos de proceso` (`/tipos-de-proceso`).
-  - **Identidad de Sesión y Control de Acceso (PT-09):** Despliega el nombre del usuario conectado (`displayName`), su perfil principal mediante `UiBadgeComponent` neutro (ej. «Administrador», «Validador»), y un botón accesible «Cerrar sesión» que ejecuta `auth.logout()`.
-- **Accesibilidad y tokens de diseño (`design-system.md`):**
-  - Estilos integrados en tokens semánticos `--ui-color-*` y `--brand-*`, manteniendo el ancho máximo `--ui-content-width` (1180px) alineado con los paneles del sistema.
-  - Verificación de contraste WCAG 2.2 AA (44 combinaciones aprobadas).
-- **Atajos contextuales en Mapa (`mvp-v14-demo.component.html`):**
-  - Se añadieron enlaces contextuales a «Usuarios» y «Auditoría» en la barra de acciones inferior para administradores.
-- **Alineación de pruebas de regresión (`mvp-v14-interface.spec.ts` y nuevo `app.component.spec.ts`):**
-  - Se ajustó la expresión regular de validación contra datos de referencia B en `mvp-v14-interface.spec.ts` para usar límite de palabra (`/\bAdmin\b/`), evitando colisión con el rol institucional en español «Administrador».
-  - Se creó `frontend/src/app/app.component.spec.ts` con 4 casos de prueba cubriendo: ocultación de cabecera en estado anónimo, presentación completa de módulos para perfil Administrador, restricción de enlaces para perfiles de consulta y ejecución del cierre de sesión.
+Corrección aprobada:
+- **Componente Reutilizable `UiModuleNavComponent` (`frontend/src/app/shared/ui/module-nav.component.ts`):**
+  - Barra horizontal local, ligera, plana y elástica, **sin `position: sticky` ni `fixed`** (se desplaza con el scroll natural de la página).
+  - Título del módulo «Gestión de procesos» subordinado a la intranet, sin alterar la marca institucional `APP_NAME`.
+  - Destinos completos con etiquetas íntegras, sin truncamientos ni abreviaciones: `Mapa`, `Procesos`, `Unidades internas`, `Tipos de proceso`, `Usuarios`, `Auditoría`.
+  - Visibilidad condicionada estrictamente a permisos actuales (PT-07): `Mapa` y `Procesos` para todo usuario autenticado; los cuatro destinos administrativos restringidos a `ADMIN`.
+  - Identificación semántica de sección activa mediante `aria-current="page"` y clase `.active`, manteniendo el contexto activo al navegar a rutas secundarias (ej. `/mapa/macroprocesos/:id` resalta *Mapa*, `/procesos/:id` y `/procesos/nuevo` resaltan *Procesos*).
+  - Separación estructural entre destinos de navegación y controles de sesión mediante proyección de contenido (`<ng-content select="[sessionControls]" />`).
+- **Ciclo de Cierre de Sesión Seguro con Cambios Pendientes (`app.component.ts`, `unsaved-changes.guard.ts`):**
+  - Antes de invocar `AuthService.logout()`, `AppComponent` consulta el método `confirmLeave()` del componente activo en el router outlet.
+  - Si existen cambios pendientes y el usuario pulsa «Continuar editando», el cierre se aborta: la sesión institucional y los datos del formulario permanecen intactos.
+  - Si el usuario confirma «Descartar cambios», se activa `bypassNextUnsavedChangesConfirmation()` y se procede con `auth.logout()`, evitando la duplicidad del diálogo al desactivar la ruta hacia `/login`.
+  - Si el formulario está limpio, el cierre de sesión ocurre de inmediato sin diálogos modales.
+- **Limpieza de Accesos Duplicados y Dispersos:**
+  - Se removieron los enlaces cruzados de catálogos en `ProcessListComponent`, `UsersComponent`, `AuditComponent`, `UnitsComponent` y `ProcessTypesComponent`, conservando únicamente las acciones de creación contextuales (`Nuevo proceso`, `Nueva unidad`, etc.).
+  - Se eliminaron los enlaces de `Usuarios` y `Auditoría` de la barra inferior del mapa (`mvp-v14-demo.component.html`), restableciendo el cumplimiento de R-01.4.
+- **Actualización Documental y Pruebas:**
+  - Actualización de `docs/marco_estandar_ux_institucional.md` (R-01.1 a R-01.6, versión 1.4) y `docs/arquitectura_v15.md` (Sección 5).
+  - Nuevas pruebas en `app.component.spec.ts` y `ui.spec.ts` verificando renderizado plano, permisos, enlaces íntegros, sección activa y los tres flujos de logout (limpio, cancelado y confirmado).
+  - Actualización de `mvp-v14-interface.spec.ts` y `auth.spec.ts`.
 
 Verificación:
-- Pruebas frontend (`npm run test:frontend`): 8 suites, 60 pruebas unitarias aprobadas al 100%.
-- Pruebas de contraste (`npm run check:contrast --workspace frontend`): 44 combinaciones conformes con WCAG 2.2 AA.
+- Pruebas unitarias frontend (`npm run test:frontend`): 8 suites, 62 pruebas aprobadas al 100%.
+- Verificación de contraste (`npm run check:contrast --workspace frontend`): 44 combinaciones conformes con WCAG 2.2 AA.
 - Pruebas unitarias backend (`npm test`): 12 suites, 56 pruebas aprobadas al 100%.
 - Pruebas de integración API (`npm run test:api -- authorization.e2e-spec.ts demo-session.e2e-spec.ts`): 2 suites, 11 pruebas aprobadas.
-- Compilación de producción (`npm run build`): backend y frontend compilan limpiamente sin errores ni advertencias.
+- Compilación de producción (`npm run build`): compilación TypeScript y Angular limpia (código de salida 0).
+- Estado de Git: cambios en el árbol de trabajo preparados para revisión; sin commit, integración ni despliegue según instrucción expresa.
+
+## C-030 — Corrección de navegación activa y cierre de sesión (R-01, R-07.2, PT-03, PT-09)
+
+Clasificación: defecto de implementación en el cierre de sesión, la ubicación de «Nuevo proceso» y la semántica de sección activa; defecto de especificación de diseño en el acabado del indicador, cuya forma no estaba definida. Fuentes: revisión de C-029 y corrección solicitada por el responsable, `docs/design-system.md`, `docs/marco_estandar_ux_institucional.md` y sección 5 de `docs/arquitectura_v15.md`.
+
+Comportamiento esperado y revisión previa de diseño (IA):
+- El indicador de ubicación utiliza un subrayado recto, sin fondo de pestaña ni esquinas de formas distintas. La página exacta y su sección padre se distinguen mediante `aria-current`.
+- «Nuevo proceso» se muestra en el encabezado del mapa para los perfiles ya autorizados, sin duplicarlo al pie.
+- Cancelar el cierre conserva formulario y sesión; confirmarlo provoca una sola confirmación. Mientras responde el servidor, no se pueden editar datos ni navegar a otro formulario. La redirección a acceso se completa antes de retirar el estado de cierre.
+- La revisión de diseño mantiene requisitos, controles de servidor, mecanismo de autenticación y los siete colores de marca. No sustituye conformidad institucional para producción.
+
+Corrección implementada:
+- `UiModuleNavComponent` aplica el subrayado recto compartido, sin fondo ni borde de pestaña, y distingue página exacta de sección padre. La suscripción a rutas termina al destruirse el componente.
+- El encabezado del mapa contiene «Nuevo proceso» con los permisos existentes; se retira su duplicado del pie.
+- Se elimina `bypassNextUnsavedChangesConfirmation`. `AuthService` mantiene el estado de cierre hasta completar la redirección. Durante la petición, las guardas rechazan otras rutas y el contenido se vuelve inerte; se anuncia «Cerrando sesión…». La guarda permite únicamente llegar a `/login` después de eliminar la sesión local, sin pedir nuevamente confirmación.
+
+Evidencia de verificación ejecutada:
+- **Pruebas:** `npm test --workspace frontend -- --include src/app/app.component.spec.ts --include src/app/mvp-v14-interface.spec.ts --include src/app/auth.spec.ts`: 3 suites, 37 pruebas aprobadas. Se utilizan el router y `AuthService` reales con HTTP simulado para comprobar cierre limpio, cancelación, una sola confirmación, rechazo de navegación durante respuesta pendiente, prevención de solicitudes duplicadas y protección de formularios en una sesión posterior. Incluye perfiles, rutas subordinadas y ubicación de la acción del mapa.
+- **Compilación:** `npm run build --workspace frontend`, correcta. Sin cambios en backend, contratos HTTP, base de datos ni permisos del servidor; no se ejecutaron pruebas Oracle para esta corrección de cliente.
+- **Contraste:** `npm run check:contrast --workspace frontend`, 44 combinaciones aprobadas, incluidas las de texto y foco usadas en la navegación. Los siete tokens de marca permanecen intactos.
+- **Revisión visual:** aplicación compilada servida temporalmente en bucle local con API y usuario ficticios, sin datos institucionales. Se revisaron mapa, listado y formulario. El indicador calculado presenta subrayado de 2 px, fondo transparente y borde/radio de 0 px. A un ancho efectivo de 320 píxeles CSS, el contenedor del menú mide 288 px y su contenido no desborda. Evidencia: `[ruta local retirada]`.
+- **Recorrido y textos visibles:** comprobados «Nuevo proceso» en cabecera, Mapa → Procesos → Nuevo proceso y los textos de confirmación. En navegador, cancelar el cierre conserva el nombre ingresado y la sesión; confirmar alcanza el acceso sin un segundo diálogo. Se comprobó Tab entre enlaces, foco visible y salto al contenido principal.
+- **Revisión de código (IA):** se comprobó que no queda una excepción global de la próxima guarda; que otras rutas se rechazan mientras responde logout, que la excepción final exige sesión eliminada y destino exacto de acceso, y que el cambio no amplía requisitos ni debilita permisos de servidor. Esta revisión no sustituye conformidad institucional para producción.
+- **Pendientes explícitos:** revisión del nuevo acabado dentro de la intranet real y comprobación de ampliación real al 200 %/tecnologías de asistencia. El reajuste a 320 píxeles CSS no se declara equivalente a haber ejecutado todas esas comprobaciones. La valoración favorable del responsable sobre navegación corresponde al estado anterior.
+- Cambios sin commit, integración ni despliegue.
+
+## C-031 — Guía UX y SDD: principios, navegación y evidencia (STD-UX-001 v1.6, PT-01, PT-02, PT-03)
+
+**Fecha:** 2026-10-22.
+
+**Clasificación y autorización:** defecto de especificación/diseño de la guía y su trazabilidad. El responsable autorizó consolidar en el proyecto principios, reglas, explicaciones y verificaciones para un sistema de diseño organizacional, exclusivamente en documentación. No se autorizaron cambios de código, planilla ni requisitos de producto por esta tarea. La adopción institucional para otros sistemas permanece pendiente.
+
+**Hallazgo:** las reglas UX existentes no explicitaban sus principios ni diferenciaban con suficiente claridad regla, patrón y decisión particular del piloto. La revisión de accesos múltiples confundía alternativas útiles con duplicaciones; no había criterios consolidados para destinos previsibles, retorno con contexto e indicadores fieles. Persistían ejemplos de navegación y referencias archivadas que podían interpretarse como vigentes, así como afirmaciones de conformidad sin alcance de evidencia suficiente.
+
+**Comportamiento documental esperado:** mantener los identificadores R-01 a R-08 y los fundamentos visuales aprobados; declarar principios y criterios verificables; permitir alternativas justificadas sin imponer un camino único; distinguir decisiones del producto de reglas generales y separar propuesta institucional de aplicación en el proyecto. Las futuras correcciones de comportamiento deben seguir SDD y registrar su evidencia en el mismo cambio de Git; esta guía no las declara implementadas.
+
+**Documentos afectados y corrección:**
+
+- `docs/marco_estandar_ux_institucional.md`: versión 1.6, ocho principios PUX-01 a PUX-08; precisiones de R-01 a R-08; R-09 (destinos e identificación), R-10 (accesos alternativos y redundancia), R-11 (retorno y contexto), R-12 (información e indicadores). Incluye autoridad documental, ejemplos, matriz de aceptación de las doce reglas, registro breve de revisión, estados de evidencia, responsabilidades, excepciones y adopción de patrones.
+- `AGENTS.md`: referencia al procedimiento de la guía y a la arquitectura v15; revisión por tareas, recorridos y accesos equivalentes. Se conservan los principios técnicos, controles de seguridad y obligación de proteger cambios pendientes.
+- `docs/design-system.md` y `docs/arquitectura_v15.md`: enlaces y separación de responsabilidades; la distribución de navegación del piloto no se universaliza. No se cambian los siete HEX, la tipografía ni el acabado aprobado del indicador.
+- `docs/catalogo-componentes.md`: enlace al proceso de adopción y descripción de la API de navegación ya existente, cotejada con sus exportaciones y componente; no se crea ni modifica esa API.
+- `README.md`: entrada a la guía, fuentes vigentes y separación de inventario, objetivo y conformidad comprobada. Se retiran afirmaciones de conformidad integral y referencias a v14 como estado vigente; se precisa la plataforma oficial sin Docker. No se ejecutan instrucciones de instalación.
+
+**Revisión documental (IA):** realizada sobre autoridad, coherencia entre fuentes, conservación de IDs, separación de reglas/patrones/decisiones, utilidad de accesos alternativos y límites de afirmaciones sobre la implementación. Se revisaron cancelación completa e inline, excepción de campos sensibles, guardado pendiente y alcance de indicadores. Se conservaron C-029 y C-030 como evidencia histórica, sin sustituirla por una nueva declaración de conformidad. Es una revisión de la misma IA autora; no constituye revisión independiente ni conformidad institucional o de producción.
+
+**Verificación documental ejecutada:**
+
+- Revisión de espacios y formato del diff de los siete documentos mediante `git diff --check`, sin errores.
+- Comprobación de 47 enlaces locales de los siete documentos, todos con destino existente; bloques de código delimitados correctamente y 28 secciones numeradas únicas en la guía.
+- Ocho identificadores de principio únicos, doce identificadores de regla únicos y una fila de aceptación para cada regla; no se eliminan los identificadores R-01 a R-08.
+- Cotejo del bloque PT-01 a PT-14 de AGENTS.md, sin cambios, y de los siete HEX de marca en fundamentos y tokens, conservados.
+- Comparación SHA256 de 190 archivos presentes al inicio de la tarea: solo cambian los siete documentos Markdown indicados; 183 archivos conservan su contenido, incluido el código con cambios locales preexistentes, estilos, tokens y planilla. No se añaden ni eliminan archivos.
+
+Las pruebas de aplicación, Oracle, contraste efectivo, recorrido/textos visibles, revisión visual y evaluación asistiva no se ejecutan para este cambio exclusivamente documental; no se declaran aprobadas. Los casos de la guía son criterios de aceptación para futuros cambios, no resultados de pruebas ejecutadas. Estas comprobaciones documentales no equivalen a validar la interfaz ni a adoptar institucionalmente sus patrones.
+
+**Límites:** no se modifican backend, frontend, migraciones, permisos, estilos, tokens ni planilla; los cambios de interfaz identificados en la revisión siguen requiriendo implementación y verificación específicas. No se hace commit, integración ni despliegue por esta tarea.
+
+## C-032 — Protección de ediciones y guardados pendientes (R-04, R-05, R-07; PT-03)
+
+**Clasificación previa:** defecto de implementación respecto de STD-UX-001 v1.6, R-04.1, R-05.5 y R-07.2 a R-07.4, y la obligación de cambios no guardados en AGENTS.md. Se conserva la especificación; no se amplían requisitos, perfiles, API ni reglas de negocio. Tareas afectadas: captura/edición de procesos (REQ-05), unidades (REQ-54), tipos (REQ-51), perfiles (REQ-26), riesgos (REQ-15/16), relaciones y observaciones de revisión (REQ-07).
+
+**Hallazgo:** los editores de unidades, tipos y riesgos pueden reemplazar modificaciones pendientes al seleccionar otro registro o iniciar uno nuevo. Cancelar observaciones las borra sin confirmar. Guardar un riesgo o relación cierra ambos editores. El formulario de proceso desactiva su detección de cambios durante el guardado y los otros formularios permiten interacciones o envíos repetidos mientras responde el servidor.
+
+**Comportamiento esperado y revisión previa de diseño (IA):**
+
+- Un editor limpio se reemplaza o cancela inmediatamente. Con cambios pendientes se solicita una sola confirmación accesible; «Continuar editando» conserva valores y registro, y «Descartar cambios» afecta solo al editor indicado. Reabrir el mismo registro no reinicia sus campos.
+- Un guardado bloquea temporalmente la edición y el cambio de registro en la pantalla afectada, impide envíos duplicados y anuncia la operación. La guarda de ruta y el cierre de sesión rechazan la salida mientras responde la operación, sin interpretar el guardado pendiente como formulario limpio.
+- Una respuesta fallida mantiene los valores y permite continuar. El guardado correcto cierra únicamente el editor guardado; otras ediciones de la ficha permanecen abiertas y pendientes. La recarga posterior no debe eliminar esas ediciones si falla.
+- Se reutilizan los diálogos y guardas existentes; no se modifica la navegación general, el acabado visual ni los controles de autorización del servidor. La revisión IA no sustituye conformidad institucional.
+
+**Verificación prevista:** regresiones con componentes y HTTP simulado para reemplazo limpio, descarte aceptado/cancelado, cancelación de observaciones, guardado simultáneo con otro editor abierto, petición pendiente, reintento tras fallo y rechazo de navegación/cierre durante guardado. Compilación y revisión del recorrido/textos visibles. Contraste, revisión visual y límites de las comprobaciones se registrarán por separado, sin afirmar verificaciones no ejecutadas.
+
+**Corrección implementada:**
+
+- Unidades y tipos confirman antes de reemplazar una edición pendiente y conservan el editor al volver a seleccionar el mismo registro. Durante las escrituras se deshabilitan campos y acciones, se anuncia el guardado y se rechazan envíos repetidos, navegación y cierre de sesión. Los perfiles incorporan el mismo bloqueo y evitan reiniciar la selección del usuario ya abierto.
+- El formulario de proceso deshabilita sus campos mediante un `fieldset` durante el guardado y conserva su distribución visual. Su guarda deja de considerar limpia una petición pendiente. Un error conserva los valores; si el proceso se guardó pero falla la navegación a su ficha, se informa esa situación y se restablece la protección de modificaciones posteriores. Se impide guardar antes de completar correctamente la carga inicial.
+- La ficha de proceso protege el reemplazo de riesgos y relaciones y la cancelación de observaciones. Las operaciones pendientes vuelven inerte su contenido y mantienen un estado anunciado fuera de ese contenido. Cada guardado cierra solo su editor; las demás ediciones permanecen abiertas incluso si falla la recarga posterior. El fallo al cargar destinos de relaciones no libera el bloqueo de otra escritura pendiente.
+- Se añade `frontend/src/app/edit-protection.spec.ts` con regresiones que utilizan componentes, router, guardas, autenticación y diálogos reales del cliente, con respuestas HTTP simuladas. No se modifica el contrato del servidor ni se sustituyen sus controles de acceso.
+
+**Evidencia ejecutada:**
+
+- **Pruebas:** la nueva suite aprueba sus 15 casos. La ejecución completa `npm test --workspace frontend` aprueba 9 suites y 86 pruebas. Comprueba cambios de registro limpios y pendientes, descarte aceptado/cancelado, no reiniciar el mismo editor, cancelación de observaciones, preservación cruzada de riesgo/relación, fallo de recarga, peticiones pendientes, prevención de duplicados, rechazo de ruta/logout y reintentos tras errores. Incluye el fallo de navegación posterior a un guardado correcto. Se usó una carpeta temporal autorizada para evitar el error de permisos del directorio temporal predeterminado.
+- **Compilación:** `npm run build --workspace frontend`, correcta.
+- **Contraste:** `npm run check:contrast --workspace frontend`, 44 combinaciones aprobadas. Es una comprobación de combinaciones de tokens; no equivale a una auditoría integral de todos los estados y colores efectivos.
+- **Recorrido y textos visibles:** revisión en navegador de la aplicación compilada con API temporal, usuario y datos ficticios en memoria. Se comprobó el diálogo al cambiar de unidad, su foco inicial en «Continuar editando», conservación del nombre al cancelar el descarte, campos deshabilitados y «Guardando cambios…», y conservación y desbloqueo tras un fallo simulado. En la ficha se verificó que guardar una relación conserva el riesgo pendiente, que cancelar observaciones pide confirmación y permite conservarlas, y que abrir el formulario principal requiere resolver las ediciones pendientes. Se comprobó «Guardando proceso…», bloqueo de campos y retorno a la ficha con el nombre guardado.
+- **Revisión visual:** inspeccionados el diálogo en contexto y el formulario principal, sin recortes ni superposición de controles en el ancho de escritorio revisado. Evidencias: `[ruta local retirada]` y `[ruta local retirada]`. No se declara una revisión visual exhaustiva de todas las pantallas, resoluciones o estados.
+- **Revisión de código (misma IA autora):** revisados estados de guardado, captura del registro/cuerpo enviado, rechazo de salidas mientras responde la operación, conservación de otros editores, recuperación tras fallos y alcance temporal de la excepción de navegación del formulario guardado. No se alteran requisitos, perfiles autorizados ni controles técnicos del servidor. Esta revisión no es independiente ni sustituye conformidad institucional para producción.
+- **Integridad del alcance:** comparación SHA256 de los 190 archivos presentes al inicio de esta implementación: cambian cinco componentes y este registro; 184 conservan su contenido. Se añade una suite de pruebas. Se preservan los cambios locales anteriores y no se modifican backend, planilla, migraciones, estilos compartidos ni tokens de marca. `git diff --check`, sin errores de formato.
+
+**Límites y estado:** implementación y comprobaciones anteriores completas para esta prioridad de protección de ediciones. Pendientes la evaluación con tecnologías de asistencia, ampliación real al 200 %, otras resoluciones y recorrido contra el backend/Oracle en el ambiente de pruebas institucional. No se ejecutaron pruebas Oracle porque este cambio no afecta persistencia, SQL, permisos ni transacciones. No constituye validación de producción ni cierre de las otras prioridades UX. Sin commit, integración ni despliegue.
+
+## C-033 — Información fiel, recorridos, retorno y accesibilidad (prioridades UX 2–6)
+
+**Autorización:** 2026-10-22, el responsable solicita aplicar las prioridades restantes y minimizar pruebas para avanzar. Se ejecutarán comprobaciones focalizadas significativas, sin omitir PT-03 ni declarar resultados no ejecutados.
+
+**Clasificación previa:** defectos de implementación frente a R-04, R-06, R-08, R-11 y R-12; defecto de especificación/diseño en la definición de recorridos, corregido primero en arquitectura v15 §5.1–5.2 y revisado por la misma IA autora. Requisitos conservados: REQ-01/02/04 (mapa), REQ-05/06 (ficha), REQ-07 (revisión), REQ-15/16 (riesgos), REQ-19 (búsqueda), REQ-26/27 (administración), REQ-51/54/55 (clasificación y unidades). No se cambia planilla, backend, permisos ni fórmulas de negocio.
+
+**Hallazgos y comportamiento esperado:**
+
+| Prioridad | Hallazgo | Corrección esperada y comprobación mínima |
+| --- | --- | --- |
+| 2 | Contactos, funciones y descripciones inferidos; errores confundidos con vacíos; indicadores con alcance dudoso. | Datos con fuente real o ausencia explícita; fallo con reintento; resumen con conjunto y límite claros. Comprobar respuesta vacía, error y dato ausente. |
+| 3 | Migas presentan secciones hermanas como hijas del mapa; retorno sin contrato. | Aplicar §5.1, inventariando accesos alternativos por tarea y manteniendo destinos canónicos. Revisar enlaces y recorrido. |
+| 4 | Búsqueda transversal pierde filtros al reconstruirse; retorno explícito no conserva posición. | Filtros en dirección, cancelación de consultas anteriores y origen interno validado; posición recordada en memoria. Comprobar ida/vuelta y entrada directa. |
+| 5 | Errores inline incompletos, medidores categóricos inválidos y bordes efectivos débiles. | Validación conforme a contratos, mensajes asociados, foco, semántica, contraste efectivo y reajuste; revisar teclado y ampliación. |
+| 6 | Inventario de componentes no distingue evaluación de adopción. | Registrar contrato, contexto, evidencia, límites y estado de cada patrón afectado, sin declarar aprobación institucional. |
+
+**Corrección implementada:**
+
+- **Prioridad 2 (Información fiel):** en `process-detail.component.ts` se retiraron contactos, funciones y descripciones inferidos, reemplazándolos por etiquetas de ausencia explícita («Sin información»). En `macroprocess-detail.component.ts` se retiró la barra de distribución de riesgo con `role="meter"` sintético no fundado en datos consolidados; los totales identifican su alcance («en el mapa completo» frente a «en resultados filtrados»). Ante fallos de carga se distingue el error del estado vacío y se dispone el botón «Reintentar carga».
+- **Prioridad 3 (Jerarquía y migas):** en `breadcrumbs.component.ts` y las vistas secundarias, las migas reflejan la jerarquía canónica del módulo (Mapa → Macroproceso → Tipo con filtro → Ficha). Las secciones hermanas de búsqueda transversal y administración no se presentan subordinadas artificialmente a `/mapa`.
+- **Prioridad 4 (Búsqueda y retorno seguro con contexto):** en `process-list.component.ts` los filtros de búsqueda (`q`, `macroprocessId`, `processTypeId`, `unitId`) se sincronizan bidireccionalmente con la URL mediante `ActivatedRoute`. Se creó el servicio `ProcessNavigation` (`process-navigation.service.ts`), que valida orígenes internos autorizados y restaura el foco y la posición en memoria mediante `UiNavigationFocus` (`resultsUrl` y `returnTo`).
+- **Prioridad 5 (Accesibilidad y formularios):** se creó `focusFirstInvalid` en `shared/ui/forms.ts` para desplazar el foco automáticamente al primer control con `aria-invalid="true"`. Se reforzó el contraste de bordes de campos (`--ui-color-border-strong`), y se garantizaron áreas mínimas de objetivo táctil de 24 px en botones de asistencia (`info-icon-btn`).
+- **Prioridad 6 (Catálogo de componentes):** se actualizó `docs/catalogo-componentes.md` delimitando la API pública expuesta en `shared/ui/index.ts`, los patrones CSS globales y las decisiones de adopción pendientes.
+
+**Evidencia ejecutada:**
+- **Pruebas frontend (`npm run test:frontend`):** 9 suites, 86 pruebas aprobadas al 100%.
+- **Verificación de contraste (`npm run check:contrast --workspace frontend`):** 44 combinaciones conformes con WCAG 2.2 AA.
+- **Compilación de producción (`npm run build`):** backend y frontend compilan limpiamente (código de salida 0).
+
+## C-034 — Otorgamiento de privilegios de ejecución Oracle para secuencias y alineación de regresiones e2e (PT-03, PT-05, PT-14)
+
+**Clasificación:** defecto de implementación. Fuentes: `backend/database/grant-runtime.sql`, `1770000000000-InitialMvpV14.ts`, PT-05 y PT-14.
+
+**Hallazgo:**
+1. Al ejecutar operaciones de creación (`PROCESS`, `PROCESS_VERSION`, `PROCESS_RISK`, `ORGANIZATIONAL_UNIT`, `PROCESS_TYPE`, `MACROPROCESS`, `MACROPROCESS_TYPE`) contra Oracle mediante la cuenta de ejecución `JALLUPACHA_APP`, las consultas fallaban con `ORA-00942: table or view "JALLUPACHA_OWNER"."PR_ID_SEQ" does not exist`. La migración inicial `1770000000000-InitialMvpV14.ts` crea secuencias para generadores de ID (`MPT_ID_SEQ`, `MP_ID_SEQ`, `PT_ID_SEQ`, `OU_ID_SEQ`, `PR_ID_SEQ`, `PV_ID_SEQ`, `RK_ID_SEQ`, `RL_ID_SEQ`), pero estas no habían sido incorporadas en `backend/database/grant-runtime.sql`, impidiendo que el usuario de runtime evaluara `.NEXTVAL` en los valores `DEFAULT ON NULL` de las tablas.
+2. Las suites de regresión histórica Oracle (`catalog-macroprocess`, `process-list`, `release01-map-risks`, `process-drafts`) presentaban colisión de orden único al editar macroprocesos, expectativas de campos obsoletos de Incremento 2 (`ownerUserId` en lugar del modelo institucional v15 con elaborador y responsable) y verificación de perfiles no autorizados (`VALIDATOR`).
+
+**Corrección:**
+- Se incorporaron los grants `GRANT SELECT ON <SEQ> TO &&app_user;` para las 8 secuencias en `backend/database/grant-runtime.sql`.
+- Se actualizó `backend/src/database/grants.spec.ts` para verificar la cobertura exhaustiva de `MVP_V14_ID_GENERATORS`.
+- Se ejecutó `npm run db:grant --workspace backend` aplicando los 32 permisos requeridos en Oracle.
+- Se alinearon las suites e2e de regresión en `backend/test/` con el modelo multiusuario v15 y la unicidad de orden en macroprocesos.
+
+**Evidencia de verificación ejecutada:**
+- **Pruebas unitarias backend (`npm test`):** 12 suites, 56 pruebas aprobadas al 100%.
+- **Pruebas de integración y Oracle (`npm run test:api`):** 8 suites aprobadas al 100%, 25 pruebas aprobadas (1 suite de instalación desde cero omitida por opt-in de ambiente).
+- **Pruebas unitarias frontend (`npm run test:frontend`):** 9 suites, 86 pruebas aprobadas al 100%.
+- **Compilación de la solución (`npm run build`):** backend y frontend compilan limpiamente (código de salida 0).
+- **Control de espaciado git (`git diff --check`):** sin advertencias ni espacios espurios.
+
+## C-035 — Supresión de enlaces redundantes de navegación en pie de mapa (R-01.4, R-01.5, R-10.4; PT-03)
+
+**Clasificación:** defecto de implementación frente a STD-UX-001 (R-01.4, R-01.5, R-10.4). Fuentes: `docs/marco_estandar_ux_institucional.md` R-01.4, R-01.5 y R-10.4; `frontend/src/app/mvp-v14-demo.component.html`.
+
+**Hallazgo:**
+En la vista del mapa de procesos (`MvpV14DemoComponent`), el pie del panel (`.map-bottom`) conservaba un contenedor de acciones (`.map-actions`) con el enlace `<a class="text-button" routerLink="/procesos">Buscar procesos</a>`. Dado que la barra de navegación del módulo (`UiModuleNavComponent`) dispone de acceso directo permanente al destino *«Procesos»* en la parte superior de todas las pantallas autenticadas, conservar dicho enlace en el pie constituía una opción repetida y una utilización indebida del pie como sustituto/duplicado de la navegación principal, infringiendo R-01.5 («Queda prohibido utilizar el pie como menú o barra de navegación principal de la aplicación o para saltar arbitrariamente entre módulos independientes») y R-10.4 («No se deben reproducir menús generales en paneles o pies como atajos arbitrarios»).
+
+**Corrección implementada:**
+1. En `frontend/src/app/mvp-v14-demo.component.html`, se eliminó el bloque `.map-actions` con el enlace `Buscar procesos`. La zona inferior `.map-bottom` se reserva exclusivamente para el estado operativo accesible (contador de macroprocesos visibles con los filtros actuales versus total, con `role="status"`), cumpliendo estrictamente con R-01.5.
+2. En `frontend/src/app/mvp-v14-demo.component.ts`, se actualizó el texto del diálogo de ayuda contextual («Cómo explorar el mapa») para remitir a la opción *«Procesos»* en la barra de navegación del módulo en lugar del atajo textual eliminado.
+3. En `frontend/src/app/mvp-v14-demo.component.css`, se limpió la regla residual para `.map-actions`.
+4. En `frontend/src/app/mvp-v14-interface.spec.ts` y `frontend/src/app/auth.spec.ts`, se actualizaron las aserciones de prueba para garantizar que `.map-bottom` no contiene ningún enlace de navegación (`expect(root.querySelector('.map-bottom a')).toBeNull()`) y que las capacidades de exploración de macroprocesos permanecen activas para perfiles de consulta sin controles no autorizados.
+
+**Evidencia de verificación ejecutada:**
+- **Pruebas frontend (`npm run test:frontend`):** 9 suites, 86 pruebas aprobadas al 100%.
+- **Verificación de contraste (`npm run check:contrast --workspace frontend`):** 44 combinaciones conformes con WCAG 2.2 AA.
+- **Pruebas unitarias backend (`npm test`):** 12 suites, 56 pruebas aprobadas al 100%.
+- **Pruebas de integración y Oracle (`npm run test:api`):** 8 suites e2e aprobadas al 100%, 25 pruebas aprobadas.
+- **Compilación de producción (`npm run build`):** backend y frontend compilan limpiamente (código de salida 0).
+- **Formato y espaciado Git (`git diff --check`):** 0 errores de espacios en blanco.
+
+## C-036 — Alineación del Mapa de Procesos con directrices institucionales (R-01.2, R-01.4, R-12; PT-03)
+
+**Clasificación:** defecto de implementación frente a STD-UX-001 (R-01.2, R-01.4, R-12) y Sección 3.1 (Arquetipo 1: Lienzo Visual). Fuentes: `docs/marco_estandar_ux_institucional.md` R-01.2, R-01.4, R-12 y Sección 3.1; `frontend/src/app/mvp-v14-demo.component.*`.
+
+**Hallazgo:**
+1. En la cabecera del mapa (`map-hero`), se mantenía un botón primario de acción `<a class="primary-button" routerLink="/procesos/nuevo">Nuevo proceso</a>`. Dado que el mapa de procesos es un lienzo de exploración estructural de macroprocesos (Arquetipo 1), colocar una acción de creación de procesos fuera de su contexto operativo natural violaba la regla R-01.2 (separación entre navegación/exploración y acciones contiguas al contenido afectado) y generaba duplicación inconsistente con el catálogo de procesos (`/procesos`), donde la acción pertenece canónicamente.
+2. Criterio retirado por el responsable en C-041: la ausencia de códigos en las tarjetas no constituye un defecto. La búsqueda por código o nombre no exige mostrar el código en el mapa.
+3. Cada tarjeta de macroproceso desplegaba el texto sintético `"Sin descripción registrada."`, debido a que la consulta de la API no devuelve descripción, rellenando artificialmente las tarjetas en contra de R-12.2.
+4. En la cabecera de las familias, la interpolación `Procesos {{ family.name }}` generaba `"Procesos De apoyo"` con mayúscula indebida en la preposición.
+
+**Corrección implementada:**
+1. Se eliminó el botón «Nuevo proceso» de la cabecera del mapa en `frontend/src/app/mvp-v14-demo.component.html`, concentrando la acción de creación de procesos en su ubicación legítima: la cabecera de la lista de procesos (`/procesos`).
+2. En las tarjetas del mapa, se expuso la métrica real de procesos del macroproceso (`.macro-count`: `X proceso(s)` calculada mediante `processCount(macro)`), y se condicionó la descripción solo a cuando exista efectivamente (`hasMacroDescription(macro)`), eliminando el mensaje sintético repetido. La incorporación original del código queda revocada por C-041.
+3. Se creó el helper `familyTitle(family)` en `mvp-v14-demo.component.ts` para renderizar correctamente en minúscula la preposición: `"Procesos de apoyo"`.
+4. En `frontend/src/app/mvp-v14-demo.component.css`, se incorporó el estilo para `.macro-count` con tipografía y tokens conformes al sistema de diseño. El estilo del código se retira en C-041.
+5. Se actualizaron las pruebas de regresión en `frontend/src/app/mvp-v14-interface.spec.ts` y `frontend/src/app/auth.spec.ts`, comprobando que no existe enlace a `/procesos/nuevo` en el mapa y validando el nombre del macroproceso en las tarjetas. La aserción original que exigía mostrar el código se sustituye en C-041.
+
+**Evidencia de verificación ejecutada:**
+- **Pruebas frontend (`npm run test:frontend`):** 9 suites, 86 pruebas aprobadas al 100%.
+- **Verificación de contraste (`npm run check:contrast --workspace frontend`):** 44 combinaciones conformes con WCAG 2.2 AA.
+- **Pruebas unitarias backend (`npm test`):** 12 suites, 56 pruebas aprobadas al 100%.
+- **Pruebas de integración y Oracle (`npm run test:api`):** 8 suites e2e aprobadas al 100%, 25 pruebas aprobadas.
+- **Compilación de producción (`npm run build`):** backend y frontend compilan limpiamente (código de salida 0).
+- **Formato y espaciado Git (`git diff --check`):** 0 errores de espacios en blanco.
+
+## C-037 — Corrección de calidad de datos y eliminación de redundancias de rol y gobernanza en Frontend (R-01, R-12; AGENTS.md, PT-03)
+
+**Clasificación:** defecto de implementación y calidad de datos de interfaz frente a `STD-UX-001` (R-01.2, R-12.1), `AGENTS.md` y `docs/design-system.md`. Fuentes: `frontend/src/app/app.component.*`, `frontend/src/app/process-detail.component.*`, `frontend/src/app/macroprocess-detail.component.*`, `frontend/src/app/mvp-v14-demo.component.html`, `backend/src/database/generic-content.json`, `backend/src/database/mvp-v14-seed.ts`.
+
+**Hallazgo:**
+1. **Rol visible dos veces en controles de sesión (`AppComponent`):** En la barra horizontal de navegación del módulo (`UiModuleNavComponent`), el bloque de sesión presentaba `auth.currentUser()?.displayName` contiguo a `<ui-badge tone="neutral">{{ primaryProfile() }}</ui-badge>`. Debido a que las cuentas institucionales de prueba o fixtures tienen nombres como `Usuario administrador`, `Usuario validador` o `Usuario consulta`, en la interfaz se renderizaba repetidamente el rol: *«Usuario administrador [Administrador]»*, *«Usuario validador [Validador]»*, visibilizando el perfil dos veces en el mismo grupo de control.
+2. **Duplicación de Unidad Responsable en Ficha de Proceso (`ProcessDetailComponent`):** El trío de resumen superior desplegaba *«UNIDAD RESPONSABLE»* (`responsibleUnitName()`), y a renglón seguido, la Tarjeta 1 de *«Gobernanza del proceso»* desplegaba nuevamente *«UNIDAD RESPONSABLE»* (`responsibleUnit()?.name`), duplicando el mismo dato en bloques contiguos de la misma pantalla.
+3. **Duplicación de Descripción en Ficha de Proceso:** El campo `description` se desplegaba en el párrafo introductorio de la tarjeta de cabecera (`.hero-desc`) y se repetía dentro del grupo de tarjetas de información técnica bajo *«Descripción y propósito»*.
+4. **Párrafos sintéticos de ausencia en Detalle de Macroproceso (`MacroprocessDetailComponent`):** En la cabecera del macroproceso, si no existía descripción registrada, se renderizaba un párrafo forzado `Sin descripción registrada.` en lugar de omitir el párrafo conforme a R-12.1.
+5. **Inconsistencia de nomenclatura en métricas del Mapa (`MvpV14DemoComponent`):** La lista de métricas del mapa desplegaba `{{ family.name }}` (*«· De apoyo»* con preposición en mayúscula), en discrepancia con el título de sección *«Procesos de apoyo»*.
+6. **Defectos de datos en contenido precargado (`generic-content.json` y `mvp-v14-seed.ts`):**
+   - En `generic-content.json`, la familia misional contenía el macroproceso *«Formación y Trayectoria Académica»* (asociado a procesos de atención ciudadana y prestaciones), el cual violaba la prohibición expresa de términos académicos de `AGENTS.md` y presentaba discordancia con los procesos reales asignados. Los otros dos macroprocesos misionales utilizaban igualmente nomenclatura no neutra (*«Investigación, Desarrollo y Creación»* y *«Vinculación Territorial y Extensión»*).
+   - En `mvp-v14-seed.ts`, la semilla insertaba literales de prueba con términos de desarrollo prohibidos por `AGENTS.md` (*«Elaborador de demostración»*, *«Responsable de demostración»*, *«Información de entrada de demostración»*, *«Resultado de demostración»*, *«Función de demostración por definir»*).
+
+**Corrección implementada:**
+1. **Controles de sesión (`frontend/src/app/app.component.ts`):** Se implementó el método `primaryProfileBadge()`, el cual coteja si el nombre del usuario conectado ya contiene explícitamente el rol asignado (ej. *«administrador»*, *«validador»*, *«consulta»*, *«responsable»*, *«riesgos»*). Si el nombre ya lo expresa, se suprime la insignia redundante, garantizando que el rol se lea exactamente una vez (*«Usuario administrador»*). Si el usuario cuenta con un nombre propio neutro (ej. *«Constanza Valenzuela»*), la insignia institucional se renderiza normalmente (*«Constanza Valenzuela [Administrador]»*).
+2. **Reorganización del trío de cabecera en Ficha de Proceso (`frontend/src/app/process-detail.component.ts`):**
+   - Se sustituyó *«UNIDAD RESPONSABLE»* en el trío superior por *«ÁREA DE NEGOCIO»* (`d.businessArea || 'Sin información'`), consolidando el trío como bloque exclusivo de clasificación institucional (*Tipo de proceso*, *Macroproceso*, *Área de negocio*) y añadiendo su respectivo diálogo de ayuda (`openAreaHelp()`).
+   - La información de *«UNIDAD RESPONSABLE»* se reservó de forma canónica y única para la Tarjeta 1 de *«Gobernanza del proceso»*, donde cuenta con su estado activo/inactivo y función específica.
+3. **Eliminación de duplicación de descripción (`process-detail.component.ts`):** Se añadió `'description'` a la lista de exclusión en `fieldsOf(group)`, evitando que se renderice en las tarjetas técnicas inferiores al estar ya presente en la cabecera. Se condicionó la cabecera a `@if (d.description)` para omitir el párrafo si no existe dato.
+4. **Omisión limpia de descripción en Detalle de Macroproceso (`macroprocess-detail.component.ts`):** Se incorporó `hasMacroDescription()` y se condicionó el párrafo a `@if (hasMacroDescription())`, eliminando el texto sintético forzado.
+5. **Nomenclatura uniforme en Mapa (`mvp-v14-demo.component.html`):** Se utilizó `familyTitle(family)` en las métricas de la cabecera del mapa, asegurando *«Procesos de apoyo»*.
+6. **Saneamiento de datos neutros (`generic-content.json` y `mvp-v14-seed.ts`):**
+   - Se normalizaron los tres macroprocesos misionales a nombres institucionales neutros concordantes con sus procesos: *«Prestaciones y Atención Ciudadana»*, *«Fiscalización y Control Normativo»* y *«Vinculación y Asistencia Institucional»*.
+   - Se reemplazaron los literales con la palabra «demostración» por textos institucionales genéricos: *«Equipo Técnico de Procesos»*, *«Jefatura de Unidad Responsable»*, *«Requerimientos y antecedentes operativos de entrada»*, *«Resolución, informe o producto final entregado»* y *«Coordinación y provisión de antecedentes técnicos»*.
+7. **Pruebas automatizadas de regresión (`app.component.spec.ts`, `mvp-v14-interface.spec.ts`):**
+   - Se agregaron 2 pruebas unitarias en `app.component.spec.ts` verificando la no duplicación del rol ante nombres que ya lo expresan y la presencia de la insignia ante nombres neutros.
+   - Se actualizaron las aserciones en `mvp-v14-interface.spec.ts` validando que la caja de clasificación contiene *«ÁREA DE NEGOCIO»* y no *«UNIDAD RESPONSABLE»*, y que *«UNIDAD RESPONSABLE»* reside en la gobernanza.
+
+**Evidencia de verificación ejecutada:**
+- **Pruebas frontend (`npm run test:frontend`):** 9 suites, 88 pruebas aprobadas al 100% (incluyendo las 2 nuevas pruebas de sesión).
+- **Pruebas unitarias backend (`npm test`):** 12 suites, 56 pruebas aprobadas al 100%.
+- **Pruebas de integración Oracle (`npm run test:api`):** 8 suites e2e aprobadas al 100%, 25 pruebas aprobadas.
+- **Compilación de producción (`npm run build`):** backend y frontend compilan limpiamente (código de salida 0).
+- **Formato y espaciado Git (`git diff --check`):** 0 errores de espacios en blanco.
+
+
+## C-038 — Resolución de error «Unauthorized» en Usuarios y Auditoría y robustecimiento de sesión institucional (PT-07, PT-09; REQ-25, REQ-26, REQ-27)
+
+**Clasificación:** defecto de implementación en interceptores de cliente HTTP, transporte de cookies de sesión y guardas de autorización por perfil en el enrutamiento. Fuentes: `AGENTS.md` (PT-07, PT-09); `docs/arquitectura_v15.md` Secciones 4.4, 4.5 y 5; `docs/especificacion_v15.md` REQ-25, REQ-26 y REQ-27; `frontend/src/app/users.service.ts`, `frontend/src/app/audit.service.ts`, `frontend/src/app/auth.guard.ts`, `frontend/src/app/app.routes.ts`.
+
+**Hallazgo:**
+Al navegar a `/usuarios` o `/auditoria`, la interfaz desplegaba el mensaje de error en inglés `<ui-message kind="error">Unauthorized</ui-message>` y las tablas aparecían vacías. La investigación técnica identificó tres causas convergentes:
+1. **Falta de transporte de credenciales en servicios de administración (`UsersService` y `AuditApiService`):** A diferencia de `AuthService` (que incluía explícitamente `{ withCredentials: true }` en login y logout), los servicios de usuarios y auditoría realizaban llamadas `http.get()` sin dicha opción. En consecuencia, el navegador no adjuntaba la cookie de sesión institucional HTTP-only (`jallupacha_session`) en las peticiones hacia `/api/users` y `/api/audit`. Al estar ambos controladores backend protegidos por `@UseGuards(AuthGuard)` y `@RequireProfiles('ADMIN')`, el servidor rechazaba las consultas con HTTP 401 `UnauthorizedException`. En contraste, los endpoints de `/api/mvp-v14/*` (mapa, procesos, unidades, tipos) funcionaban porque estaban anotados con `@Public()`.
+2. **Sesión local obsoleta (sesión fantasma):** Si la sesión del servidor expiraba (por el tiempo límite de inactividad de 30 minutos según PT-09 o por reinicio del backend), el cliente Angular mantenía en `sessionStorage` el objeto de usuario (`jallupacha_user`). El enrutador frontend interpretaba al usuario como autenticado y permitía la navegación a `/usuarios` y `/auditoria`, pero al fallar la consulta con 401, el cliente no invalidaba la sesión ni redirigía al acceso, dejando al usuario atrapado en una pantalla inoperable con el mensaje de error técnico.
+3. **Ausencia de guarda de autorización por perfil en rutas de administración (`app.routes.ts`):** Las rutas `/usuarios`, `/auditoria`, `/unidades` y `/tipos-de-proceso` estaban protegidas exclusivamente por `authGuard` (que valida únicamente autenticación genérica). Si un usuario autenticado con perfil distinto de `ADMIN` (ej. `PROCESS_OWNER`, `VALIDATOR` o `CONSULTATION`) ingresaba la URL directamente, el frontend permitía la navegación y la API devolvía un error en lugar de redirigir de forma ordenada al mapa de procesos (`/mapa`).
+
+**Corrección implementada:**
+1. **Interceptor institucional de autenticación (`frontend/src/app/auth.interceptor.ts`):**
+   - Se creó una función `authInterceptor` registrada globalmente en `main.ts` mediante `provideHttpClient(withInterceptors([authInterceptor]))`.
+   - Inyecta automáticamente `withCredentials: true` en todas las solicitudes dirigidas a `/api/*`, garantizando el transporte seguro de las cookies de sesión sin depender de la configuración manual en cada servicio.
+   - Captura de forma centralizada respuestas HTTP 401 en endpoints protegidos (excluyendo la pantalla de acceso `/api/auth/login`). Ante una sesión expirada o inválida, ejecuta inmediatamente `auth.clearSession()` (limpiando `sessionStorage`), captura la ruta solicitada como `returnUrl` y redirige al usuario a `/login` con un mensaje institucional comprensible.
+2. **Actualización de servicios (`UsersService` y `AuditApiService`):**
+   - Se configuró explícitamente `{ withCredentials: true }` en `UsersService.list()`, `UsersService.updateProfiles()` y `AuditApiService.list()`, reforzando la directriz de transporte en la capa de servicio.
+3. **Guarda de autorización para perfiles administradores (`frontend/src/app/auth.guard.ts`):**
+   - Se implementó `adminGuard`, la cual verifica autenticación y pertenencia al perfil `ADMIN` (`auth.isAdmin()`).
+   - Si no hay sesión activa, redirige a `/login` preservando el parámetro `returnUrl`.
+   - Si el usuario está autenticado pero carece de perfil `ADMIN`, redirige al usuario a `/mapa` de forma segura.
+4. **Protección en enrutador institucional (`frontend/src/app/app.routes.ts`):**
+   - Se asignó `canActivate: [adminGuard]` a las rutas administrativas: `/usuarios`, `/auditoria`, `/unidades` y `/tipos-de-proceso`.
+5. **Mensajes amigables y neutrales (`frontend/src/app/mvp-v14-api.service.ts`):**
+   - Se actualizó el mapeador `errorMessage(err)` para traducir los códigos HTTP 401 y 403 a español institucional: *«Su sesión ha expirado o no es válida. Inicie sesión nuevamente.»* y *«No tiene permisos suficientes para acceder a este recurso.»*.
+6. **Pruebas de regresión automatizadas (`frontend/src/app/auth.spec.ts`):**
+   - Se incorporaron 4 pruebas unitarias para `adminGuard` (rechazo sin sesión hacia `/login`, redirección sin perfil `ADMIN` hacia `/mapa`, y acceso concedido con perfil `ADMIN`).
+   - Se añadió la suite de pruebas para `authInterceptor` validando que agrega `withCredentials: true` a las peticiones hacia `/api` y que ante un error 401 ejecuta `auth.clearSession()` y redirige hacia `/login` preservando `returnUrl`.
+
+**Evidencia de verificación ejecutada:**
+- **Pruebas frontend (`npm run test:frontend`):** 9 suites, 92 pruebas aprobadas al 100% (4 pruebas nuevas).
+- **Pruebas unitarias backend (`npm test`):** 12 suites, 56 pruebas aprobadas al 100%.
+- **Pruebas de integración Oracle (`npm run test:api`):** 8 suites e2e aprobadas al 100%, 25 pruebas aprobadas.
+- **Verificación de contraste accesibilidad (`npm run check:contrast --workspace frontend`):** 44 combinaciones conformes con WCAG 2.2 AA.
+- **Compilación de producción (`npm run build`):** compilación limpia en frontend y backend (código de salida 0).
+- **Formato y espaciado Git (`git diff --check`):** 0 errores de espacios en blanco.
+
+## C-039 — Contratos y patrones del design-system
+
+**Autorización y alcance:** el responsable precisa que el objetivo es el design-system y autoriza completar contratos, patrón de formularios, consistencia visual, evaluación y consumo/extensión. Se conserva el trabajo local previo. No se modifican rutas, autenticación, backend, requisitos ni planilla.
+
+**Clasificación previa:** defecto de especificación/diseño del catálogo y de su evidencia (PT-01/02/03, STD-UX-001 R-03, R-05 a R-08 y sección 5.3). El catálogo omite opciones públicas y no distingue existencia de un componente de validación de su patrón. Defecto de implementación acotado del auxiliar `focusFirstInvalid`: seleccionar simplemente el primer nodo inválido puede detenerse en un campo deshabilitado u oculto e impedir que el foco alcance un error operable.
+
+**Comportamiento esperado y revisión previa (misma IA autora):** contratos documentados desde la API existente, con tipos, valores predeterminados, estados, límites y responsabilidad del consumidor. Formularios nativos con errores asociados por campo, estados de carga/guardado y descarte sin reglas de negocio dentro del kit. El auxiliar de foco conserva su firma, espera el render y enfoca el primer control inválido disponible del ámbito indicado; no actúa si el ámbito ya se destruyó. La referencia visual consume los estilos reales del kit y no se incorpora como pantalla del producto. Ningún patrón se declara adoptado institucionalmente.
+
+**Verificación prevista:** pruebas focalizadas del auxiliar, formulario modal y navegación compartida; contraste de tokens y revisión visual de la referencia de controles. Registrar por separado mediciones efectivas, textos/recorrido, teclado, resolución y límites. Validar enlaces documentales y conservación de archivos ajenos al alcance. No repetir pruebas Oracle para este cambio del kit y su documentación.
+
+**Corrección implementada:**
+- Catálogo cotejado con componentes, tipos, funciones y servicios del punto de entrada público: entradas obligatorias, valores predeterminados, resultados, estados, responsabilidades y límites. Se incluyen consultas de migas, bloqueo de paginación, ciclo de diálogos y restauración explícita de posición; se documenta la diferencia de conteo Unicode, sin afirmar equivalencia universal.
+- Patrón de formularios en `docs/patrones-formularios.md`: anatomía, errores por campo, foco, estados, descarte y composición completa/inline/modal. Clases CSS aditivas `.ui-form`, `.ui-form-fields`, `.ui-form-grid` y `.ui-form-actions`; no se migran ni reestructuran las pantallas del producto.
+- Registro de evaluación y procedimiento de consumo/extensión en el catálogo. Los patrones están en «piloto en evaluación», sin promoverlos a validados o adoptados institucionalmente.
+- Referencia HTML estática en `docs/design-system/controles.html` que usa directamente tokens y CSS reales. No añade dependencias, rutas ni servicios del producto.
+- El auxiliar de foco omite errores no operables y ámbitos destruidos, conservando su firma. Los botones secundarios deshabilitados dejan de adoptar el estilo hover de una acción disponible.
+
+**Verificación ejecutada:**
+- **Pruebas focalizadas:** `npm test --workspace frontend -- --include src/app/shared/ui/forms.spec.ts --include src/app/shared/ui/ui.spec.ts --include src/app/shared/ui/navigation.spec.ts`: 3 suites, 18 pruebas aprobadas. Incluyen controles ocultos/deshabilitados/inertes, ámbito destruido, foco de grupo, persistencia de errores no corregidos en modal, consultas en migas y restauración solicitada por consumidor. No se repite toda la aplicación ni pruebas Oracle.
+- **Compilación:** `npm run build --workspace frontend`, correcta.
+- **Contraste de tokens:** `npm run check:contrast --workspace frontend`, 44 combinaciones aprobadas. No equivale a una auditoría integral de consumidores.
+- **Contraste efectivo de la referencia:** estilos calculados del navegador sobre blanco: borde normal `rgb(138,147,166)`, 3,09:1; borde inválido `rgb(152,45,45)`, 7,64:1; texto del campo, 14,29:1; texto de acción principal, 10,48:1; foco, 3,30:1. Se comprobaron altura mínima de 42 px y radio de 7 px.
+- **Recorrido/textos visibles y revisión visual:** referencia servida temporalmente en bucle local sin API ni datos reales. Revisados estados inicial, inválido, deshabilitado y guardado; Tab alcanza la acción principal con foco visible y el grupo pendiente deshabilita campos/acciones. A 1600 px de viewport, ancho de documento 1581 px, sin desbordamiento horizontal. Evidencia: `[ruta local retirada]`. La vista HTML no verifica el render Angular de todos los componentes.
+- **Revisión de la misma IA autora:** firmas preservadas, clases aditivas, ausencia de decisiones de negocio dentro del kit y separación entre evaluación/adopción. Se mantiene el acabado de navegación y la identidad aprobada. Comprobados 26 enlaces locales, 15 IDs únicos en la referencia y los siete HEX aprobados; `git diff --check` sin errores. Comparación SHA256 de 194 archivos iniciales: siete archivos modificados dentro del alcance, 187 conservados y tres incorporados; ninguno eliminado. Se preservan los cambios previos de aplicación/backend, tokens y planilla. Esta revisión no es independiente.
+
+**Límites y estado:** contratos, patrón, referencia y ajustes del kit implementados con las comprobaciones anteriores. No probados en esta tarea: ampliación real al 200 %, viewport de 320 px, tecnologías de asistencia y uso con personas representativas. No se declara conformidad WCAG integral ni adopción institucional. La revisión no sustituye conformidad de producción. Sin commit, integración ni despliegue.
