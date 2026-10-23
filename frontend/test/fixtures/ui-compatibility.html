@@ -1,0 +1,47 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Convivencia del kit de interfaz</title>
+  <link rel="stylesheet" href="../../src/app/shared/ui/styles/tokens.css" data-kit>
+  <link rel="stylesheet" href="../../src/app/shared/ui/styles/base.css" data-kit>
+  <style>
+    /* Estilos del anfitrión, deliberadamente distintos del kit. */
+    body { margin: 18px; font: 18px Georgia, serif; color: #123; background: #fff; }
+    .sample-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 320px), 1fr)); gap: 20px; }
+    .host-sample { border: 2px dashed #345; padding: 10px; }
+    .host-sample button { padding: 2px; border-radius: 0; font: 18px Georgia, serif; }
+    #themed-kit { --ui-color-primary: #22213F; --ui-radius-md: 4px; }
+  </style>
+</head>
+<body>
+  <h1>Convivencia del kit de interfaz</h1>
+  <p>Referencia de prueba con datos genéricos. No representa una pantalla del producto.</p>
+  <div class="sample-grid">
+    <section class="host-sample" id="outside">
+      <h2>Controles del anfitrión</h2>
+      <p class="message">Este mensaje conserva el estilo del anfitrión.</p>
+      <label for="outside-name">Nombre externo</label><input id="outside-name" value="Registro externo" aria-invalid="true">
+      <fieldset><legend>Opciones externas</legend><label><input type="checkbox">Disponible</label></fieldset>
+      <button class="primary-button" type="button">Acción externa</button>
+      <table><caption>Tabla externa</caption><tbody><tr><th scope="row">Registro</th><td>Externo</td></tr></tbody></table>
+    </section>
+    <section class="ui-root" id="default-kit">
+      <div class="panel">
+        <div class="panel-heading"><h2>Registro de la entidad</h2><span class="badge">Activo</span></div>
+        <nav class="breadcrumbs" aria-label="Ubicación de la referencia"><ol><li><a href="#default-kit">Inicio</a></li><li aria-current="page">Registro</li></ol></nav>
+        <p class="message success" role="status">El registro se guardó correctamente.</p>
+        <div class="field"><label for="kit-name">Nombre</label><input id="kit-name" value="Registro genérico"></div>
+        <div class="field"><label for="kit-description">Descripción</label><textarea id="kit-description" aria-invalid="true" aria-describedby="kit-error"></textarea><p id="kit-error" class="field-error">Ingresa una descripción.</p></div>
+        <fieldset><legend>Opciones del registro</legend><label class="check-label"><input type="checkbox">Disponible</label></fieldset>
+        <div class="ui-form-actions"><button type="button" class="primary-button">Guardar</button><button type="button" class="quiet-button">Cancelar</button><button type="button" disabled>Procesando</button></div>
+        <section class="ui-section" aria-labelledby="related-title"><h3 id="related-title">Registros relacionados con una denominación extensa</h3><div class="table-scroll" tabindex="0" role="region" aria-label="Registros relacionados"><table><caption>Registros</caption><thead><tr><th scope="col">Nombre</th><th scope="col">Estado</th></tr></thead><tbody><tr><td>Registro de descripción extensa de la organización</td><td><span class="badge badge-success">Activo</span></td></tr></tbody></table></div></section>
+      </div>
+    </section>
+    <section class="ui-root" id="themed-kit">
+      <div class="panel"><h2>Segundo consumidor</h2><p>Roles visuales adaptados dentro de su ámbito.</p><div class="field"><label for="themed-name">Nombre</label><input id="themed-name" value="Otro registro"></div><button class="primary-button" type="button">Guardar registro</button></div>
+    </section>
+  </div>
+</body>
+</html>

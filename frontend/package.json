@@ -7,10 +7,12 @@
     "npm": "11.12.x"
   },
   "scripts": {
+    "pretest": "npm run check:ui-compatibility",
     "start:dev": "ng serve --host 127.0.0.1 --port 4200",
     "build": "ng build",
     "test": "ng test --watch=false",
-    "check:contrast": "node scripts/check-contrast.mjs"
+    "check:contrast": "node scripts/check-contrast.mjs",
+    "check:ui-compatibility": "node --test scripts/ui-compatibility.spec.mjs"
   },
   "dependencies": {
     "@angular/common": "22.2.1",

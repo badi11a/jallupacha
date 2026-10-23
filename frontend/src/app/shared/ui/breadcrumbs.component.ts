@@ -1,10 +1,11 @@
 import { Component, input } from '@angular/core';
-import { RouterLink } from '@angular/router';
+import { Params, RouterLink } from '@angular/router';
 
 export interface UiBreadcrumb {
   label: string;
   /** Destino del enlace; el último elemento se presenta como página actual. */
   link?: string | (string | number)[];
+  queryParams?: Params;
 }
 
 @Component({
@@ -16,7 +17,7 @@ export interface UiBreadcrumb {
         @for (item of items(); track $index; let last = $last) {
           <li>
             @if (item.link && !last) {
-              <a [routerLink]="item.link">{{ item.label }}</a>
+              <a [routerLink]="item.link" [queryParams]="item.queryParams">{{ item.label }}</a>
             } @else {
               <span [attr.aria-current]="last ? 'page' : null">{{ item.label }}</span>
             }

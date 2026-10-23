@@ -1,4 +1,5 @@
 import { Injectable, signal } from '@angular/core';
+import { countCharacters, UiTextLengthMode } from './text-length';
 
 export interface UiConfirmOptions {
   title: string;
@@ -16,6 +17,8 @@ export interface UiDialogField {
   value?: string | number | null;
   required?: boolean;
   maxLength?: number;
+  /** Usar el mismo criterio que el contrato del servidor consumidor. */
+  lengthMode?: UiTextLengthMode;
   /** Solo para type 'number': se exige un entero dentro del rango. */
   min?: number;
   max?: number;
@@ -103,10 +106,17 @@ export function validateDialogFields(
       values[field.key] = number;
       continue;
     }
-    if (field.maxLength !== undefined && text.length > field.maxLength) {
+    if (field.maxLength !== undefined && countCharacters(text, field.lengthMode) > field.maxLength) {
       errors[field.key] = `Use como máximo ${field.maxLength} caracteres.`;
     }
     values[field.key] = text;
   }
   return { values, errors };
+}
+
+/** maxlength HTML limita unidades UTF-16 del texto bruto, no el cálculo validator. */
+export function nativeMaxLength(field: UiDialogField): number | null {
+  return field.type !== 'number' && (field.lengthMode ?? 'utf16') === 'utf16'
+    ? field.maxLength ?? null
+    : null;
 }

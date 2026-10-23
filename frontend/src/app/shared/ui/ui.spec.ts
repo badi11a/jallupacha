@@ -11,8 +11,12 @@ import {
   countCharacters,
   UiDialogService,
   UiDialogValues,
+  UiTextLengthMode,
+  nativeMaxLength,
   UiMessageComponent,
   UiPaginationComponent,
+  UiModuleNavComponent,
+  UiModuleNavItem,
   UiPanelComponent,
   validateDialogFields
 } from './index';
@@ -48,13 +52,14 @@ class HostComponent {
   imports: [UiBadgeComponent, UiBreadcrumbsComponent, UiSectionComponent, UiCharCounterComponent],
   template: `
     <ui-badge tone="info">Borrador</ui-badge>
-    <ui-breadcrumbs [items]="[{ label: 'Inicio', link: '/inicio' }, { label: 'Actual' }]" />
+    <ui-breadcrumbs [items]="[{ label: 'Inicio', link: '/inicio', queryParams: { q: 'registro' } }, { label: 'Actual' }]" />
     <ui-section heading="Datos"><p>Contenido</p></ui-section>
-    <ui-char-counter [value]="text()" [max]="10" />
+    <ui-char-counter [value]="text()" [max]="10" [lengthMode]="lengthMode()" />
   `
 })
 class KitPartsComponent {
   readonly text = signal('abc');
+  readonly lengthMode = signal<UiTextLengthMode>('utf16');
 }
 
 function buttonByText(root: HTMLElement, text: string): HTMLButtonElement {
@@ -161,6 +166,10 @@ describe('shared/ui', () => {
 
     name.value = '  Nuevo  ';
     name.dispatchEvent(new Event('input'));
+    fixture.detectChanges();
+    expect(name.getAttribute('aria-invalid')).toBeNull();
+    expect(order.getAttribute('aria-invalid')).toBe('true');
+    expect(order.getAttribute('aria-describedby')).toContain('ui-dialog-field-order-error');
     order.value = '7';
     order.dispatchEvent(new Event('input'));
     buttonByText(root, 'Guardar').click();
@@ -175,14 +184,75 @@ describe('shared/ui', () => {
     await expect(first).resolves.toBe(false);
   });
 
-  it('counts characters with the server criterion', () => {
+  it('counts normalized input with the declared server criterion', () => {
     expect(countCharacters('  hola  ')).toBe(4);
-    expect(countCharacters('a😀b')).toBe(3);
-    expect(countCharacters('❤️')).toBe(1);
+    expect(countCharacters('a😀b')).toBe(4);
+    expect(countCharacters('❤️')).toBe(2);
+    expect(countCharacters('a😀b', 'validator')).toBe(3);
+    expect(countCharacters('❤️', 'validator')).toBe(1);
     expect(countCharacters(null)).toBe(0);
     expect(charCountState(224, 250)).toBe('ok');
     expect(charCountState(225, 250)).toBe('near');
     expect(charCountState(251, 250)).toBe('over');
+  });
+
+  it('keeps counter and dialog validation aligned at Unicode boundaries without normalizing values', () => {
+    for (const mode of ['utf16', 'validator'] as const) {
+      for (const raw of ['abc', '😀', '❤️', 'e\u0301', 'é', '👩‍💻', '  😀e\u0301  ', '', '   ']) {
+        const length = countCharacters(raw, mode);
+        const result = validateDialogFields([{ key: 'text', label: 'Texto', maxLength: length, lengthMode: mode }], { text: raw });
+        expect(result.errors, `${mode}: ${raw}`).toEqual({});
+        expect(result.values['text']).toBe(raw.trim() || null);
+        if (length > 0) {
+          const over = validateDialogFields([{ key: 'text', label: 'Texto', maxLength: length - 1, lengthMode: mode }], { text: raw });
+          expect(over.errors['text'], `${mode}: ${raw}`).toBeTruthy();
+        }
+      }
+    }
+    expect(countCharacters('e\u0301')).toBe(2);
+    expect(countCharacters('é')).toBe(1);
+    expect(nativeMaxLength({ key: 'a', label: 'Texto', maxLength: 2 })).toBe(2);
+    expect(nativeMaxLength({ key: 'b', label: 'Texto', maxLength: 2, lengthMode: 'validator' })).toBeNull();
+    expect(nativeMaxLength({ key: 'n', label: 'Número', type: 'number', maxLength: 2 })).toBeNull();
+  });
+
+  it('renders the selected length criterion and validates modal emoji input with it', async () => {
+    const parts = TestBed.createComponent(KitPartsComponent);
+    parts.componentInstance.text.set('😀'.repeat(6));
+    parts.detectChanges();
+    const counter = parts.nativeElement.querySelector('ui-char-counter') as HTMLElement;
+    expect(counter.textContent?.trim()).toBe('12 / 10');
+    expect(counter.classList.contains('char-counter-over')).toBe(true);
+    parts.componentInstance.lengthMode.set('validator');
+    parts.componentInstance.text.set('😀'.repeat(9));
+    parts.detectChanges();
+    expect(counter.textContent?.trim()).toBe('9 / 10');
+    expect(counter.classList.contains('char-counter-near')).toBe(true);
+    parts.destroy();
+
+    const fixture = TestBed.createComponent(HostComponent);
+    fixture.detectChanges();
+    const dialogs = TestBed.inject(UiDialogService);
+    const answer = dialogs.form({ title: 'Editar registro', fields: [
+      { key: 'text', label: 'Texto', maxLength: 1, lengthMode: 'validator', required: true }
+    ] });
+    fixture.detectChanges();
+    const root = fixture.nativeElement as HTMLElement;
+    const input = root.querySelector('dialog input') as HTMLInputElement;
+    expect(input.hasAttribute('maxlength')).toBe(false);
+    input.value = '😀😀';
+    input.dispatchEvent(new Event('input'));
+    buttonByText(root, 'Guardar').click();
+    fixture.detectChanges();
+    expect(input.getAttribute('aria-invalid')).toBe('true');
+    expect(document.activeElement).toBe(input);
+    input.value = ' 😀 ';
+    input.dispatchEvent(new Event('input'));
+    fixture.detectChanges();
+    expect(input.hasAttribute('aria-invalid')).toBe(false);
+    buttonByText(root, 'Guardar').click();
+    await expect(answer).resolves.toEqual({ text: '😀' });
+    fixture.destroy();
   });
 
   it('renders badges, breadcrumbs and sections accessibly', () => {
@@ -192,7 +262,7 @@ describe('shared/ui', () => {
     expect(root.querySelector('ui-badge')?.className).toBe('badge badge-info');
     const nav = root.querySelector('nav.breadcrumbs') as HTMLElement;
     expect(nav.getAttribute('aria-label')).toBe('Ubicación');
-    expect(nav.querySelector('a')?.getAttribute('href')).toBe('/inicio');
+    expect(nav.querySelector('a')?.getAttribute('href')).toBe('/inicio?q=registro');
     expect(nav.querySelector('[aria-current="page"]')?.textContent).toBe('Actual');
     const section = root.querySelector('ui-section') as HTMLElement;
     expect(section.getAttribute('role')).toBe('group');
