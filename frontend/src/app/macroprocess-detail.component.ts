@@ -2,19 +2,15 @@ import { Component, DestroyRef, computed, inject, OnInit, signal } from '@angula
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, NavigationEnd, Router, RouterLink } from '@angular/router';
-import { catchError, distinctUntilChanged, filter, forkJoin, map, of, startWith, switchMap } from 'rxjs';
+import { Subject, catchError, distinctUntilChanged, filter, forkJoin, map, of, startWith, switchMap } from 'rxjs';
 import { MvpV14Api, MapMacroprocess, ProcessListItem, UnitItem, errorMessage } from './mvp-v14-api.service';
-import { UiBadgeComponent, UiBadgeTone, UiBreadcrumbsComponent, UiDialogService, UiMessageComponent } from './shared/ui';
+import { UiBadgeComponent, UiBadgeTone, UiBreadcrumbsComponent, UiMessageComponent } from './shared/ui';
 
 @Component({
   selector: 'app-macroprocess-detail',
   imports: [FormsModule, RouterLink, UiBadgeComponent, UiBreadcrumbsComponent, UiMessageComponent],
   styles: [`
     .top-nav-bar { display: flex; align-items: center; justify-content: space-between; margin-bottom: var(--ui-space-3); gap: 1rem; }
-    .help-btn { display: inline-flex; align-items: center; gap: .45rem; padding: .45rem .9rem; background: var(--ui-color-surface); border: 1px solid var(--ui-color-border-strong); border-radius: var(--ui-radius-lg); color: var(--ui-color-text); font-size: var(--ui-font-size-sm); font-weight: var(--ui-font-weight-medium); cursor: pointer; transition: all .15s ease-in-out; }
-    .help-btn:hover { background: var(--ui-color-surface-accent); border-color: var(--ui-color-primary); color: var(--ui-color-primary); }
-    .help-btn svg { color: var(--ui-color-text-subtle); flex-shrink: 0; }
-
     .hero-card { display: grid; grid-template-columns: 1fr 340px; gap: 2rem; align-items: start; padding: 1.75rem 2rem; background: var(--ui-color-surface); border: 1px solid var(--ui-color-border); border-radius: var(--ui-radius-xl); box-shadow: var(--ui-shadow-panel); margin-bottom: 1.5rem; }
     @media (max-width: 960px) { .hero-card { grid-template-columns: 1fr; gap: 1.5rem; padding: 1.5rem; } }
     .hero-main { min-width: 0; }
@@ -52,8 +48,6 @@ import { UiBadgeComponent, UiBadgeTone, UiBreadcrumbsComponent, UiDialogService,
     .search-box input { width: 100%; padding-left: 2.6rem; background: var(--ui-color-surface); }
     .filter-type-section { display: flex; flex-direction: column; gap: .45rem; }
     .filter-type-header { display: inline-flex; align-items: center; gap: .35rem; font-size: var(--ui-font-size-xs); font-weight: var(--ui-font-weight-heavy); letter-spacing: .05em; text-transform: uppercase; color: var(--ui-color-text-subtle); }
-    .info-icon-btn { display: inline-flex; align-items: center; justify-content: center; width: 16px; height: 16px; border-radius: 50%; background: none; border: 1px solid var(--ui-color-border-strong); color: var(--ui-color-text-subtle); font-size: 10px; font-weight: bold; cursor: pointer; padding: 0; line-height: 1; }
-    .info-icon-btn:hover { border-color: var(--ui-color-primary); color: var(--ui-color-primary); }
     .type-filters { display: flex; flex-wrap: wrap; gap: .5rem; }
     .type-pill { display: inline-flex; align-items: center; justify-content: center; min-height: 38px; padding: .35rem .95rem; border: 1px solid var(--ui-color-border); border-radius: var(--ui-radius-pill); background: var(--ui-color-surface); color: var(--ui-color-text); font-size: var(--ui-font-size-sm); font-weight: var(--ui-font-weight-medium); text-decoration: none; transition: all .15s ease; cursor: pointer; }
     .type-pill:hover { border-color: var(--ui-color-border-strong); }
@@ -84,18 +78,11 @@ import { UiBadgeComponent, UiBadgeTone, UiBreadcrumbsComponent, UiDialogService,
   `],
   template: `
     <div class="top-nav-bar">
-      <ui-breadcrumbs [items]="[{ label: 'Mapa de procesos', link: '/mapa' }, { label: macro()?.name || 'Macroproceso' }]" />
-      <button type="button" class="help-btn" (click)="openHelp()" aria-label="Ayuda sobre este macroproceso">
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-          <circle cx="12" cy="12" r="10"></circle>
-          <path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"></path>
-          <line x1="12" y1="17" x2="12.01" y2="17"></line>
-        </svg>
-        <span>Ayuda</span>
-      </button>
+      <ui-breadcrumbs [items]="[{ label: 'Mapa de procesos', link: '/mapa', queryParams: mapQuery() }, { label: macro()?.name || 'Macroproceso' }]" />
     </div>
 
     @if (error()) { <ui-message kind="error">{{ error() }}</ui-message> }
+    @if (error()) { <button type="button" class="quiet-button" (click)="reload()">Reintentar carga</button> }
     @if (loading()) { <p role="status">Cargando macroproceso…</p> }
 
     @if (macro(); as m) {
@@ -103,32 +90,20 @@ import { UiBadgeComponent, UiBadgeTone, UiBreadcrumbsComponent, UiDialogService,
         <div class="hero-main">
           <span class="hero-eyebrow">{{ eyebrowText() }}</span>
           <h1 id="macro-title" class="hero-title">{{ m.name }}</h1>
-          <p class="hero-desc">{{ macroDescription() }}</p>
-          <div class="stats-row" aria-label="Resumen de indicadores del macroproceso">
-            <div class="stat-box"><strong>{{ m.processTypes.length }}</strong> <span>Tipos de proceso</span></div>
-            <div class="stat-box"><strong>{{ totalProcessCount() }}</strong> <span>Procesos</span></div>
-            <div class="stat-box"><strong>{{ responsibleUnitsCount() }}</strong> <span>Unidades responsables</span></div>
+          @if (hasMacroDescription()) {
+            <p class="hero-desc">{{ macroDescription() }}</p>
+          }
+          <div class="stats-row" aria-label="Resumen del macroproceso y unidades en resultados filtrados">
+            <div class="stat-box"><strong>{{ m.processTypes.length }}</strong> <span>Tipos del macroproceso</span></div>
+            <div class="stat-box"><strong>{{ totalProcessCount() }}</strong> <span>Procesos del macroproceso</span></div>
+            <div class="stat-box"><strong>{{ responsibleUnitsCount() }}</strong> <span>Unidades en resultados</span></div>
           </div>
         </div>
 
-        <aside class="risk-widget" aria-label="Distribución de riesgo en los procesos">
-          <div class="risk-widget-header">DISTRIBUCIÓN DE RIESGO</div>
-          <div class="risk-bar" role="meter" [attr.aria-valuenow]="riskSummary().total" aria-valuemin="0" [attr.aria-valuemax]="riskSummary().total" [attr.aria-label]="'Distribución de riesgo: ' + riskSummary().bajo + ' bajo, ' + riskSummary().medio + ' medio, ' + riskSummary().alto + ' alto, ' + riskSummary().critico + ' crítico'">
-            @if (riskSummary().total > 0) {
-              @if (riskSummary().bajo > 0) { <div class="risk-seg risk-seg-bajo" [style.width.%]="riskSummary().bajoPct" title="Bajo: {{ riskSummary().bajo }}"></div> }
-              @if (riskSummary().medio > 0) { <div class="risk-seg risk-seg-medio" [style.width.%]="riskSummary().medioPct" title="Medio: {{ riskSummary().medio }}"></div> }
-              @if (riskSummary().alto > 0) { <div class="risk-seg risk-seg-alto" [style.width.%]="riskSummary().altoPct" title="Alto: {{ riskSummary().alto }}"></div> }
-              @if (riskSummary().critico > 0) { <div class="risk-seg risk-seg-critico" [style.width.%]="riskSummary().criticoPct" title="Crítico: {{ riskSummary().critico }}"></div> }
-            } @else {
-              <div class="risk-seg risk-seg-none" style="width: 100%" title="Sin riesgos registrados"></div>
-            }
-          </div>
-          <div class="risk-legend">
-            <div class="risk-legend-item"><span>Bajo</span> <strong>{{ riskSummary().bajo }}</strong></div>
-            <div class="risk-legend-item"><span>Medio</span> <strong>{{ riskSummary().medio }}</strong></div>
-            <div class="risk-legend-item"><span>Alto</span> <strong>{{ riskSummary().alto }}</strong></div>
-            <div class="risk-legend-item"><span>Crítico</span> <strong>{{ riskSummary().critico }}</strong></div>
-          </div>
+        <aside class="risk-widget" aria-label="Consulta de riesgos">
+          <div class="risk-widget-header">RIESGOS ASOCIADOS</div>
+          <p>Filtra los procesos que tienen riesgos del nivel seleccionado. Consulta cada evaluación en la ficha del proceso.</p>
+          <p class="helper">Esta vista no presenta una evaluación consolidada de riesgo del macroproceso.</p>
         </aside>
       </header>
 
@@ -139,7 +114,7 @@ import { UiBadgeComponent, UiBadgeTone, UiBreadcrumbsComponent, UiDialogService,
             <p class="panel-subheading">Explora y filtra los procesos asociados a este macroproceso.</p>
           </div>
           <div class="panel-count-label" role="status">
-            {{ items().length }} {{ items().length === 1 ? 'resultado visible' : 'resultados visibles' }}
+            {{ items().length }} {{ items().length === 1 ? 'resultado visible' : 'resultados visibles' }}{{ items().length >= 300 ? ' (límite de 300; afine los filtros)' : '' }}
           </div>
         </div>
 
@@ -155,7 +130,6 @@ import { UiBadgeComponent, UiBadgeTone, UiBreadcrumbsComponent, UiDialogService,
           <div class="filter-type-section">
             <div class="filter-type-header">
               <span>TIPO DE PROCESO</span>
-              <button type="button" class="info-icon-btn" (click)="openTypeHelp()" title="Información de tipo de proceso" aria-label="Información de tipo de proceso">?</button>
             </div>
             <nav class="type-filters" aria-label="Tipos de proceso del macroproceso">
               <a [routerLink]="[]" [queryParams]="{ type: null }" queryParamsHandling="merge" class="type-pill" [attr.aria-current]="!processTypeId ? 'true' : null">
@@ -173,7 +147,7 @@ import { UiBadgeComponent, UiBadgeTone, UiBreadcrumbsComponent, UiDialogService,
 
           <div class="dropdowns-row">
             <label class="dropdown-group">
-              <span class="dropdown-label">NIVEL DE RIESGO</span>
+              <span class="dropdown-label">CON RIESGOS DE NIVEL</span>
               <select name="risk" [(ngModel)]="riskLevel" (ngModelChange)="applyFilters()" aria-label="Filtrar por nivel de riesgo">
                 <option value="">Todos los riesgos</option>
                 <option value="Bajo">Bajo</option>
@@ -197,7 +171,7 @@ import { UiBadgeComponent, UiBadgeTone, UiBreadcrumbsComponent, UiDialogService,
         <ul class="results" role="list">
           @for (item of items(); track item.id) {
             <li>
-              <a class="process-row" [routerLink]="['/procesos', item.id]" [attr.aria-label]="item.name + ', ' + (item.responsibleUnit || 'Sin unidad responsable') + ', tipo ' + item.processType">
+              <a class="process-row" [routerLink]="['/procesos', item.id]" [queryParams]="{ returnTo: resultsUrl }" [attr.aria-label]="item.name + ', ' + (item.responsibleUnit || 'Sin unidad responsable') + ', tipo ' + item.processType">
                 <div class="col-main">
                   <strong class="process-name">{{ item.name }}</strong>
                   <span class="process-unit">{{ item.responsibleUnit || 'Sin unidad responsable' }}</span>
@@ -206,11 +180,7 @@ import { UiBadgeComponent, UiBadgeTone, UiBreadcrumbsComponent, UiDialogService,
                   <span class="process-type">{{ item.processType }}</span>
                 </div>
                 <div class="col-actions">
-                  @if (item.riskLevel) {
-                    <ui-badge [tone]="badgeTone(item.riskLevel)">{{ item.riskLevel }}</ui-badge>
-                  } @else {
-                    <ui-badge tone="neutral">{{ item.status }}</ui-badge>
-                  }
+                  <ui-badge tone="neutral">{{ item.status }}</ui-badge>
                   <svg class="chevron-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
                     <polyline points="9 18 15 12 9 6"></polyline>
                   </svg>
@@ -235,12 +205,10 @@ export class MacroprocessDetailComponent implements OnInit {
   private readonly route = inject(ActivatedRoute);
   private readonly router = inject(Router);
   private readonly destroyRef = inject(DestroyRef);
-  private readonly dialogs = inject(UiDialogService);
 
   readonly macro = signal<MapMacroprocess | null>(null);
   readonly family = signal('');
   readonly items = signal<ProcessListItem[]>([]);
-  readonly allProcesses = signal<ProcessListItem[]>([]);
   readonly units = signal<UnitItem[]>([]);
   readonly loading = signal(true);
   readonly error = signal('');
@@ -249,6 +217,11 @@ export class MacroprocessDetailComponent implements OnInit {
   unitId = '';
   processTypeId = '';
   riskLevel = '';
+  resultsUrl = '';
+  private readonly retryLoad = new Subject<void>();
+
+  mapQuery() { return { q: this.route.snapshot.queryParamMap.get('mapQ'), family: this.route.snapshot.queryParamMap.get('mapFamily') }; }
+  reload(): void { this.retryLoad.next(); }
 
   readonly eyebrowText = computed(() => {
     const fam = this.family().toLowerCase();
@@ -258,43 +231,12 @@ export class MacroprocessDetailComponent implements OnInit {
     return fam ? `MACROPROCESO · ${this.family().toUpperCase()}` : 'MACROPROCESO';
   });
 
-  readonly riskSummary = computed(() => {
-    const source = this.allProcesses().length > 0 ? this.allProcesses() : this.items();
-    let bajo = 0;
-    let medio = 0;
-    let alto = 0;
-    let critico = 0;
-    for (const item of source) {
-      const lvl = (item.riskLevel || '').toLowerCase();
-      if (lvl.includes('bajo')) bajo++;
-      else if (lvl.includes('medio')) medio++;
-      else if (lvl.includes('crítico') || lvl.includes('critico')) critico++;
-      else if (lvl.includes('alto')) alto++;
-    }
-    const total = bajo + medio + alto + critico;
-    const bajoPct = total > 0 ? (bajo / total) * 100 : 0;
-    const medioPct = total > 0 ? (medio / total) * 100 : 0;
-    const altoPct = total > 0 ? (alto / total) * 100 : 0;
-    const criticoPct = total > 0 ? (critico / total) * 100 : 0;
-    return { bajo, medio, alto, critico, total, bajoPct, medioPct, altoPct, criticoPct };
-  });
+  hasMacroDescription(): boolean {
+    return Boolean(this.macroDescription());
+  }
 
   macroDescription(): string {
-    const m = this.macro();
-    if (!m) return '';
-    const desc = (m as { description?: string }).description;
-    if (desc && desc.trim()) return desc;
-    const fam = this.family().toLowerCase();
-    if (fam.includes('estratég') || fam.includes('estrateg')) {
-      return 'Orienta la planificación y el desarrollo institucional, definiendo prioridades, objetivos y mecanismos de seguimiento para la entidad.';
-    }
-    if (fam.includes('mision')) {
-      return 'Conduce la entrega de servicios y la atención de requerimientos esenciales de la organización.';
-    }
-    if (fam.includes('apoyo')) {
-      return 'Asegura la gestión eficiente de recursos, soporte administrativo y tecnológico requerido para la operación institucional.';
-    }
-    return `${m.code} · Explora los tipos de proceso y consulta las fichas de este macroproceso.`;
+    return this.macro()?.description?.trim() ?? '';
   }
 
   totalProcessCount(): number {
@@ -302,7 +244,7 @@ export class MacroprocessDetailComponent implements OnInit {
   }
 
   responsibleUnitsCount(): number {
-    const source = this.allProcesses().length > 0 ? this.allProcesses() : this.items();
+    const source = this.items();
     const set = new Set(source.map(item => item.responsibleUnit).filter(Boolean));
     return set.size;
   }
@@ -325,34 +267,20 @@ export class MacroprocessDetailComponent implements OnInit {
     this.unitId = '';
     this.processTypeId = '';
     this.riskLevel = '';
-    void this.router.navigate([], { relativeTo: this.route, queryParams: {} });
+    void this.router.navigate([], { relativeTo: this.route, queryParams: { mapQ: this.mapQuery().q, mapFamily: this.mapQuery().family } });
   }
 
   applyFilters(): void {
     void this.router.navigate([], {
       relativeTo: this.route,
       queryParams: {
+        mapQ: this.mapQuery().q,
+        mapFamily: this.mapQuery().family,
         q: this.q || null,
         unit: this.unitId || null,
         type: this.processTypeId || null,
         risk: this.riskLevel || null
       }
-    });
-  }
-
-  openHelp(): void {
-    void this.dialogs.confirm({
-      title: 'Ayuda sobre macroprocesos',
-      message: 'Esta vista detalla el macroproceso seleccionado, permitiendo explorar sus tipos de proceso y consultar o filtrar las fichas de procesos institucionales asociadas según nivel de riesgo o unidad responsable.',
-      confirmLabel: 'Entendido'
-    });
-  }
-
-  openTypeHelp(): void {
-    void this.dialogs.confirm({
-      title: 'Tipos de proceso',
-      message: 'Los tipos de proceso clasifican las actividades dentro del macroproceso. Seleccione cualquiera de los botones para enfocar la lista en esa categoría.',
-      confirmLabel: 'Entendido'
     });
   }
 
@@ -363,12 +291,13 @@ export class MacroprocessDetailComponent implements OnInit {
       map(() => [this.route.snapshot.paramMap, this.route.snapshot.queryParamMap] as const),
       distinctUntilChanged(([oldParams, oldQuery], [params, query]) => oldParams.get('id') === params.get('id')
         && ['q', 'unit', 'type', 'risk'].every(key => oldQuery.get(key) === query.get(key))),
-      switchMap(([params, query]) => {
+      switchMap(([params, query]) => this.retryLoad.pipe(startWith(undefined), switchMap(() => {
         this.macro.set(null); this.items.set([]); this.loading.set(true); this.error.set('');
         this.q = query.get('q') ?? '';
         this.unitId = query.get('unit') ?? '';
         this.processTypeId = query.get('type') ?? '';
         this.riskLevel = query.get('risk') ?? '';
+        this.resultsUrl = this.router.url;
         const id = Number(params.get('id'));
         if (!Number.isSafeInteger(id) || id <= 0) {
           this.error.set('Macroproceso no encontrado.'); this.loading.set(false); return of(null);
@@ -387,7 +316,7 @@ export class MacroprocessDetailComponent implements OnInit {
           map(result => ({ ...result, id })),
           catchError(error => { this.error.set(errorMessage(error)); this.loading.set(false); return of(null); })
         );
-      }),
+      }))),
       takeUntilDestroyed(this.destroyRef)
     ).subscribe(result => {
       if (!result) return;
@@ -396,11 +325,6 @@ export class MacroprocessDetailComponent implements OnInit {
       this.family.set(family?.name ?? '');
       this.units.set(result.units.filter(unit => unit.isActive));
       this.items.set(result.items);
-      if (!this.q && !this.unitId && !this.processTypeId && !this.riskLevel) {
-        this.allProcesses.set(result.items);
-      } else if (this.allProcesses().length === 0) {
-        this.allProcesses.set(result.items);
-      }
       this.loading.set(false);
       if (!this.macro()) this.error.set('Macroproceso no encontrado.');
     });

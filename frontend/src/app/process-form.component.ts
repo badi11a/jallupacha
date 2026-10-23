@@ -1,10 +1,11 @@
-import { Component, OnInit, inject, signal } from '@angular/core';
+import { Component, ElementRef, OnInit, inject, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import {
   FICHA_FIELDS, FichaKey, MvpV14Api, ProcessInput, ProcessListItem, ProcessTypeItem, UnitItem, errorMessage
 } from './mvp-v14-api.service';
-import { UiBreadcrumbsComponent, UiDialogService, UiMessageComponent, UiPanelComponent, UiSectionComponent } from './shared/ui';
+import { UiBreadcrumbsComponent, UiDialogService, UiMessageComponent, UiPanelComponent, UiSectionComponent, focusFirstInvalid } from './shared/ui';
+import { ProcessNavigation } from './process-navigation.service';
 import { LeavesWithConfirmation } from './unsaved-changes.guard';
 
 interface ParticipantRow { unitId: number | null; function: string; }
@@ -13,13 +14,15 @@ interface ParticipantRow { unitId: number | null; function: string; }
   selector: 'app-process-form',
   imports: [FormsModule, UiBreadcrumbsComponent, UiMessageComponent, UiPanelComponent, UiSectionComponent],
   styles: [`
-    .form-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(18rem, 1fr)); gap: .9rem 1.5rem; }
+    .form-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 18rem), 1fr)); gap: .9rem 1.5rem; }
     label { display: grid; gap: .25rem; font-weight: 600; }
-    input, select, textarea { padding: .45rem .6rem; border: 1px solid var(--ui-color-border); border-radius: var(--ui-radius-lg); font: inherit; }
+    input, select, textarea { padding: .45rem .6rem; border: 1px solid var(--ui-color-border-strong); border-radius: var(--ui-radius-lg); font: inherit; }
     input, select { min-height: 2.5rem; }
     .wide { grid-column: 1 / -1; }
     .participant { display: grid; grid-template-columns: minmax(12rem, 1fr) minmax(12rem, 2fr) auto; gap: .6rem; align-items: end; margin-bottom: .6rem; }
     .actions { display: flex; flex-wrap: wrap; gap: .75rem; margin-top: 1rem; }
+    .form-fields { display: block; }
+    @media (max-width: 640px) { .participant { grid-template-columns: minmax(0, 1fr); } }
   `],
   template: `
     <ui-breadcrumbs [items]="[{ label: 'Procesos', link: '/procesos' }, { label: editingId ? 'Editar proceso' : 'Nuevo proceso' }]" />
@@ -27,8 +30,12 @@ interface ParticipantRow { unitId: number | null; function: string; }
       <p class="helper">El nombre y la clasificación son obligatorios. El proceso se guarda como borrador; los campos mínimos faltantes se informan en la ficha.</p>
       @if (error()) { <ui-message kind="error">{{ error() }}</ui-message> }
       @if (loading()) { <p class="helper" role="status">Cargando información…</p> }
+      @else if (loadFailed()) { <button type="button" class="quiet-button" (click)="ngOnInit()">Reintentar carga del formulario</button> }
       @else {
-        <form (ngSubmit)="save()">
+        @if (saving()) { <p class="helper" role="status">Guardando proceso…</p> }
+        <form novalidate (ngSubmit)="save()" [attr.aria-busy]="saving()">
+          <fieldset class="form-fields" [disabled]="saving()">
+          <legend class="visually-hidden">Ficha del proceso</legend>
           <ui-section heading="Clasificación">
             <div class="form-grid">
               <label for="field-macro">Macroproceso (obligatorio)
@@ -85,18 +92,18 @@ interface ParticipantRow { unitId: number | null; function: string; }
             @for (row of participants; track $index) {
               <div class="participant">
                 <label [for]="'pu' + $index">Unidad (obligatorio)
-                  <select [id]="'pu' + $index" [name]="'pu' + $index" [(ngModel)]="row.unitId" (ngModelChange)="clearFieldError('pu_' + $index)" [attr.aria-invalid]="fieldErrors()['pu_' + $index] ? true : null">
+                  <select [id]="'pu' + $index" [name]="'pu' + $index" [(ngModel)]="row.unitId" (ngModelChange)="clearFieldError('pu_' + $index)" [attr.aria-invalid]="fieldErrors()['pu_' + $index] ? true : null" [attr.aria-describedby]="fieldErrors()['pu_' + $index] ? 'error-pu-' + $index : null">
                     <option [ngValue]="null">Seleccione…</option>
                     @for (unit of units(); track unit.id) { <option [ngValue]="unit.id">{{ unit.name }}{{ unit.isActive ? '' : ' (inactiva)' }}</option> }
                   </select>
                   @if (fieldErrors()['pu_' + $index]) {
-                    <p class="field-error" role="alert">{{ fieldErrors()['pu_' + $index] }}</p>
+                    <p [id]="'error-pu-' + $index" class="field-error" role="alert">{{ fieldErrors()['pu_' + $index] }}</p>
                   }
                 </label>
                 <label [for]="'pf' + $index">Función en el proceso (obligatorio)
-                  <input [id]="'pf' + $index" [name]="'pf' + $index" maxlength="500" [(ngModel)]="row.function" (input)="clearFieldError('pf_' + $index)" [attr.aria-invalid]="fieldErrors()['pf_' + $index] ? true : null" />
+                  <input [id]="'pf' + $index" [name]="'pf' + $index" maxlength="500" [(ngModel)]="row.function" (input)="clearFieldError('pf_' + $index)" [attr.aria-invalid]="fieldErrors()['pf_' + $index] ? true : null" [attr.aria-describedby]="fieldErrors()['pf_' + $index] ? 'error-pf-' + $index : null" />
                   @if (fieldErrors()['pf_' + $index]) {
-                    <p class="field-error" role="alert">{{ fieldErrors()['pf_' + $index] }}</p>
+                    <p [id]="'error-pf-' + $index" class="field-error" role="alert">{{ fieldErrors()['pf_' + $index] }}</p>
                   }
                 </label>
                 <button class="quiet-button" type="button" (click)="removeParticipant($index)">Quitar</button>
@@ -119,6 +126,7 @@ interface ParticipantRow { unitId: number | null; function: string; }
             <button class="primary-button" type="submit" [disabled]="saving()">{{ saving() ? 'Guardando…' : 'Guardar proceso' }}</button>
             <button class="text-button" type="button" (click)="cancel()">Cancelar</button>
           </div>
+          </fieldset>
         </form>
       }
     </ui-panel>
@@ -129,11 +137,15 @@ export class ProcessFormComponent implements OnInit, LeavesWithConfirmation {
   private readonly route = inject(ActivatedRoute);
   private readonly router = inject(Router);
   private readonly dialogs = inject(UiDialogService);
+  private readonly element = inject<ElementRef<HTMLElement>>(ElementRef);
+  private readonly navigation = inject(ProcessNavigation);
+  private returnUrl: string | null = null;
 
   readonly types = signal<ProcessTypeItem[]>([]);
   readonly units = signal<Array<UnitItem | { id: number; name: string; isActive: boolean }>>([]);
   readonly processes = signal<ProcessListItem[]>([]);
   readonly loading = signal(true);
+  readonly loadFailed = signal(false);
   readonly saving = signal(false);
   readonly error = signal('');
   readonly fieldErrors = signal<Record<string, string>>({});
@@ -192,11 +204,12 @@ export class ProcessFormComponent implements OnInit, LeavesWithConfirmation {
   }
 
   private isDirty(): boolean {
-    if (this.savedSuccessfully || this.saving() || !this.initialSnapshot) return false;
+    if (this.savedSuccessfully || !this.initialSnapshot) return false;
     return this.serializeState() !== this.initialSnapshot;
   }
 
   async confirmLeave(): Promise<boolean> {
+    if (this.saving() && !this.savedSuccessfully) return false;
     if (!this.isDirty()) return true;
     return await this.dialogs.confirm({
       title: 'Cambios no guardados',
@@ -208,14 +221,18 @@ export class ProcessFormComponent implements OnInit, LeavesWithConfirmation {
   }
 
   async cancel(): Promise<void> {
+    if (this.saving()) return;
     if (await this.confirmLeave()) {
       this.savedSuccessfully = true;
       const target = this.editingId ? ['/procesos', this.editingId] : ['/procesos'];
-      void this.router.navigate(target);
+      try { await this.router.navigate(target, { queryParams: { returnTo: this.returnUrl } }); }
+      finally { this.savedSuccessfully = false; }
     }
   }
 
   ngOnInit(): void {
+    this.loading.set(true); this.loadFailed.set(false); this.error.set('');
+    this.returnUrl = this.navigation.resultsUrl(this.route.snapshot.queryParamMap.get('returnTo'));
     const id = this.route.snapshot.paramMap.get('id');
     this.editingId = id === null ? null : Number(id);
     this.api.processTypes().subscribe({
@@ -236,7 +253,7 @@ export class ProcessFormComponent implements OnInit, LeavesWithConfirmation {
     });
   }
 
-  private failLoad(e: unknown): void { this.error.set(errorMessage(e)); this.loading.set(false); }
+  private failLoad(e: unknown): void { this.error.set(errorMessage(e)); this.loadFailed.set(true); this.loading.set(false); }
 
   private loadExisting(allUnits: UnitItem[]): void {
     if (this.editingId === null) {
@@ -264,6 +281,7 @@ export class ProcessFormComponent implements OnInit, LeavesWithConfirmation {
   }
 
   save(): void {
+    if (this.saving() || this.loading() || !this.initialSnapshot) return;
     const errors: Record<string, string> = {};
     if (!(this.values['name'] ?? '').trim()) {
       errors['name'] = 'El nombre es obligatorio.';
@@ -283,6 +301,7 @@ export class ProcessFormComponent implements OnInit, LeavesWithConfirmation {
     if (Object.keys(errors).length > 0) {
       this.fieldErrors.set(errors);
       this.error.set('Por favor completa los campos obligatorios indicados.');
+      focusFirstInvalid(this.element.nativeElement);
       return;
     }
 
@@ -301,9 +320,17 @@ export class ProcessFormComponent implements OnInit, LeavesWithConfirmation {
     const request = this.editingId === null ? this.api.createProcess(body) : this.api.updateProcess(this.editingId, body);
     request.subscribe({
       next: (result) => {
+        this.takeSnapshot();
         this.savedSuccessfully = true;
         const id = this.editingId ?? (result as { id: number }).id;
-        void this.router.navigate(['/procesos', id]);
+        const finish = (): void => { this.savedSuccessfully = false; this.saving.set(false); };
+        void this.router.navigate(['/procesos', id], { queryParams: { returnTo: this.returnUrl } }).then(
+          (navigated) => {
+            finish();
+            if (!navigated) this.error.set('El proceso se guardó, pero no fue posible abrir su ficha.');
+          },
+          () => { finish(); this.error.set('El proceso se guardó, pero no fue posible abrir su ficha.'); }
+        );
       },
       error: (e) => { this.error.set(errorMessage(e)); this.saving.set(false); }
     });

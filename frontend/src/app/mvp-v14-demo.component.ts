@@ -1,24 +1,11 @@
-import { Component, OnInit, inject, signal } from '@angular/core';
-import { RouterLink } from '@angular/router';
+import { Component, DestroyRef, OnInit, inject, signal } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { AuthService } from './auth.service';
-import { UiDialogService, UiMessageComponent } from './shared/ui';
+import { UiMessageComponent } from './shared/ui';
 import { MvpV14Api, MapFamily, MapMacroprocess } from './mvp-v14-api.service';
 
 const normalize = (value: string) => value.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase().trim();
-
-const DESCRIPTIONS: Record<string, string> = {
-  'Planificación y Gestión Estratégica': 'Define el rumbo institucional y orienta la planificación, seguimiento y desarrollo de la entidad.',
-  'Aseguramiento Institucional de la Calidad': 'Promueve el aseguramiento de la calidad, la evaluación institucional y los procesos de acreditación.',
-  'Relaciones y Comunicaciones Corporativas': 'Gestiona la identidad institucional, el posicionamiento y la comunicación con sus públicos de interés.',
-  'Gobierno Digital y Tecnologías': 'Impulsa la modernización digital, gobierno de datos y soporte tecnológico de la institución.',
-  'Gestión Jurídica y Cumplimiento Normativo': 'Resguarda la legalidad institucional, los actos oficiales y el cumplimiento normativo aplicable.',
-  'Docencia y Formación de Pregrado y Postgrado': 'Acompaña la trayectoria formativa integral y el desarrollo técnico y profesional de los participantes.',
-  'Investigación, Innovación y Creación': 'Promueve la generación de conocimiento científico, tecnológico, transferencia e innovación.',
-  'Vinculación con el Medio y Extensión': 'Articula a la institución con el entorno mediante vinculación social y colaboración territorial.',
-  'Gestión de Personas y Desarrollo del Talento': 'Gestiona el bienestar, desarrollo profesional y trayectoria de las personas que integran la organización.',
-  'Gestión Financiera y Presupuestaria': 'Administra con probidad y sostenibilidad los recursos presupuestarios, contables y financieros institucionales.',
-  'Gestión de Infraestructura, Campus y Operaciones': 'Administra y mantiene los espacios físicos, servicios generales y operaciones para el funcionamiento de la entidad.'
-};
 
 @Component({
   selector: 'app-process-map',
@@ -28,7 +15,9 @@ const DESCRIPTIONS: Record<string, string> = {
 })
 export class MvpV14DemoComponent implements OnInit {
   private readonly api = inject(MvpV14Api);
-  private readonly dialogs = inject(UiDialogService);
+  private readonly router = inject(Router);
+  private readonly route = inject(ActivatedRoute);
+  private readonly destroyRef = inject(DestroyRef);
   readonly auth = inject(AuthService);
   readonly map = signal<MapFamily[]>([]);
   readonly loading = signal(true);
@@ -50,7 +39,19 @@ export class MvpV14DemoComponent implements OnInit {
   }
 
   macroDescription(macro: MapMacroprocess): string {
-    return (macro as { description?: string }).description || DESCRIPTIONS[macro.name] || 'Orientación y desarrollo de los procesos institucionales asociados.';
+    return macro.description?.trim() ?? '';
+  }
+
+  familyTitle(family: MapFamily): string {
+    const name = family.name.trim();
+    if (name.toLowerCase().startsWith('de ')) {
+      return `Procesos ${name.charAt(0).toLowerCase()}${name.slice(1)}`;
+    }
+    return `Procesos ${name}`;
+  }
+
+  hasMacroDescription(macro: MapMacroprocess): boolean {
+    return Boolean(this.macroDescription(macro));
   }
 
   processCount(macro: MapMacroprocess): number { return macro.processTypes.reduce((sum, type) => sum + type.processes.length, 0); }
@@ -59,13 +60,23 @@ export class MvpV14DemoComponent implements OnInit {
   macroCount(): number { return this.map().reduce((sum, family) => sum + family.macroprocesses.length, 0); }
   visibleCount(): number { return this.filteredMap().reduce((sum, family) => sum + family.macroprocesses.length, 0); }
 
-  help(): void {
-    void this.dialogs.confirm({ title: 'Cómo explorar el mapa',
-      message: 'Busca un macroproceso por código o nombre, o filtra por su clasificación. Selecciona una tarjeta para consultar sus tipos y procesos. Desde allí puedes abrir cada ficha. Para buscar un proceso directamente, utiliza Buscar procesos.',
-      confirmLabel: 'Entendido', cancelLabel: 'Cerrar' });
+  ngOnInit(): void {
+    this.route.queryParamMap.pipe(takeUntilDestroyed(this.destroyRef)).subscribe(params => {
+      this.filter.set(params.get('q') ?? '');
+      const family = Number(params.get('family'));
+      this.selectedFamily.set(Number.isSafeInteger(family) && family > 0 ? family : null);
+    });
+    this.load();
   }
 
-  ngOnInit(): void {
+  updateFilter(value: string): void { this.filter.set(value); this.updateAddress(); }
+  updateFamily(value: number | null): void { this.selectedFamily.set(value); this.updateAddress(); }
+  private updateAddress(): void {
+    void this.router.navigate([], { relativeTo: this.route, queryParams: { q: this.filter() || null, family: this.selectedFamily() }, replaceUrl: true });
+  }
+
+  load(): void {
+    this.loading.set(true); this.error.set('');
     this.api.map().subscribe({
       next: response => { this.map.set(response.macroprocessTypes); this.loading.set(false); },
       error: () => { this.error.set('No fue posible cargar el mapa. Intenta nuevamente más tarde.'); this.loading.set(false); }

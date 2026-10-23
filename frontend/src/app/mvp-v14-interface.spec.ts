@@ -8,7 +8,7 @@ import { routes } from './app.routes';
 import { FICHA_FIELDS } from './mvp-v14-api.service';
 
 const MAP = { macroprocessTypes: [{ id: 1, name: 'Estratégicos', macroprocesses: [{
-  id: 2, code: 'MP1', name: 'Estrategia', processTypes: [{ id: 3, name: 'Planificación', processes: [
+  id: 2, code: 'MP1', name: 'Estrategia', description: 'Define los objetivos de la entidad y supervisa el avance de sus metas.', processTypes: [{ id: 3, name: 'Planificación', processes: [
     { id: 4, code: 'PR4', name: 'Plan anual', status: 'Borrador' }
   ] }]
 }] }] };
@@ -32,12 +32,18 @@ describe('Interfaz MVP v14 — adaptación visual', () => {
     sessionStorage.clear();
   });
 
-  it('conserva las rutas sin cabecera, menú lateral ni pie de aplicación', async () => {
+  it('renderiza la navegación local del módulo de forma estable, identifica la sección activa y no reproduce datos ficticios de B', async () => {
     const fixture = TestBed.createComponent(AppComponent);
     const http = TestBed.inject(HttpTestingController);
     const router = TestBed.inject(Router);
     fixture.detectChanges();
-    for (const path of ['/mapa', '/procesos', '/unidades', '/tipos-de-proceso']) {
+    const expectations = {
+      '/mapa': 'Mapa',
+      '/procesos': 'Procesos',
+      '/unidades': 'Unidades internas',
+      '/tipos-de-proceso': 'Tipos de proceso'
+    };
+    for (const [path, activeLabel] of Object.entries(expectations)) {
       await router.navigateByUrl(path);
       fixture.detectChanges();
       http.match(() => true).forEach(request => {
@@ -46,17 +52,21 @@ describe('Interfaz MVP v14 — adaptación visual', () => {
       });
       fixture.detectChanges();
       const root = fixture.nativeElement as HTMLElement;
-      expect(root.querySelector('.topbar, .app-nav, .sidebar, .shell-navigation, .app-footer')).toBeNull();
+      expect(root.querySelector('ui-module-nav')).not.toBeNull();
       expect(root.querySelector('main router-outlet')).not.toBeNull();
       expect(root.querySelector('#map-filter') !== null).toBe(path === '/mapa');
-      expect(root.querySelector('.account')).toBeNull();
+
+      const activeLink = root.querySelector('ui-module-nav a[aria-current="page"]');
+      expect(activeLink?.textContent?.trim()).toBe(activeLabel);
+
+      expect(root.querySelector('.topbar, .app-nav, .sidebar, .shell-navigation, .app-footer, .account')).toBeNull();
       expect(root.textContent).not.toMatch(/\bAdmin\b|Cambiar Sede|Favoritos|533|En revisión/);
     }
     fixture.destroy();
     http.verify();
   });
 
-  it('muestra macroprocesos de la API y busca por código o nombre sin copiar datos de B', async () => {
+  it('muestra nombres sin códigos en las tarjetas y permite buscar por código o nombre', async () => {
     const fixture = TestBed.createComponent(AppComponent);
     const http = TestBed.inject(HttpTestingController);
     fixture.detectChanges();
@@ -83,9 +93,11 @@ describe('Interfaz MVP v14 — adaptación visual', () => {
     }
     expect(root.querySelectorAll('.macro-link')).toHaveLength(1);
     expect(root.querySelectorAll('.map-hero, .map-panel')).toHaveLength(2);
-    expect(root.querySelector('.map-bottom a[href="/procesos"]')?.textContent).toContain('Buscar procesos');
-    expect(root.querySelector('.map-bottom a[href="/unidades"]')).toBeNull();
-    expect(root.querySelector('.map-bottom a[href="/tipos-de-proceso"]')).toBeNull();
+    expect(root.querySelector('.map-bottom a')).toBeNull();
+    expect(root.querySelector('.map-heading a[href="/procesos/nuevo"]')).toBeNull();
+    expect(root.querySelector('.macro-link')?.textContent).not.toContain('MP1');
+    expect(root.querySelector('.macro-title')?.textContent).toBe('Estratégicos');
+    expect(root.querySelector('.macro-desc')).toBeNull();
     expect(root.textContent).not.toMatch(/533|46 tipos|UTA 2026|Macro Región Andina|Dirección y Desarrollo Estratégico/);
     fixture.destroy();
     http.verify();
@@ -107,7 +119,7 @@ describe('Interfaz MVP v14 — adaptación visual', () => {
     http.verify();
   });
 
-  it('combina búsqueda y clasificación, conserva el color de familia y abre ayuda', async () => {
+  it('combina búsqueda y clasificación y conserva el color de familia', async () => {
     const fixture = TestBed.createComponent(AppComponent);
     const http = TestBed.inject(HttpTestingController);
     fixture.detectChanges();
@@ -130,11 +142,8 @@ describe('Interfaz MVP v14 — adaptación visual', () => {
     button('Todos').click(); fixture.detectChanges();
     expect(root.querySelectorAll('.macro-link')).toHaveLength(1);
     expect(root.querySelector('.family')?.getAttribute('data-tone')).toBe('support');
-    expect(root.querySelector('.macro-link')?.getAttribute('href')).toBe('/mapa/macroprocesos/11');
-    button('ⓘ Ayuda').click(); fixture.detectChanges();
-    expect(root.querySelector('dialog')?.textContent).toContain('Cómo explorar el mapa');
-    button('Entendido').click(); fixture.detectChanges();
-    expect(root.querySelector('dialog')).toBeNull();
+    expect(root.querySelector('.macro-link')?.getAttribute('href')).toBe('/mapa/macroprocesos/11?mapQ=soporte');
+    expect(root.querySelector('.help-button')).toBeNull();
     fixture.destroy(); http.verify();
   });
 
@@ -146,6 +155,8 @@ describe('Interfaz MVP v14 — adaptación visual', () => {
     await router.navigateByUrl('/mapa'); fixture.detectChanges();
     http.expectOne('/api/mvp-v14/map').flush(MAP); fixture.detectChanges();
     const root = fixture.nativeElement as HTMLElement;
+    expect(root.querySelector('.macro-desc')?.textContent).toBe(MAP.macroprocessTypes[0].macroprocesses[0].description);
+    expect(root.querySelector('.macro-title')?.nextElementSibling?.className).toBe('macro-desc');
     (root.querySelector('.macro-link') as HTMLAnchorElement).click();
     await fixture.whenStable(); fixture.detectChanges();
     expect(router.url).toBe('/mapa/macroprocesos/2');
@@ -154,18 +165,23 @@ describe('Interfaz MVP v14 — adaptación visual', () => {
     http.expectOne(r => r.url.endsWith('/processes') && r.params.get('macroprocessId') === '2').flush([ITEM]);
     fixture.detectChanges();
     expect(root.querySelector('#macro-title')?.textContent).toBe('Estrategia');
+    expect(root.querySelector('.hero-desc')?.textContent).toBe(MAP.macroprocessTypes[0].macroprocesses[0].description);
+    expect(root.querySelector('#macro-title')?.nextElementSibling?.className).toBe('hero-desc');
+    expect(root.textContent).not.toContain('Tipos y procesos del mapa completo de este macroproceso. Las unidades se cuentan en los resultados filtrados, hasta 300.');
     expect(root.querySelector('#map-filter')).toBeNull();
     expect(root.querySelector('.topbar, .app-nav, .sidebar, .app-footer')).toBeNull();
-    expect(root.querySelector('.process-row')?.getAttribute('href')).toBe('/procesos/4');
+    expect(root.querySelector('.process-row')?.getAttribute('href')).toBe('/procesos/4?returnTo=%2Fmapa%2Fmacroprocesos%2F2');
+    expect(root.querySelector('ui-module-nav a[aria-current="location"]')?.textContent?.trim()).toBe('Mapa');
 
     await router.navigateByUrl('/mapa/macroprocesos/2?type=3&q=plan&unit=7'); fixture.detectChanges();
-    http.expectOne('/api/mvp-v14/map').flush(MAP);
+    http.expectOne('/api/mvp-v14/map').flush({ macroprocessTypes: [{ ...MAP.macroprocessTypes[0], macroprocesses: [{ ...MAP.macroprocessTypes[0].macroprocesses[0], description: '   ' }] }] });
     http.expectOne('/api/mvp-v14/units').flush([]);
     http.expectOne(r => r.url.endsWith('/processes') && r.params.get('macroprocessId') === '2'
       && r.params.get('processTypeId') === '3' && r.params.get('q') === 'plan' && r.params.get('unitId') === '7').flush([]);
     fixture.detectChanges();
     await fixture.whenStable();
     fixture.detectChanges();
+    expect(root.querySelector('.hero-desc')).toBeNull();
     expect((root.querySelector('input[name="q"]') as HTMLInputElement).value).toBe('plan');
     expect(root.querySelector('.type-filters [aria-current="true"]')?.textContent).toContain('Planificación');
     expect(root.textContent).toContain('Ningún proceso coincide');
@@ -198,6 +214,7 @@ describe('Interfaz MVP v14 — adaptación visual', () => {
     const root = fixture.nativeElement as HTMLElement;
     for (const field of FICHA_FIELDS) expect(root.textContent, field.key).toContain(`Valor de ${field.key}`);
     expect(root.querySelector('.topbar, .app-nav, .sidebar, .app-footer')).toBeNull();
+    expect(root.querySelector('ui-module-nav a[aria-current="location"]')?.textContent?.trim()).toBe('Procesos');
     expect(root.querySelector('.purpose')?.textContent).toContain('Valor de objective');
     expect(root.querySelector('.governance')?.textContent).toContain('Coordinar');
     expect(root.querySelector('.governance')?.textContent).toContain('Inactiva');
@@ -205,6 +222,9 @@ describe('Interfaz MVP v14 — adaptación visual', () => {
     expect(root.textContent).toContain('Posibles duplicados');
     expect(root.textContent).toContain('Crítico');
     expect(root.textContent).not.toMatch(/Diagrama disponible|Medio-Alto|direccion.planificacion@/);
+    expect(root.querySelector('.trio-box')?.textContent).toContain('ÁREA DE NEGOCIO');
+    expect(root.querySelector('.trio-box')?.textContent).not.toContain('UNIDAD RESPONSABLE');
+    expect(root.querySelector('.governance')?.textContent).toContain('UNIDAD RESPONSABLE');
     expect(root.querySelector('a[href="/mapa/macroprocesos/2"]')).not.toBeNull();
     expect(root.querySelector('a[href="/procesos/4/editar"]')).not.toBeNull();
     expect(root.querySelector('a[href="/procesos/4/editar"]')?.classList.contains('quiet-button')).toBe(true);

@@ -31,6 +31,6 @@ export class AuditApiService {
     const params: Record<string, string> = { page: String(page), limit: String(limit) };
     if (entityType && entityType.trim()) params['entityType'] = entityType.trim();
     if (action && action.trim()) params['action'] = action.trim();
-    return this.http.get<AuditResponse>(this.base, { params });
+    return this.http.get<AuditResponse>(this.base, { params, withCredentials: true });
   }
 }

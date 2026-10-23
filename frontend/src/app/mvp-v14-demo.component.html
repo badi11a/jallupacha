@@ -3,9 +3,10 @@
   <h1 id="map-title">Mapa de procesos</h1>
   <p class="map-intro">Representación de los procesos estratégicos, misionales y de apoyo y su organización institucional.</p>
   @if (!loading() && !error()) {
-    <ul class="map-metrics" aria-label="Resumen de la estructura">
+    <p class="helper">Resumen del mapa completo; los filtros siguientes solo afectan las tarjetas.</p>
+    <ul class="map-metrics" aria-label="Resumen del mapa completo sin filtros">
       @for (family of map(); track family.id) {
-        <li><strong>{{ family.macroprocesses.length }}</strong> {{ family.macroprocesses.length === 1 ? 'macroproceso' : 'macroprocesos' }} · {{ family.name }}</li>
+        <li><strong>{{ family.macroprocesses.length }}</strong> {{ family.macroprocesses.length === 1 ? 'macroproceso' : 'macroprocesos' }} · {{ familyTitle(family) }}</li>
       }
       <li><strong>{{ typeCount() }}</strong> tipos de proceso</li>
       <li><strong>{{ totalCount() }}</strong> procesos</li>
@@ -14,22 +15,21 @@
 </section>
 
 <section class="panel map-panel" aria-label="Explorar el mapa de procesos">
-  @if (error()) { <ui-message kind="error">{{ error() }}</ui-message> }
+  @if (error()) { <ui-message kind="error">{{ error() }}</ui-message><button type="button" class="quiet-button" (click)="load()">Reintentar carga</button> }
   @if (loading()) { <p class="helper" role="status">Cargando información…</p> }
   @else if (!error()) {
     <div class="map-toolbar">
       <div class="map-search">
         <span aria-hidden="true" class="search-icon">⌕</span>
         <label class="visually-hidden" for="map-filter">Buscar macroproceso</label>
-        <input id="map-filter" type="search" placeholder="Buscar macroproceso…" [value]="filter()" (input)="filter.set($any($event.target).value)" />
+        <input id="map-filter" type="search" placeholder="Buscar macroproceso…" [value]="filter()" (input)="updateFilter($any($event.target).value)" />
       </div>
       <div class="family-filters" role="group" aria-label="Filtrar por clasificación">
-        <button type="button" [attr.aria-pressed]="selectedFamily() === null" (click)="selectedFamily.set(null)">Todos</button>
+        <button type="button" [attr.aria-pressed]="selectedFamily() === null" (click)="updateFamily(null)">Todos</button>
         @for (family of map(); track family.id) {
-          <button type="button" [attr.aria-pressed]="selectedFamily() === family.id" (click)="selectedFamily.set(family.id)">{{ family.name }}</button>
+          <button type="button" [attr.aria-pressed]="selectedFamily() === family.id" (click)="updateFamily(family.id)">{{ family.name }}</button>
         }
       </div>
-      <button type="button" class="help-button" (click)="help()"><span aria-hidden="true">ⓘ</span> Ayuda</button>
     </div>
 
     <div class="process-architecture">
@@ -41,12 +41,15 @@
       <div class="families">
         @for (family of filteredMap(); track family.id) {
           <section class="family" [attr.data-tone]="familyTone(family)" [attr.aria-label]="family.name">
-            <header class="family-label"><h2>Procesos {{ family.name }}</h2></header>
-            <div class="family-cards" [style.grid-template-columns]="'repeat(' + family.macroprocesses.length + ', minmax(0, 1fr))'">
+            <header class="family-label"><h2>{{ familyTitle(family) }}</h2></header>
+            <div class="family-cards">
               @for (macro of family.macroprocesses; track macro.id) {
-                <a class="macro-link" [routerLink]="['/mapa/macroprocesos', macro.id]">
+                <a class="macro-link" [routerLink]="['/mapa/macroprocesos', macro.id]" [queryParams]="{ mapQ: filter() || null, mapFamily: selectedFamily() }">
                   <strong class="macro-title">{{ macro.name }}</strong>
-                  <p class="macro-desc">{{ macroDescription(macro) }}</p>
+                  @if (hasMacroDescription(macro)) {
+                    <p class="macro-desc">{{ macroDescription(macro) }}</p>
+                  }
+                  <span class="macro-count">{{ processCount(macro) }} {{ processCount(macro) === 1 ? 'proceso' : 'procesos' }}</span>
                 </a>
               }
             </div>
@@ -62,17 +65,7 @@
       </aside>
     </div>
     <div class="map-bottom">
-      <p class="helper" role="status">{{ visibleCount() }} de {{ macroCount() }} macroprocesos</p>
-      <div class="map-actions">
-        <a class="text-button" routerLink="/procesos">Buscar procesos</a>
-        @if (auth.isAdmin()) {
-          <a class="text-button" routerLink="/usuarios">Usuarios</a>
-          <a class="text-button" routerLink="/auditoria">Auditoría</a>
-        }
-        @if (auth.hasAnyProfile('ADMIN', 'PROCESS_OWNER')) {
-          <a class="text-button" routerLink="/procesos/nuevo">Nuevo proceso</a>
-        }
-      </div>
+      <p class="helper" role="status">{{ visibleCount() }} de {{ macroCount() }} macroprocesos visibles con los filtros actuales</p>
     </div>
   }
 </section>

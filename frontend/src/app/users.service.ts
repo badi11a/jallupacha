@@ -31,10 +31,10 @@ export class UsersService {
   private readonly base = '/api/users';
 
   list(): Observable<UserItem[]> {
-    return this.http.get<UserItem[]>(this.base);
+    return this.http.get<UserItem[]>(this.base, { withCredentials: true });
   }
 
   updateProfiles(id: number, profiles: ProfileCode[]): Observable<{ userId: number; profiles: ProfileCode[] }> {
-    return this.http.put<{ userId: number; profiles: ProfileCode[] }>(`${this.base}/${id}/profiles`, { profiles });
+    return this.http.put<{ userId: number; profiles: ProfileCode[] }>(`${this.base}/${id}/profiles`, { profiles }, { withCredentials: true });
   }
 }

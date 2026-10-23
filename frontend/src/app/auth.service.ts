@@ -28,6 +28,7 @@ export class AuthService {
   private readonly router = inject(Router);
 
   readonly currentUser = signal<CurrentUser | null>(this.readInitialUser());
+  readonly logoutInProgress = signal(false);
   readonly isAuthenticated = computed(() => this.currentUser() !== null);
   readonly profiles = computed(() => this.currentUser()?.profiles ?? []);
   readonly isAdmin = computed(() => this.hasProfile('ADMIN'));
@@ -63,6 +64,8 @@ export class AuthService {
   }
 
   async logout(): Promise<void> {
+    if (this.logoutInProgress()) return;
+    this.logoutInProgress.set(true);
     try {
       await firstValueFrom(
         this.http.post<void>('/api/auth/logout', {}, { withCredentials: true })
@@ -71,7 +74,11 @@ export class AuthService {
       // Ignore network errors during logout
     } finally {
       this.clearSession();
-      this.router.navigate(['/login']);
+      try {
+        await this.router.navigate(['/login']);
+      } finally {
+        this.logoutInProgress.set(false);
+      }
     }
   }
 

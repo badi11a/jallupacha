@@ -25,7 +25,7 @@ export interface RelationItem { id: number; processId: number; code: string; nam
 export interface ProcessRef { id: number; code: string; name: string; }
 export interface MapProcess extends ProcessRef { status: string; }
 export interface MapProcessType { id: number; name: string; processes: MapProcess[]; }
-export interface MapMacroprocess { id: number; code: string; name: string; processTypes: MapProcessType[]; }
+export interface MapMacroprocess { id: number; code: string; name: string; description?: string | null; processTypes: MapProcessType[]; }
 export interface MapFamily { id: number; name: string; macroprocesses: MapMacroprocess[]; }
 export interface ProcessMap { macroprocessTypes: MapFamily[]; }
 
@@ -90,6 +90,8 @@ export interface ProcessInput extends Partial<Record<FichaKey, string | null>> {
 /** Mensaje de negocio devuelto por la API (sin detalles internos). */
 export function errorMessage(error: unknown): string {
   if (error instanceof HttpErrorResponse) {
+    if (error.status === 401) return 'Su sesión ha expirado o no es válida. Inicie sesión nuevamente.';
+    if (error.status === 403) return 'No tiene permisos suficientes para acceder a este recurso.';
     const message = (error.error as { message?: string | string[] } | null)?.message;
     if (Array.isArray(message)) return message.join(' ');
     if (typeof message === 'string') return message;

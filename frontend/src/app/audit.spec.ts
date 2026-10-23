@@ -55,7 +55,7 @@ describe('AuditComponent (REQ-27)', () => {
     TestBed.configureTestingModule({
       imports: [AuditComponent],
       providers: [
-        provideRouter([]),
+        provideRouter([{ path: 'auditoria', component: AuditComponent }]),
         { provide: AuditApiService, useValue: mockAuditApi },
         { provide: AuthService, useValue: mockAuth }
       ]
@@ -98,7 +98,7 @@ describe('AuditComponent (REQ-27)', () => {
     expect(comp.isExpanded(1)).toBe(false);
   });
 
-  it('filters by entity type and action', () => {
+  it('filters by entity type and action', async () => {
     const fixture = TestBed.createComponent(AuditComponent);
     fixture.detectChanges();
     const comp = fixture.componentInstance;
@@ -106,11 +106,12 @@ describe('AuditComponent (REQ-27)', () => {
     comp.entityType = 'PROCESS';
     comp.action = 'PROCESS_APPROVED';
     comp.search();
+    await fixture.whenStable();
 
     expect(mockAuditApi.list).toHaveBeenCalledWith(1, 25, 'PROCESS', 'PROCESS_APPROVED');
   });
 
-  it('navigates between pages', () => {
+  it('navigates between pages', async () => {
     mockAuditApi.list = vi.fn(() => of({
       ...sampleAuditResponse,
       total: 60,
@@ -124,6 +125,7 @@ describe('AuditComponent (REQ-27)', () => {
     expect(comp.totalPages()).toBe(3);
 
     comp.goToPage(2);
+    await fixture.whenStable();
     expect(comp.page()).toBe(2);
     expect(mockAuditApi.list).toHaveBeenCalledWith(2, 25, '', '');
   });

@@ -182,4 +182,14 @@ describe('Process Lifecycle & Validation (REQ-07, REQ-09, REQ-56)', () => {
     expect(mockApi.retireProcess).toHaveBeenCalledWith(10);
     expect(comp.notice()).toContain('formalmente retirado a estado Obsoleto');
   });
+
+  it('does not render help buttons or micro-help in process detail', () => {
+    const fixture = TestBed.createComponent(ProcessDetailComponent);
+    fixture.detectChanges();
+    const compiled = fixture.nativeElement as HTMLElement;
+
+    expect(compiled.querySelector('.help-button')).toBeNull();
+    expect(compiled.querySelector('.info-icon-btn')).toBeNull();
+    expect((fixture.componentInstance as any).openHelp).toBeUndefined();
+  });
 });

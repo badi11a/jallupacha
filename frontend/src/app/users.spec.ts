@@ -112,7 +112,9 @@ describe('UsersComponent (REQ-26)', () => {
 
     comp.saveProfiles();
     expect(mockUsersService.updateProfiles).not.toHaveBeenCalled();
-    expect(comp.error()).toContain('El usuario debe conservar al menos un perfil asignado');
+    expect(comp.profileError()).toContain('El usuario debe conservar al menos un perfil asignado');
+    fixture.detectChanges();
+    expect(fixture.nativeElement.querySelector('fieldset')?.getAttribute('aria-describedby')).toBe('profile-error');
   });
 
   it('handles backend conflict or forbidden errors properly', async () => {

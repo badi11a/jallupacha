@@ -1,6 +1,8 @@
-import { Component, OnInit, inject, signal } from '@angular/core';
+import { Component, DestroyRef, OnInit, inject, signal } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { FormsModule } from '@angular/forms';
-import { RouterLink } from '@angular/router';
+import { ActivatedRoute, Router, RouterLink } from '@angular/router';
+import { Subject, catchError, of, startWith, switchMap } from 'rxjs';
 import { AuthService } from './auth.service';
 import { MvpV14Api, ProcessListItem, ProcessTypeItem, UnitItem, errorMessage } from './mvp-v14-api.service';
 import { UiBadgeComponent, UiBreadcrumbsComponent, UiMessageComponent, UiPanelComponent } from './shared/ui';
@@ -9,30 +11,19 @@ import { UiBadgeComponent, UiBreadcrumbsComponent, UiMessageComponent, UiPanelCo
   selector: 'app-process-list',
   imports: [FormsModule, RouterLink, UiBadgeComponent, UiBreadcrumbsComponent, UiMessageComponent, UiPanelComponent],
   styles: [`
-    .filters { display: grid; grid-template-columns: repeat(auto-fit, minmax(14rem, 1fr)); gap: .75rem; align-items: end; margin-bottom: 1rem; }
+    .filters { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 14rem), 1fr)); gap: .75rem; align-items: end; margin-bottom: 1rem; }
     .filters label { display: grid; gap: .25rem; font-weight: 600; }
-    .filters input, .filters select { min-height: 2.5rem; padding: 0 .6rem; border: 1px solid var(--ui-color-border); border-radius: var(--ui-radius-lg); font: inherit; }
+    .filters input, .filters select { min-height: 2.5rem; padding: 0 .6rem; border: 1px solid var(--ui-color-border-strong); border-radius: var(--ui-radius-lg); font: inherit; }
     td a { font-weight: 600; }
   `],
   template: `
-    <ui-breadcrumbs [items]="[{ label: 'Mapa de procesos', link: '/mapa' }, { label: 'Procesos' }]" />
+    <ui-breadcrumbs [items]="[{ label: 'Procesos' }]" />
     <ui-panel headingId="processes-title" eyebrow="PROCESOS" heading="Procesos">
-      @if (auth.isAdmin()) {
-        <a panelActions class="text-button" routerLink="/usuarios">Usuarios</a>
-      }
-      @if (auth.isAdmin()) {
-        <a panelActions class="text-button" routerLink="/auditoria">Auditoría</a>
-      }
-      @if (auth.isAdmin()) {
-        <a panelActions class="text-button" routerLink="/unidades">Unidades internas</a>
-      }
-      @if (auth.isAdmin()) {
-        <a panelActions class="text-button" routerLink="/tipos-de-proceso">Tipos de proceso</a>
-      }
       @if (auth.hasAnyProfile('ADMIN', 'PROCESS_OWNER')) {
         <a panelActions class="primary-button" routerLink="/procesos/nuevo">Nuevo proceso</a>
       }
-      @if (error()) { <ui-message kind="error">{{ error() }}</ui-message> }
+      @if (error()) { <ui-message kind="error">{{ error() }}</ui-message><button type="button" class="quiet-button" (click)="search()">Reintentar búsqueda</button> }
+      @if (catalogError()) { <ui-message kind="error">{{ catalogError() }}</ui-message><button type="button" class="quiet-button" (click)="loadFilters()">Reintentar filtros</button> }
       <form class="filters" (ngSubmit)="search()" role="search" aria-label="Buscar procesos">
         <label>Buscar
           <input name="q" type="search" placeholder="Código, nombre, alias, responsable o descripción" [(ngModel)]="q" />
@@ -59,9 +50,9 @@ import { UiBadgeComponent, UiBreadcrumbsComponent, UiMessageComponent, UiPanelCo
           <button class="quiet-button" type="button" (click)="clear()">Limpiar</button></div>
       </form>
       @if (loading()) { <p class="helper" role="status">Cargando información…</p> }
-      @else {
-        <p class="helper" role="status">{{ items().length }} proceso(s){{ items().length >= 300 ? ' (se muestran los primeros 300; afine la búsqueda)' : '' }}</p>
-        <div class="table-scroll">
+      @else if (!error()) {
+        <p class="helper" role="status">{{ items().length }} proceso(s) en los resultados{{ items().length >= 300 ? ' (límite de 300; afine la búsqueda para consultar otros resultados)' : '' }}</p>
+        <div class="table-scroll" tabindex="0" role="region" aria-label="Resultados de procesos">
           <table>
             <caption class="visually-hidden">Procesos</caption>
             <thead><tr><th scope="col">Código</th><th scope="col">Nombre</th><th scope="col">Clasificación</th>
@@ -70,7 +61,7 @@ import { UiBadgeComponent, UiBreadcrumbsComponent, UiMessageComponent, UiPanelCo
               @for (item of items(); track item.id) {
                 <tr>
                   <td>{{ item.code }}</td>
-                  <td><a [routerLink]="['/procesos', item.id]">{{ item.name }}</a>@if (item.alias) { <span class="helper"> ({{ item.alias }})</span> }</td>
+                  <td><a [routerLink]="['/procesos', item.id]" [queryParams]="{ returnTo: resultsUrl }">{{ item.name }}</a>@if (item.alias) { <span class="helper"> ({{ item.alias }})</span> }</td>
                   <td>{{ item.macroprocess }} › {{ item.processType }}</td>
                   <td>{{ item.responsibleUnit || 'Sin información' }}</td>
                   <td><ui-badge tone="info">{{ item.status }}</ui-badge></td>
@@ -85,12 +76,18 @@ import { UiBadgeComponent, UiBreadcrumbsComponent, UiMessageComponent, UiPanelCo
 })
 export class ProcessListComponent implements OnInit {
   private readonly api = inject(MvpV14Api);
+  private readonly route = inject(ActivatedRoute);
+  private readonly router = inject(Router);
+  private readonly destroyRef = inject(DestroyRef);
+  private readonly retrySearch = new Subject<void>();
   readonly auth = inject(AuthService);
   readonly items = signal<ProcessListItem[]>([]);
   readonly types = signal<ProcessTypeItem[]>([]);
   readonly units = signal<UnitItem[]>([]);
   readonly loading = signal(true);
   readonly error = signal('');
+  readonly catalogError = signal('');
+  resultsUrl = '/procesos';
   q = '';
   macroprocessId = '';
   processTypeId = '';
@@ -107,17 +104,35 @@ export class ProcessListComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    this.api.processTypes().subscribe({ next: (types) => this.types.set(types), error: (e) => this.error.set(errorMessage(e)) });
-    this.api.units().subscribe({ next: (units) => this.units.set(units.filter((unit) => unit.isActive)), error: (e) => this.error.set(errorMessage(e)) });
-    this.search();
+    this.loadFilters();
+    this.route.queryParamMap.pipe(
+      switchMap(params => this.retrySearch.pipe(startWith(undefined), switchMap(() => {
+        this.q = params.get('q') ?? '';
+        this.macroprocessId = params.get('macroprocessId') ?? '';
+        this.processTypeId = params.get('processTypeId') ?? '';
+        this.unitId = params.get('unitId') ?? '';
+        this.resultsUrl = this.router.url;
+        this.loading.set(true); this.error.set('');
+        return this.api.listProcesses({ q: this.q, macroprocessId: this.macroprocessId, processTypeId: this.processTypeId, unitId: this.unitId }).pipe(
+          catchError(e => { this.error.set(errorMessage(e)); return of(null); })
+        );
+      }))), takeUntilDestroyed(this.destroyRef)
+    ).subscribe(items => { this.items.set(items ?? []); this.loading.set(false); });
+  }
+
+  loadFilters(): void {
+    this.catalogError.set('');
+    this.api.processTypes().subscribe({ next: types => this.types.set(types), error: e => this.catalogError.set(errorMessage(e)) });
+    this.api.units().subscribe({ next: units => this.units.set(units.filter(unit => unit.isActive)), error: e => this.catalogError.set(errorMessage(e)) });
   }
 
   search(): void {
-    this.loading.set(true);
-    this.api.listProcesses({ q: this.q, macroprocessId: this.macroprocessId, processTypeId: this.processTypeId, unitId: this.unitId }).subscribe({
-      next: (items) => { this.items.set(items); this.error.set(''); this.loading.set(false); },
-      error: (e) => { this.error.set(errorMessage(e)); this.loading.set(false); }
-    });
+    const queryParams = { q: this.q || null, macroprocessId: this.macroprocessId || null, processTypeId: this.processTypeId || null, unitId: this.unitId || null };
+    const url = this.router.createUrlTree(['/procesos'], { queryParams });
+    // Un reintento con los mismos filtros también debe ejecutar la consulta.
+    if (this.router.serializeUrl(url) === this.router.url) {
+      this.retrySearch.next();
+    } else void this.router.navigateByUrl(url);
   }
 
   clear(): void {

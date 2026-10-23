@@ -1,6 +1,6 @@
-import { Component, OnInit, inject, signal } from '@angular/core';
+import { Component, ElementRef, OnInit, inject, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { RouterLink } from '@angular/router';
+
 import { AuthService, ProfileCode } from './auth.service';
 import { errorMessage } from './mvp-v14-api.service';
 import {
@@ -9,7 +9,8 @@ import {
   UiBreadcrumbsComponent,
   UiDialogService,
   UiMessageComponent,
-  UiPanelComponent
+  UiPanelComponent,
+  focusFirstInvalid
 } from './shared/ui';
 import { LeavesWithConfirmation } from './unsaved-changes.guard';
 import { SYSTEM_PROFILES, UserItem, UsersService } from './users.service';
@@ -19,7 +20,7 @@ import { SYSTEM_PROFILES, UserItem, UsersService } from './users.service';
   standalone: true,
   imports: [
     FormsModule,
-    RouterLink,
+
     UiBadgeComponent,
     UiBreadcrumbsComponent,
     UiMessageComponent,
@@ -86,20 +87,18 @@ import { SYSTEM_PROFILES, UserItem, UsersService } from './users.service';
     }
   `],
   template: `
-    <ui-breadcrumbs [items]="[{ label: 'Mapa de procesos', link: '/mapa' }, { label: 'Usuarios y perfiles' }]" />
+    <ui-breadcrumbs [items]="[{ label: 'Usuarios y perfiles' }]" />
     <ui-panel headingId="users-title" eyebrow="ADMINISTRACIÓN" heading="Gestión de usuarios y perfiles">
-      <a panelActions class="text-button" routerLink="/procesos">Buscar procesos</a>
-      <a panelActions class="text-button" routerLink="/tipos-de-proceso">Tipos de proceso</a>
-      <a panelActions class="text-button" routerLink="/unidades">Unidades internas</a>
 
       @if (error()) { <ui-message kind="error">{{ error() }}</ui-message> }
       @if (notice()) { <ui-message kind="success">{{ notice() }}</ui-message> }
+      @if (saving()) { <p class="helper" role="status">Guardando perfiles…</p> }
 
       @if (editingUser(); as target) {
         <section class="profile-editor" aria-labelledby="editor-title">
           <h2 id="editor-title">Asignar perfiles: {{ target.displayName }} ({{ target.email }})</h2>
           <p class="helper">Seleccione los perfiles institucionales correspondientes a este usuario.</p>
-          <fieldset class="profile-checkboxes">
+          <fieldset class="profile-checkboxes" tabindex="-1" [disabled]="saving()" [attr.aria-busy]="saving()" [attr.aria-invalid]="profileError() ? true : null" [attr.aria-describedby]="profileError() ? 'profile-error' : null">
             <legend class="visually-hidden">Perfiles institucionales</legend>
             @for (prof of availableProfiles; track prof.code) {
               <label class="profile-card">
@@ -115,6 +114,7 @@ import { SYSTEM_PROFILES, UserItem, UsersService } from './users.service';
               </label>
             }
           </fieldset>
+          @if (profileError()) { <p id="profile-error" class="field-error" role="alert">{{ profileError() }}</p> }
           <div class="editor-actions">
             <button class="primary-button" type="button" [disabled]="saving()" (click)="saveProfiles()">
               {{ saving() ? 'Guardando…' : 'Guardar perfiles' }}
@@ -128,8 +128,9 @@ import { SYSTEM_PROFILES, UserItem, UsersService } from './users.service';
 
       @if (loading()) {
         <p class="helper" role="status">Cargando usuarios…</p>
-      } @else {
-        <div class="table-scroll">
+      } @else if (loadFailed()) { <button type="button" class="quiet-button" (click)="loadUsers()">Reintentar carga de usuarios</button> }
+      @else {
+        <div class="table-scroll" tabindex="0" role="region" aria-label="Usuarios y perfiles">
           <table>
             <caption class="visually-hidden">Listado de usuarios institucionales y sus perfiles</caption>
             <thead>
@@ -163,7 +164,7 @@ import { SYSTEM_PROFILES, UserItem, UsersService } from './users.service';
                       <button
                         type="button"
                         class="text-button"
-                        [disabled]="editingUser()?.id === user.id"
+                        [disabled]="saving() || editingUser()?.id === user.id"
                         (click)="startEdit(user)"
                       >
                         Modificar perfiles
@@ -188,7 +189,10 @@ export class UsersComponent implements OnInit, LeavesWithConfirmation {
 
   readonly availableProfiles = SYSTEM_PROFILES;
   readonly users = signal<UserItem[]>([]);
+  private readonly element = inject<ElementRef<HTMLElement>>(ElementRef);
   readonly loading = signal(true);
+  readonly loadFailed = signal(false);
+  readonly profileError = signal('');
   readonly saving = signal(false);
   readonly error = signal<string | null>(null);
   readonly notice = signal<string | null>(null);
@@ -209,6 +213,7 @@ export class UsersComponent implements OnInit, LeavesWithConfirmation {
   }
 
   async confirmLeave(): Promise<boolean> {
+    if (this.saving()) return false;
     if (!this.isDirty()) return true;
     return await this.dialog.confirm({
       title: 'Cambios no guardados',
@@ -220,6 +225,7 @@ export class UsersComponent implements OnInit, LeavesWithConfirmation {
   }
 
   loadUsers(): void {
+    this.loadFailed.set(false);
     this.loading.set(true);
     this.error.set(null);
     this.usersService.list().subscribe({
@@ -229,6 +235,7 @@ export class UsersComponent implements OnInit, LeavesWithConfirmation {
       },
       error: (err) => {
         this.error.set(errorMessage(err));
+        this.loadFailed.set(true);
         this.loading.set(false);
       }
     });
@@ -259,7 +266,7 @@ export class UsersComponent implements OnInit, LeavesWithConfirmation {
   }
 
   async startEdit(user: UserItem): Promise<void> {
-    if (this.isSelf(user.id)) return;
+    if (this.saving() || this.isSelf(user.id) || this.editingUser()?.id === user.id) return;
     if (this.isDirty()) {
       const ok = await this.dialog.confirm({
         title: 'Descartar cambios',
@@ -274,6 +281,7 @@ export class UsersComponent implements OnInit, LeavesWithConfirmation {
   }
 
   private doStartEdit(user: UserItem): void {
+    this.profileError.set('');
     this.editingUser.set(user);
     const parsed = this.parseProfiles(user.profiles);
     this.selectedProfiles.set([...parsed]);
@@ -287,6 +295,8 @@ export class UsersComponent implements OnInit, LeavesWithConfirmation {
   }
 
   toggleProfile(code: ProfileCode): void {
+    this.profileError.set('');
+    if (this.saving()) return;
     const list = this.selectedProfiles();
     if (list.includes(code)) {
       this.selectedProfiles.set(list.filter((c) => c !== code));
@@ -296,11 +306,13 @@ export class UsersComponent implements OnInit, LeavesWithConfirmation {
   }
 
   saveProfiles(): void {
+    if (this.saving()) return;
     const target = this.editingUser();
     if (!target) return;
 
     if (this.selectedProfiles().length === 0) {
-      this.error.set('El usuario debe conservar al menos un perfil asignado.');
+      this.profileError.set('El usuario debe conservar al menos un perfil asignado.');
+      focusFirstInvalid(this.element.nativeElement);
       return;
     }
 
@@ -325,6 +337,7 @@ export class UsersComponent implements OnInit, LeavesWithConfirmation {
   }
 
   async cancelEdit(): Promise<void> {
+    if (this.saving()) return;
     if (this.isDirty()) {
       const confirmed = await this.dialog.confirm({
         title: 'Descartar cambios',

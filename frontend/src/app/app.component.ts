@@ -1,119 +1,55 @@
-import { Component, ElementRef, inject } from '@angular/core';
-import { RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
+import { Component, ElementRef, ViewChild, computed, inject, signal } from '@angular/core';
+import { RouterOutlet } from '@angular/router';
 import { AuthService } from './auth.service';
-import { UiBadgeComponent, UiDialogHostComponent } from './shared/ui';
+import { UiBadgeComponent, UiDialogHostComponent, UiModuleNavComponent, UiModuleNavItem } from './shared/ui';
+import { LeavesWithConfirmation } from './unsaved-changes.guard';
 
 @Component({
   selector: 'app-root',
+  host: { class: 'ui-root' },
   standalone: true,
-  imports: [RouterOutlet, RouterLink, RouterLinkActive, UiBadgeComponent, UiDialogHostComponent],
+  imports: [RouterOutlet, UiModuleNavComponent, UiBadgeComponent, UiDialogHostComponent],
   template: `
     <a class="skip-link" href="#main-content" (click)="focusContent($event)">Ir al contenido principal</a>
 
     @if (auth.isAuthenticated()) {
-      <header class="app-header" role="banner">
-        <div class="header-container">
-          <div class="header-brand">
-            <a routerLink="/mapa" class="brand-link" aria-label="Ir al Mapa de procesos">
-              <span class="brand-name">Gestión de Procesos</span>
-            </a>
-          </div>
-          <nav class="nav-links" aria-label="Navegación principal">
-            <a routerLink="/mapa" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }">Mapa</a>
-            <a routerLink="/procesos" routerLinkActive="active">Procesos</a>
-            @if (auth.isAdmin()) {
-              <a routerLink="/usuarios" routerLinkActive="active">Usuarios</a>
-              <a routerLink="/auditoria" routerLinkActive="active">Auditoría</a>
-              <a routerLink="/unidades" routerLinkActive="active">Unidades</a>
-              <a routerLink="/tipos-de-proceso" routerLinkActive="active">Tipos de proceso</a>
-            }
-          </nav>
-          <div class="session-info">
-            <span class="user-name">{{ auth.currentUser()?.displayName }}</span>
-            @if (primaryProfile()) {
-              <ui-badge tone="neutral">{{ primaryProfile() }}</ui-badge>
-            }
-            <button type="button" class="logout-btn" (click)="logout()" aria-label="Cerrar sesión">Cerrar sesión</button>
-          </div>
+      <ui-module-nav
+        [attr.inert]="auth.logoutInProgress() ? '' : null"
+        appName="Gestión de procesos"
+        appLink="/mapa"
+        [items]="navItems()">
+        <div sessionControls class="session-controls">
+          <span class="user-name">{{ auth.currentUser()?.displayName }}</span>
+          @if (primaryProfileBadge()) {
+            <ui-badge tone="neutral">{{ primaryProfileBadge() }}</ui-badge>
+          }
+          <button type="button" class="quiet-button logout-btn" [disabled]="logoutBusy()" (click)="logout()" aria-label="Cerrar sesión">Cerrar sesión</button>
         </div>
-      </header>
+      </ui-module-nav>
     }
 
-    <main id="main-content" tabindex="-1">
-      <router-outlet />
+    @if (auth.logoutInProgress()) {
+      <p class="session-status" role="status">Cerrando sesión…</p>
+    }
+    <main id="main-content" tabindex="-1"
+      [attr.inert]="auth.logoutInProgress() ? '' : null"
+      [attr.aria-busy]="auth.logoutInProgress() ? 'true' : null">
+      <router-outlet #outlet="outlet" />
     </main>
     <ui-dialog-host />
   `,
   styles: [`
-    .app-header {
-      background: var(--ui-color-surface);
-      border-bottom: 1px solid var(--ui-color-border);
-      position: sticky;
-      top: 0;
-      z-index: 100;
-      box-shadow: 0 1px 3px rgba(34, 33, 63, 0.05);
-    }
-    .header-container {
+    .session-status {
       width: min(var(--ui-content-width), calc(100% - 2rem));
-      margin: 0 auto;
-      height: 3.5rem;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 1.5rem;
+      margin: 1rem auto 0;
+      color: var(--ui-color-text);
     }
-    .header-brand {
-      display: flex;
-      align-items: center;
-      flex-shrink: 0;
-    }
-    .brand-link {
-      text-decoration: none;
-      display: inline-flex;
-      align-items: center;
-      gap: 0.5rem;
-    }
-    .brand-name {
-      color: var(--brand-ink);
-      font-weight: var(--ui-font-weight-heavy);
-      font-size: var(--ui-font-size-md);
-      letter-spacing: -0.02em;
-    }
-    .nav-links {
-      display: flex;
-      align-items: center;
-      gap: 0.25rem;
-      flex-wrap: wrap;
-    }
-    .nav-links a {
-      display: inline-flex;
-      align-items: center;
-      padding: 0.35rem 0.65rem;
-      border-radius: var(--ui-radius-md);
-      color: var(--ui-color-text-muted);
-      font-size: var(--ui-font-size-sm);
-      font-weight: var(--ui-font-weight-medium);
-      text-decoration: none;
-      transition: color 0.15s ease, background 0.15s ease;
-    }
-    .nav-links a:hover {
-      color: var(--ui-color-primary);
-      background: var(--ui-color-surface-accent);
-    }
-    .nav-links a.active {
-      color: var(--ui-color-primary);
-      background: var(--ui-color-surface-accent);
-      font-weight: var(--ui-font-weight-bold);
-      border-bottom: 2px solid var(--brand-indigo);
-      border-bottom-left-radius: 0;
-      border-bottom-right-radius: 0;
-    }
-    .session-info {
+    .session-controls {
       display: flex;
       align-items: center;
       gap: 0.75rem;
+      flex-wrap: wrap;
       font-size: var(--ui-font-size-sm);
-      flex-shrink: 0;
     }
     .user-name {
       color: var(--ui-color-text);
@@ -140,6 +76,27 @@ import { UiBadgeComponent, UiDialogHostComponent } from './shared/ui';
 export class AppComponent {
   private readonly host = inject<ElementRef<HTMLElement>>(ElementRef);
   readonly auth = inject(AuthService);
+  readonly logoutBusy = signal(false);
+
+  @ViewChild('outlet', { static: false }) private outlet?: RouterOutlet;
+
+  readonly navItems = computed<UiModuleNavItem[]>(() => {
+    const items: UiModuleNavItem[] = [
+      { label: 'Mapa', link: '/mapa', matchPrefix: '/mapa' },
+      { label: 'Procesos', link: '/procesos', matchPrefix: '/procesos' }
+    ];
+
+    if (this.auth.isAdmin()) {
+      items.push(
+        { label: 'Unidades internas', link: '/unidades', matchPrefix: '/unidades' },
+        { label: 'Tipos de proceso', link: '/tipos-de-proceso', matchPrefix: '/tipos-de-proceso' },
+        { label: 'Usuarios', link: '/usuarios', matchPrefix: '/usuarios' },
+        { label: 'Auditoría', link: '/auditoria', matchPrefix: '/auditoria' }
+      );
+    }
+
+    return items;
+  });
 
   primaryProfile(): string {
     const profiles = this.auth.profiles();
@@ -151,8 +108,34 @@ export class AppComponent {
     return '';
   }
 
-  logout(): void {
-    void this.auth.logout();
+  primaryProfileBadge(): string {
+    const profile = this.primaryProfile();
+    if (!profile) return '';
+    const name = (this.auth.currentUser()?.displayName || '').toLowerCase();
+    const keywords: Record<string, string[]> = {
+      'Administrador': ['administrador', 'admin'],
+      'Dueño de proceso': ['dueño', 'responsable'],
+      'Validador': ['validador', 'revisor'],
+      'Gestor de riesgos': ['riesgo', 'riesgos'],
+      'Consulta': ['consulta', 'lector']
+    };
+    const words = keywords[profile] ?? [profile.toLowerCase()];
+    if (words.some((w) => name.includes(w))) return '';
+    return profile;
+  }
+
+  async logout(): Promise<void> {
+    if (this.logoutBusy() || this.auth.logoutInProgress()) return;
+    this.logoutBusy.set(true);
+    try {
+      const comp = this.outlet?.isActivated ? (this.outlet.component as Partial<LeavesWithConfirmation>) : null;
+      if (comp && typeof comp.confirmLeave === 'function') {
+        if (!await comp.confirmLeave()) return;
+      }
+      await this.auth.logout();
+    } finally {
+      this.logoutBusy.set(false);
+    }
   }
 
   focusContent(event: Event): void {

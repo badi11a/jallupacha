@@ -1,9 +1,10 @@
-import { provideHttpClient } from '@angular/common/http';
+import { HttpClient, provideHttpClient, withInterceptors } from '@angular/common/http';
 import { HttpTestingController, provideHttpClientTesting } from '@angular/common/http/testing';
 import { Component } from '@angular/core';
 import { TestBed } from '@angular/core/testing';
 import { provideRouter, Router } from '@angular/router';
-import { authGuard, guestGuard } from './auth.guard';
+import { adminGuard, authGuard, guestGuard } from './auth.guard';
+import { authInterceptor } from './auth.interceptor';
 import { AuthService, USER_STORAGE_KEY } from './auth.service';
 import { LoginComponent } from './login.component';
 import { MvpV14DemoComponent } from './mvp-v14-demo.component';
@@ -30,7 +31,8 @@ describe('Autenticación Local Institucional v15 (REQ-25)', () => {
         provideRouter([
           { path: 'login', component: LoginComponent, canActivate: [guestGuard] },
           { path: 'mapa', component: DummyProtectedComponent, canActivate: [authGuard] },
-          { path: 'procesos', component: DummyProtectedComponent, canActivate: [authGuard] }
+          { path: 'procesos', component: DummyProtectedComponent, canActivate: [authGuard] },
+          { path: 'usuarios', component: DummyProtectedComponent, canActivate: [adminGuard] }
         ])
       ]
     });
@@ -102,7 +104,36 @@ describe('Autenticación Local Institucional v15 (REQ-25)', () => {
     });
   });
 
-  describe('authGuard & guestGuard', () => {
+  describe('authGuard, adminGuard & guestGuard', () => {
+    it('adminGuard redirige a /login a usuarios no autenticados', async () => {
+      await router.navigateByUrl('/usuarios');
+      expect(router.url).toContain('/login');
+    });
+
+    it('adminGuard redirige a /mapa a usuarios autenticados sin perfil ADMIN', async () => {
+      authService.currentUser.set({
+        userId: 2,
+        displayName: 'Usuario Consulta',
+        email: 'consulta@example.test',
+        profiles: ['CONSULTATION']
+      });
+
+      await router.navigateByUrl('/usuarios');
+      expect(router.url).toBe('/mapa');
+    });
+
+    it('adminGuard permite el acceso a usuarios con perfil ADMIN', async () => {
+      authService.currentUser.set({
+        userId: 1,
+        displayName: 'Usuario Admin',
+        email: 'admin@example.test',
+        profiles: ['ADMIN']
+      });
+
+      const success = await router.navigateByUrl('/usuarios');
+      expect(success).toBe(true);
+      expect(router.url).toBe('/usuarios');
+    });
     it('redirige a /login al intentar acceder a rutas protegidas sin sesión', async () => {
       await router.navigateByUrl('/mapa');
       expect(router.url).toContain('/login');
@@ -213,10 +244,10 @@ describe('Autenticación Local Institucional v15 (REQ-25)', () => {
 
       const el = fixture.nativeElement as HTMLElement;
       expect(el.querySelector('a[href="/procesos/nuevo"]')).toBeNull();
-      expect(el.querySelector('a[href="/procesos"]')).not.toBeNull();
+      expect(el.querySelector('.macro-link')).not.toBeNull();
     });
 
-    it('muestra acciones de creación a perfiles PROCESS_OWNER en el mapa', () => {
+    it('permite explorar macroprocesos a perfiles PROCESS_OWNER en el mapa sin acciones fuera de contexto', () => {
       authService.currentUser.set({
         userId: 1,
         displayName: 'Usuario Dueño',
@@ -240,7 +271,8 @@ describe('Autenticación Local Institucional v15 (REQ-25)', () => {
       fixture.detectChanges();
 
       const el = fixture.nativeElement as HTMLElement;
-      expect(el.querySelector('a[href="/procesos/nuevo"]')).not.toBeNull();
+      expect(el.querySelector('a[href="/procesos/nuevo"]')).toBeNull();
+      expect(el.querySelector('.macro-link')).not.toBeNull();
     });
 
     it('oculta administración de catálogos y creación a CONSULTATION en listado de procesos', () => {
@@ -259,11 +291,11 @@ describe('Autenticación Local Institucional v15 (REQ-25)', () => {
 
       const el = fixture.nativeElement as HTMLElement;
       expect(el.querySelector('a[href="/procesos/nuevo"]')).toBeNull();
-      expect(el.querySelector('a[href="/unidades"]')).toBeNull();
-      expect(el.querySelector('a[href="/tipos-de-proceso"]')).toBeNull();
+
+
     });
 
-    it('muestra administración de catálogos y creación a ADMIN en listado de procesos', () => {
+    it('muestra creación de procesos a ADMIN en listado de procesos', () => {
       authService.currentUser.set({
         userId: 1,
         displayName: 'Usuario Administrador',
@@ -279,8 +311,58 @@ describe('Autenticación Local Institucional v15 (REQ-25)', () => {
 
       const el = fixture.nativeElement as HTMLElement;
       expect(el.querySelector('a[href="/procesos/nuevo"]')).not.toBeNull();
-      expect(el.querySelector('a[href="/unidades"]')).not.toBeNull();
-      expect(el.querySelector('a[href="/tipos-de-proceso"]')).not.toBeNull();
+
+
+    });
+  });
+
+  describe('authInterceptor', () => {
+    it('agrega withCredentials: true a llamadas /api y redirige a /login ante 401', async () => {
+      TestBed.resetTestingModule();
+      sessionStorage.clear();
+      TestBed.configureTestingModule({
+        imports: [DummyProtectedComponent, LoginComponent],
+        providers: [
+          provideHttpClient(withInterceptors([authInterceptor])),
+          provideHttpClientTesting(),
+          provideRouter([
+            { path: 'login', component: LoginComponent },
+            { path: 'mapa', component: DummyProtectedComponent }
+          ])
+        ]
+      });
+
+      const http = TestBed.inject(HttpClient);
+      const httpController = TestBed.inject(HttpTestingController);
+      const auth = TestBed.inject(AuthService);
+      const testRouter = TestBed.inject(Router);
+      const navigateSpy = vi.spyOn(testRouter, 'navigate');
+
+      await testRouter.navigateByUrl('/mapa');
+
+      auth.currentUser.set({
+        userId: 1,
+        displayName: 'Admin',
+        email: 'admin@example.test',
+        profiles: ['ADMIN']
+      });
+      sessionStorage.setItem(USER_STORAGE_KEY, JSON.stringify(auth.currentUser()));
+
+      let responseError = null;
+      http.get('/api/users').subscribe({
+        error: (err) => { responseError = err; }
+      });
+
+      const req = httpController.expectOne('/api/users');
+      expect(req.request.withCredentials).toBe(true);
+      req.flush({ message: 'Unauthorized' }, { status: 401, statusText: 'Unauthorized' });
+
+      expect(responseError).toBeDefined();
+      expect(auth.isAuthenticated()).toBe(false);
+      expect(auth.currentUser()).toBeNull();
+      expect(sessionStorage.getItem(USER_STORAGE_KEY)).toBeNull();
+      expect(navigateSpy).toHaveBeenCalledWith(['/login'], { queryParams: { returnUrl: '/mapa' } });
+      httpController.verify();
     });
   });
 });

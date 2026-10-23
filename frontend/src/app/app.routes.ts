@@ -1,6 +1,6 @@
 import { Routes } from '@angular/router';
 import { AuditComponent } from './audit.component';
-import { authGuard, guestGuard } from './auth.guard';
+import { adminGuard, authGuard, guestGuard } from './auth.guard';
 import { LoginComponent } from './login.component';
 import { MacroprocessDetailComponent } from './macroprocess-detail.component';
 import { MvpV14DemoComponent } from './mvp-v14-demo.component';
@@ -29,9 +29,9 @@ export const routes: Routes = [
   { title: 'Nuevo proceso', path: 'procesos/nuevo', component: ProcessFormComponent, canActivate: [authGuard], canDeactivate: [unsavedChangesGuard] },
   { title: 'Ficha del proceso', path: 'procesos/:id', component: ProcessDetailComponent, canActivate: [authGuard], canDeactivate: [unsavedChangesGuard] },
   { title: 'Editar proceso', path: 'procesos/:id/editar', component: ProcessFormComponent, canActivate: [authGuard], canDeactivate: [unsavedChangesGuard] },
-  { title: 'Unidades internas', path: 'unidades', component: UnitsComponent, canActivate: [authGuard], canDeactivate: [unsavedChangesGuard] },
-  { title: 'Tipos de proceso', path: 'tipos-de-proceso', component: ProcessTypesComponent, canActivate: [authGuard], canDeactivate: [unsavedChangesGuard] },
-  { title: 'Gestión de usuarios y perfiles', path: 'usuarios', component: UsersComponent, canActivate: [authGuard], canDeactivate: [unsavedChangesGuard] },
-  { title: 'Bitácora de auditoría inmutable', path: 'auditoria', component: AuditComponent, canActivate: [authGuard] },
+  { title: 'Unidades internas', path: 'unidades', component: UnitsComponent, canActivate: [adminGuard], canDeactivate: [unsavedChangesGuard] },
+  { title: 'Tipos de proceso', path: 'tipos-de-proceso', component: ProcessTypesComponent, canActivate: [adminGuard], canDeactivate: [unsavedChangesGuard] },
+  { title: 'Gestión de usuarios y perfiles', path: 'usuarios', component: UsersComponent, canActivate: [adminGuard], canDeactivate: [unsavedChangesGuard] },
+  { title: 'Bitácora de auditoría inmutable', path: 'auditoria', component: AuditComponent, canActivate: [adminGuard] },
   { title: 'Página no encontrada', path: '**', component: NotFoundComponent }
 ];

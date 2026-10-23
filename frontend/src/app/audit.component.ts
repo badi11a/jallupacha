@@ -1,7 +1,10 @@
-import { Component, OnInit, inject, signal } from '@angular/core';
+import { Component, DestroyRef, OnInit, inject, signal } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { ActivatedRoute, Router } from '@angular/router';
+import { Subject, catchError, of, startWith, switchMap } from 'rxjs';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { RouterLink } from '@angular/router';
+
 import { AuditApiService, AuditItem } from './audit.service';
 import { AuthService } from './auth.service';
 import { errorMessage } from './mvp-v14-api.service';
@@ -19,7 +22,7 @@ import {
   imports: [
     CommonModule,
     FormsModule,
-    RouterLink,
+
     UiBadgeComponent,
     UiBreadcrumbsComponent,
     UiMessageComponent,
@@ -28,7 +31,7 @@ import {
   styles: [`
     .audit-filters {
       display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(14rem, 1fr));
+      grid-template-columns: repeat(auto-fit, minmax(min(100%, 14rem), 1fr));
       gap: .75rem;
       align-items: end;
       margin-bottom: 1.25rem;
@@ -41,7 +44,7 @@ import {
     .audit-filters input, .audit-filters select {
       min-height: 2.5rem;
       padding: 0 .6rem;
-      border: 1px solid var(--ui-color-border);
+      border: 1px solid var(--ui-color-border-strong);
       border-radius: var(--ui-radius-lg);
       font: inherit;
     }
@@ -53,7 +56,7 @@ import {
       border-radius: var(--ui-radius-md);
       font-size: .85rem;
       display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(18rem, 1fr));
+      grid-template-columns: repeat(auto-fit, minmax(min(100%, 18rem), 1fr));
       gap: .75rem;
     }
     .diff-col pre {
@@ -80,14 +83,11 @@ import {
     }
   `],
   template: `
-    <ui-breadcrumbs [items]="[{ label: 'Mapa de procesos', link: '/mapa' }, { label: 'Auditoría' }]" />
+    <ui-breadcrumbs [items]="[{ label: 'Auditoría' }]" />
     <ui-panel headingId="audit-title" eyebrow="SEGURIDAD Y CONTROL" heading="Bitácora de auditoría inmutable">
-      <a panelActions class="text-button" routerLink="/procesos">Buscar procesos</a>
-      <a panelActions class="text-button" routerLink="/usuarios">Usuarios</a>
-      <a panelActions class="text-button" routerLink="/unidades">Unidades internas</a>
-      <a panelActions class="text-button" routerLink="/tipos-de-proceso">Tipos de proceso</a>
 
       @if (error()) { <ui-message kind="error">{{ error() }}</ui-message> }
+      @if (error()) { <button type="button" class="quiet-button" (click)="load()">Reintentar consulta</button> }
 
       <form class="audit-filters" (ngSubmit)="search()" role="search" aria-label="Filtrar eventos de auditoría">
         <label>Tipo de entidad
@@ -110,9 +110,9 @@ import {
 
       @if (loading()) {
         <p class="helper" role="status">Cargando bitácora de auditoría…</p>
-      } @else {
-        <p class="helper" role="status">{{ total() }} evento(s) registrado(s) en la bitácora institucional</p>
-        <div class="table-scroll">
+      } @else if (!error()) {
+        <p class="helper" role="status">{{ total() }} evento(s) coincidente(s) con la consulta ejecutada; {{ items().length }} en esta página.</p>
+        <div class="table-scroll" tabindex="0" role="region" aria-label="Resultados de auditoría">
           <table>
             <caption class="visually-hidden">Registro histórico inmutable de eventos de auditoría</caption>
             <thead>
@@ -211,6 +211,10 @@ import {
 })
 export class AuditComponent implements OnInit {
   private readonly auditApi = inject(AuditApiService);
+  private readonly route = inject(ActivatedRoute);
+  private readonly router = inject(Router);
+  private readonly destroyRef = inject(DestroyRef);
+  private readonly retryLoad = new Subject<void>();
   readonly auth = inject(AuthService);
 
   readonly items = signal<AuditItem[]>([]);
@@ -226,23 +230,25 @@ export class AuditComponent implements OnInit {
   action = '';
 
   ngOnInit(): void {
-    this.load();
+    this.route.queryParamMap.pipe(switchMap(params => this.retryLoad.pipe(startWith(undefined), switchMap(() => {
+      this.entityType = params.get('entityType') ?? '';
+      this.action = params.get('action') ?? '';
+      const page = Number(params.get('page'));
+      this.page.set(Number.isSafeInteger(page) && page > 0 ? page : 1);
+      this.loading.set(true); this.error.set(null); this.expandedIds.set(new Set());
+      return this.auditApi.list(this.page(), this.limit(), this.entityType, this.action).pipe(
+        catchError(err => { this.error.set(errorMessage(err)); return of(null); })
+      );
+    }))), takeUntilDestroyed(this.destroyRef)).subscribe(res => {
+      if (res) { this.items.set(res.items); this.total.set(res.total); }
+      this.loading.set(false);
+    });
   }
 
   load(): void {
-    this.loading.set(true);
-    this.error.set(null);
-    this.auditApi.list(this.page(), this.limit(), this.entityType, this.action).subscribe({
-      next: (res) => {
-        this.items.set(res.items);
-        this.total.set(res.total);
-        this.loading.set(false);
-      },
-      error: (err) => {
-        this.error.set(errorMessage(err));
-        this.loading.set(false);
-      }
-    });
+    const url = this.router.createUrlTree(['/auditoria'], { queryParams: { entityType: this.entityType || null, action: this.action || null, page: this.page() === 1 ? null : this.page() } });
+    if (this.router.serializeUrl(url) === this.router.url) this.retryLoad.next();
+    else void this.router.navigateByUrl(url);
   }
 
   search(): void {
