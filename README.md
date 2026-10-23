@@ -6,27 +6,29 @@ Sistema web institucional para la gestión, gobierno y administración de proces
 
 ## Estado actual del proyecto
 
-El proyecto implementa la versión funcional y visual del **MVP v14 de Operador Único** (`C-011`), desarrollada bajo el paradigma **Spec-Driven Development (SDD)** con un kit de componentes desacoplado, tokens semánticos del Sistema de Diseño Digital (SDD) y total conformidad de accesibilidad WCAG 2.2 AA.
+El producto se rige por la [especificación v15](docs/producto/especificacion_v15.md) y la [arquitectura v15](docs/producto/arquitectura_v15.md), que superan el piloto de operador único C-011. Jallupacha es también el piloto para una guía de experiencia y un sistema de diseño reutilizable. La existencia de código, componentes o pruebas no acredita por sí sola cumplimiento completo de v15, seguridad ni conformidad WCAG 2.2 AA; consultar evidencia y pendientes en [correcciones](docs/trazabilidad/correcciones.md).
 
-### Módulos y vistas operativas
+Para diseñar y revisar cambios, comenzar por la [guía UX y SDD — STD-UX-001](docs/diseno/marco_estandar_ux_institucional.md): principios explícitos, reglas, navegación alternativa y redundancia, criterios de aceptación, recorridos de revisión y gobierno de patrones. Se aplica como referencia del proyecto; su adopción organizacional permanece pendiente.
+
+### Vistas del frontend (inventario descriptivo, no certificación)
 
 1. **Mapa de Procesos Institucional (`/mapa`)**:
    - Visualización jerárquica por familias (`Estratégicos`, `Misionales`, `De apoyo`) con bandas de color semánticas estables.
    - Filtro integrado mediante control segmentado accesible (patrón *radio group* con tokens de radio de 7 px) y buscador reactivo en tiempo real con normalización sin tildes.
-   - Resumen de procesos y tipos por macroproceso, enlaces contextuales a detalle y diálogo de ayuda modal.
+   - Resumen de procesos y tipos por macroproceso y enlaces contextuales a detalle.
 
 2. **Detalle de Macroproceso (`/mapa/macroprocesos/:id`)**:
    - *Hero Card* con indicadores clave consolidados: tipos de proceso, total de procesos asociados y unidades responsables participantes.
-   - *Widget de distribución de riesgo*: medidor acumulativo calibrado con los 4 niveles de criticidad del sistema (`Bajo`, `Medio`, `Alto`, `Crítico`).
+   - *Widget de distribución de riesgo*: representación de los niveles `Bajo`, `Medio`, `Alto` y `Crítico`. Su cálculo, alcance y accesibilidad se evalúan conforme a R-12 de la guía; no se confunde con el campo criticidad del proceso.
    - Explorador y filtrado multifacético de procesos por término de búsqueda, tipo de proceso (chips filtrables), unidad responsable y nivel de riesgo.
 
-3. **Ficha de Proceso Homologada (`/procesos/:id`)**:
+3. **Ficha de Proceso (`/procesos/:id`)**:
    - *Hero Card (Grilla 2 columnas)*: rótulo institucional de proceso, código y nombre, línea decorativa dorada (`--ui-color-map-support`), indicador semántico de estado, descripción del proceso y bloque trío de clasificación (`Tipo de proceso`, `Macroproceso` con enlace navegable y `Unidad responsable`).
-   - *Widget de Nivel de Riesgo*: medidor tipo *gauge* de 4 ranuras que resalta la clasificación activa con su color semántico y leyenda de criticidad (`Bajo`, `Medio`, `Alto`, `Crítico`).
+   - *Widget de Nivel de Riesgo*: medidor tipo *gauge* de 4 ranuras; su presencia no acredita una fórmula de agregación aprobada ni conformidad accesible.
    - *Propósito del proceso*: tarjeta destacada con acento lateral en `--brand-steel-blue` (`#446BA9`).
    - *Gobernanza del proceso*: contenedor homologado con grilla de 3 tarjetas:
-     - **Unidad Responsable**: nombre de la unidad líder, función institucional, indicador de actividad y canales de contacto institucional genéricos.
-     - **Responsable del Proceso**: persona o cargo encargado, descripción de gestión operativa, mención del elaborador del proceso y canales de coordinación.
+     - **Unidad Responsable**: identificación de la unidad y estado de actividad. Los contactos y funciones solo son información válida del registro si tienen una fuente definida; los ejemplos visuales no los sustituyen.
+     - **Responsable del Proceso**: persona o cargo encargado y mención del elaborador; no atribuir funciones específicas a partir de textos de ayuda genéricos.
      - **Unidades Participantes**: colección de píldoras/chips de unidades colaboradoras, estado de actividad y función asignada.
    - *Ficha técnica completa*: visualización de todos los campos estandarizados (REQ-06), avisos de completitud de campos mínimos y posibles duplicados.
    - *Gestión interactiva*: operaciones CRUD completas sobre riesgos (descripción, causa, consecuencia, tipo y nivel) y relaciones operativas (`Flujo`, `Dependencia`, `Coordinación`).
@@ -38,7 +40,7 @@ El proyecto implementa la versión funcional y visual del **MVP v14 de Operador 
 
 ## Reglas de diseño y datos genéricos
 
-- **Datos estrictamente genéricos (`AGENTS.md`)**: El sistema utiliza exclusivamente datos de demostración neutrales e institucionales ("la entidad", "la institución", "la organización"). No contiene referencias a instituciones particulares, facultades reales ni dominios específicos.
+- **Datos estrictamente genéricos (`AGENTS.md`)**: los datos de prueba y textos deben usar términos neutrales como «la entidad», «la institución» o «la organización», sin referencias a instituciones particulares ni sus denominaciones. Los ejemplos no deben presentarse como atributos reales de un registro.
 - **Sistema de diseño y tokens (`tokens.css`, `base.css`)**:
   - Controles y botones: `--ui-radius-md: 7px`.
   - Contenedores y tarjetas: `--ui-radius-lg: 8px` / `--ui-radius-xl: 12px`.
@@ -85,7 +87,7 @@ jallupacha/
 
 ### Requisitos previos
 - Node.js 24 LTS y npm 11.
-- Instancia activa de Oracle Database 19c (o contenedor Oracle Database Free / EE).
+- Instalación directa de Oracle Database 19c, sin Docker, conforme a la arquitectura vigente.
 - Variables de entorno configuradas en `backend/.env` (tomando como base `backend/.env.example`).
 
 ### Instalación y configuración
@@ -118,7 +120,7 @@ Direcciones locales por defecto:
 
 ## Aseguramiento de calidad y pruebas automatizadas
 
-El proyecto cuenta con un conjunto exhaustivo de pruebas unitarias, de integración y auditoría de accesibilidad:
+El proyecto dispone de verificaciones unitarias, de integración y de contraste. Los resultados y límites se registran por cambio; no equivalen a una auditoría integral de accesibilidad. La revisión documental C-031 no ejecuta estas verificaciones de aplicación:
 
 ```bash
 # 1. Verificación de contraste de diseño (WCAG 2.2 AA - 44 combinaciones)
@@ -138,11 +140,16 @@ npm run build
 
 ## Documentación del sistema
 
+- [Índice general de documentación](docs/README.md)
 - [Instrucciones y principios de desarrollo SDD](AGENTS.md)
-- [Especificación funcional vigente del MVP v14](docs/mvp_v14.md)
-- [Arquitectura técnica del MVP v14](docs/arquitectura_mvp_v14.md)
-- [Adaptación visual y de navegación del mapa](docs/adaptacion_visual_mvp_v14.md)
-- [Sistema de diseño digital](docs/design-system.md)
+- [Especificación funcional vigente v15](docs/producto/especificacion_v15.md)
+- [Arquitectura técnica vigente v15](docs/producto/arquitectura_v15.md)
+- [Guía UX y SDD: principios, reglas, patrones y verificaciones](docs/diseno/marco_estandar_ux_institucional.md)
+- [Sistema de diseño digital](docs/diseno/design-system.md)
+- [Catálogo de componentes](docs/diseno/catalogo-componentes.md)
+- [Patrón compartido de formularios](docs/diseno/patrones-formularios.md)
+- [Correcciones y evidencia de revisión](docs/trazabilidad/correcciones.md)
+- Los documentos históricos y la referencia visual temporal se retiraron mediante C-040. La documentación vigente está en los enlaces anteriores; los antecedentes versionados se consultan en el historial de Git.
 
 ---
 

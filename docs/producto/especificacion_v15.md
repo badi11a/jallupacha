@@ -4,11 +4,11 @@
 
 La especificación de la versión 15 (v15) define el producto institucional para su operación en la red interna (intranet) bajo un modelo multiusuario y control de acceso basado en perfiles. 
 
-Toma como línea base funcional la planilla `docs/referencias/Requisitos_Sistema_Procesos_v15.xlsx` (actualizada desde la versión 14), incorporando formalmente la decisión de arquitectura autorizada por el responsable del producto:
+Toma como línea base funcional la planilla `../referencias/Requisitos_Sistema_Procesos_v15.xlsx` (actualizada desde la versión 14), incorporando formalmente la decisión de arquitectura autorizada por el responsable del producto:
 1. **Sustitución de REQ-25 (Autenticación externa Google Workspace por Autenticación Local Institucional):** Debido a que la aplicación opera en un entorno de red privada institucional (intranet) sin salida obligatoria a Internet ni interconexión inmediata a servicios de terceros, la autenticación se realiza de forma autónoma y segura mediante credenciales locales gestionadas por la entidad (correo institucional y contraseña con hashing robusto Argon2id). El diseño queda preparado para conectarse a directorios corporativos internos (como LDAP o Active Directory) cuando la infraestructura de red lo habilite.
 2. **Superación del piloto de operador único (C-011):** Se restablece el modelo institucional multiusuario pleno, reactivando los requisitos de identidad, perfiles, auditoría de usuario y ciclo de vida de procesos que habían sido transitoriamente postergados durante el piloto.
 
-Los documentos `docs/mvp_v14.md` y `docs/arquitectura_mvp_v14.md` pasan a ser antecedentes históricos del piloto mono-operador C-011.
+El piloto mono-operador C-011 queda superado por esta especificación multiusuario. Sus documentos históricos se retiraron del árbol de trabajo mediante la purga autorizada C-040; los antecedentes versionados permanecen en Git.
 
 ---
 
@@ -69,6 +69,9 @@ Los procesos se organizan jerárquicamente en:
 $$\text{Tipos de Macroproceso} \longrightarrow \text{Macroprocesos} \longrightarrow \text{Tipos de Proceso} \longrightarrow \text{Procesos}$$
 * Tipos de Macroproceso iniciales: Estratégicos, Misionales y De apoyo.
 * La estructura base de tipos de macroproceso y macroprocesos permanece estable para garantizar la coherencia institucional.
+* Criterios de contenido y presentación autorizados en C-042: cada macroproceso de la estructura inicial tiene una descripción propia, concreta y coherente con los procesos que agrupa. Se muestra inmediatamente debajo de su nombre, tanto en la tarjeta del mapa como en el detalle, antes de los contadores.
+* La descripción procede del registro y se conserva en la respuesta de la API del mapa. Si falta en un registro existente, se omite el párrafo sin inventar contenido ni sustituirlo por instrucciones de navegación, filtros o límites de consulta.
+* El texto fijo retirado en C-042 no forma parte de los requisitos. El alcance de los indicadores se comunica mediante sus etiquetas y el aviso del listado cuando alcanza su límite, sin ocupar el lugar de la descripción.
 
 ### REQ-51 — Gestión de tipos de proceso
 El Administrador crea, edita y desactiva tipos de proceso asociados a un macroproceso específico.
