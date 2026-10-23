@@ -19,6 +19,15 @@ describe('MVP v14 demonstration content', () => {
       .toEqual(processes.map((_, index) => index + 1));
   });
 
+  it('preserves a distinct description for every macroprocess and the approved names', () => {
+    const content = loadMvpV14Content();
+    expect(content.every(macro => macro.description.trim().length > 0 && macro.description !== macro.name)).toBe(true);
+    expect(new Set(content.map(macro => macro.description)).size).toBe(content.length);
+    expect(content.map(macro => macro.name)).toEqual(expect.arrayContaining([
+      'Gestión de Personas y Abastecimiento', 'Gestión de Servicios Tecnológicos'
+    ]));
+  });
+
   it('keeps every demonstration risk within the fixed MVP risk levels', () => {
     const levels = loadMvpV14Content()
       .flatMap((macroprocess) => macroprocess.processes)

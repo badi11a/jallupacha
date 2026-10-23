@@ -3,6 +3,7 @@
   "macroprocesses": [
     {
       "name": "Planificación y Gestión Estratégica",
+      "description": "Define los objetivos y lineamientos estratégicos de la entidad, organiza la cartera de proyectos plurianuales y supervisa el avance de las metas institucionales para orientar las decisiones de gestión.",
       "typeCode": "ESTRATEGICOS",
       "processes": [
         {
@@ -83,6 +84,7 @@
     },
     {
       "name": "Aseguramiento Institucional de la Calidad",
+      "description": "Revisa los flujos de trabajo de la entidad, identifica fallas y oportunidades de mejora y promueve el rediseño de procesos para corregir desviaciones y mejorar sus resultados.",
       "typeCode": "ESTRATEGICOS",
       "processes": [
         {
@@ -108,6 +110,7 @@
     },
     {
       "name": "Relaciones y Comunicaciones Corporativas",
+      "description": "Recibe, evalúa y prioriza las iniciativas propuestas por las unidades de la entidad, coordinando los antecedentes necesarios para decidir su incorporación al portafolio institucional.",
       "typeCode": "ESTRATEGICOS",
       "processes": [
         {
@@ -133,6 +136,7 @@
     },
     {
       "name": "Gobierno Digital y Tecnologías",
+      "description": "Supervisa el desempeño y la seguridad de las plataformas y los datos institucionales mediante el seguimiento de indicadores operativos, para detectar desviaciones y orientar decisiones sobre los servicios digitales.",
       "typeCode": "ESTRATEGICOS",
       "processes": [
         {
@@ -158,6 +162,7 @@
     },
     {
       "name": "Control de Gestión y Sostenibilidad",
+      "description": "Evalúa el cumplimiento anual de los compromisos de gestión y las metas de la entidad, consolidando indicadores y antecedentes de las unidades para identificar brechas y fundamentar ajustes de planificación.",
       "typeCode": "ESTRATEGICOS",
       "processes": [
         {
@@ -180,7 +185,8 @@
       ]
     },
     {
-      "name": "Formación y Trayectoria Académica",
+      "name": "Prestaciones y Atención Ciudadana",
+      "description": "Gestiona las solicitudes de la ciudadanía, verifica los antecedentes para entregar prestaciones y organiza los canales de atención presencial y remota, desde la recepción del requerimiento hasta la comunicación de su resultado.",
       "typeCode": "MISIONALES",
       "processes": [
         {
@@ -241,7 +247,8 @@
       ]
     },
     {
-      "name": "Investigación, Desarrollo y Creación",
+      "name": "Fiscalización y Control Normativo",
+      "description": "Verifica el cumplimiento técnico, financiero y normativo de programas, instalaciones y contratos mediante revisiones documentales e inspecciones, registrando desviaciones respecto de las obligaciones y estándares aplicables.",
       "typeCode": "MISIONALES",
       "processes": [
         {
@@ -302,7 +309,8 @@
       ]
     },
     {
-      "name": "Vinculación Territorial y Extensión",
+      "name": "Vinculación y Asistencia Institucional",
+      "description": "Tramita reclamos y recursos de reconsideración sobre las decisiones de la entidad y coordina asistencia técnica especializada para los casos derivados, hasta emitir la respuesta o disponer el apoyo requerido.",
       "typeCode": "MISIONALES",
       "processes": [
         {
@@ -346,7 +354,8 @@
       ]
     },
     {
-      "name": "Gestión del Talento y Personas",
+      "name": "Gestión de Personas y Abastecimiento",
+      "description": "Administra el ciclo laboral, las remuneraciones y el desarrollo de las personas, junto con la adquisición de bienes y la contratación de suministros necesarios para la operación de la entidad.",
       "typeCode": "APOYO",
       "processes": [
         {
@@ -391,6 +400,7 @@
     },
     {
       "name": "Administración, Logística e Infraestructura",
+      "description": "Formula y controla el presupuesto institucional y administra los espacios físicos e inmuebles, coordinando su asignación, mantenimiento y seguridad para sostener la operación de las unidades.",
       "typeCode": "APOYO",
       "processes": [
         {
@@ -432,7 +442,8 @@
       ]
     },
     {
-      "name": "Asesoría Jurídica y Normativa Institucional",
+      "name": "Gestión de Servicios Tecnológicos",
+      "description": "Desarrolla y opera las plataformas informáticas de la entidad, resuelve incidencias de soporte y mantiene redes y comunicaciones. Gestiona además los respaldos y los controles de acceso para proteger la información institucional.",
       "typeCode": "APOYO",
       "processes": [
         {

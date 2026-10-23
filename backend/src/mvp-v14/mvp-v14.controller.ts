@@ -12,6 +12,7 @@ interface MapRow {
   macroprocessId: number | string;
   macroprocessCode: string;
   macroprocessName: string;
+  macroprocessDescription: string | null;
   macroprocessOrder: number | string;
   processTypeId: number | string | null;
   processTypeName: string | null;
@@ -31,7 +32,7 @@ export class MvpV14Controller {
     const table = qualifiedTable;
     const rows: MapRow[] = await this.dataSource.query(`
       SELECT MT.ID AS "macroprocessTypeId", MT.NAME AS "macroprocessTypeName", MT.SORT_ORDER AS "macroprocessTypeOrder",
-             M.ID AS "macroprocessId", M.CODE AS "macroprocessCode", M.NAME AS "macroprocessName", M.SORT_ORDER AS "macroprocessOrder",
+             M.ID AS "macroprocessId", M.CODE AS "macroprocessCode", M.NAME AS "macroprocessName", M.DESCRIPTION AS "macroprocessDescription", M.SORT_ORDER AS "macroprocessOrder",
              PT.ID AS "processTypeId", PT.NAME AS "processTypeName",
              P.ID AS "processId", P.CODE AS "processCode", V.NAME AS "processName", V.STATUS AS "status"
       FROM ${table('MACROPROCESS_TYPE')} MT
@@ -43,14 +44,14 @@ export class MvpV14Controller {
       ORDER BY MT.SORT_ORDER, M.SORT_ORDER, PT.NAME, P.CODE
     `);
     const types = new Map<number, { id: number; name: string; order: number; macroprocesses: unknown[] }>();
-    const macros = new Map<number, { id: number; code: string; name: string; order: number; processTypes: unknown[] }>();
+    const macros = new Map<number, { id: number; code: string; name: string; description: string | null; order: number; processTypes: unknown[] }>();
     const processTypes = new Map<number, { id: number; name: string; processes: unknown[] }>();
     for (const row of rows) {
       const typeId = Number(row.macroprocessTypeId);
       if (!types.has(typeId)) types.set(typeId, { id: typeId, name: row.macroprocessTypeName, order: Number(row.macroprocessTypeOrder), macroprocesses: [] });
       const macroId = Number(row.macroprocessId);
       if (!macros.has(macroId)) {
-        const macro = { id: macroId, code: row.macroprocessCode, name: row.macroprocessName, order: Number(row.macroprocessOrder), processTypes: [] };
+        const macro = { id: macroId, code: row.macroprocessCode, name: row.macroprocessName, description: row.macroprocessDescription, order: Number(row.macroprocessOrder), processTypes: [] };
         macros.set(macroId, macro);
         types.get(typeId)?.macroprocesses.push(macro);
       }

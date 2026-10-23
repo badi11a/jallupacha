@@ -90,7 +90,7 @@ describe('process create-list-detail HTTP flow (Oracle)', () => {
 
     expect(created.body).toMatchObject({
       code: expect.stringMatching(/^PR\d+$/),
-      ownerUserId: owner.id,
+      ownerUserId: null,
       status: 'Borrador',
       name: marker
     });
@@ -133,7 +133,7 @@ describe('process create-list-detail HTTP flow (Oracle)', () => {
     expect(detail.body).toMatchObject({
       id: created.body.id,
       code: created.body.code,
-      ownerUserId: owner.id,
+      ownerUserId: null,
       status: 'Borrador',
       name: marker
     });

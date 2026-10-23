@@ -51,9 +51,9 @@ export async function seedMvpV14(manager: EntityManager): Promise<void> {
     const sortOrder = (sortOrderByType.get(macroprocess.typeCode) ?? 0) + 1;
     sortOrderByType.set(macroprocess.typeCode, sortOrder);
     await manager.query(
-      `INSERT INTO ${table('MACROPROCESS')} (MACROPROCESS_TYPE_ID, CODE, NAME, SORT_ORDER, IS_ACTIVE)
-       VALUES (:1, :2, :3, :4, 1)`,
-      [macroprocessTypeId, code, macroprocess.name, sortOrder]
+      `INSERT INTO ${table('MACROPROCESS')} (MACROPROCESS_TYPE_ID, CODE, NAME, DESCRIPTION, SORT_ORDER, IS_ACTIVE)
+       VALUES (:1, :2, :3, :4, :5, 1)`,
+      [macroprocessTypeId, code, macroprocess.name, macroprocess.description, sortOrder]
     );
     const macroprocessId = await idFor(manager, table('MACROPROCESS'), 'CODE', code);
     macroprocessIds.set(macroprocess.name, macroprocessId);
@@ -105,10 +105,10 @@ export async function seedMvpV14(manager: EntityManager): Promise<void> {
           NAME, DESCRIPTION, OBJECTIVE, SCOPE, INPUTS, OUTPUTS, REVISION
         ) VALUES (:1, 1, 'Borrador', :2, :3, :4, :5, :6, :7, :8, :9, :10, :11, 1)`,
         [
-          processId, macroprocessId, processTypeId, 'Elaborador de demostración', 'Responsable de demostración',
+          processId, macroprocessId, processTypeId, 'Equipo Técnico de Procesos', 'Jefatura de Unidad Responsable',
           processContent.name, processContent.description, processContent.objective,
-          processContent.scope, 'Información de entrada de demostración',
-          'Resultado de demostración'
+          processContent.scope, 'Requerimientos y antecedentes operativos de entrada',
+          'Resolución, informe o producto final entregado'
         ]
       );
       const versionId = await idForProcessVersion(manager, table('PROCESS_VERSION'), processId);
@@ -125,7 +125,7 @@ export async function seedMvpV14(manager: EntityManager): Promise<void> {
         if (participantId === responsibleUnitId) continue;
         await manager.query(
           `INSERT INTO ${table('PROCESS_UNIT')} (PROCESS_ID, UNIT_ID, ROLE, PARTICIPANT_FUNCTION)
-           VALUES (:1, :2, 'PARTICIPANTE', 'Función de demostración por definir')`,
+           VALUES (:1, :2, 'PARTICIPANTE', 'Coordinación y provisión de antecedentes técnicos')`,
           [processId, participantId]
         );
       }

@@ -30,11 +30,13 @@ export interface MvpV14ProcessContent {
 export interface MvpV14MacroprocessContent {
   typeCode: (typeof MVP_V14_MACROPROCESS_TYPES)[number]['code'];
   name: string;
+  description: string;
   processes: MvpV14ProcessContent[];
 }
 
 interface LegacyMacroprocessContent {
   name: string;
+  description: string;
   typeCode?: (typeof MVP_V14_MACROPROCESS_TYPES)[number]['code'];
   processes: MvpV14ProcessContent[];
 }
@@ -66,7 +68,7 @@ export function loadMvpV14Content(): MvpV14MacroprocessContent[] {
         throw new Error(`Unsupported MVP v14 risk level in ${process.name}: ${process.risk.level}`);
       }
     }
-    return { typeCode, name: macroprocess.name, processes: macroprocess.processes };
+    return { typeCode, name: macroprocess.name, description: macroprocess.description.trim(), processes: macroprocess.processes };
   });
 
   const presentTypeCodes = new Set(macroprocesses.map((macroprocess) => macroprocess.typeCode));
@@ -85,7 +87,7 @@ export function loadMvpV14Content(): MvpV14MacroprocessContent[] {
 function isLegacyContentPackage(value: unknown): value is LegacyContentPackage {
   if (!isRecord(value) || value.schemaVersion !== 1 || !Array.isArray(value.macroprocesses)) return false;
   return value.macroprocesses.every((macroprocess) =>
-    isRecord(macroprocess) && isNonEmptyString(macroprocess.name) &&
+    isRecord(macroprocess) && isNonEmptyString(macroprocess.name) && isNonEmptyString(macroprocess.description) &&
     (macroprocess.typeCode === undefined || typeof macroprocess.typeCode === 'string') &&
     Array.isArray(macroprocess.processes) &&
     macroprocess.processes.every((process) =>
