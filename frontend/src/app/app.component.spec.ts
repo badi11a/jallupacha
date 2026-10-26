@@ -1,181 +1,201 @@
-import { provideHttpClient, withXsrfConfiguration } from '@angular/common/http';
-import { HttpTestingController, TestRequest, provideHttpClientTesting } from '@angular/common/http/testing';
-import { provideZoneChangeDetection } from '@angular/core';
+import { provideHttpClient } from '@angular/common/http';
+import { HttpTestingController, provideHttpClientTesting } from '@angular/common/http/testing';
+import { Component, inject } from '@angular/core';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { By } from '@angular/platform-browser';
 import { Router, provideRouter } from '@angular/router';
 import { AppComponent } from './app.component';
-import { routes } from './app.routes';
+import { authGuard, guestGuard } from './auth.guard';
+import { AuthService, ProfileCode } from './auth.service';
+import { UiDialogService } from './shared/ui';
+import { LeavesWithConfirmation, unsavedChangesGuard } from './unsaved-changes.guard';
 
-const ADMIN = { userId: 1, displayName: 'Usuario administrador', email: 'admin@example.test', profiles: ['ADMIN'] };
-const CONSULTATION = { userId: 4, displayName: 'Usuario consulta', email: 'consultation@example.test', profiles: ['CONSULTATION'] };
-const PROCESS = {
-  id: 8, code: 'PR8', name: 'Proceso', macroprocessId: 1, macroprocessName: 'Estratégicos', processTypeId: 2,
-  processTypeName: 'Institucional', ownerUserId: 1, ownerDisplayName: 'Usuario administrador', status: 'Borrador',
-  revision: 1, versionNumber: 1, parentProcessId: null
-};
-// Paneles que C-008 retira de la estructura común.
-const ADMIN_PANELS = /Estructura|Clasificación|Perfiles de usuario|Auditoría reciente/i;
+@Component({ template: '<h1>Contenido de revisión</h1>' })
+class CleanViewComponent {}
 
-describe('AppComponent', () => {
+@Component({ template: '<h1>Formulario de revisión</h1><label>Nombre<input (input)="dirty = true" /></label>' })
+class DirtyViewComponent implements LeavesWithConfirmation {
+  private readonly dialogs = inject(UiDialogService);
+  dirty = false;
+  confirmations = 0;
+
+  confirmLeave(): boolean | Promise<boolean> {
+    this.confirmations++;
+    return !this.dirty || this.dialogs.confirm({
+      title: 'Cambios no guardados', message: 'Hay cambios pendientes.',
+      confirmLabel: 'Descartar cambios', cancelLabel: 'Continuar editando'
+    });
+  }
+}
+
+describe('Navegación del módulo y cierre de sesión (C-030)', () => {
+  let fixture: ComponentFixture<AppComponent>;
+  let auth: AuthService;
   let http: HttpTestingController;
+  let router: Router;
+  let dialogs: UiDialogService;
 
-  beforeEach(() => {
+  beforeEach(async () => {
+    sessionStorage.clear();
     TestBed.configureTestingModule({
       imports: [AppComponent],
-      providers: [
-        provideZoneChangeDetection(),
-        provideRouter(routes),
-        provideHttpClient(withXsrfConfiguration({
-          cookieName: 'jallupacha_csrf',
-          headerName: 'X-CSRF-Token'
-        })),
-        provideHttpClientTesting()
-      ]
+      providers: [provideHttpClient(), provideHttpClientTesting(), provideRouter([
+        { path: 'login', component: CleanViewComponent, canActivate: [guestGuard] },
+        { path: 'mapa', component: CleanViewComponent, canActivate: [authGuard] },
+        { path: 'mapa/macroprocesos/:id', component: CleanViewComponent, canActivate: [authGuard] },
+        { path: 'procesos', component: CleanViewComponent, canActivate: [authGuard] },
+        { path: 'procesos/nuevo', component: DirtyViewComponent, canActivate: [authGuard], canDeactivate: [unsavedChangesGuard] },
+        { path: 'procesos/:id', component: DirtyViewComponent, canActivate: [authGuard], canDeactivate: [unsavedChangesGuard] },
+        { path: 'unidades', component: DirtyViewComponent, canActivate: [authGuard], canDeactivate: [unsavedChangesGuard] }
+      ])]
     });
+    auth = TestBed.inject(AuthService);
     http = TestBed.inject(HttpTestingController);
+    router = TestBed.inject(Router);
+    dialogs = TestBed.inject(UiDialogService);
+    setProfile('ADMIN');
+    fixture = TestBed.createComponent(AppComponent);
+    fixture.detectChanges();
+    expect((fixture.nativeElement as HTMLElement).classList.contains('ui-root')).toBe(true);
+    await go('/mapa');
   });
 
-  afterEach(() => http.verify());
+  afterEach(() => {
+    http.verify();
+    fixture.destroy();
+    sessionStorage.clear();
+  });
 
-  /** Responde todas las peticiones pendientes de las pantallas de procesos con datos mínimos. */
-  function flushScreens(): void {
-    http.match(() => true).forEach((request: TestRequest) => {
-      const url = request.request.urlWithParams;
-      if (url === '/api/process-map') request.flush({ macroprocesses: [] });
-      else if (url.startsWith('/api/processes?')) request.flush({ items: [], total: 0, page: 1, limit: 20 });
-      else if (url.endsWith('/risks?page=1&limit=100')) request.flush({ items: [], total: 0, page: 1, limit: 100 });
-      else if (url === '/api/processes/8') request.flush(PROCESS);
-      else request.flush([]);
-    });
+  function setProfile(profile: ProfileCode): void {
+    auth.currentUser.set({ userId: 1, displayName: 'Usuario de revisión', email: 'revision@example.test', profiles: [profile] });
   }
 
-  async function settle(fixture: ComponentFixture<AppComponent>): Promise<void> {
-    for (let round = 0; round < 4; round++) {
-      fixture.detectChanges();
-      await fixture.whenStable();
-      flushScreens();
-    }
+  async function go(url: string): Promise<void> {
+    await router.navigateByUrl(url);
     fixture.detectChanges();
-  }
-
-  async function render(user: typeof ADMIN, url: string): Promise<ComponentFixture<AppComponent>> {
-    const fixture = TestBed.createComponent(AppComponent);
-    fixture.componentInstance.user = user;
-    fixture.detectChanges();
-    http.expectOne('/api/auth/me').flush({ statusCode: 401 }, { status: 401, statusText: 'Unauthorized' });
     await fixture.whenStable();
-    http.expectOne('/api/auth/demo/identities').flush([]);
-    await TestBed.inject(Router).navigateByUrl(url);
-    await settle(fixture);
-    return fixture;
   }
 
-  function navLabels(fixture: ComponentFixture<AppComponent>): string[] {
-    return [...fixture.nativeElement.querySelectorAll('.app-nav a')].map((a: HTMLElement) => a.textContent?.trim() ?? '');
-  }
-
-  it('presents the local access screen with neutral user labels and names', async () => {
-    const fixture = TestBed.createComponent(AppComponent);
+  function changeForm(): DirtyViewComponent {
+    const input = fixture.nativeElement.querySelector('input') as HTMLInputElement;
+    input.value = 'Cambio pendiente';
+    input.dispatchEvent(new Event('input'));
     fixture.detectChanges();
-    http.expectOne('/api/auth/me').flush({ statusCode: 401 }, { status: 401, statusText: 'Unauthorized' });
-    await fixture.whenStable();
-    http.expectOne('/api/auth/demo/identities').flush([
-      { id: 1, displayName: 'Usuario administrador' },
-      { id: 2, displayName: 'Usuario responsable' },
-      { id: 3, displayName: 'Usuario de riesgos' },
-      { id: 4, displayName: 'Usuario consulta' },
-      { id: 5, displayName: 'Usuario responsable y de riesgos' }
+    return fixture.debugElement.query(By.directive(DirtyViewComponent)).componentInstance;
+  }
+
+  it('oculta la navegación en la pantalla de acceso sin sesión', async () => {
+    auth.clearSession();
+    await go('/login');
+    expect(fixture.nativeElement.querySelector('ui-module-nav')).toBeNull();
+  });
+
+  it('mantiene los seis destinos completos y en orden para ADMIN', () => {
+    const links = [...fixture.nativeElement.querySelectorAll('.module-nav-list a')] as HTMLAnchorElement[];
+    expect(links.map(a => a.textContent?.trim())).toEqual([
+      'Mapa', 'Procesos', 'Unidades internas', 'Tipos de proceso', 'Usuarios', 'Auditoría'
     ]);
-    await fixture.whenStable();
+  });
+
+  it.each<ProfileCode>(['CONSULTATION', 'PROCESS_OWNER', 'VALIDATOR', 'RISK_MANAGER'])('muestra solo los destinos operativos para %s', profile => {
+    setProfile(profile);
     fixture.detectChanges();
-    expect(fixture.nativeElement.querySelector('.brand')?.textContent).toContain('Sistema de Procesos Institucionales');
-    expect(fixture.nativeElement.querySelector('label[for="identity"]')?.textContent).toContain('Usuario de prueba');
-    expect(fixture.nativeElement.querySelector('button.primary-button')?.textContent.trim()).toBe('Ingresar');
-    expect(fixture.nativeElement.textContent).toContain('Usuario administrador');
-    expect(fixture.nativeElement.textContent).toContain('Usuario consulta');
-    expect(fixture.nativeElement.textContent).not.toMatch(/demo|fictici|simulad|prototipo/i);
-    fixture.destroy();
+    const links = [...fixture.nativeElement.querySelectorAll('.module-nav-list a')] as HTMLAnchorElement[];
+    expect(links.map(a => a.textContent?.trim())).toEqual(['Mapa', 'Procesos']);
   });
 
-  it('keeps only the common structure around every process screen (C-008 V1)', async () => {
-    const fixture = await render(ADMIN, '/mapa');
-    for (const url of ['/mapa', '/mapa/macroprocesos/1', '/procesos', '/procesos/8', '/procesos/8/riesgos']) {
-      await TestBed.inject(Router).navigateByUrl(url);
-      await settle(fixture);
-      const text = fixture.nativeElement.textContent as string;
-      expect(text, url).not.toMatch(ADMIN_PANELS);
-      expect(fixture.nativeElement.querySelector('.brand'), url).not.toBeNull();
-      expect(text, url).toContain('Usuario administrador · Administrador');
-      expect(fixture.nativeElement.querySelector('.app-nav'), url).not.toBeNull();
-      expect(fixture.nativeElement.querySelectorAll('.environment-notice'), url).toHaveLength(1);
-      expect(text, url).not.toMatch(/demo|fictici|simulad|prototipo/i);
-    }
-    fixture.destroy();
-  });
-
-  it('offers Perfiles and Auditoría in the navigation only to administrators (C-008 V4)', async () => {
-    const admin = await render(ADMIN, '/mapa');
-    expect(navLabels(admin)).toEqual(['Mapa de procesos', 'Procesos', 'Catálogos', 'Perfiles', 'Auditoría']);
-    expect([...admin.nativeElement.querySelectorAll('.app-nav a')].map((a: HTMLElement) => a.getAttribute('href')))
-      .toEqual(['/mapa', '/procesos', '/administracion/catalogos', '/administracion/perfiles', '/administracion/auditoria']);
-    admin.destroy();
-
-    const consultation = await render(CONSULTATION, '/mapa');
-    expect(navLabels(consultation)).toEqual(['Mapa de procesos', 'Procesos', 'Catálogos']);
-    consultation.destroy();
-  });
-
-  it('navigates home from the brand through the router without reloading (C-008 R10)', async () => {
-    const fixture = await render(ADMIN, '/procesos');
-    const brand = fixture.nativeElement.querySelector('.brand') as HTMLAnchorElement;
-    expect(brand.getAttribute('href')).toBe('/mapa');
-    const click = new MouseEvent('click', { bubbles: true, cancelable: true, button: 0 });
-    brand.dispatchEvent(click);
-    expect(click.defaultPrevented).toBe(true);
-    await settle(fixture);
-    expect(TestBed.inject(Router).url).toBe('/mapa');
-    fixture.destroy();
-  });
-
-  it('closes the session through the router when there are no pending changes', async () => {
-    const fixture = await render(ADMIN, '/procesos');
-    const root = fixture.nativeElement as HTMLElement;
-    buttonByText(root, 'Cerrar sesión')!.click();
-    await fixture.whenStable();
-    http.match('/api/process-map').forEach((request) => request.flush({ macroprocesses: [] }));
-    http.expectOne({ method: 'POST', url: '/api/auth/logout' }).flush({});
-    await fixture.whenStable();
-    http.expectOne('/api/auth/demo/identities').flush([{ id: 1, displayName: 'Usuario administrador' }]);
-    await fixture.whenStable();
+  it('evita duplicar el rol cuando el nombre de usuario ya expresa el perfil asignado', () => {
+    auth.currentUser.set({ userId: 1, displayName: 'Usuario Administrador', email: 'admin@example.test', profiles: ['ADMIN'] });
     fixture.detectChanges();
-    expect(TestBed.inject(Router).url).toBe('/mapa');
-    expect(root.querySelector('label[for="identity"]')?.textContent).toContain('Usuario de prueba');
-    fixture.destroy();
+    expect(fixture.nativeElement.querySelector('.session-controls ui-badge')).toBeNull();
+    expect(fixture.nativeElement.querySelector('.session-controls .user-name').textContent).toBe('Usuario Administrador');
   });
 
-  it('keeps the session when leaving an editor with unsaved changes is declined', async () => {
-    const fixture = await render(ADMIN, '/procesos');
-    const root = fixture.nativeElement as HTMLElement;
-    const router = TestBed.inject(Router);
-    await router.navigateByUrl('/procesos/8/editar');
-    await settle(fixture);
-    const name = root.querySelector('#process-name') as HTMLInputElement;
-    name.value = 'Cambio pendiente';
-    name.dispatchEvent(new Event('input'));
+  it('muestra la insignia del perfil cuando el nombre de usuario no contiene el rol', () => {
+    auth.currentUser.set({ userId: 1, displayName: 'Constanza Valenzuela', email: 'cvalenzuela@example.test', profiles: ['ADMIN'] });
+    fixture.detectChanges();
+    expect(fixture.nativeElement.querySelector('.session-controls ui-badge')?.textContent?.trim()).toBe('Administrador');
+    expect(fixture.nativeElement.querySelector('.session-controls .user-name').textContent).toBe('Constanza Valenzuela');
+  });
 
-    buttonByText(root, 'Cerrar sesión')!.click();
-    await new Promise<void>((resolve) => setTimeout(resolve, 0));
-    fixture.detectChanges();
-    buttonByText(root.querySelector('dialog')!, 'Seguir editando')!.click();
-    await fixture.whenStable();
-    fixture.detectChanges();
+  it.each([
+    ['/mapa', 'Mapa', 'page'], ['/mapa/macroprocesos/2', 'Mapa', 'location'],
+    ['/procesos?q=consulta', 'Procesos', 'page'], ['/procesos/nuevo', 'Procesos', 'location'],
+    ['/procesos/4', 'Procesos', 'location']
+  ])('distingue página y sección en %s', async (url, label, current) => {
+    await go(url);
+    const active = fixture.nativeElement.querySelector('.module-nav-list a.active') as HTMLAnchorElement;
+    expect(active.textContent?.trim()).toBe(label);
+    expect(active.getAttribute('aria-current')).toBe(current);
+    expect(fixture.nativeElement.querySelectorAll('.module-nav-list a[aria-current]')).toHaveLength(1);
+  });
+
+  it('cierra desde un formulario limpio sin mostrar confirmación', async () => {
+    await go('/procesos/nuevo');
+    const closing = fixture.componentInstance.logout();
+    await Promise.resolve();
+    expect(dialogs.active()).toBeNull();
+    http.expectOne('/api/auth/logout').flush(null);
+    await closing;
+    expect(router.url).toBe('/login');
+    expect(auth.isAuthenticated()).toBe(false);
+    expect(auth.logoutInProgress()).toBe(false);
+  });
+
+  it('conserva formulario y sesión cuando se cancela el cierre', async () => {
+    await go('/procesos/nuevo');
+    const form = changeForm();
+    const closing = fixture.componentInstance.logout();
+    expect(dialogs.active()?.options.title).toBe('Cambios no guardados');
+    dialogs.settle(false);
+    await closing;
     http.expectNone('/api/auth/logout');
-    expect(router.url).toBe('/procesos/8/editar');
-    expect(root.textContent).toContain('Cerrar sesión');
-    fixture.destroy();
+    expect(router.url).toBe('/procesos/nuevo');
+    expect(auth.isAuthenticated()).toBe(true);
+    expect(form.dirty).toBe(true);
+    expect(fixture.componentInstance.logoutBusy()).toBe(false);
+  });
+
+  it('confirma una sola vez y bloquea navegación y edición hasta terminar la revocación', async () => {
+    await go('/procesos/nuevo');
+    const form = changeForm();
+    const closing = fixture.componentInstance.logout();
+    dialogs.settle(true);
+    await Promise.resolve();
+    fixture.detectChanges();
+    const request = http.expectOne('/api/auth/logout');
+    expect(auth.isAuthenticated()).toBe(true);
+    expect(fixture.nativeElement.querySelector('main').hasAttribute('inert')).toBe(true);
+    expect(fixture.nativeElement.querySelector('ui-module-nav').hasAttribute('inert')).toBe(true);
+    expect(fixture.nativeElement.querySelector('[role="status"]').textContent).toContain('Cerrando sesión');
+    expect(await router.navigateByUrl('/unidades')).toBe(false);
+    expect(await router.navigateByUrl('/login')).toBe(false);
+    expect(router.url).toBe('/procesos/nuevo');
+    await fixture.componentInstance.logout();
+    http.expectNone('/api/auth/logout');
+    request.flush(null);
+    await closing;
+    expect(router.url).toBe('/login');
+    expect(form.confirmations).toBe(1);
+    expect(dialogs.active()).toBeNull();
+    expect(auth.logoutInProgress()).toBe(false);
+
+    // Una sesión posterior sigue protegida: no queda ninguna excepción global.
+    setProfile('ADMIN');
+    await go('/procesos/nuevo');
+    changeForm();
+    const leaving = router.navigateByUrl('/mapa');
+    await vi.waitFor(() => expect(dialogs.active()).not.toBeNull());
+    dialogs.settle(false);
+    expect(await leaving).toBe(false);
+  });
+
+  it('impide abrir formularios durante logout desde una pantalla sin canDeactivate', async () => {
+    const closing = fixture.componentInstance.logout();
+    const request = http.expectOne('/api/auth/logout');
+    expect(await router.navigateByUrl('/procesos/nuevo')).toBe(false);
+    request.flush(null);
+    await closing;
+    expect(router.url).toBe('/login');
   });
 });
-
-function buttonByText(root: HTMLElement, text: string): HTMLButtonElement | undefined {
-  return [...root.querySelectorAll('button')].find((button) => button.textContent?.trim() === text);
-}

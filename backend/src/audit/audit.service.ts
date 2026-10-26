@@ -1,5 +1,6 @@
 import { Inject, Injectable } from '@nestjs/common';
 import { DataSource, EntityManager } from 'typeorm';
+import { qualifiedTable } from '../common/database';
 import { AuditEntity } from './audit.entity';
 import { SecurityEventEntity } from './security-event.entity';
 import { SecurityEventIpEntity } from './security-event-ip.entity';
@@ -48,12 +49,47 @@ export class AuditService {
     else await this.dataSource.transaction(insert);
   }
 
-  async list(page: number, limit: number): Promise<{ items: AuditEntity[]; total: number }> {
-    const [items, total] = await this.dataSource.getRepository(AuditEntity).findAndCount({
-      order: { id: 'DESC' },
-      skip: (page - 1) * limit,
-      take: limit
-    });
-    return { items, total };
+  async list(
+    page: number,
+    limit: number,
+    filter?: { entityType?: string; action?: string }
+  ): Promise<{ items: unknown[]; total: number }> {
+    const offset = (page - 1) * limit;
+    const whereClauses: string[] = ['1 = 1'];
+    const params: unknown[] = [];
+
+    if (filter?.entityType && filter.entityType.trim()) {
+      params.push(filter.entityType.trim());
+      whereClauses.push(`A.ENTITY_TYPE = :${params.length}`);
+    }
+    if (filter?.action && filter.action.trim()) {
+      params.push(filter.action.trim());
+      whereClauses.push(`A.ACTION = :${params.length}`);
+    }
+
+    const whereSql = whereClauses.join(' AND ');
+    const countParams = [...params];
+    params.push(offset, limit);
+
+    const [items, count] = await Promise.all([
+      this.dataSource.query(
+        `SELECT A.ID AS "id", A.CREATED_AT AS "createdAt", A.ACTOR_USER_ID AS "actorUserId",
+                I.DISPLAY_NAME AS "actorDisplayName", I.EMAIL AS "actorEmail",
+                A.ACTION AS "action", A.ENTITY_TYPE AS "entityType", A.ENTITY_ID AS "entityId",
+                A.BEFORE_VALUE AS "beforeValue", A.AFTER_VALUE AS "afterValue"
+         FROM ${qualifiedTable('AUDIT')} A
+         LEFT JOIN ${qualifiedTable('USER_IDENTITY')} I ON I.USER_ID = A.ACTOR_USER_ID
+         WHERE ${whereSql}
+         ORDER BY A.ID DESC
+         OFFSET :${params.length - 1} ROWS FETCH NEXT :${params.length} ROWS ONLY`,
+        params
+      ),
+      this.dataSource.query(
+        `SELECT COUNT(*) AS "total" FROM ${qualifiedTable('AUDIT')} A WHERE ${whereSql}`,
+        countParams
+      )
+    ]);
+
+    return { items, total: Number(count[0]?.total ?? 0) };
   }
 }

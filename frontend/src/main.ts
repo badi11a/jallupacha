@@ -1,9 +1,10 @@
-import { provideHttpClient, withXsrfConfiguration } from '@angular/common/http';
+import { provideHttpClient, withInterceptors, withXsrfConfiguration } from '@angular/common/http';
 import { provideZoneChangeDetection } from '@angular/core';
 import { bootstrapApplication } from '@angular/platform-browser';
 import { provideRouter, withRouterConfig } from '@angular/router';
 import { AppComponent } from './app/app.component';
 import { APP_NAME, routes } from './app/app.routes';
+import { authInterceptor } from './app/auth.interceptor';
 import { provideUiNavigation } from './app/shared/ui';
 
 bootstrapApplication(AppComponent, {
@@ -13,10 +14,13 @@ bootstrapApplication(AppComponent, {
     provideRouter(routes, withRouterConfig({ canceledNavigationResolution: 'computed' })),
     // Títulos por pantalla y foco/desplazamiento al navegar (C-007).
     provideUiNavigation({ appName: APP_NAME }),
-    provideHttpClient(withXsrfConfiguration({
+    provideHttpClient(
+      withInterceptors([authInterceptor]),
+      withXsrfConfiguration({
       cookieName: 'jallupacha_csrf',
       headerName: 'X-CSRF-Token'
-    }))
+      })
+    )
   ]
 }).catch(() => {
   const root = document.querySelector('app-root');

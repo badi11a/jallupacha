@@ -1,15 +1,14 @@
 # Instrucciones de desarrollo
 
-La fuente de verdad del producto es Requisitos_Sistema_Procesos_v14.xlsx, suministrada por el responsable del producto. Se encuentra en docs\referencias\Requisitos_Sistema_Procesos_v14.xlsx. No inventar requisitos ni cambiar su alcance sin aprobación. Consultar `docs/mvp_v14.md` y `docs/arquitectura_mvp_v14.md` antes de modificar comportamiento. Los documentos anteriores de especificación, arquitectura e incrementos son históricos hasta que se alineen explícitamente con v14.
+La fuente de requisitos del producto es `Requisitos_Sistema_Procesos_v15.xlsx` (en `docs/referencias/Requisitos_Sistema_Procesos_v15.xlsx`), actualizada a la **Versión 15 (v15)** por decisión autorizada del responsable del producto para su operación en intranet mediante **Autenticación Local Institucional con Argon2id** (sustituyendo la dependencia externa de Google Workspace de REQ-25 en v14) y reactivación del modelo institucional multiusuario con perfiles y ciclo de vida de procesos. La especificación y arquitectura vigentes son `docs/producto/especificacion_v15.md` y `docs/producto/arquitectura_v15.md`. La documentación histórica v13/v14 se retiró del árbol de trabajo mediante la purga autorizada C-040; los documentos versionados siguen recuperables desde Git. No inventar requisitos ni cambiar su alcance sin aprobación del responsable.
 
 ## Reglas de trabajo
 
 - TypeScript, Angular, NestJS y TypeORM; Oracle Database 19c es la plataforma oficial para desarrollo, pruebas y producción. Instalación directa en el equipo local, sin Docker. El despliegue es on-premise; verificar versión, edición y compatibilidad de la instalación institucional antes de desplegar.
 - Mantener una aplicación backend. No introducir microservicios, capas o patrones sin necesidad concreta.
-- La aplicación es el producto institucional. El entorno local utiliza datos de prueba y autenticación local de desarrollo, exclusivamente para desarrollo; no se habilita este acceso en producción. Consultar “Presentación del producto”, en docs/especificacion.md, para sus condiciones de presentación.
-- Fuera del piloto definido en C-011, todo endpoint requiere autenticación y una política explícita de autorización. Verificar permisos en el servidor y consultar perfiles actuales en cada solicitud. El piloto MVP de operador único no incorpora autenticación, perfiles ni autorización; debe limitarse al entorno de piloto y no se declara apto para usuarios reales o producción mientras esta excepción siga vigente.
+- La aplicación es el producto institucional. Todo endpoint fuera de `/api/auth/login` requiere autenticación y una política explícita de autorización. Verificar permisos en el servidor y consultar perfiles actuales en cada solicitud (PT-07). La excepción del piloto de operador único (C-011) queda superada por la arquitectura multiusuario v15.
 - Migraciones versionadas; synchronize: false. Nunca borrar ni alterar una migración ya aplicada.
-- Permisos Oracle: solo en `backend/database/grant-runtime.sql` (objetos) y `grant-system.sql` (sistema); las migraciones nuevas no otorgan permisos. Ver `docs/arquitectura_mvp_v14.md`, «Operación e infraestructura».
+- Permisos Oracle: solo en `backend/database/grant-runtime.sql` (objetos) y `grant-system.sql` (sistema); las migraciones nuevas no otorgan permisos. Ver `docs/producto/arquitectura_v15.md`, sección 6, «Operación e infraestructura».
 - Cada cambio debe referenciar requisitos, incluir verificación apropiada y tener revisión registrada antes de integrarse. La revisión de IA no sustituye la conformidad requerida para producción.
 - Ejecutar la verificación significativa más pequeña para el comportamiento afectado. Usar pruebas Oracle para persistencia, SQL, grants o transacciones; ampliar o repetir verificaciones solo cuando el impacto o un fallo lo justifique. Mantener PT-03 y ejecutar las verificaciones requeridas para liberar.
 - No declarar cumplida una verificación que no se ejecutó. La autenticación local de desarrollo no cumple REQ-25.
@@ -120,14 +119,16 @@ Registrar el hallazgo, documentos afectados, corrección y evidencia de verifica
 
 No trasladar nombres de modos técnicos, fixtures, credenciales o condiciones del entorno a títulos, menús, botones o registros del producto sin una razón definida en la especificación. Los avisos de seguridad necesarios se mantienen en el lugar indicado, sin repetirse por toda la interfaz.
 
-Al modificar la navegación, rutas o la estructura común de la interfaz, revisar por separado el contenido común y el contenido propio de cada ruta, y comprobar que ningún panel o función queda mostrado en una ruta que no le corresponde. Para el piloto, la navegación permitida está definida en `docs/arquitectura_mvp_v14.md`, «Interfaz MVP».
+Al modificar la navegación, rutas o la estructura común de la interfaz, revisar por separado el contenido común y el contenido propio de cada ruta, y comprobar que ningún panel o función queda mostrado en una ruta que no le corresponde. Para el producto multiusuario vigente, las decisiones de navegación están en `docs/producto/arquitectura_v15.md`, sección 5; los documentos v14 son antecedentes archivados.
 
 Antes de cerrar un cambio de interfaz, verificar textos visibles y recorrido funcional, además de pruebas de lógica y seguridad. Antes de cerrar cualquier corrección, revisar que no cambió el alcance ni debilitó controles técnicos.
 
 ## Sistema de diseño visual y navegación
 
-- Consultar `docs/design-system.md` para la paleta, tipografía, marca de producto y criterios WCAG 2.2 AA del kit compartido.
-- Consultar `docs/marco_estandar_ux_institucional.md` para las directrices obligatorias de experiencia de usuario, consistencia espacial y patrones de navegación institucional.
+- Consultar `docs/diseno/design-system.md` para la paleta, tipografía, marca de producto y criterios WCAG 2.2 AA del kit compartido.
+- Aplicar `docs/diseno/marco_estandar_ux_institucional.md` (STD-UX-001) como guía de principios, reglas y criterios de revisión de los próximos cambios de interfaz del proyecto. Su adopción institucional para otros sistemas permanece pendiente y no se presume conformidad del frontend existente.
+- Antes de construir o revisar un cambio UX, identificar tarea, recorrido y reglas aplicables, incluidas sus subreglas. Usar el procedimiento, matriz y registro de evidencia de la sección 6 de la guía; conservar hallazgo, decisión y revisión en el mismo cambio de Git. Registrar cada comprobación como aprobada en su alcance, fallida, no probada o no aplicable con justificación.
+- Inventariar accesos equivalentes al revisar navegación. Permitir caminos alternativos que sirvan tareas distintas; justificar repeticiones en una misma pantalla y comprobar etiquetas, destinos y retorno con contexto (R-09 a R-11). No imponer un camino único ni convertir la disposición de Jallupacha en obligación universal.
 - Mantener los siete tokens `--brand-*` con sus HEX aprobados exactos. Los colores funcionales adicionales son semánticos de interfaz y no forman parte de esa paleta.
 - Mantener la identidad visual propia de cada producto y el sistema independiente de marcas externas. No incorporar fuentes sin licencia comprobada.
 - Mantener fundamentos y componentes genéricos en `frontend/src/app/shared/ui/`; lógica de negocio y navegación específica permanecen en la aplicación.

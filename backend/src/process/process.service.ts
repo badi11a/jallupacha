@@ -35,7 +35,14 @@ const PROCESS_FIELDS: Array<keyof ProcessFieldsDto> = [
   'subprocessType',
   'criticality',
   'automationLevel',
-  'periodicity'
+  'periodicity',
+  'elaborator',
+  'responsible',
+  'documents',
+  'systemsUsed',
+  'indicators',
+  'improvementOpportunities',
+  'bpmnModelReference'
 ];
 
 @Injectable()
@@ -60,13 +67,13 @@ export class ProcessService {
         `SELECT P.ID AS "id", P.CODE AS "code", COALESCE(V.NAME, 'Sin nombre') AS "name",
                 M.ID AS "macroprocessId", M.NAME AS "macroprocessName",
                 T.ID AS "processTypeId", T.NAME AS "processTypeName",
-                P.OWNER_USER_ID AS "ownerUserId", I.DISPLAY_NAME AS "ownerDisplayName",
+                CAST(NULL AS NUMBER) AS "ownerUserId",
+                COALESCE(V.RESPONSIBLE, 'Sin responsable') AS "ownerDisplayName",
                 V.STATUS AS "status", V.REVISION AS "revision"
          FROM ${qualifiedTable('PROCESS')} P
          JOIN ${qualifiedTable('PROCESS_VERSION')} V ON V.ID = P.CURRENT_VERSION_ID
          JOIN ${qualifiedTable('MACROPROCESS')} M ON M.ID = V.MACROPROCESS_ID
          JOIN ${qualifiedTable('PROCESS_TYPE')} T ON T.ID = V.PROCESS_TYPE_ID
-         JOIN ${qualifiedTable('USER_IDENTITY')} I ON I.USER_ID = P.OWNER_USER_ID
          WHERE P.IS_ACTIVE = 1
          ORDER BY P.ID DESC OFFSET :1 ROWS FETCH NEXT :2 ROWS ONLY`,
         [offset, limit]
@@ -102,7 +109,6 @@ export class ProcessService {
       const processRepository = manager.getRepository(ProcessEntity);
       const process = await processRepository.save(processRepository.create({
         code: `PR${Number(sequence[0].codeNumber)}`,
-        ownerUserId: actor.id,
         currentVersionId: null,
         isActive: 1
       }));
@@ -114,6 +120,8 @@ export class ProcessService {
         macroprocessId: input.macroprocessId,
         processTypeId: input.processTypeId,
         parentProcessId: input.parentProcessId ?? null,
+        elaborator: input.elaborator ?? `Usuario ${actor.id}`,
+        responsible: input.responsible ?? null,
         revision: 1,
         ...nullableFields(input)
       }));
@@ -166,7 +174,7 @@ export class ProcessService {
       version.processTypeId = processTypeId;
       version.parentProcessId = parentProcessId;
       for (const field of PROCESS_FIELDS) {
-        if (input[field] !== undefined) version[field] = input[field] ?? null;
+        if (input[field] !== undefined) (version as unknown as Record<string, unknown>)[field] = input[field] ?? null;
       }
       version.revision += 1;
       const savedVersion = await manager.getRepository(ProcessVersionEntity).save(version);
@@ -192,12 +200,12 @@ export class ProcessService {
       const process = await this.lockProcess(manager, id);
       const version = await this.getCurrentVersion(manager, process);
       this.ensureDraftAndRevision(version, input.revision);
-      if (process.ownerUserId === input.ownerUserId) {
-        throw new ConflictException('Process already has this owner');
-      }
 
       const target = await manager.query(
-        `SELECT ID FROM ${qualifiedTable('APP_USER')} WHERE ID = :1 AND IS_ACTIVE = 1 FOR UPDATE`,
+        `SELECT U.ID, I.DISPLAY_NAME AS "displayName"
+         FROM ${qualifiedTable('APP_USER')} U
+         JOIN ${qualifiedTable('USER_IDENTITY')} I ON I.USER_ID = U.ID
+         WHERE U.ID = :1 AND U.IS_ACTIVE = 1 FOR UPDATE`,
         [input.ownerUserId]
       );
       const ownerProfile = await manager.query(
@@ -210,8 +218,7 @@ export class ProcessService {
       }
 
       const before = processSnapshot(process, version);
-      process.ownerUserId = input.ownerUserId;
-      await manager.getRepository(ProcessEntity).save(process);
+      version.responsible = String(target[0].displayName);
       version.revision += 1;
       const savedVersion = await manager.getRepository(ProcessVersionEntity).save(version);
       await this.audit.record({
@@ -237,7 +244,7 @@ export class ProcessService {
   }
 
   private async lockProcess(manager: EntityManager, id: number): Promise<ProcessEntity> {
-    const rows: Array<{ parentProcessId: number | string | null }> = await manager.query(
+    const rows: Array<{ id: number | string }> = await manager.query(
       `SELECT ID AS "id" FROM ${qualifiedTable('PROCESS')}
        WHERE ID = :1 AND IS_ACTIVE = 1 FOR UPDATE`,
       [id]
@@ -249,10 +256,8 @@ export class ProcessService {
   }
 
   private ensureCanEdit(process: ProcessEntity, actor: AuthenticatedUser): void {
-    if (actor.profiles.includes('ADMIN')) return;
-    if (process.ownerUserId !== actor.id || !actor.profiles.includes('PROCESS_OWNER')) {
-      throw new ForbiddenException();
-    }
+    if (actor.profiles.includes('ADMIN') || actor.profiles.includes('PROCESS_OWNER')) return;
+    throw new ForbiddenException();
   }
 
   private async getCurrentVersion(manager: EntityManager, process: ProcessEntity): Promise<ProcessVersionEntity> {
@@ -312,8 +317,10 @@ export class ProcessService {
   }
 
   private detailSelect(): string {
-    return `SELECT P.ID AS "id", P.CODE AS "code", P.OWNER_USER_ID AS "ownerUserId",
-                   I.DISPLAY_NAME AS "ownerDisplayName", V.VERSION_NUMBER AS "versionNumber",
+    return `SELECT P.ID AS "id", P.CODE AS "code", CAST(NULL AS NUMBER) AS "ownerUserId",
+                   COALESCE(V.RESPONSIBLE, 'Sin responsable') AS "ownerDisplayName",
+                   V.ELABORATOR AS "elaborator", V.RESPONSIBLE AS "responsible",
+                   V.VERSION_NUMBER AS "versionNumber",
                    V.REVISION AS "revision", V.STATUS AS "status",
                    V.MACROPROCESS_ID AS "macroprocessId", M.NAME AS "macroprocessName",
                    V.PROCESS_TYPE_ID AS "processTypeId", T.NAME AS "processTypeName",
@@ -327,13 +334,16 @@ export class ProcessService {
                    V.BUSINESS_AREA AS "businessArea", V.SUBPROCESS_TYPE AS "subprocessType",
                    V.CRITICALITY AS "criticality", V.AUTOMATION_LEVEL AS "automationLevel",
                    V.PERIODICITY AS "periodicity",
+                   V.DOCUMENTS AS "documents", V.SYSTEMS_USED AS "systemsUsed",
+                   V.INDICATORS AS "indicators",
+                   V.IMPROVEMENT_OPPORTUNITIES AS "improvementOpportunities",
+                   V.BPMN_MODEL_REFERENCE AS "bpmnModelReference",
                    CAST(NULL AS VARCHAR2(1 CHAR)) AS "internalUnits",
                    CAST(NULL AS VARCHAR2(1 CHAR)) AS "bpmnModel"
             FROM ${qualifiedTable('PROCESS')} P
             JOIN ${qualifiedTable('PROCESS_VERSION')} V ON V.ID = P.CURRENT_VERSION_ID
             JOIN ${qualifiedTable('MACROPROCESS')} M ON M.ID = V.MACROPROCESS_ID
-            JOIN ${qualifiedTable('PROCESS_TYPE')} T ON T.ID = V.PROCESS_TYPE_ID
-            JOIN ${qualifiedTable('USER_IDENTITY')} I ON I.USER_ID = P.OWNER_USER_ID`;
+            JOIN ${qualifiedTable('PROCESS_TYPE')} T ON T.ID = V.PROCESS_TYPE_ID`;
   }
 }
 
@@ -342,10 +352,12 @@ function nullableFields(input: ProcessFieldsDto): Record<string, string | null> 
 }
 
 function processSnapshot(process: ProcessEntity, version: ProcessVersionEntity): Record<string, unknown> {
-  const fields = Object.fromEntries(PROCESS_FIELDS.map((field) => [field, version[field]]));
+  const fields = Object.fromEntries(PROCESS_FIELDS.map((field) => [field, (version as unknown as Record<string, unknown>)[field]]));
   return {
     code: process.code,
-    ownerUserId: process.ownerUserId,
+    ownerUserId: null,
+    elaborator: version.elaborator,
+    responsible: version.responsible,
     versionNumber: version.versionNumber,
     status: version.status,
     revision: version.revision,

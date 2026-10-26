@@ -1,4 +1,5 @@
-import { CreateDateColumn, Entity, Column, PrimaryGeneratedColumn } from 'typeorm';
+import { Column, CreateDateColumn, Entity, JoinColumn, ManyToOne, PrimaryGeneratedColumn } from 'typeorm';
+import { ProcessEntity } from '../process/process.entity';
 
 @Entity({ name: 'PROCESS_RISK' })
 export class RiskEntity {
@@ -17,15 +18,16 @@ export class RiskEntity {
   @Column({ name: 'CONSEQUENCE', type: 'clob' })
   consequence!: string;
 
-  @Column({ name: 'RISK_TYPE_ID', type: 'number' })
-  riskTypeId!: number;
+  @Column({ name: 'RISK_TYPE', type: 'varchar2', length: 120 })
+  riskType!: string;
 
-  @Column({ name: 'RISK_LEVEL_ID', type: 'number' })
-  riskLevelId!: number;
-
-  @Column({ name: 'CREATED_BY_USER_ID', type: 'number' })
-  createdByUserId!: number;
+  @Column({ name: 'RISK_LEVEL', type: 'varchar2', length: 20 })
+  riskLevel!: string;
 
   @CreateDateColumn({ name: 'CREATED_AT', type: 'timestamp with time zone' })
   createdAt!: Date;
+
+  @ManyToOne(() => ProcessEntity)
+  @JoinColumn({ name: 'PROCESS_ID' })
+  process?: ProcessEntity;
 }

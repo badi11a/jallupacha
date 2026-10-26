@@ -1,5 +1,6 @@
 import { BadRequestException, InternalServerErrorException } from '@nestjs/common';
 import { OracleConnectionOptions } from 'typeorm/driver/oracle/OracleConnectionOptions';
+import { requiredOracleIdentifier } from '../database/schema';
 import { initializeOracleClient } from './oracle-client';
 
 const required = (name: string): string => {
@@ -90,4 +91,30 @@ export function configuredRateLimit(): { ttl: number; limit: number } {
     throw new BadRequestException('Invalid rate-limit configuration');
   }
   return { ttl, limit };
+}
+
+
+export function assertSchemaInstallAllowed(): string {
+  const schema = requiredOracleIdentifier('ORACLE_SCHEMA');
+  const service = process.env.ORACLE_SERVICE?.trim();
+  const migrationUser = requiredOracleIdentifier('MIGRATION_USER');
+  const expectedConfirmation = service ? `INSTALL SCHEMA ${schema}@${service}` : '';
+
+  if (!service || migrationUser !== schema ||
+    process.env.SCHEMA_INSTALL_ALLOWED !== 'true' ||
+    process.env.SCHEMA_INSTALL_CONFIRM !== expectedConfirmation) {
+    throw new Error(
+      'Schema installation refused. Require the owner migration user, SCHEMA_INSTALL_ALLOWED=true, and ' +
+      `SCHEMA_INSTALL_CONFIRM="${expectedConfirmation}".`
+    );
+  }
+  const usesOwnerAsRuntime = process.env.DATABASE_USER?.trim().toUpperCase() === schema;
+  const allowsOwnerRuntimeInQa = process.env.SCHEMA_ALLOW_OWNER_RUNTIME_FOR_QA === 'true';
+  if (usesOwnerAsRuntime && !allowsOwnerRuntimeInQa) {
+    throw new Error(
+      'Schema installation requires a runtime database user separate from the schema owner. ' +
+      'For the approved QA exception, set SCHEMA_ALLOW_OWNER_RUNTIME_FOR_QA=true explicitly.'
+    );
+  }
+  return schema;
 }

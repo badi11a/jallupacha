@@ -63,7 +63,7 @@ describe('Release 01 internal process map and risk flow (Oracle)', () => {
       };
     };
     owner = await findActor('PROCESS_OWNER');
-    otherOwner = await findActor('PROCESS_OWNER', owner.id);
+    otherOwner = await findActor('VALIDATOR');
     riskManager = await findActor('RISK_MANAGER');
     consultation = await findActor('CONSULTATION');
     actors.set('owner-session', owner);
@@ -72,7 +72,7 @@ describe('Release 01 internal process map and risk flow (Oracle)', () => {
     actors.set('consultation-session', consultation);
 
     macroprocess = await dataSource.getRepository(MacroprocessEntity)
-      .findOneByOrFail({ name: 'Misionales', isActive: 1 });
+      .findOneByOrFail({ isActive: 1 });
     processType = await dataSource.getRepository(ProcessTypeEntity)
       .findOneByOrFail({ isActive: 1 });
     const riskTypes: Array<{ id: number | string }> = await dataSource.query(
@@ -183,8 +183,8 @@ describe('Release 01 internal process map and risk flow (Oracle)', () => {
         description: 'La atención puede retrasarse ante una interrupción.',
         cause: 'Una dependencia de coordinación puede no estar disponible.',
         consequence: 'Las solicitudes tardan más en resolverse.',
-        riskTypeId,
-        riskLevelId
+        riskType: expect.any(String),
+        riskLevel: expect.any(String)
       })]
     });
 

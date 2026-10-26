@@ -1,6 +1,7 @@
 import { readdirSync, readFileSync } from 'fs';
 import { join } from 'path';
 import { compareGrants, parseRuntimeGrants, readRuntimeGrants, runtimeGrantStatements } from './grants';
+import { SCHEMA_ID_GENERATORS } from './schema';
 
 const srcDir = join(__dirname, '..');
 const migrationsDir = join(__dirname, 'migrations');
@@ -57,7 +58,10 @@ describe('runtime grants', () => {
   });
 
   it('grants every table and sequence created by migrations and used by the code', () => {
-    const created = migrations.flatMap((name) => allMatches(read(join(migrationsDir, name)), CREATED));
+    const created = [
+      ...migrations.flatMap((name) => allMatches(read(join(migrationsDir, name)), CREATED)),
+      ...SCHEMA_ID_GENERATORS.map((generator) => generator.sequence)
+    ];
     expect(created.length).toBeGreaterThan(10);
     for (const object of created) expect(declaredObjects).toContain(object);
 
@@ -70,7 +74,10 @@ describe('runtime grants', () => {
   });
 
   it('declares no grant for an object that no migration creates', () => {
-    const created = new Set(migrations.flatMap((name) => allMatches(read(join(migrationsDir, name)), CREATED)));
+    const created = new Set([
+      ...migrations.flatMap((name) => allMatches(read(join(migrationsDir, name)), CREATED)),
+      ...SCHEMA_ID_GENERATORS.map((generator) => generator.sequence)
+    ]);
     created.add('AUDIT');
     for (const object of declaredObjects) expect(created).toContain(object);
   });

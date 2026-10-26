@@ -1,5 +1,5 @@
 import { Component, ElementRef, computed, effect, inject, linkedSignal, signal, viewChild } from '@angular/core';
-import { UiDialogField, UiDialogService, UiDialogValues, validateDialogFields } from './dialog.service';
+import { UiDialogField, UiDialogService, UiDialogValues, nativeMaxLength, validateDialogFields } from './dialog.service';
 
 /** Presenta el diálogo activo de `UiDialogService` con un `<dialog>` modal nativo. */
 @Component({
@@ -20,7 +20,7 @@ import { UiDialogField, UiDialogService, UiDialogValues, validateDialogFields } 
                 <input [id]="inputId(field)" [name]="field.key"
                   [type]="field.type === 'number' ? 'number' : 'text'"
                   [attr.inputmode]="field.type === 'number' ? 'numeric' : null"
-                  [attr.maxlength]="field.maxLength ?? null"
+                  [attr.maxlength]="nativeMaxLength(field)"
                   [attr.min]="field.min ?? null" [attr.max]="field.max ?? null"
                   [attr.aria-required]="field.required ? 'true' : null"
                   [attr.aria-invalid]="errors()[field.key] ? 'true' : null"
@@ -45,6 +45,7 @@ import { UiDialogField, UiDialogService, UiDialogValues, validateDialogFields } 
   `
 })
 export class UiDialogHostComponent {
+  protected readonly nativeMaxLength = nativeMaxLength;
   protected readonly dialogs = inject(UiDialogService);
   protected readonly request = this.dialogs.active;
   private readonly dialog = viewChild<ElementRef<HTMLDialogElement>>('dialog');

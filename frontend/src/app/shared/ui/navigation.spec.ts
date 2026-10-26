@@ -4,7 +4,7 @@ import { Component, NgZone, provideZoneChangeDetection } from '@angular/core';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { Title } from '@angular/platform-browser';
 import { Router, RouterOutlet, provideRouter, withRouterConfig } from '@angular/router';
-import { provideUiNavigation } from './index';
+import { UiNavigationFocus, provideUiNavigation } from './index';
 
 @Component({ template: `<h1>Bienvenida</h1>` })
 class WelcomeComponent {}
@@ -147,5 +147,15 @@ describe('provideUiNavigation (C-007 R3)', () => {
     await settle();
     expect(router.url).toBe('/a');
     expect(scrollY).toBe(200);
+  });
+
+  it('restaura la posición del destino exacto solicitada por un consumidor del kit', async () => {
+    await go('/a?q=registro');
+    scrollY = 420;
+    await go('/b');
+    TestBed.inject(UiNavigationFocus).restoreOnNextNavigation('/a?q=registro');
+    await go('/a?q=registro');
+    expect(scrollY).toBe(420);
+    expect(document.activeElement).toBe(heading('Pantalla A'));
   });
 });

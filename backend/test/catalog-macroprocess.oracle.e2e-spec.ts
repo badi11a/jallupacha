@@ -46,7 +46,7 @@ describe('macroprocess edit (Oracle)', () => {
     const input: UpdateMacroprocessDto = {
       name: marker,
       description: `Oracle regression ${marker}`,
-      order: original.order + 1
+      order: original.order + 10
     };
 
     try {

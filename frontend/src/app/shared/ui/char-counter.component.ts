@@ -1,16 +1,8 @@
 import { Component, computed, input } from '@angular/core';
+import { countCharacters, UiTextLengthMode } from './text-length';
 
-/**
- * Cuenta caracteres con el criterio de class-validator (MaxLength) aplicado
- * al texto recortado: un carácter por punto de código y sin contar selectores
- * de variación. Así coincide con la validación del servidor.
- */
-export function countCharacters(value: string | null | undefined): number {
-  const text = (value ?? '').trim();
-  const presentation = text.match(/[^️︎][️︎]/g)?.length ?? 0;
-  const surrogates = text.match(/[\uD800-\uDBFF][\uDC00-\uDFFF]/g)?.length ?? 0;
-  return text.length - presentation - surrogates;
-}
+// Compatibilidad del punto de importación anterior; consumidores nuevos usan index.ts.
+export { countCharacters } from './text-length';
 
 export type UiCharCountState = 'ok' | 'near' | 'over';
 
@@ -38,7 +30,8 @@ export function charCountState(length: number, max: number): UiCharCountState {
 export class UiCharCounterComponent {
   readonly value = input<string | null>(null);
   readonly max = input.required<number>();
-  protected readonly length = computed(() => countCharacters(this.value()));
+  readonly lengthMode = input<UiTextLengthMode>('utf16');
+  protected readonly length = computed(() => countCharacters(this.value(), this.lengthMode()));
   protected readonly state = computed(() => charCountState(this.length(), this.max()));
 
   protected format(value: number): string {

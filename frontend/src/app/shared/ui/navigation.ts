@@ -53,6 +53,9 @@ export class UiNavigationFocus {
   private readonly document = inject(DOCUMENT);
   private readonly options = inject(UI_NAVIGATION_OPTIONS);
   private readonly positions = new Map<number, number>();
+  private readonly urlPositions = new Map<string, number>();
+  private requestedReturn: string | null = null;
+  private explicitPosition: number | undefined;
   private currentId = 0;
   private currentPath: string | null = null;
   private restoreFrom: number | null = null;
@@ -67,11 +70,17 @@ export class UiNavigationFocus {
     this.router.events.subscribe((event) => {
       if (event instanceof NavigationStart) {
         this.positions.set(this.currentId, this.window?.scrollY ?? 0);
+        this.urlPositions.set(this.router.url, this.window?.scrollY ?? 0);
+        // Limitar memoria; las posiciones no contienen datos de formularios ni se persisten.
+        if (this.urlPositions.size > 100) this.urlPositions.delete(this.urlPositions.keys().next().value!);
+        this.explicitPosition = this.requestedReturn === event.url ? this.urlPositions.get(event.url) : undefined;
+        this.requestedReturn = null;
         this.restoreFrom = event.navigationTrigger === 'popstate' ? event.restoredState?.navigationId ?? null : null;
       } else if (event instanceof NavigationEnd) {
         this.afterNavigation(event);
       } else if (event instanceof NavigationCancel || event instanceof NavigationError) {
         this.restoreFrom = null;
+        this.explicitPosition = undefined;
       }
     });
   }
@@ -81,6 +90,9 @@ export class UiNavigationFocus {
     afterNextRender({ write: () => this.focusHeading() }, { injector: this.injector });
   }
 
+  /** La aplicación ha validado el destino de su control «Volver a resultados». */
+  restoreOnNextNavigation(url: string): void { this.requestedReturn = url; }
+
   private afterNavigation(event: NavigationEnd): void {
     const path = event.urlAfterRedirects.split(/[?#]/)[0];
     const initial = this.currentPath === null;
@@ -88,34 +100,40 @@ export class UiNavigationFocus {
     this.currentPath = path;
     // El router registra este id en la entrada del historial (también al volver con Atrás/Adelante).
     this.currentId = event.id;
-    const restoreTo = this.restoreFrom !== null ? this.positions.get(this.restoreFrom) : undefined;
+    const restoreTo = this.explicitPosition ?? (this.restoreFrom !== null ? this.positions.get(this.restoreFrom) : undefined);
+    this.explicitPosition = undefined;
     this.restoreFrom = null;
     if (initial || !pathChanged) return;
     afterNextRender({
       write: () => {
-        this.focusHeading();
+        this.focusHeading(0, event.id);
         if (restoreTo !== undefined) this.restoreScroll(restoreTo);
         else this.window?.scrollTo(0, 0);
       }
     }, { injector: this.injector });
   }
 
-  private focusHeading(): void {
+  private focusHeading(attempt = 0, navigationId = this.currentId): void {
+    if (navigationId !== this.currentId) return;
     const heading = this.options.headingSelectors
       .map((selector) => this.document.querySelector<HTMLElement>(selector))
       .find((element) => element !== null);
-    if (!heading) return;
+    if (!heading) {
+      if (attempt < RESTORE_ATTEMPTS) setTimeout(() => this.focusHeading(attempt + 1, navigationId), RESTORE_INTERVAL_MS);
+      return;
+    }
     if (!heading.hasAttribute('tabindex')) heading.setAttribute('tabindex', '-1');
     heading.focus({ preventScroll: true });
   }
 
   /** Reintenta mientras la pantalla carga sus datos y aún no alcanza la altura necesaria. */
-  private restoreScroll(top: number, attempt = 0): void {
+  private restoreScroll(top: number, attempt = 0, navigationId = this.currentId): void {
+    if (navigationId !== this.currentId) return;
     const window = this.window;
     if (!window) return;
     window.scrollTo(0, top);
     if (Math.abs(window.scrollY - top) > 1 && attempt < RESTORE_ATTEMPTS) {
-      setTimeout(() => this.restoreScroll(top, attempt + 1), RESTORE_INTERVAL_MS);
+      setTimeout(() => this.restoreScroll(top, attempt + 1, navigationId), RESTORE_INTERVAL_MS);
     }
   }
 

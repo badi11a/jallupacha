@@ -1,7 +1,7 @@
-/* Tokens de diseño del kit. Las aplicaciones pueden adaptar los roles visuales
+/* Tokens de diseño locales al contenedor .ui-root. Las aplicaciones pueden adaptar los roles visuales
    redefiniendo estas propiedades, no editando los componentes.
    Colores en hexadecimal de 6 dígitos: scripts/check-contrast.mjs los verifica (WCAG 2.2 AA). */
-:root {
+.ui-root {
   /* Paleta de referencia del sistema de diseño. */
   --brand-ink: #22213F;
   --brand-blue: #678FCA;

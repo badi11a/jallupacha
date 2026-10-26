@@ -40,17 +40,51 @@ export class CreateRiskDto {
   @plainText
   consequence!: string;
 
-  @ApiProperty({ type: Number, minimum: 1 })
+  @ApiPropertyOptional({ type: Number, minimum: 1 })
+  @IsOptional()
   @Type(() => Number)
   @IsInt()
   @Min(1)
-  riskTypeId!: number;
+  riskTypeId?: number;
 
-  @ApiProperty({ type: Number, minimum: 1 })
+  @ApiPropertyOptional({ type: Number, minimum: 1 })
+  @IsOptional()
   @Type(() => Number)
   @IsInt()
   @Min(1)
-  riskLevelId!: number;
+  riskLevelId?: number;
+
+  @ApiPropertyOptional({ type: String, maxLength: 120 })
+  @IsOptional()
+  @trimText
+  @IsString()
+  @MaxLength(120)
+  @plainText
+  riskType?: string;
+
+  @ApiPropertyOptional({ type: String, maxLength: 120 })
+  @IsOptional()
+  @trimText
+  @IsString()
+  @MaxLength(120)
+  @plainText
+  type?: string;
+
+  @ApiPropertyOptional({ type: String, maxLength: 20 })
+  @IsOptional()
+  @trimText
+  @IsString()
+  @MaxLength(20)
+  @plainText
+  riskLevel?: string;
+
+  @ApiPropertyOptional({ type: String, maxLength: 20 })
+  @IsOptional()
+  @trimText
+  @IsString()
+  @MaxLength(20)
+  @plainText
+  level?: string;
 }
 
 export class CreateRiskListValueDto {

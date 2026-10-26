@@ -1,4 +1,4 @@
-import { configuredRateLimit, loadRuntimeConfig, validateDemoRuntime } from './config';
+import { assertSchemaInstallAllowed, configuredRateLimit, loadRuntimeConfig, validateDemoRuntime } from './config';
 
 describe('local demo runtime controls', () => {
   it('allows demo authentication only on loopback in development', () => {
@@ -24,6 +24,44 @@ describe('local demo runtime controls', () => {
     else process.env.API_RATE_LIMIT_TTL_MS = ttl;
     if (limit === undefined) delete process.env.API_RATE_LIMIT_MAX;
     else process.env.API_RATE_LIMIT_MAX = limit;
+  });
+});
+
+describe('explicit historical schema installation controls', () => {
+  const values = {
+    ORACLE_SCHEMA: 'TEST_OWNER', ORACLE_SERVICE: 'TEST_SERVICE', MIGRATION_USER: 'TEST_OWNER', DATABASE_USER: 'TEST_RUNTIME',
+    SCHEMA_INSTALL_ALLOWED: 'true', SCHEMA_INSTALL_CONFIRM: 'INSTALL SCHEMA TEST_OWNER@TEST_SERVICE',
+    SCHEMA_ALLOW_OWNER_RUNTIME_FOR_QA: 'false'
+  };
+  const saved: Record<string, string | undefined> = {};
+  beforeEach(() => {
+    for (const key of Object.keys(values)) saved[key] = process.env[key];
+    Object.assign(process.env, values);
+  });
+  afterEach(() => {
+    for (const key of Object.keys(values)) {
+      if (saved[key] === undefined) delete process.env[key];
+      else process.env[key] = saved[key];
+    }
+  });
+  it('requires the exact target confirmation before any connection can be opened', () => {
+    expect(assertSchemaInstallAllowed()).toBe('TEST_OWNER');
+    process.env.SCHEMA_INSTALL_CONFIRM = 'INSTALL SCHEMA OTHER_OWNER@TEST_SERVICE';
+    expect(() => assertSchemaInstallAllowed()).toThrow('installation refused');
+  });
+  it('refuses disabled or missing opt-in', () => {
+    delete process.env.SCHEMA_INSTALL_ALLOWED;
+    expect(() => assertSchemaInstallAllowed()).toThrow('installation refused');
+  });
+  it('requires the migration account to own the target schema', () => {
+    process.env.MIGRATION_USER = 'OTHER_OWNER';
+    expect(() => assertSchemaInstallAllowed()).toThrow('installation refused');
+  });
+  it('preserves separate runtime accounts unless the explicit QA exception is set', () => {
+    process.env.DATABASE_USER = 'TEST_OWNER';
+    expect(() => assertSchemaInstallAllowed()).toThrow('separate');
+    process.env.SCHEMA_ALLOW_OWNER_RUNTIME_FOR_QA = 'true';
+    expect(assertSchemaInstallAllowed()).toBe('TEST_OWNER');
   });
 });
 

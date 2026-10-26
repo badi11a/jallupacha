@@ -1,4 +1,7 @@
-import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
+import { Column, Entity, JoinColumn, ManyToOne, PrimaryGeneratedColumn } from 'typeorm';
+import { MacroprocessEntity } from '../structure/macroprocess.entity';
+import { ProcessTypeEntity } from '../structure/process-type.entity';
+import { ProcessEntity } from './process.entity';
 
 @Entity({ name: 'PROCESS_VERSION' })
 export class ProcessVersionEntity {
@@ -22,6 +25,12 @@ export class ProcessVersionEntity {
 
   @Column({ name: 'PARENT_PROCESS_ID', type: 'number', nullable: true })
   parentProcessId!: number | null;
+
+  @Column({ name: 'ELABORATOR', type: 'varchar2', length: 250, nullable: true })
+  elaborator!: string | null;
+
+  @Column({ name: 'RESPONSIBLE', type: 'varchar2', length: 250, nullable: true })
+  responsible!: string | null;
 
   @Column({ name: 'NAME', type: 'varchar2', length: 250, nullable: true })
   name!: string | null;
@@ -53,6 +62,18 @@ export class ProcessVersionEntity {
   @Column({ name: 'INVOLVED_PARTIES', type: 'clob', nullable: true })
   involvedParties!: string | null;
 
+  @Column({ name: 'DOCUMENTS', type: 'clob', nullable: true })
+  documents!: string | null;
+
+  @Column({ name: 'SYSTEMS_USED', type: 'clob', nullable: true })
+  systemsUsed!: string | null;
+
+  @Column({ name: 'INDICATORS', type: 'clob', nullable: true })
+  indicators!: string | null;
+
+  @Column({ name: 'IMPROVEMENT_OPPORTUNITIES', type: 'clob', nullable: true })
+  improvementOpportunities!: string | null;
+
   @Column({ name: 'STARTS_WHEN', type: 'clob', nullable: true })
   startsWhen!: string | null;
 
@@ -71,6 +92,9 @@ export class ProcessVersionEntity {
   @Column({ name: 'VALIDATION', type: 'clob', nullable: true })
   validation!: string | null;
 
+  @Column({ name: 'BPMN_MODEL_REFERENCE', type: 'clob', nullable: true })
+  bpmnModelReference!: string | null;
+
   @Column({ name: 'BUSINESS_AREA', type: 'varchar2', length: 250, nullable: true })
   businessArea!: string | null;
 
@@ -88,4 +112,20 @@ export class ProcessVersionEntity {
 
   @Column({ name: 'REVISION', type: 'number', default: 1 })
   revision!: number;
+
+  @ManyToOne(() => ProcessEntity)
+  @JoinColumn({ name: 'PROCESS_ID' })
+  process?: ProcessEntity;
+
+  @ManyToOne(() => MacroprocessEntity)
+  @JoinColumn({ name: 'MACROPROCESS_ID' })
+  macroprocess?: MacroprocessEntity;
+
+  @ManyToOne(() => ProcessTypeEntity)
+  @JoinColumn({ name: 'PROCESS_TYPE_ID' })
+  processType?: ProcessTypeEntity;
+
+  @ManyToOne(() => ProcessEntity, { nullable: true })
+  @JoinColumn({ name: 'PARENT_PROCESS_ID' })
+  parentProcess?: ProcessEntity | null;
 }

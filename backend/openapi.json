@@ -1,7 +1,71 @@
 {
   "openapi": "3.0.0",
   "paths": {
-    "/auth/demo/identities": {
+    "/api/audit": {
+      "get": {
+        "operationId": "AuditController_list",
+        "parameters": [
+          {
+            "name": "entityType",
+            "required": true,
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "action",
+            "required": true,
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "jallupacha_session": []
+          }
+        ],
+        "tags": [
+          "audit"
+        ]
+      }
+    },
+    "/api/auth/login": {
+      "post": {
+        "operationId": "AuthController_login",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/LoginDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Sesión iniciada exitosamente"
+          },
+          "401": {
+            "description": "Credenciales no válidas"
+          }
+        },
+        "summary": "Inicio de sesión institucional mediante correo y contraseña",
+        "tags": [
+          "authentication"
+        ]
+      }
+    },
+    "/api/auth/demo/identities": {
       "get": {
         "operationId": "AuthController_demoIdentities",
         "parameters": [],
@@ -15,7 +79,7 @@
         ]
       }
     },
-    "/auth/demo/session": {
+    "/api/auth/demo/session": {
       "post": {
         "operationId": "AuthController_createDemoSession",
         "parameters": [],
@@ -39,7 +103,7 @@
         ]
       }
     },
-    "/auth/me": {
+    "/api/auth/me": {
       "get": {
         "operationId": "AuthController_me",
         "parameters": [],
@@ -58,7 +122,7 @@
         ]
       }
     },
-    "/auth/logout": {
+    "/api/auth/logout": {
       "post": {
         "operationId": "AuthController_logout",
         "parameters": [
@@ -86,7 +150,7 @@
         ]
       }
     },
-    "/users": {
+    "/api/users": {
       "get": {
         "operationId": "UsersController_list",
         "parameters": [],
@@ -105,7 +169,7 @@
         ]
       }
     },
-    "/users/process-owners": {
+    "/api/users/process-owners": {
       "get": {
         "description": "Requiere perfil ADMIN.",
         "operationId": "UsersController_listProcessOwners",
@@ -151,7 +215,7 @@
         ]
       }
     },
-    "/users/{id}/profiles": {
+    "/api/users/{id}/profiles": {
       "put": {
         "operationId": "UsersController_updateProfiles",
         "parameters": [
@@ -197,7 +261,26 @@
         ]
       }
     },
-    "/macroprocesses": {
+    "/api/macroprocess-types": {
+      "get": {
+        "operationId": "CatalogController_macroprocessTypes",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "jallupacha_session": []
+          }
+        ],
+        "tags": [
+          "catalogs"
+        ]
+      }
+    },
+    "/api/macroprocesses": {
       "get": {
         "operationId": "CatalogController_macroprocesses",
         "parameters": [],
@@ -252,7 +335,7 @@
         ]
       }
     },
-    "/macroprocesses/{id}": {
+    "/api/macroprocesses/{id}": {
       "patch": {
         "operationId": "CatalogController_updateMacroprocess",
         "parameters": [
@@ -298,7 +381,7 @@
         ]
       }
     },
-    "/macroprocesses/{id}/deactivate": {
+    "/api/macroprocesses/{id}/deactivate": {
       "post": {
         "operationId": "CatalogController_deactivateMacroprocess",
         "parameters": [
@@ -334,7 +417,7 @@
         ]
       }
     },
-    "/process-types": {
+    "/api/process-types": {
       "get": {
         "operationId": "CatalogController_processTypes",
         "parameters": [],
@@ -389,7 +472,7 @@
         ]
       }
     },
-    "/process-types/{id}": {
+    "/api/process-types/{id}": {
       "patch": {
         "operationId": "CatalogController_updateProcessType",
         "parameters": [
@@ -435,9 +518,9 @@
         ]
       }
     },
-    "/process-types/{id}/deactivate": {
+    "/api/process-types/{id}/deactivate": {
       "post": {
-        "operationId": "CatalogController_deactivateProcessType",
+        "operationId": "CatalogController_deactivateProcessTypePost",
         "parameters": [
           {
             "name": "id",
@@ -469,11 +552,45 @@
         "tags": [
           "catalogs"
         ]
+      },
+      "patch": {
+        "operationId": "CatalogController_deactivateProcessTypePatch",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "number"
+            }
+          },
+          {
+            "name": "X-CSRF-Token",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "jallupacha_session": []
+          }
+        ],
+        "tags": [
+          "catalogs"
+        ]
       }
     },
-    "/audit": {
+    "/api/units": {
       "get": {
-        "operationId": "AuditController_list",
+        "operationId": "CatalogController_units",
         "parameters": [],
         "responses": {
           "200": {
@@ -486,11 +603,397 @@
           }
         ],
         "tags": [
-          "audit"
+          "catalogs"
+        ]
+      },
+      "post": {
+        "operationId": "CatalogController_createUnit",
+        "parameters": [
+          {
+            "name": "X-CSRF-Token",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateUnitDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "jallupacha_session": []
+          }
+        ],
+        "tags": [
+          "catalogs"
         ]
       }
     },
-    "/processes": {
+    "/api/units/{id}": {
+      "patch": {
+        "operationId": "CatalogController_updateUnit",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "number"
+            }
+          },
+          {
+            "name": "X-CSRF-Token",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateUnitDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "jallupacha_session": []
+          }
+        ],
+        "tags": [
+          "catalogs"
+        ]
+      }
+    },
+    "/api/units/{id}/deactivate": {
+      "post": {
+        "operationId": "CatalogController_deactivateUnitPost",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "number"
+            }
+          },
+          {
+            "name": "X-CSRF-Token",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "jallupacha_session": []
+          }
+        ],
+        "tags": [
+          "catalogs"
+        ]
+      },
+      "patch": {
+        "operationId": "CatalogController_deactivateUnitPatch",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "number"
+            }
+          },
+          {
+            "name": "X-CSRF-Token",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "jallupacha_session": []
+          }
+        ],
+        "tags": [
+          "catalogs"
+        ]
+      }
+    },
+    "/api/management/process-types": {
+      "get": {
+        "operationId": "ProcessTypesController_processTypes",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "jallupacha_session": []
+          }
+        ],
+        "tags": [
+          "structure-management"
+        ]
+      },
+      "post": {
+        "operationId": "ProcessTypesController_createProcessType",
+        "parameters": [
+          {
+            "name": "X-CSRF-Token",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "jallupacha_session": []
+          }
+        ],
+        "tags": [
+          "structure-management"
+        ]
+      }
+    },
+    "/api/management/process-types/{id}": {
+      "patch": {
+        "operationId": "ProcessTypesController_updateProcessType",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "number"
+            }
+          },
+          {
+            "name": "X-CSRF-Token",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "jallupacha_session": []
+          }
+        ],
+        "tags": [
+          "structure-management"
+        ]
+      }
+    },
+    "/api/management/process-types/{id}/deactivate": {
+      "patch": {
+        "operationId": "ProcessTypesController_deactivateProcessType",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "number"
+            }
+          },
+          {
+            "name": "X-CSRF-Token",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "jallupacha_session": []
+          }
+        ],
+        "tags": [
+          "structure-management"
+        ]
+      }
+    },
+    "/api/management/units": {
+      "get": {
+        "operationId": "UnitsController_units",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "jallupacha_session": []
+          }
+        ],
+        "tags": [
+          "structure-management"
+        ]
+      },
+      "post": {
+        "operationId": "UnitsController_createUnit",
+        "parameters": [
+          {
+            "name": "X-CSRF-Token",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "jallupacha_session": []
+          }
+        ],
+        "tags": [
+          "structure-management"
+        ]
+      }
+    },
+    "/api/management/units/{id}": {
+      "patch": {
+        "operationId": "UnitsController_updateUnit",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "number"
+            }
+          },
+          {
+            "name": "X-CSRF-Token",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "jallupacha_session": []
+          }
+        ],
+        "tags": [
+          "structure-management"
+        ]
+      }
+    },
+    "/api/management/units/{id}/deactivate": {
+      "patch": {
+        "operationId": "UnitsController_deactivateUnit",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "number"
+            }
+          },
+          {
+            "name": "X-CSRF-Token",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "jallupacha_session": []
+          }
+        ],
+        "tags": [
+          "structure-management"
+        ]
+      }
+    },
+    "/api/processes": {
       "get": {
         "description": "Requiere sesión; pueden consultar ADMIN, PROCESS_OWNER, RISK_MANAGER y CONSULTATION.",
         "operationId": "ProcessController_list",
@@ -594,7 +1097,7 @@
         ]
       }
     },
-    "/processes/{id}": {
+    "/api/processes/{id}": {
       "get": {
         "description": "Requiere sesión; pueden consultar ADMIN, PROCESS_OWNER, RISK_MANAGER y CONSULTATION.",
         "operationId": "ProcessController_get",
@@ -699,7 +1202,7 @@
         ]
       }
     },
-    "/processes/{id}/owner": {
+    "/api/processes/{id}/owner": {
       "patch": {
         "description": "Requiere perfil ADMIN.",
         "operationId": "ProcessController_reassignOwner",
@@ -762,12 +1265,915 @@
           "processes"
         ]
       }
+    },
+    "/api/process-map": {
+      "get": {
+        "description": "Requiere sesión y cualquier perfil vigente. Incluye procesos Borrador.",
+        "operationId": "ProcessMapController_getMap",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProcessMapResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Sesión requerida."
+          },
+          "403": {
+            "description": "Perfil sin permiso."
+          }
+        },
+        "security": [
+          {
+            "jallupacha_session": []
+          }
+        ],
+        "summary": "Obtiene el mapa interno Macroproceso → Proceso agrupado por tipo.",
+        "tags": [
+          "process-map"
+        ]
+      }
+    },
+    "/api/management/processes/{id}": {
+      "get": {
+        "operationId": "ProcessRecordsController_detail",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "number"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "jallupacha_session": []
+          }
+        ],
+        "tags": [
+          "process-management"
+        ]
+      },
+      "patch": {
+        "operationId": "ProcessRecordsController_updateProcess",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "number"
+            }
+          },
+          {
+            "name": "X-CSRF-Token",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "jallupacha_session": []
+          }
+        ],
+        "tags": [
+          "process-management"
+        ]
+      }
+    },
+    "/api/management/processes": {
+      "get": {
+        "operationId": "ProcessRecordsController_processes",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "jallupacha_session": []
+          }
+        ],
+        "tags": [
+          "process-management"
+        ]
+      },
+      "post": {
+        "operationId": "ProcessRecordsController_createProcess",
+        "parameters": [
+          {
+            "name": "X-CSRF-Token",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "jallupacha_session": []
+          }
+        ],
+        "tags": [
+          "process-management"
+        ]
+      }
+    },
+    "/api/management/processes/{id}/submit": {
+      "post": {
+        "operationId": "ProcessLifecycleController_submitProcess",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "number"
+            }
+          },
+          {
+            "name": "X-CSRF-Token",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "jallupacha_session": []
+          }
+        ],
+        "tags": [
+          "process-management"
+        ]
+      }
+    },
+    "/api/management/processes/{id}/approve": {
+      "post": {
+        "operationId": "ProcessLifecycleController_approveProcess",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "number"
+            }
+          },
+          {
+            "name": "X-CSRF-Token",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "jallupacha_session": []
+          }
+        ],
+        "tags": [
+          "process-management"
+        ]
+      }
+    },
+    "/api/management/processes/{id}/reject": {
+      "post": {
+        "operationId": "ProcessLifecycleController_rejectProcess",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "number"
+            }
+          },
+          {
+            "name": "X-CSRF-Token",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "jallupacha_session": []
+          }
+        ],
+        "tags": [
+          "process-management"
+        ]
+      }
+    },
+    "/api/management/processes/{id}/new-version": {
+      "post": {
+        "operationId": "ProcessLifecycleController_newVersion",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "number"
+            }
+          },
+          {
+            "name": "X-CSRF-Token",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "jallupacha_session": []
+          }
+        ],
+        "tags": [
+          "process-management"
+        ]
+      }
+    },
+    "/api/management/processes/{id}/retire": {
+      "post": {
+        "operationId": "ProcessLifecycleController_retireProcess",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "number"
+            }
+          },
+          {
+            "name": "X-CSRF-Token",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "jallupacha_session": []
+          }
+        ],
+        "tags": [
+          "process-management"
+        ]
+      }
+    },
+    "/api/management/map": {
+      "get": {
+        "operationId": "ProcessMapViewController_map",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "jallupacha_session": []
+          }
+        ],
+        "tags": [
+          "process-management"
+        ]
+      }
+    },
+    "/api/management/processes/{id}/relations": {
+      "post": {
+        "operationId": "ProcessRelationsController_addRelation",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "number"
+            }
+          },
+          {
+            "name": "X-CSRF-Token",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "jallupacha_session": []
+          }
+        ],
+        "tags": [
+          "process-management"
+        ]
+      }
+    },
+    "/api/management/processes/{id}/relations/{relationId}": {
+      "patch": {
+        "operationId": "ProcessRelationsController_updateRelation",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "number"
+            }
+          },
+          {
+            "name": "relationId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "number"
+            }
+          },
+          {
+            "name": "X-CSRF-Token",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "jallupacha_session": []
+          }
+        ],
+        "tags": [
+          "process-management"
+        ]
+      },
+      "delete": {
+        "operationId": "ProcessRelationsController_deleteRelation",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "number"
+            }
+          },
+          {
+            "name": "relationId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "number"
+            }
+          },
+          {
+            "name": "X-CSRF-Token",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "jallupacha_session": []
+          }
+        ],
+        "tags": [
+          "process-management"
+        ]
+      }
+    },
+    "/api/processes/{processId}/risks": {
+      "get": {
+        "operationId": "RiskController_list",
+        "parameters": [
+          {
+            "name": "processId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "number"
+            }
+          },
+          {
+            "name": "page",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "minimum": 1,
+              "default": 1,
+              "type": "number"
+            }
+          },
+          {
+            "name": "limit",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "minimum": 1,
+              "maximum": 100,
+              "default": 100,
+              "type": "number"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Página de riesgos vinculados al proceso."
+          },
+          "401": {
+            "description": "Sesión requerida."
+          },
+          "403": {
+            "description": "Consulta o dueño de otro proceso no puede ver riesgos."
+          },
+          "404": {
+            "description": "Proceso inexistente."
+          }
+        },
+        "security": [
+          {
+            "jallupacha_session": []
+          }
+        ],
+        "summary": "Lista riesgos de un proceso según el permiso del actor sobre ese proceso.",
+        "tags": [
+          "risks"
+        ]
+      },
+      "post": {
+        "operationId": "RiskController_create",
+        "parameters": [
+          {
+            "name": "processId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "number"
+            }
+          },
+          {
+            "name": "X-CSRF-Token",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateRiskDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Riesgo guardado con su nivel y tipo."
+          },
+          "400": {
+            "description": "Campos o referencias inválidos."
+          },
+          "403": {
+            "description": "Se requiere perfil Gestor de riesgos."
+          },
+          "404": {
+            "description": "Proceso inexistente."
+          }
+        },
+        "security": [
+          {
+            "jallupacha_session": []
+          }
+        ],
+        "summary": "Registra un riesgo para un proceso existente.",
+        "tags": [
+          "risks"
+        ]
+      }
+    },
+    "/api/risk-types": {
+      "get": {
+        "operationId": "RiskCatalogController_listTypes",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Tipos activos; Administrador también recibe inactivos."
+          },
+          "401": {
+            "description": "Sesión requerida."
+          }
+        },
+        "security": [
+          {
+            "jallupacha_session": []
+          }
+        ],
+        "summary": "Lista tipos de riesgo disponibles.",
+        "tags": [
+          "risk-catalogs"
+        ]
+      },
+      "post": {
+        "operationId": "RiskCatalogController_createType",
+        "parameters": [
+          {
+            "name": "X-CSRF-Token",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateRiskListValueDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Tipo de riesgo creado."
+          },
+          "403": {
+            "description": "Se requiere perfil Administrador."
+          }
+        },
+        "security": [
+          {
+            "jallupacha_session": []
+          }
+        ],
+        "summary": "Agrega un tipo de riesgo al catálogo.",
+        "tags": [
+          "risk-catalogs"
+        ]
+      }
+    },
+    "/api/risk-levels": {
+      "get": {
+        "operationId": "RiskCatalogController_listLevels",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Niveles activos; Administrador también recibe inactivos."
+          },
+          "401": {
+            "description": "Sesión requerida."
+          }
+        },
+        "security": [
+          {
+            "jallupacha_session": []
+          }
+        ],
+        "summary": "Lista niveles de riesgo disponibles.",
+        "tags": [
+          "risk-catalogs"
+        ]
+      },
+      "post": {
+        "operationId": "RiskCatalogController_createLevel",
+        "parameters": [
+          {
+            "name": "X-CSRF-Token",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateRiskListValueDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Nivel de riesgo creado."
+          },
+          "403": {
+            "description": "Se requiere perfil Administrador."
+          }
+        },
+        "security": [
+          {
+            "jallupacha_session": []
+          }
+        ],
+        "summary": "Agrega un nivel de riesgo al catálogo.",
+        "tags": [
+          "risk-catalogs"
+        ]
+      }
+    },
+    "/api/risk-types/{id}/deactivate": {
+      "post": {
+        "operationId": "RiskCatalogController_deactivateType",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "number"
+            }
+          },
+          {
+            "name": "X-CSRF-Token",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Tipo desactivado."
+          },
+          "403": {
+            "description": "Se requiere perfil Administrador."
+          }
+        },
+        "security": [
+          {
+            "jallupacha_session": []
+          }
+        ],
+        "summary": "Desactiva un tipo sin borrar su historial.",
+        "tags": [
+          "risk-catalogs"
+        ]
+      }
+    },
+    "/api/risk-levels/{id}/deactivate": {
+      "post": {
+        "operationId": "RiskCatalogController_deactivateLevel",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "number"
+            }
+          },
+          {
+            "name": "X-CSRF-Token",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Nivel desactivado."
+          },
+          "403": {
+            "description": "Se requiere perfil Administrador."
+          }
+        },
+        "security": [
+          {
+            "jallupacha_session": []
+          }
+        ],
+        "summary": "Desactiva un nivel sin borrar su historial.",
+        "tags": [
+          "risk-catalogs"
+        ]
+      }
+    },
+    "/api/management/processes/{id}/risks": {
+      "post": {
+        "operationId": "ProcessRisksController_addRisk",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "number"
+            }
+          },
+          {
+            "name": "X-CSRF-Token",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "jallupacha_session": []
+          }
+        ],
+        "tags": [
+          "risk-management"
+        ]
+      }
+    },
+    "/api/management/processes/{id}/risks/{riskId}": {
+      "patch": {
+        "operationId": "ProcessRisksController_updateRisk",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "number"
+            }
+          },
+          {
+            "name": "riskId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "number"
+            }
+          },
+          {
+            "name": "X-CSRF-Token",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "jallupacha_session": []
+          }
+        ],
+        "tags": [
+          "risk-management"
+        ]
+      },
+      "delete": {
+        "operationId": "ProcessRisksController_deleteRisk",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "number"
+            }
+          },
+          {
+            "name": "riskId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "number"
+            }
+          },
+          {
+            "name": "X-CSRF-Token",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "jallupacha_session": []
+          }
+        ],
+        "tags": [
+          "risk-management"
+        ]
+      }
     }
   },
   "info": {
     "title": "Jallupacha API",
     "description": "API institucional de gestión de procesos. Requiere sesión y perfiles autorizados, salvo endpoints de autenticación pública documentados explícitamente.",
-    "version": "0.1.0",
+    "version": "15",
     "contact": {}
   },
   "tags": [],
@@ -781,6 +2187,25 @@
       }
     },
     "schemas": {
+      "LoginDto": {
+        "type": "object",
+        "properties": {
+          "email": {
+            "type": "string",
+            "example": "admin@example.test",
+            "description": "Correo electrónico institucional"
+          },
+          "password": {
+            "type": "string",
+            "example": "ClaveDemo2026!",
+            "description": "Contraseña institucional"
+          }
+        },
+        "required": [
+          "email",
+          "password"
+        ]
+      },
       "DemoSessionDto": {
         "type": "object",
         "properties": {
@@ -804,6 +2229,7 @@
               "enum": [
                 "ADMIN",
                 "PROCESS_OWNER",
+                "VALIDATOR",
                 "RISK_MANAGER",
                 "CONSULTATION"
               ]
@@ -817,6 +2243,10 @@
       "CreateMacroprocessDto": {
         "type": "object",
         "properties": {
+          "macroprocessTypeId": {
+            "type": "number",
+            "minimum": 1
+          },
           "name": {
             "type": "string",
             "maxLength": 120
@@ -859,6 +2289,10 @@
       "ProcessTypeDto": {
         "type": "object",
         "properties": {
+          "macroprocessId": {
+            "type": "number",
+            "minimum": 1
+          },
           "name": {
             "type": "string",
             "maxLength": 120
@@ -871,9 +2305,44 @@
       "UpdateProcessTypeDto": {
         "type": "object",
         "properties": {
+          "macroprocessId": {
+            "type": "number",
+            "minimum": 1
+          },
           "name": {
             "type": "string",
             "maxLength": 120
+          }
+        }
+      },
+      "CreateUnitDto": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "maxLength": 200
+          },
+          "parentUnitId": {
+            "type": "object",
+            "minimum": 1,
+            "nullable": true
+          }
+        },
+        "required": [
+          "name"
+        ]
+      },
+      "UpdateUnitDto": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "maxLength": 200
+          },
+          "parentUnitId": {
+            "type": "object",
+            "minimum": 1,
+            "nullable": true
           }
         }
       },
@@ -1070,6 +2539,41 @@
             "maxLength": 250,
             "nullable": true
           },
+          "elaborator": {
+            "type": "string",
+            "maxLength": 250,
+            "nullable": true
+          },
+          "responsible": {
+            "type": "string",
+            "maxLength": 250,
+            "nullable": true
+          },
+          "documents": {
+            "type": "string",
+            "maxLength": 10000,
+            "nullable": true
+          },
+          "systemsUsed": {
+            "type": "string",
+            "maxLength": 10000,
+            "nullable": true
+          },
+          "indicators": {
+            "type": "string",
+            "maxLength": 10000,
+            "nullable": true
+          },
+          "improvementOpportunities": {
+            "type": "string",
+            "maxLength": 10000,
+            "nullable": true
+          },
+          "bpmnModelReference": {
+            "type": "string",
+            "maxLength": 10000,
+            "nullable": true
+          },
           "macroprocessId": {
             "type": "number",
             "minimum": 1
@@ -1219,6 +2723,34 @@
             "type": "string",
             "nullable": true
           },
+          "elaborator": {
+            "type": "string",
+            "nullable": true
+          },
+          "responsible": {
+            "type": "string",
+            "nullable": true
+          },
+          "documents": {
+            "type": "string",
+            "nullable": true
+          },
+          "systemsUsed": {
+            "type": "string",
+            "nullable": true
+          },
+          "indicators": {
+            "type": "string",
+            "nullable": true
+          },
+          "improvementOpportunities": {
+            "type": "string",
+            "nullable": true
+          },
+          "bpmnModelReference": {
+            "type": "string",
+            "nullable": true
+          },
           "internalUnits": {
             "type": "string",
             "nullable": true,
@@ -1264,6 +2796,13 @@
           "criticality",
           "automationLevel",
           "periodicity",
+          "elaborator",
+          "responsible",
+          "documents",
+          "systemsUsed",
+          "indicators",
+          "improvementOpportunities",
+          "bpmnModelReference",
           "internalUnits",
           "bpmnModel"
         ]
@@ -1376,6 +2915,41 @@
             "maxLength": 250,
             "nullable": true
           },
+          "elaborator": {
+            "type": "string",
+            "maxLength": 250,
+            "nullable": true
+          },
+          "responsible": {
+            "type": "string",
+            "maxLength": 250,
+            "nullable": true
+          },
+          "documents": {
+            "type": "string",
+            "maxLength": 10000,
+            "nullable": true
+          },
+          "systemsUsed": {
+            "type": "string",
+            "maxLength": 10000,
+            "nullable": true
+          },
+          "indicators": {
+            "type": "string",
+            "maxLength": 10000,
+            "nullable": true
+          },
+          "improvementOpportunities": {
+            "type": "string",
+            "maxLength": 10000,
+            "nullable": true
+          },
+          "bpmnModelReference": {
+            "type": "string",
+            "maxLength": 10000,
+            "nullable": true
+          },
           "revision": {
             "type": "number",
             "minimum": 1
@@ -1413,6 +2987,68 @@
         "required": [
           "ownerUserId",
           "revision"
+        ]
+      },
+      "ProcessMapResponse": {
+        "type": "object",
+        "properties": {}
+      },
+      "CreateRiskDto": {
+        "type": "object",
+        "properties": {
+          "description": {
+            "type": "string",
+            "maxLength": 10000
+          },
+          "cause": {
+            "type": "string",
+            "maxLength": 10000
+          },
+          "consequence": {
+            "type": "string",
+            "maxLength": 10000
+          },
+          "riskTypeId": {
+            "type": "number",
+            "minimum": 1
+          },
+          "riskLevelId": {
+            "type": "number",
+            "minimum": 1
+          },
+          "riskType": {
+            "type": "string",
+            "maxLength": 120
+          },
+          "type": {
+            "type": "string",
+            "maxLength": 120
+          },
+          "riskLevel": {
+            "type": "string",
+            "maxLength": 20
+          },
+          "level": {
+            "type": "string",
+            "maxLength": 20
+          }
+        },
+        "required": [
+          "description",
+          "cause",
+          "consequence"
+        ]
+      },
+      "CreateRiskListValueDto": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "maxLength": 120
+          }
+        },
+        "required": [
+          "name"
         ]
       }
     }

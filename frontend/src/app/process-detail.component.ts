@@ -2,10 +2,11 @@ import { NgTemplateOutlet } from '@angular/common';
 import { Component, OnInit, inject, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, RouterLink } from '@angular/router';
+import { AuthService } from './auth.service';
 import {
-  FICHA_FIELDS, MvpV14Api, ProcessDetail, ProcessListItem, ProcessUnit,
+  FICHA_FIELDS, ProcessApi, ProcessDetail, ProcessListItem, ProcessUnit,
   RELATION_TYPES, RISK_LEVELS, RiskInput, errorMessage
-} from './mvp-v14-api.service';
+} from './process-api.service';
 import {
   UiBadgeComponent, UiBreadcrumbsComponent, UiDialogService,
   UiMessageComponent, UiSectionComponent, type UiBadgeTone
@@ -20,11 +21,9 @@ const emptyRelation = (): { destinationProcessId: number | null; type: string; d
   imports: [FormsModule, NgTemplateOutlet, RouterLink, UiBadgeComponent, UiBreadcrumbsComponent, UiMessageComponent, UiSectionComponent],
   styles: [`
     .top-nav-bar { display: flex; align-items: center; justify-content: space-between; margin-bottom: var(--ui-space-3); gap: 1rem; }
-    .top-nav-actions { display: inline-flex; align-items: center; gap: .75rem; }
+    .workflow-actions-bar { display: flex; flex-wrap: wrap; align-items: center; justify-content: flex-end; gap: .75rem; margin-bottom: var(--ui-space-3); }
+    .workflow-actions-bar:empty { display: none; }
     .edit-action-btn { min-height: 38px; padding: .4rem .9rem; font-size: var(--ui-font-size-sm); }
-    .help-btn { display: inline-flex; align-items: center; gap: .45rem; min-height: 38px; padding: .45rem .9rem; background: var(--ui-color-surface); border: 1px solid var(--ui-color-border-strong); border-radius: var(--ui-radius-md); color: var(--ui-color-text); font-size: var(--ui-font-size-sm); font-weight: var(--ui-font-weight-medium); cursor: pointer; transition: all .15s ease-in-out; }
-    .help-btn:hover { background: var(--ui-color-surface-accent); border-color: var(--ui-color-primary); color: var(--ui-color-primary); }
-    .help-btn svg { color: var(--ui-color-text-subtle); flex-shrink: 0; }
 
     .hero-card { display: grid; grid-template-columns: 1fr 340px; gap: 2rem; align-items: start; padding: 1.75rem 2rem; background: var(--ui-color-surface); border: 1px solid var(--ui-color-border); border-radius: var(--ui-radius-xl); box-shadow: var(--ui-shadow-panel); margin-bottom: 1.5rem; }
     @media (max-width: 960px) { .hero-card { grid-template-columns: 1fr; gap: 1.5rem; padding: 1.5rem; } }
@@ -43,8 +42,6 @@ const emptyRelation = (): { destinationProcessId: number | null; type: string; d
     .trio-value { font-size: var(--ui-font-size-md); font-weight: var(--ui-font-weight-bold); color: var(--ui-color-heading); overflow-wrap: anywhere; }
     .trio-link { color: var(--ui-color-heading); text-decoration: none; }
     .trio-link:hover { color: var(--ui-color-primary); text-decoration: underline; }
-    .info-icon-btn { display: inline-flex; align-items: center; justify-content: center; width: 16px; height: 16px; border-radius: 50%; background: none; border: 1px solid var(--ui-color-border-strong); color: var(--ui-color-text-subtle); font-size: 10px; font-weight: bold; cursor: pointer; padding: 0; line-height: 1; }
-    .info-icon-btn:hover { border-color: var(--ui-color-primary); color: var(--ui-color-primary); }
 
     .risk-widget { padding: 1.25rem 1.4rem; border-radius: var(--ui-radius-lg); background: var(--ui-color-background); border: 1px solid var(--ui-color-border); }
     .risk-widget-top { display: flex; justify-content: space-between; align-items: flex-start; gap: .75rem; margin-bottom: 1rem; }
@@ -220,18 +217,98 @@ const emptyRelation = (): { destinationProcessId: number | null; type: string; d
           { label: d.macroprocess, link: '/mapa/macroprocesos/' + d.macroprocessId },
           { label: d.name }
         ]" />
-        <div class="top-nav-actions">
-          <a class="quiet-button edit-action-btn" [routerLink]="['/procesos', d.id, 'editar']">Editar</a>
-          <button type="button" class="help-btn" (click)="openHelp()" aria-label="Ayuda sobre este proceso">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-              <circle cx="12" cy="12" r="10"></circle>
-              <path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"></path>
-              <line x1="12" y1="17" x2="12.01" y2="17"></line>
-            </svg>
-            <span>Ayuda</span>
-          </button>
-        </div>
       </div>
+
+      <div class="workflow-actions-bar" aria-label="Acciones de la ficha">
+        @if (d.status === 'Borrador' && auth.hasAnyProfile('ADMIN', 'PROCESS_OWNER')) {
+          <a class="quiet-button edit-action-btn" [routerLink]="['/procesos', d.id, 'editar']">Editar</a>
+          <button
+            type="button"
+            class="primary-button"
+            [disabled]="submitting() || !d.completeness.complete"
+            (click)="submitForReview(d.id)"
+            [title]="!d.completeness.complete ? 'Complete los campos obligatorios antes de enviar a revisión' : 'Enviar ficha a validación técnica'"
+          >
+            Enviar a revisión
+          </button>
+        }
+        @if (d.status === 'En revisión' && auth.hasAnyProfile('ADMIN', 'VALIDATOR')) {
+          <button
+            type="button"
+            class="primary-button"
+            [disabled]="submitting()"
+            (click)="approveProcess(d.id)"
+          >
+            Aprobar proceso
+          </button>
+          <button
+            type="button"
+            class="quiet-button"
+            [disabled]="submitting()"
+            (click)="startReject()"
+          >
+            Rechazar con observaciones
+          </button>
+        }
+        @if (d.status === 'Vigente') {
+          @if (auth.hasAnyProfile('ADMIN', 'PROCESS_OWNER')) {
+            <button
+              type="button"
+              class="quiet-button"
+              [disabled]="submitting()"
+              (click)="createNewVersion(d.id)"
+            >
+              Nueva versión (v{{ (d.versionNumber || 1) + 1 }})
+            </button>
+          }
+          @if (auth.isAdmin()) {
+            <button
+              type="button"
+              class="quiet-button"
+              [disabled]="submitting()"
+              (click)="retireProcess(d.id)"
+            >
+              Retirar proceso
+            </button>
+          }
+        }
+      </div>
+
+      @if (rejecting()) {
+        <section class="inline-form" aria-labelledby="reject-title">
+          <h2 id="reject-title" style="margin: 0; font-size: 1rem;">Observaciones de rechazo técnico (obligatorio)</h2>
+          <label>Motivo u observaciones técnicas
+            <textarea
+              name="rejectionReason"
+              rows="3"
+              placeholder="Indique las observaciones técnicas para devolver el proceso a borrador..."
+              [(ngModel)]="rejectionReason"
+              required
+            ></textarea>
+          </label>
+          <div class="row-actions">
+            <button
+              type="button"
+              class="primary-button"
+              [disabled]="submitting() || !rejectionReason.trim()"
+              (click)="submitReject(d.id)"
+            >
+              Confirmar rechazo
+            </button>
+            <button type="button" class="quiet-button" (click)="cancelReject()">Cancelar</button>
+          </div>
+        </section>
+      }
+      @if (d.status === 'En revisión') {
+        <ui-message kind="info">
+          Este proceso se encuentra <strong>En revisión técnica</strong> por el Validador. La edición de campos queda bloqueada hasta su resolución.
+        </ui-message>
+      }
+      @if (d.status === 'Obsoleto') {
+        <ui-message kind="info">
+          Esta versión del proceso se encuentra formalmente <strong>Obsoleta</strong> y ha sido retirada de la operación activa.
+        </ui-message>
+      }
 
       <header class="hero-card" aria-labelledby="process-title">
         <div class="hero-main">
@@ -239,23 +316,24 @@ const emptyRelation = (): { destinationProcessId: number | null; type: string; d
           <h1 id="process-title" class="hero-title">{{ d.name }}</h1>
           <div class="accent-bar" aria-hidden="true"></div>
           <div class="hero-status">
-            <span class="status-dot" aria-hidden="true"></span>
-            <span>{{ d.status }} · Código: {{ d.code }}</span>
+            <ui-badge [tone]="statusTone(d.status)">{{ d.status }}</ui-badge>
+            <span>v{{ d.versionNumber || 1 }} · Código: {{ d.code }}</span>
+            @if (d.versions && d.versions.length > 1) {
+              <span class="helper">({{ d.versions.length }} versiones registradas)</span>
+            }
           </div>
           <p class="hero-desc">{{ d.description || 'Sin descripción registrada.' }}</p>
 
-          <div class="trio-box" aria-label="Clasificación y unidad responsable">
+          <div class="trio-box" aria-label="Clasificación institucional">
             <div class="trio-item">
               <div class="trio-label">
                 <span>TIPO DE PROCESO</span>
-                <button type="button" class="info-icon-btn" (click)="openProcessTypeHelp()" aria-label="Información de tipo de proceso">?</button>
               </div>
               <div class="trio-value">{{ d.processType }}</div>
             </div>
             <div class="trio-item">
               <div class="trio-label">
                 <span>MACROPROCESO</span>
-                <button type="button" class="info-icon-btn" (click)="openMacroprocessHelp()" aria-label="Información de macroproceso">?</button>
               </div>
               <div class="trio-value">
                 <a class="trio-link" [routerLink]="['/mapa/macroprocesos', d.macroprocessId]">{{ d.macroprocess }}</a>
@@ -263,10 +341,9 @@ const emptyRelation = (): { destinationProcessId: number | null; type: string; d
             </div>
             <div class="trio-item">
               <div class="trio-label">
-                <span>UNIDAD RESPONSABLE</span>
-                <button type="button" class="info-icon-btn" (click)="openUnitHelp()" aria-label="Información de unidad responsable">?</button>
+                <span>ÁREA DE NEGOCIO</span>
               </div>
-              <div class="trio-value">{{ responsibleUnitName() }}</div>
+              <div class="trio-value">{{ d.businessArea || 'Sin información' }}</div>
             </div>
           </div>
         </div>
@@ -275,10 +352,9 @@ const emptyRelation = (): { destinationProcessId: number | null; type: string; d
           <div class="risk-widget-top">
             <div class="risk-title-group">
               <div class="risk-label-row">
-                <span>Nivel de riesgo</span>
-                <button type="button" class="info-icon-btn" (click)="openRiskHelp()" aria-label="Información sobre nivel de riesgo">?</button>
+                <span>Mayor nivel entre riesgos registrados</span>
               </div>
-              <span class="risk-subtitle">Clasificación actual</span>
+              <span class="risk-subtitle">Resumen de {{ d.risks.length }} riesgo(s) registrado(s)</span>
             </div>
             <ui-badge [tone]="currentRiskTone()">{{ currentRiskLevel() }}</ui-badge>
           </div>
@@ -424,30 +500,32 @@ const emptyRelation = (): { destinationProcessId: number | null; type: string; d
       <ui-section heading="Riesgos">
         @for (risk of d.risks; track risk.id) {
           @if (editingRisk() === risk.id) {
-            <form class="inline-form" (ngSubmit)="saveRisk(d.id)" [attr.aria-label]="'Editar riesgo'">
+            <form class="inline-form" (ngSubmit)="saveRisk(d.id)" [attr.inert]="saving() ? '' : null" [attr.aria-label]="'Editar riesgo'">
               <ng-container *ngTemplateOutlet="riskFields" />
-              <div class="row-actions"><button class="primary-button" type="submit">Guardar riesgo</button>
-                <button class="quiet-button" type="button" (click)="cancelRisk()">Cancelar</button></div>
+              <div class="row-actions"><button class="primary-button" type="submit" [disabled]="saving()">Guardar riesgo</button>
+                <button class="quiet-button" type="button" [disabled]="saving()" (click)="cancelRisk()">Cancelar</button></div>
             </form>
           } @else {
             <article class="item">
               <header><ui-badge [tone]="riskTone(risk.level)">{{ risk.level }}</ui-badge><strong>{{ risk.type }}</strong></header>
               <p>{{ risk.description }}</p>
               <p class="helper"><strong>Causa:</strong> {{ risk.cause }} · <strong>Consecuencia:</strong> {{ risk.consequence }}</p>
-              <div class="item-actions">
-                <button class="quiet-button" type="button" (click)="editRisk(risk)">Editar</button>
-                <button class="danger-button" type="button" (click)="removeRisk(d.id, risk.id)">Eliminar</button>
-              </div>
+              @if (auth.hasAnyProfile('RISK_MANAGER')) {
+                <div class="item-actions">
+                  <button class="quiet-button" type="button" (click)="editRisk(risk)">Editar</button>
+                  <button class="danger-button" type="button" (click)="removeRisk(d.id, risk.id)">Eliminar</button>
+                </div>
+              }
             </article>
           }
         } @empty { <p class="helper">Sin riesgos registrados.</p> }
         @if (editingRisk() === 0) {
-          <form class="inline-form" (ngSubmit)="saveRisk(d.id)" aria-label="Nuevo riesgo">
+          <form class="inline-form" (ngSubmit)="saveRisk(d.id)" [attr.inert]="saving() ? '' : null" aria-label="Nuevo riesgo">
             <ng-container *ngTemplateOutlet="riskFields" />
-            <div class="row-actions"><button class="primary-button" type="submit">Agregar riesgo</button>
-              <button class="quiet-button" type="button" (click)="cancelRisk()">Cancelar</button></div>
+            <div class="row-actions"><button class="primary-button" type="submit" [disabled]="saving()">Agregar riesgo</button>
+              <button class="quiet-button" type="button" [disabled]="saving()" (click)="cancelRisk()">Cancelar</button></div>
           </form>
-        } @else if (editingRisk() === null) {
+        } @else if (editingRisk() === null && auth.hasAnyProfile('RISK_MANAGER')) {
           <button class="quiet-button" type="button" (click)="newRisk()">Agregar riesgo</button>
         }
       </ui-section>
@@ -456,31 +534,33 @@ const emptyRelation = (): { destinationProcessId: number | null; type: string; d
         <h3>Salientes</h3>
         @for (rel of d.relations.outgoing; track rel.id) {
           @if (editingRelation() === rel.id) {
-            <form class="inline-form" (ngSubmit)="saveRelation(d.id)" aria-label="Editar relación">
+            <form class="inline-form" (ngSubmit)="saveRelation(d.id)" [attr.inert]="saving() ? '' : null" aria-label="Editar relación">
               <p><strong>{{ rel.code }} · {{ rel.name }}</strong></p>
               <ng-container *ngTemplateOutlet="relationFields; context: { $implicit: false }" />
-              <div class="row-actions"><button class="primary-button" type="submit">Guardar relación</button>
-                <button class="quiet-button" type="button" (click)="cancelRelation()">Cancelar</button></div>
+              <div class="row-actions"><button class="primary-button" type="submit" [disabled]="saving()">Guardar relación</button>
+                <button class="quiet-button" type="button" [disabled]="saving()" (click)="cancelRelation()">Cancelar</button></div>
             </form>
           } @else {
             <article class="item">
               <header><ui-badge tone="info">{{ relationLabel(rel.type) }}</ui-badge>
                 <a [routerLink]="['/procesos', rel.processId]">{{ rel.code }} · {{ rel.name }}</a></header>
               <p>{{ rel.description }}</p>
-              <div class="item-actions">
-                <button class="quiet-button" type="button" (click)="editRelation(rel.id, rel.type, rel.description)">Editar</button>
-                <button class="danger-button" type="button" (click)="removeRelation(d.id, rel.id)">Eliminar</button>
-              </div>
+              @if (auth.hasAnyProfile('ADMIN', 'PROCESS_OWNER')) {
+                <div class="item-actions">
+                  <button class="quiet-button" type="button" (click)="editRelation(rel.id, rel.type, rel.description)">Editar</button>
+                  <button class="danger-button" type="button" (click)="removeRelation(d.id, rel.id)">Eliminar</button>
+                </div>
+              }
             </article>
           }
         } @empty { <p class="helper">Sin relaciones salientes.</p> }
         @if (editingRelation() === 0) {
-          <form class="inline-form" (ngSubmit)="saveRelation(d.id)" aria-label="Nueva relación">
+          <form class="inline-form" (ngSubmit)="saveRelation(d.id)" [attr.inert]="saving() ? '' : null" aria-label="Nueva relación">
             <ng-container *ngTemplateOutlet="relationFields; context: { $implicit: true }" />
-            <div class="row-actions"><button class="primary-button" type="submit">Agregar relación</button>
-              <button class="quiet-button" type="button" (click)="cancelRelation()">Cancelar</button></div>
+            <div class="row-actions"><button class="primary-button" type="submit" [disabled]="saving()">Agregar relación</button>
+              <button class="quiet-button" type="button" [disabled]="saving()" (click)="cancelRelation()">Cancelar</button></div>
           </form>
-        } @else if (editingRelation() === null) {
+        } @else if (editingRelation() === null && auth.hasAnyProfile('ADMIN', 'PROCESS_OWNER')) {
           <button class="quiet-button" type="button" (click)="newRelation(d.id)">Agregar relación</button>
         }
         <h3>Entrantes</h3>
@@ -530,11 +610,13 @@ const emptyRelation = (): { destinationProcessId: number | null; type: string; d
   `
 })
 export class ProcessDetailComponent implements OnInit, LeavesWithConfirmation {
-  private readonly api = inject(MvpV14Api);
+  private readonly api = inject(ProcessApi);
   private readonly route = inject(ActivatedRoute);
   private readonly dialogs = inject(UiDialogService);
+  readonly auth = inject(AuthService);
   readonly detail = signal<ProcessDetail | null>(null);
   readonly loading = signal(true);
+  readonly saving = signal(false);
   readonly error = signal('');
   readonly notice = signal('');
   readonly editingRisk = signal<number | null>(null);
@@ -579,56 +661,26 @@ export class ProcessDetailComponent implements OnInit, LeavesWithConfirmation {
     return this.detail()?.responsible || 'Sin información';
   }
 
-  openHelp(): void {
-    void this.dialogs.confirm({
-      title: 'Ayuda sobre la ficha de proceso',
-      message: 'Esta vista presenta la información integral del proceso seleccionado: propósito, gobernanza, nivel de riesgo, ficha técnica, riesgos asociados y relaciones operativas.',
-      confirmLabel: 'Entendido'
-    });
-  }
-
-  openRiskHelp(): void {
-    void this.dialogs.confirm({
-      title: 'Nivel de riesgo del proceso',
-      message: 'Representa la mayor criticidad evaluada entre los riesgos registrados para este proceso (Bajo, Medio, Alto o Crítico).',
-      confirmLabel: 'Entendido'
-    });
-  }
-
-  openProcessTypeHelp(): void {
-    void this.dialogs.confirm({
-      title: 'Tipo de proceso',
-      message: 'Clasificación temática o funcional del proceso dentro de su macroproceso institucional.',
-      confirmLabel: 'Entendido'
-    });
-  }
-
-  openMacroprocessHelp(): void {
-    void this.dialogs.confirm({
-      title: 'Macroproceso',
-      message: 'Macroproceso al cual se encuentra adscrito y vinculado operativamente este proceso.',
-      confirmLabel: 'Entendido'
-    });
-  }
-
-  openUnitHelp(): void {
-    void this.dialogs.confirm({
-      title: 'Unidad responsable',
-      message: 'Unidad técnica u organizacional encargada de la ejecución, control y actualización de este proceso.',
-      confirmLabel: 'Entendido'
-    });
-  }
-
   ngOnInit(): void {
     this.route.paramMap.subscribe((params) => this.load(Number(params.get('id'))));
   }
 
-  private load(id: number, keepNotice = false): void {
-    this.loading.set(true);
+  private load(id: number, keepNotice = false, silent = false): void {
+    if (!silent) this.loading.set(true);
     if (!keepNotice) this.notice.set('');
     this.api.process(id).subscribe({
-      next: (detail) => { this.detail.set(detail); this.error.set(''); this.loading.set(false); },
-      error: (e) => { this.detail.set(null); this.error.set(errorMessage(e)); this.loading.set(false); }
+      next: (detail) => {
+        this.saving.set(false);
+        this.detail.set(detail);
+        this.error.set('');
+        this.loading.set(false);
+      },
+      error: (e) => {
+        this.saving.set(false);
+        if (!silent) this.detail.set(null);
+        this.error.set(errorMessage(e));
+        this.loading.set(false);
+      }
     });
   }
 
@@ -638,20 +690,40 @@ export class ProcessDetailComponent implements OnInit, LeavesWithConfirmation {
   private afterChange(id: number, message: string): void {
     this.error.set('');
     this.notice.set(message);
-    this.editingRisk.set(null);
-    this.editingRelation.set(null);
     this.load(id, true);
   }
 
   private fail(e: unknown): void { this.notice.set(''); this.error.set(errorMessage(e)); }
 
-  newRisk(): void {
+  async newRisk(): Promise<void> {
+    if (this.saving()) return;
+    if (this.isRiskDirty()) {
+      const ok = await this.dialogs.confirm({
+        title: 'Descartar cambios',
+        message: 'Hay cambios sin guardar en el riesgo. ¿Deseas descartarlos?',
+        confirmLabel: 'Descartar cambios',
+        cancelLabel: 'Continuar editando',
+        tone: 'danger'
+      });
+      if (!ok) return;
+    }
     this.risk = emptyRisk();
     this.initialRiskSnapshot = JSON.stringify(this.risk);
     this.editingRisk.set(0);
   }
 
-  editRisk(item: RiskInput & { id: number }): void {
+  async editRisk(item: RiskInput & { id: number }): Promise<void> {
+    if (this.saving()) return;
+    if (this.isRiskDirty() && this.editingRisk() !== item.id) {
+      const ok = await this.dialogs.confirm({
+        title: 'Descartar cambios',
+        message: 'Hay cambios sin guardar en el riesgo. ¿Deseas descartarlos?',
+        confirmLabel: 'Descartar cambios',
+        cancelLabel: 'Continuar editando',
+        tone: 'danger'
+      });
+      if (!ok) return;
+    }
     this.risk = { description: item.description, cause: item.cause, consequence: item.consequence, type: item.type, level: item.level };
     this.initialRiskSnapshot = JSON.stringify(this.risk);
     this.editingRisk.set(item.id);
@@ -663,6 +735,7 @@ export class ProcessDetailComponent implements OnInit, LeavesWithConfirmation {
   }
 
   async cancelRisk(): Promise<void> {
+    if (this.saving()) return;
     if (this.isRiskDirty()) {
       const confirmed = await this.dialogs.confirm({
         title: 'Descartar riesgo',
@@ -677,9 +750,22 @@ export class ProcessDetailComponent implements OnInit, LeavesWithConfirmation {
   }
 
   saveRisk(processId: number): void {
+    if (this.saving()) return;
     const target = this.editingRisk();
+    this.saving.set(true);
     const request = target === 0 ? this.api.addRisk(processId, this.risk) : this.api.updateRisk(processId, target as number, this.risk);
-    request.subscribe({ next: () => this.afterChange(processId, 'Riesgo guardado.'), error: (e) => this.fail(e) });
+    request.subscribe({
+      next: () => {
+        this.editingRisk.set(null);
+        this.error.set('');
+        this.notice.set('Riesgo guardado.');
+        this.load(processId, true, true);
+      },
+      error: (e) => {
+        this.saving.set(false);
+        this.fail(e);
+      }
+    });
   }
 
   async removeRisk(processId: number, riskId: number): Promise<void> {
@@ -691,10 +777,27 @@ export class ProcessDetailComponent implements OnInit, LeavesWithConfirmation {
       tone: 'danger'
     });
     if (!confirmed) return;
-    this.api.deleteRisk(processId, riskId).subscribe({ next: () => this.afterChange(processId, 'Riesgo eliminado.'), error: (e) => this.fail(e) });
+    this.api.deleteRisk(processId, riskId).subscribe({
+      next: () => {
+        this.editingRisk.set(null);
+        this.afterChange(processId, 'Riesgo eliminado.');
+      },
+      error: (e) => this.fail(e)
+    });
   }
 
-  newRelation(processId: number): void {
+  async newRelation(processId: number): Promise<void> {
+    if (this.saving()) return;
+    if (this.isRelationDirty()) {
+      const ok = await this.dialogs.confirm({
+        title: 'Descartar cambios',
+        message: 'Hay cambios sin guardar en la relación. ¿Deseas descartarlos?',
+        confirmLabel: 'Descartar cambios',
+        cancelLabel: 'Continuar editando',
+        tone: 'danger'
+      });
+      if (!ok) return;
+    }
     this.relation = emptyRelation();
     this.initialRelationSnapshot = JSON.stringify(this.relation);
     this.editingRelation.set(0);
@@ -706,7 +809,18 @@ export class ProcessDetailComponent implements OnInit, LeavesWithConfirmation {
     }
   }
 
-  editRelation(id: number, type: string, description: string): void {
+  async editRelation(id: number, type: string, description: string): Promise<void> {
+    if (this.saving()) return;
+    if (this.isRelationDirty() && this.editingRelation() !== id) {
+      const ok = await this.dialogs.confirm({
+        title: 'Descartar cambios',
+        message: 'Hay cambios sin guardar en la relación. ¿Deseas descartarlos?',
+        confirmLabel: 'Descartar cambios',
+        cancelLabel: 'Continuar editando',
+        tone: 'danger'
+      });
+      if (!ok) return;
+    }
     this.relation = { destinationProcessId: null, type, description };
     this.initialRelationSnapshot = JSON.stringify(this.relation);
     this.editingRelation.set(id);
@@ -718,6 +832,7 @@ export class ProcessDetailComponent implements OnInit, LeavesWithConfirmation {
   }
 
   async cancelRelation(): Promise<void> {
+    if (this.saving()) return;
     if (this.isRelationDirty()) {
       const confirmed = await this.dialogs.confirm({
         title: 'Descartar relación',
@@ -732,12 +847,25 @@ export class ProcessDetailComponent implements OnInit, LeavesWithConfirmation {
   }
 
   saveRelation(processId: number): void {
+    if (this.saving()) return;
     const target = this.editingRelation();
     const { destinationProcessId, type, description } = this.relation;
+    this.saving.set(true);
     const request = target === 0
       ? this.api.addRelation(processId, { destinationProcessId: destinationProcessId ?? undefined, type, description })
       : this.api.updateRelation(processId, target as number, { type, description });
-    request.subscribe({ next: () => this.afterChange(processId, 'Relación guardada.'), error: (e) => this.fail(e) });
+    request.subscribe({
+      next: () => {
+        this.editingRelation.set(null);
+        this.error.set('');
+        this.notice.set('Relación guardada.');
+        this.load(processId, true, true);
+      },
+      error: (e) => {
+        this.saving.set(false);
+        this.fail(e);
+      }
+    });
   }
 
   async removeRelation(processId: number, relationId: number): Promise<void> {
@@ -749,14 +877,164 @@ export class ProcessDetailComponent implements OnInit, LeavesWithConfirmation {
       tone: 'danger'
     });
     if (!confirmed) return;
-    this.api.deleteRelation(processId, relationId).subscribe({ next: () => this.afterChange(processId, 'Relación eliminada.'), error: (e) => this.fail(e) });
+    this.api.deleteRelation(processId, relationId).subscribe({
+      next: () => {
+        this.editingRelation.set(null);
+        this.afterChange(processId, 'Relación eliminada.');
+      },
+      error: (e) => this.fail(e)
+    });
+  }
+
+  readonly submitting = signal(false);
+  readonly rejecting = signal(false);
+  rejectionReason = '';
+
+  statusTone(status: string): UiBadgeTone {
+    switch (status) {
+      case 'Vigente': return 'success';
+      case 'En revisión': return 'info';
+      case 'Borrador': return 'warning';
+      case 'Obsoleto': return 'neutral';
+      default: return 'neutral';
+    }
+  }
+
+  async submitForReview(id: number): Promise<void> {
+    const ok = await this.dialogs.confirm({
+      title: 'Enviar a revisión',
+      message: '¿Desea enviar este proceso a revisión técnica por el Validador? La ficha no podrá modificarse mientras permanezca en revisión.',
+      confirmLabel: 'Enviar a revisión',
+      cancelLabel: 'Volver a la ficha'
+    });
+    if (!ok) return;
+    this.submitting.set(true);
+    this.api.submitProcess(id).subscribe({
+      next: () => {
+        this.submitting.set(false);
+        this.notice.set('Proceso enviado a revisión exitosamente.');
+        this.load(id, true);
+      },
+      error: (e) => {
+        this.submitting.set(false);
+        this.error.set(errorMessage(e));
+      }
+    });
+  }
+
+  async approveProcess(id: number): Promise<void> {
+    const ok = await this.dialogs.confirm({
+      title: 'Aprobar proceso',
+      message: '¿Está seguro de aprobar este proceso y declararlo como versión Vigente institucional?',
+      confirmLabel: 'Aprobar y publicar',
+      cancelLabel: 'Cancelar'
+    });
+    if (!ok) return;
+    this.submitting.set(true);
+    this.api.approveProcess(id).subscribe({
+      next: () => {
+        this.submitting.set(false);
+        this.notice.set('El proceso ha sido aprobado y publicado como versión Vigente.');
+        this.load(id, true);
+      },
+      error: (e) => {
+        this.submitting.set(false);
+        this.error.set(errorMessage(e));
+      }
+    });
+  }
+
+  startReject(): void {
+    if (!this.rejecting()) {
+      this.rejectionReason = '';
+    }
+    this.rejecting.set(true);
+  }
+
+  async cancelReject(): Promise<void> {
+    if (this.rejectionReason.trim()) {
+      const ok = await this.dialogs.confirm({
+        title: 'Descartar observaciones',
+        message: 'Hay observaciones ingresadas. ¿Deseas descartarlas?',
+        confirmLabel: 'Descartar cambios',
+        cancelLabel: 'Continuar editando',
+        tone: 'danger'
+      });
+      if (!ok) return;
+    }
+    this.rejecting.set(false);
+    this.rejectionReason = '';
+  }
+
+  submitReject(id: number): void {
+    if (!this.rejectionReason.trim()) return;
+    this.submitting.set(true);
+    this.api.rejectProcess(id, this.rejectionReason.trim()).subscribe({
+      next: () => {
+        this.submitting.set(false);
+        this.rejecting.set(false);
+        this.rejectionReason = '';
+        this.notice.set('El proceso fue devuelto a estado Borrador con las observaciones técnicas registradas.');
+        this.load(id, true);
+      },
+      error: (e) => {
+        this.submitting.set(false);
+        this.error.set(errorMessage(e));
+      }
+    });
+  }
+
+  async createNewVersion(id: number): Promise<void> {
+    const ok = await this.dialogs.confirm({
+      title: 'Crear nueva versión',
+      message: 'Se creará un nuevo borrador como siguiente versión del proceso, conservando los datos de la versión vigente. ¿Desea continuar?',
+      confirmLabel: 'Crear nueva versión',
+      cancelLabel: 'Cancelar'
+    });
+    if (!ok) return;
+    this.submitting.set(true);
+    this.api.newVersion(id).subscribe({
+      next: (res) => {
+        this.submitting.set(false);
+        this.notice.set(`Nueva versión ${res.versionNumber} creada en estado Borrador.`);
+        this.load(id, true);
+      },
+      error: (e) => {
+        this.submitting.set(false);
+        this.error.set(errorMessage(e));
+      }
+    });
+  }
+
+  async retireProcess(id: number): Promise<void> {
+    const ok = await this.dialogs.confirm({
+      title: 'Retirar proceso',
+      message: '¿Está seguro de retirar este proceso? La versión vigente pasará a estado Obsoleto.',
+      confirmLabel: 'Retirar proceso',
+      cancelLabel: 'Cancelar',
+      tone: 'danger'
+    });
+    if (!ok) return;
+    this.submitting.set(true);
+    this.api.retireProcess(id).subscribe({
+      next: () => {
+        this.submitting.set(false);
+        this.notice.set('El proceso ha sido formalmente retirado a estado Obsoleto.');
+        this.load(id, true);
+      },
+      error: (e) => {
+        this.submitting.set(false);
+        this.error.set(errorMessage(e));
+      }
+    });
   }
 
   isDirty(): boolean {
-    return this.isRiskDirty() || this.isRelationDirty();
+    return this.saving() || this.submitting() || this.isRiskDirty() || this.isRelationDirty() || (this.rejecting() && this.rejectionReason.trim() !== '');
   }
 
   async confirmLeave(): Promise<boolean> {
+    if (this.saving() || this.submitting()) return false;
     if (!this.isDirty()) return true;
     return await this.dialogs.confirm({
       title: 'Cambios no guardados',

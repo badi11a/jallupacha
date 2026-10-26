@@ -92,7 +92,7 @@ describe('process drafts (Oracle)', () => {
     expect(Number.isSafeInteger(processId)).toBe(true);
     expect(created).toMatchObject({
       code: expect.stringMatching(/^PR\d+$/),
-      ownerUserId: owner.id,
+      ownerUserId: null,
       ownerDisplayName: expect.any(String),
       status: 'Borrador',
       versionNumber: 1,
@@ -137,7 +137,7 @@ describe('process drafts (Oracle)', () => {
 
     const unauthorizedOwner: AuthenticatedUser = {
       id: secondOwnerId,
-      profiles: ['PROCESS_OWNER'],
+      profiles: ['CONSULTATION'],
       sessionHash: '',
       csrfHash: ''
     };
@@ -151,13 +151,13 @@ describe('process drafts (Oracle)', () => {
       revision: 2
     });
     expect(reassigned).toMatchObject({
-      ownerUserId: secondOwnerId,
+      ownerUserId: null,
       revision: 3
     });
     const reloaded = await processes.get(processId);
     expect(reloaded).toMatchObject({
       code: created.code,
-      ownerUserId: secondOwnerId,
+      ownerUserId: null,
       revision: 3,
       status: 'Borrador',
       name: `${marker} actualizado`
@@ -177,8 +177,8 @@ describe('process drafts (Oracle)', () => {
     ]);
     expect(JSON.parse(auditRows[1].beforeValue).name).toBe(marker);
     expect(JSON.parse(auditRows[1].afterValue).name).toBe(`${marker} actualizado`);
-    expect(JSON.parse(auditRows[2].beforeValue).ownerUserId).toBe(owner.id);
-    expect(JSON.parse(auditRows[2].afterValue).ownerUserId).toBe(secondOwnerId);
+    expect(JSON.parse(auditRows[2].beforeValue).ownerUserId).toBeNull();
+    expect(JSON.parse(auditRows[2].afterValue).ownerUserId).toBeNull();
     expect(auditRows.some((row) => /email|displayName/i.test(row.beforeValue + row.afterValue))).toBe(false);
 
     await expect(catalogs.deactivateMacroprocess(admin.id, macroprocessId))

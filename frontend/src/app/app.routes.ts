@@ -1,12 +1,16 @@
 import { Routes } from '@angular/router';
+import { AuditComponent } from './audit.component';
+import { adminGuard, authGuard, guestGuard } from './auth.guard';
+import { LoginComponent } from './login.component';
+import { MacroprocessDetailComponent } from './macroprocess-detail.component';
+import { ProcessMapComponent } from './process-map.component';
 import { NotFoundComponent } from './not-found.component';
-import { MvpV14DemoComponent } from './mvp-v14-demo.component';
 import { ProcessDetailComponent } from './process-detail.component';
 import { ProcessFormComponent } from './process-form.component';
 import { ProcessListComponent } from './process-list.component';
 import { ProcessTypesComponent } from './process-types.component';
 import { UnitsComponent } from './units.component';
-import { MacroprocessDetailComponent } from './macroprocess-detail.component';
+import { UsersComponent } from './users.component';
 import { unsavedChangesGuard } from './unsaved-changes.guard';
 
 /** Página de inicio: mapa de procesos. */
@@ -15,16 +19,19 @@ export const HOME_URL = '/mapa';
 /** Nombre visible de la aplicación (marca y títulos de pantalla). */
 export const APP_NAME = 'Sistema de Procesos Institucionales';
 
-// MVP v14 de operador único (C-011): sin autenticación ni perfiles; la navegación es la definida en docs/arquitectura_mvp_v14.md.
+// Arquitectura v15 (REQ-25): Autenticación local institucional y control de acceso.
 export const routes: Routes = [
   { path: '', pathMatch: 'full', redirectTo: 'mapa' },
-  { title: 'Mapa de procesos', path: 'mapa', component: MvpV14DemoComponent },
-  { title: 'Detalle de macroproceso', path: 'mapa/macroprocesos/:id', component: MacroprocessDetailComponent },
-  { title: 'Procesos', path: 'procesos', component: ProcessListComponent },
-  { title: 'Nuevo proceso', path: 'procesos/nuevo', component: ProcessFormComponent, canDeactivate: [unsavedChangesGuard] },
-  { title: 'Ficha del proceso', path: 'procesos/:id', component: ProcessDetailComponent, canDeactivate: [unsavedChangesGuard] },
-  { title: 'Editar proceso', path: 'procesos/:id/editar', component: ProcessFormComponent, canDeactivate: [unsavedChangesGuard] },
-  { title: 'Unidades internas', path: 'unidades', component: UnitsComponent, canDeactivate: [unsavedChangesGuard] },
-  { title: 'Tipos de proceso', path: 'tipos-de-proceso', component: ProcessTypesComponent, canDeactivate: [unsavedChangesGuard] },
+  { title: 'Acceso Institucional', path: 'login', component: LoginComponent, canActivate: [guestGuard] },
+  { title: 'Mapa de procesos', path: 'mapa', component: ProcessMapComponent, canActivate: [authGuard] },
+  { title: 'Detalle de macroproceso', path: 'mapa/macroprocesos/:id', component: MacroprocessDetailComponent, canActivate: [authGuard] },
+  { title: 'Procesos', path: 'procesos', component: ProcessListComponent, canActivate: [authGuard] },
+  { title: 'Nuevo proceso', path: 'procesos/nuevo', component: ProcessFormComponent, canActivate: [authGuard], canDeactivate: [unsavedChangesGuard] },
+  { title: 'Ficha del proceso', path: 'procesos/:id', component: ProcessDetailComponent, canActivate: [authGuard], canDeactivate: [unsavedChangesGuard] },
+  { title: 'Editar proceso', path: 'procesos/:id/editar', component: ProcessFormComponent, canActivate: [authGuard], canDeactivate: [unsavedChangesGuard] },
+  { title: 'Unidades internas', path: 'unidades', component: UnitsComponent, canActivate: [adminGuard], canDeactivate: [unsavedChangesGuard] },
+  { title: 'Tipos de proceso', path: 'tipos-de-proceso', component: ProcessTypesComponent, canActivate: [adminGuard], canDeactivate: [unsavedChangesGuard] },
+  { title: 'Gestión de usuarios y perfiles', path: 'usuarios', component: UsersComponent, canActivate: [adminGuard], canDeactivate: [unsavedChangesGuard] },
+  { title: 'Bitácora de auditoría inmutable', path: 'auditoria', component: AuditComponent, canActivate: [adminGuard] },
   { title: 'Página no encontrada', path: '**', component: NotFoundComponent }
 ];

@@ -1,5 +1,6 @@
 @import "./app/shared/ui/styles/tokens.css";
 @import "./app/shared/ui/styles/base.css";
+@import "./app/shared/ui/styles/page.css";
 
 /* Estilos propios de esta aplicación. Lo reutilizable va en shared/ui. */
 .welcome { margin-bottom: 2rem; }
