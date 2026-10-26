@@ -16,10 +16,10 @@ Fundamentos visuales, kit compartido de interfaz, patrones de experiencia de usu
 
 ## 3. Trazabilidad y Calidad SDD (`docs/trazabilidad/`)
 Registro formal de hallazgos, correcciones técnicas, verificación con pruebas y auditoría de cambios:
-- [`correcciones.md`](trazabilidad/correcciones.md): Registro activo de correcciones verificables del ciclo v15 (C-040 en adelante).
-- [`historico/correcciones_legacy.md`](trazabilidad/historico/correcciones_legacy.md): Archivo histórico de evidencia de los ciclos previos v13/v14 (C-001 a C-039).
+- [`correcciones.md`](trazabilidad/correcciones.md): Registro activo de correcciones y verificaciones; reorganización v15 en C-047.
+- Los registros históricos de correcciones se conservan en Git.
 
 ## 4. Referencias Inmutables (`docs/referencias/`)
 Planillas y modelos de referencia originales:
 - `Requisitos_Sistema_Procesos_v15.xlsx`: Matriz de requisitos aprobada versión 15 (fuente de verdad oficial).
-- `Requisitos_Sistema_Procesos_v13.xlsx`: Matriz de requisitos versión 13 previa (antecedente histórico).
+- `Requisitos_Sistema_Procesos_v14.xlsx`: Matriz anterior conservada como fuente histórica; no define la versión vigente.

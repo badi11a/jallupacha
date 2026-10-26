@@ -3,12 +3,12 @@ import { provideRouter } from '@angular/router';
 import { of } from 'rxjs';
 import { describe, expect, it, vi, beforeEach } from 'vitest';
 import { AuthService, ProfileCode } from './auth.service';
-import { MvpV14Api, ProcessDetail } from './mvp-v14-api.service';
+import { ProcessApi, ProcessDetail } from './process-api.service';
 import { ProcessDetailComponent } from './process-detail.component';
 import { UiDialogService } from './shared/ui';
 
 describe('Process Lifecycle & Validation (REQ-07, REQ-09, REQ-56)', () => {
-  let mockApi: Partial<MvpV14Api>;
+  let mockApi: Partial<ProcessApi>;
   let mockAuth: any;
   let mockDialogs: Partial<UiDialogService>;
 
@@ -87,7 +87,7 @@ describe('Process Lifecycle & Validation (REQ-07, REQ-09, REQ-56)', () => {
       imports: [ProcessDetailComponent],
       providers: [
         provideRouter([]),
-        { provide: MvpV14Api, useValue: mockApi },
+        { provide: ProcessApi, useValue: mockApi },
         { provide: AuthService, useValue: mockAuth },
         { provide: UiDialogService, useValue: mockDialogs }
       ]

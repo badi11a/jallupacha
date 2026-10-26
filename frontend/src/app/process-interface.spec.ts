@@ -5,22 +5,29 @@ import { TestBed } from '@angular/core/testing';
 import { Router, provideRouter } from '@angular/router';
 import { AppComponent } from './app.component';
 import { routes } from './app.routes';
-import { FICHA_FIELDS } from './mvp-v14-api.service';
+import { FICHA_FIELDS } from './process-api.service';
+import { AuthService } from './auth.service';
 
-const MAP = { macroprocessTypes: [{ id: 1, name: 'Estratégicos', macroprocesses: [{
-  id: 2, code: 'MP1', name: 'Estrategia', description: 'Define los objetivos de la entidad y supervisa el avance de sus metas.', processTypes: [{ id: 3, name: 'Planificación', processes: [
-    { id: 4, code: 'PR4', name: 'Plan anual', status: 'Borrador' }
-  ] }]
-}] }] };
+const MAP = {
+  macroprocessTypes: [{
+    id: 1, name: 'Estratégicos', macroprocesses: [{
+      id: 2, code: 'MP1', name: 'Estrategia', description: 'Define los objetivos de la entidad y supervisa el avance de sus metas.', processTypes: [{
+        id: 3, name: 'Planificación', processes: [
+          { id: 4, code: 'PR4', name: 'Plan anual', status: 'Borrador' }
+        ]
+      }]
+    }]
+  }]
+};
 const ITEM = { id: 4, code: 'PR4', name: 'Plan anual', processType: 'Planificación', status: 'Borrador', responsibleUnit: 'Dirección' };
 
-describe('Interfaz MVP v14 — adaptación visual', () => {
+describe('Interfaz base de esquema — adaptación visual', () => {
   beforeEach(() => {
     sessionStorage.setItem('jallupacha_user', JSON.stringify({
       userId: 1,
       displayName: 'Usuario Administrador',
       email: 'admin@example.test',
-      profiles: ['ADMIN']
+      profiles: ['ADMIN', 'RISK_MANAGER']
     }));
     return TestBed.configureTestingModule({
       imports: [AppComponent],
@@ -30,6 +37,35 @@ describe('Interfaz MVP v14 — adaptación visual', () => {
 
   afterEach(() => {
     sessionStorage.clear();
+  });
+
+  it('muestra acciones de riesgos solo al perfil autorizado por el servidor', async () => {
+    const fixture = TestBed.createComponent(AppComponent);
+    const http = TestBed.inject(HttpTestingController);
+    fixture.detectChanges();
+    await TestBed.inject(Router).navigateByUrl('/procesos/4');
+    fixture.detectChanges();
+    http.expectOne('/api/management/processes/4').flush({
+      ...Object.fromEntries(FICHA_FIELDS.map(field => [field.key, 'Información del proceso'])),
+      id: 4, code: 'PR4', name: 'Plan anual', macroprocessId: 2, macroprocess: 'Estrategia', processType: 'Planificación',
+      status: 'Borrador', completeness: { complete: true, missing: [] }, possibleDuplicates: [],
+      parent: null, subprocesses: [], units: [],
+      risks: [{ id: 9, description: 'Riesgo de prueba', cause: 'Causa', consequence: 'Consecuencia', type: 'Operativo', level: 'Bajo' }],
+      relations: { outgoing: [], incoming: [] }
+    });
+    const auth = TestBed.inject(AuthService);
+    const root = fixture.nativeElement as HTMLElement;
+    for (const profile of ['ADMIN', 'PROCESS_OWNER', 'CONSULTATION', 'VALIDATOR', 'RISK_MANAGER'] as const) {
+      auth.currentUser.update(user => user ? { ...user, profiles: [profile] } : user);
+      fixture.detectChanges();
+      const risks = [...root.querySelectorAll('ui-section')].find(section => section.querySelector('h3')?.textContent === 'Riesgos')!;
+      const actions = [...risks.querySelectorAll('button')].map(button => button.textContent?.trim());
+      for (const label of ['Agregar riesgo', 'Editar', 'Eliminar']) {
+        expect(actions.includes(label), `${profile}: ${label}`).toBe(profile === 'RISK_MANAGER');
+      }
+    }
+    fixture.destroy();
+    http.verify();
   });
 
   it('renderiza la navegación local del módulo de forma estable, identifica la sección activa y no reproduce datos ficticios de B', async () => {
@@ -47,7 +83,7 @@ describe('Interfaz MVP v14 — adaptación visual', () => {
       await router.navigateByUrl(path);
       fixture.detectChanges();
       http.match(() => true).forEach(request => {
-        expect(request.request.url).toMatch(/^\/api\/mvp-v14\//);
+        expect(request.request.url).toMatch(/^\/api\/management\//);
         request.flush(request.request.url.endsWith('/map') ? { macroprocessTypes: [] } : []);
       });
       fixture.detectChanges();
@@ -72,14 +108,18 @@ describe('Interfaz MVP v14 — adaptación visual', () => {
     fixture.detectChanges();
     await TestBed.inject(Router).navigateByUrl('/mapa');
     fixture.detectChanges();
-    http.expectOne('/api/mvp-v14/map').flush({ macroprocessTypes: [{
-      id: 1, name: 'Estratégicos', macroprocesses: [{ id: 2, code: 'MP1', name: 'Estratégicos', processTypes: [{
-        id: 3, name: 'Planificación', processes: [
-          { id: 4, code: 'PR4', name: 'Plan anual', status: 'Borrador' },
-          { id: 5, code: 'PR5', name: 'Seguimiento', status: 'Borrador' }
-        ]
-      }] }]
-    }] });
+    http.expectOne('/api/management/map').flush({
+      macroprocessTypes: [{
+        id: 1, name: 'Estratégicos', macroprocesses: [{
+          id: 2, code: 'MP1', name: 'Estratégicos', processTypes: [{
+            id: 3, name: 'Planificación', processes: [
+              { id: 4, code: 'PR4', name: 'Plan anual', status: 'Borrador' },
+              { id: 5, code: 'PR5', name: 'Seguimiento', status: 'Borrador' }
+            ]
+          }]
+        }]
+      }]
+    });
     fixture.detectChanges();
     const root = fixture.nativeElement as HTMLElement;
     expect([...root.querySelectorAll('.macro-link')].map(a => a.getAttribute('href'))).toEqual(['/mapa/macroprocesos/2']);
@@ -111,7 +151,7 @@ describe('Interfaz MVP v14 — adaptación visual', () => {
     fixture.detectChanges();
     const root = fixture.nativeElement as HTMLElement;
     expect(root.textContent).toContain('Cargando información');
-    http.expectOne('/api/mvp-v14/map').flush({}, { status: 503, statusText: 'Unavailable' });
+    http.expectOne('/api/management/map').flush({}, { status: 503, statusText: 'Unavailable' });
     fixture.detectChanges();
     expect(root.querySelector('[role="alert"]')?.textContent).toContain('No fue posible cargar el mapa');
     expect(root.querySelectorAll('.macro-link')).toHaveLength(0);
@@ -124,11 +164,13 @@ describe('Interfaz MVP v14 — adaptación visual', () => {
     const http = TestBed.inject(HttpTestingController);
     fixture.detectChanges();
     await TestBed.inject(Router).navigateByUrl('/mapa'); fixture.detectChanges();
-    http.expectOne('/api/mvp-v14/map').flush({ macroprocessTypes: [
-      ...MAP.macroprocessTypes,
-      { id: 8, name: 'Misionales', macroprocesses: [{ id: 9, code: 'MP2', name: 'Servicios', processTypes: [] }] },
-      { id: 10, name: 'De apoyo', macroprocesses: [{ id: 11, code: 'MP3', name: 'Soporte', processTypes: [] }] }
-    ] });
+    http.expectOne('/api/management/map').flush({
+      macroprocessTypes: [
+        ...MAP.macroprocessTypes,
+        { id: 8, name: 'Misionales', macroprocesses: [{ id: 9, code: 'MP2', name: 'Servicios', processTypes: [] }] },
+        { id: 10, name: 'De apoyo', macroprocesses: [{ id: 11, code: 'MP3', name: 'Soporte', processTypes: [] }] }
+      ]
+    });
     fixture.detectChanges();
     const root = fixture.nativeElement as HTMLElement;
     const button = (name: string) => [...root.querySelectorAll('button')].find(b => b.textContent?.trim() === name)!;
@@ -153,15 +195,15 @@ describe('Interfaz MVP v14 — adaptación visual', () => {
     const router = TestBed.inject(Router);
     fixture.detectChanges();
     await router.navigateByUrl('/mapa'); fixture.detectChanges();
-    http.expectOne('/api/mvp-v14/map').flush(MAP); fixture.detectChanges();
+    http.expectOne('/api/management/map').flush(MAP); fixture.detectChanges();
     const root = fixture.nativeElement as HTMLElement;
     expect(root.querySelector('.macro-desc')?.textContent).toBe(MAP.macroprocessTypes[0].macroprocesses[0].description);
     expect(root.querySelector('.macro-title')?.nextElementSibling?.className).toBe('macro-desc');
     (root.querySelector('.macro-link') as HTMLAnchorElement).click();
     await fixture.whenStable(); fixture.detectChanges();
     expect(router.url).toBe('/mapa/macroprocesos/2');
-    http.expectOne('/api/mvp-v14/map').flush(MAP);
-    http.expectOne('/api/mvp-v14/units').flush([{ id: 7, name: 'Dirección', isActive: true }]);
+    http.expectOne('/api/management/map').flush(MAP);
+    http.expectOne('/api/management/units').flush([{ id: 7, name: 'Dirección', isActive: true }]);
     http.expectOne(r => r.url.endsWith('/processes') && r.params.get('macroprocessId') === '2').flush([ITEM]);
     fixture.detectChanges();
     expect(root.querySelector('#macro-title')?.textContent).toBe('Estrategia');
@@ -174,8 +216,8 @@ describe('Interfaz MVP v14 — adaptación visual', () => {
     expect(root.querySelector('ui-module-nav a[aria-current="location"]')?.textContent?.trim()).toBe('Mapa');
 
     await router.navigateByUrl('/mapa/macroprocesos/2?type=3&q=plan&unit=7'); fixture.detectChanges();
-    http.expectOne('/api/mvp-v14/map').flush({ macroprocessTypes: [{ ...MAP.macroprocessTypes[0], macroprocesses: [{ ...MAP.macroprocessTypes[0].macroprocesses[0], description: '   ' }] }] });
-    http.expectOne('/api/mvp-v14/units').flush([]);
+    http.expectOne('/api/management/map').flush({ macroprocessTypes: [{ ...MAP.macroprocessTypes[0], macroprocesses: [{ ...MAP.macroprocessTypes[0].macroprocesses[0], description: '   ' }] }] });
+    http.expectOne('/api/management/units').flush([]);
     http.expectOne(r => r.url.endsWith('/processes') && r.params.get('macroprocessId') === '2'
       && r.params.get('processTypeId') === '3' && r.params.get('q') === 'plan' && r.params.get('unitId') === '7').flush([]);
     fixture.detectChanges();
@@ -187,8 +229,8 @@ describe('Interfaz MVP v14 — adaptación visual', () => {
     expect(root.textContent).toContain('Ningún proceso coincide');
 
     await router.navigateByUrl('/mapa/macroprocesos/99'); fixture.detectChanges();
-    http.expectOne('/api/mvp-v14/map').flush(MAP);
-    http.expectOne('/api/mvp-v14/units').flush([]);
+    http.expectOne('/api/management/map').flush(MAP);
+    http.expectOne('/api/management/units').flush([]);
     http.expectOne(r => r.url.endsWith('/processes') && r.params.get('macroprocessId') === '99').flush([]);
     fixture.detectChanges();
     expect(root.textContent).toContain('Macroproceso no encontrado');
@@ -210,7 +252,7 @@ describe('Interfaz MVP v14 — adaptación visual', () => {
       risks: [{ id: 9, description: 'Riesgo de prueba', cause: 'Causa', consequence: 'Consecuencia', type: 'Operativo', level: 'Crítico' }],
       relations: { outgoing: [{ id: 10, processId: 5, code: 'PR5', name: 'Destino', type: 'FLUJO', description: 'Entrega' }], incoming: [] }
     };
-    http.expectOne('/api/mvp-v14/processes/4').flush(detail); fixture.detectChanges();
+    http.expectOne('/api/management/processes/4').flush(detail); fixture.detectChanges();
     const root = fixture.nativeElement as HTMLElement;
     for (const field of FICHA_FIELDS) expect(root.textContent, field.key).toContain(`Valor de ${field.key}`);
     expect(root.querySelector('.topbar, .app-nav, .sidebar, .app-footer')).toBeNull();
@@ -239,10 +281,10 @@ describe('Interfaz MVP v14 — adaptación visual', () => {
       input.value = value; input.dispatchEvent(new Event(name === 'level' ? 'change' : 'input'));
     }
     form.dispatchEvent(new Event('submit', { bubbles: true, cancelable: true }));
-    const request = http.expectOne({ method: 'POST', url: '/api/mvp-v14/processes/4/risks' });
+    const request = http.expectOne({ method: 'POST', url: '/api/management/processes/4/risks' });
     expect(request.request.body).toEqual({ description: 'Nuevo riesgo', cause: 'Causa nueva', consequence: 'Consecuencia nueva', type: 'Operativo', level: 'Alto' });
     request.flush({});
-    http.expectOne('/api/mvp-v14/processes/4').flush(detail); fixture.detectChanges();
+    http.expectOne('/api/management/processes/4').flush(detail); fixture.detectChanges();
     expect(root.textContent).toContain('Riesgo guardado');
 
     // Confirmación modal accesible para eliminar riesgo (R-07.1)
@@ -258,9 +300,9 @@ describe('Interfaz MVP v14 — adaptación visual', () => {
     confirmDelete.click();
     await fixture.whenStable();
     fixture.detectChanges();
-    const delReq = http.expectOne({ method: 'DELETE', url: '/api/mvp-v14/processes/4/risks/9' });
+    const delReq = http.expectOne({ method: 'DELETE', url: '/api/management/processes/4/risks/9' });
     delReq.flush({});
-    http.expectOne('/api/mvp-v14/processes/4').flush(detail);
+    http.expectOne('/api/management/processes/4').flush(detail);
     fixture.detectChanges();
     expect(root.textContent).toContain('Riesgo eliminado');
 
@@ -274,11 +316,11 @@ describe('Interfaz MVP v14 — adaptación visual', () => {
     fixture.detectChanges();
     await router.navigateByUrl('/procesos/nuevo');
     fixture.detectChanges();
-    http.expectOne('/api/mvp-v14/process-types').flush([
+    http.expectOne('/api/management/process-types').flush([
       { id: 10, name: 'Planificación', macroprocessId: 2, macroprocessCode: 'MP1', macroprocessName: 'Estrategia', processCount: 0, isActive: true }
     ]);
-    http.expectOne('/api/mvp-v14/units').flush([{ id: 8, name: 'Dirección', isActive: true }]);
-    http.expectOne('/api/mvp-v14/processes').flush([]);
+    http.expectOne('/api/management/units').flush([{ id: 8, name: 'Dirección', isActive: true }]);
+    http.expectOne('/api/management/processes').flush([]);
     fixture.detectChanges();
     await fixture.whenStable();
 
@@ -331,9 +373,9 @@ describe('Interfaz MVP v14 — adaptación visual', () => {
     fixture.detectChanges();
 
     expect(router.url).toBe('/procesos');
-    http.expectOne('/api/mvp-v14/process-types').flush([]);
-    http.expectOne('/api/mvp-v14/units').flush([]);
-    http.expectOne('/api/mvp-v14/processes').flush([]);
+    http.expectOne('/api/management/process-types').flush([]);
+    http.expectOne('/api/management/units').flush([]);
+    http.expectOne('/api/management/processes').flush([]);
 
     fixture.destroy(); http.verify();
   });
@@ -345,7 +387,7 @@ describe('Interfaz MVP v14 — adaptación visual', () => {
     fixture.detectChanges();
     await router.navigateByUrl('/unidades');
     fixture.detectChanges();
-    http.expectOne('/api/mvp-v14/units').flush([{ id: 1, name: 'Unidad A', parentUnitId: null, processCount: 0, isActive: true }]);
+    http.expectOne('/api/management/units').flush([{ id: 1, name: 'Unidad A', parentUnitId: null, processCount: 0, isActive: true }]);
     fixture.detectChanges();
     await fixture.whenStable();
 
@@ -366,9 +408,9 @@ describe('Interfaz MVP v14 — adaptación visual', () => {
     await fixture.whenStable();
     fixture.detectChanges();
 
-    const deactReq = http.expectOne({ method: 'PATCH', url: '/api/mvp-v14/units/1/deactivate' });
+    const deactReq = http.expectOne({ method: 'PATCH', url: '/api/management/units/1/deactivate' });
     deactReq.flush({});
-    http.expectOne('/api/mvp-v14/units').flush([{ id: 1, name: 'Unidad A', parentUnitId: null, processCount: 0, isActive: false }]);
+    http.expectOne('/api/management/units').flush([{ id: 1, name: 'Unidad A', parentUnitId: null, processCount: 0, isActive: false }]);
     fixture.detectChanges();
     expect(root.textContent).toContain('Unidad desactivada');
 
@@ -382,11 +424,11 @@ describe('Interfaz MVP v14 — adaptación visual', () => {
     fixture.detectChanges();
     await router.navigateByUrl('/procesos/nuevo');
     fixture.detectChanges();
-    http.expectOne('/api/mvp-v14/process-types').flush([
+    http.expectOne('/api/management/process-types').flush([
       { id: 10, name: 'Planificación', macroprocessId: 2, macroprocessCode: 'MP1', macroprocessName: 'Estrategia', processCount: 0, isActive: true }
     ]);
-    http.expectOne('/api/mvp-v14/units').flush([{ id: 8, name: 'Dirección', isActive: true }]);
-    http.expectOne('/api/mvp-v14/processes').flush([]);
+    http.expectOne('/api/management/units').flush([{ id: 8, name: 'Dirección', isActive: true }]);
+    http.expectOne('/api/management/processes').flush([]);
     fixture.detectChanges();
     await fixture.whenStable();
 
@@ -402,16 +444,16 @@ describe('Interfaz MVP v14 — adaptación visual', () => {
     // Debe navegar a /procesos directamente sin levantar modal de confirmación
     expect(root.querySelector('dialog')).toBeNull();
     expect(router.url).toBe('/procesos');
-    http.expectOne('/api/mvp-v14/process-types').flush([]);
-    http.expectOne('/api/mvp-v14/units').flush([]);
-    http.expectOne('/api/mvp-v14/processes').flush([]);
+    http.expectOne('/api/management/process-types').flush([]);
+    http.expectOne('/api/management/units').flush([]);
+    http.expectOne('/api/management/processes').flush([]);
 
     // 2. Comprobar navegación directa mediante router o migas de pan desde /procesos/nuevo sin cambios
     await router.navigateByUrl('/procesos/nuevo');
     fixture.detectChanges();
-    http.expectOne('/api/mvp-v14/process-types').flush([]);
-    http.expectOne('/api/mvp-v14/units').flush([]);
-    http.expectOne('/api/mvp-v14/processes').flush([]);
+    http.expectOne('/api/management/process-types').flush([]);
+    http.expectOne('/api/management/units').flush([]);
+    http.expectOne('/api/management/processes').flush([]);
     fixture.detectChanges();
     await fixture.whenStable();
 
@@ -422,7 +464,7 @@ describe('Interfaz MVP v14 — adaptación visual', () => {
 
     expect(root.querySelector('dialog')).toBeNull();
     expect(router.url).toBe('/mapa');
-    http.expectOne('/api/mvp-v14/map').flush(MAP);
+    http.expectOne('/api/management/map').flush(MAP);
 
     fixture.destroy();
     http.verify();
@@ -441,7 +483,7 @@ describe('Interfaz MVP v14 — adaptación visual', () => {
       parent: null, subprocesses: [],
       units: [], risks: [], relations: { outgoing: [], incoming: [] }
     };
-    http.expectOne('/api/mvp-v14/processes/4').flush(detail);
+    http.expectOne('/api/management/processes/4').flush(detail);
     fixture.detectChanges();
     await fixture.whenStable();
 
@@ -527,7 +569,7 @@ describe('Interfaz MVP v14 — adaptación visual', () => {
     await fixture.whenStable();
     fixture.detectChanges();
     expect(router.url).toBe('/mapa');
-    http.expectOne('/api/mvp-v14/map').flush(MAP);
+    http.expectOne('/api/management/map').flush(MAP);
 
     fixture.destroy();
     http.verify();

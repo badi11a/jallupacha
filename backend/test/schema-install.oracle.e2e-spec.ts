@@ -1,7 +1,7 @@
 import { DataSource, EntityManager } from 'typeorm';
 import { databaseOptions } from '../src/common/config';
 
-const oracleOptIn = process.env.MVP_V14_ORACLE_TEST === 'true';
+const oracleOptIn = process.env.SCHEMA_ORACLE_TEST === 'true';
 const oracleDescribe = oracleOptIn ? describe : describe.skip;
 let dataSourceForOracle: DataSource | undefined;
 
@@ -40,7 +40,7 @@ interface ClassifiedTypeRow {
   processTypeId: number | string;
 }
 
-oracleDescribe('MVP v14 Oracle installation', () => {
+oracleDescribe('initial schema Oracle installation', () => {
   let schema: string;
 
   beforeAll(async () => {
@@ -53,21 +53,21 @@ oracleDescribe('MVP v14 Oracle installation', () => {
       'ORACLE_SCHEMA',
       'MIGRATION_USER',
       'MIGRATION_PASSWORD',
-      'MVP_V14_ORACLE_SCHEMA'
+      'SCHEMA_ORACLE_SCHEMA'
     ];
     const missing = requiredVariables.filter((name) => !process.env[name]?.trim());
     if (missing.length) {
       throw new Error(
-        `MVP_V14_ORACLE_TEST=true requires explicit Oracle configuration: ${missing.join(', ')}`
+        `SCHEMA_ORACLE_TEST=true requires explicit Oracle configuration: ${missing.join(', ')}`
       );
     }
 
     schema = process.env.ORACLE_SCHEMA!.trim().toUpperCase();
-    if (process.env.MVP_V14_ORACLE_SCHEMA!.trim().toUpperCase() !== schema) {
-      throw new Error('MVP_V14_ORACLE_SCHEMA must explicitly match ORACLE_SCHEMA.');
+    if (process.env.SCHEMA_ORACLE_SCHEMA!.trim().toUpperCase() !== schema) {
+      throw new Error('SCHEMA_ORACLE_SCHEMA must explicitly match ORACLE_SCHEMA.');
     }
     if (process.env.MIGRATION_USER!.trim().toUpperCase() !== schema) {
-      throw new Error('MVP v14 Oracle install tests must connect as the ORACLE_SCHEMA owner.');
+      throw new Error('initial schema Oracle install tests must connect as the ORACLE_SCHEMA owner.');
     }
 
     dataSourceForOracle = new DataSource(databaseOptions(true));

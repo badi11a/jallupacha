@@ -4,7 +4,7 @@ import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { Subject, catchError, of, startWith, switchMap } from 'rxjs';
 import { AuthService } from './auth.service';
-import { MvpV14Api, ProcessListItem, ProcessTypeItem, UnitItem, errorMessage } from './mvp-v14-api.service';
+import { ProcessApi, ProcessListItem, ProcessTypeItem, UnitItem, errorMessage } from './process-api.service';
 import { UiBadgeComponent, UiBreadcrumbsComponent, UiMessageComponent, UiPanelComponent } from './shared/ui';
 
 @Component({
@@ -75,7 +75,7 @@ import { UiBadgeComponent, UiBreadcrumbsComponent, UiMessageComponent, UiPanelCo
   `
 })
 export class ProcessListComponent implements OnInit {
-  private readonly api = inject(MvpV14Api);
+  private readonly api = inject(ProcessApi);
   private readonly route = inject(ActivatedRoute);
   private readonly router = inject(Router);
   private readonly destroyRef = inject(DestroyRef);

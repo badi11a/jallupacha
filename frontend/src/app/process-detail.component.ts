@@ -4,9 +4,9 @@ import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, RouterLink } from '@angular/router';
 import { AuthService } from './auth.service';
 import {
-  FICHA_FIELDS, MvpV14Api, ProcessDetail, ProcessListItem, ProcessUnit,
+  FICHA_FIELDS, ProcessApi, ProcessDetail, ProcessListItem, ProcessUnit,
   RELATION_TYPES, RISK_LEVELS, RiskInput, errorMessage
-} from './mvp-v14-api.service';
+} from './process-api.service';
 import {
   UiBadgeComponent, UiBreadcrumbsComponent, UiDialogService,
   UiMessageComponent, UiSectionComponent, type UiBadgeTone
@@ -510,7 +510,7 @@ const emptyRelation = (): { destinationProcessId: number | null; type: string; d
               <header><ui-badge [tone]="riskTone(risk.level)">{{ risk.level }}</ui-badge><strong>{{ risk.type }}</strong></header>
               <p>{{ risk.description }}</p>
               <p class="helper"><strong>Causa:</strong> {{ risk.cause }} · <strong>Consecuencia:</strong> {{ risk.consequence }}</p>
-              @if (auth.hasAnyProfile('ADMIN', 'PROCESS_OWNER', 'RISK_MANAGER')) {
+              @if (auth.hasAnyProfile('RISK_MANAGER')) {
                 <div class="item-actions">
                   <button class="quiet-button" type="button" (click)="editRisk(risk)">Editar</button>
                   <button class="danger-button" type="button" (click)="removeRisk(d.id, risk.id)">Eliminar</button>
@@ -525,7 +525,7 @@ const emptyRelation = (): { destinationProcessId: number | null; type: string; d
             <div class="row-actions"><button class="primary-button" type="submit" [disabled]="saving()">Agregar riesgo</button>
               <button class="quiet-button" type="button" [disabled]="saving()" (click)="cancelRisk()">Cancelar</button></div>
           </form>
-        } @else if (editingRisk() === null && auth.hasAnyProfile('ADMIN', 'PROCESS_OWNER', 'RISK_MANAGER')) {
+        } @else if (editingRisk() === null && auth.hasAnyProfile('RISK_MANAGER')) {
           <button class="quiet-button" type="button" (click)="newRisk()">Agregar riesgo</button>
         }
       </ui-section>
@@ -610,7 +610,7 @@ const emptyRelation = (): { destinationProcessId: number | null; type: string; d
   `
 })
 export class ProcessDetailComponent implements OnInit, LeavesWithConfirmation {
-  private readonly api = inject(MvpV14Api);
+  private readonly api = inject(ProcessApi);
   private readonly route = inject(ActivatedRoute);
   private readonly dialogs = inject(UiDialogService);
   readonly auth = inject(AuthService);

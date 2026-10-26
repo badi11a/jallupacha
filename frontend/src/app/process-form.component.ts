@@ -2,8 +2,8 @@ import { Component, ElementRef, OnInit, inject, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import {
-  FICHA_FIELDS, FichaKey, MvpV14Api, ProcessInput, ProcessListItem, ProcessTypeItem, UnitItem, errorMessage
-} from './mvp-v14-api.service';
+  FICHA_FIELDS, FichaKey, ProcessApi, ProcessInput, ProcessListItem, ProcessTypeItem, UnitItem, errorMessage
+} from './process-api.service';
 import { UiBreadcrumbsComponent, UiDialogService, UiMessageComponent, UiPanelComponent, UiSectionComponent, focusFirstInvalid } from './shared/ui';
 import { ProcessNavigation } from './process-navigation.service';
 import { LeavesWithConfirmation } from './unsaved-changes.guard';
@@ -133,7 +133,7 @@ interface ParticipantRow { unitId: number | null; function: string; }
   `
 })
 export class ProcessFormComponent implements OnInit, LeavesWithConfirmation {
-  private readonly api = inject(MvpV14Api);
+  private readonly api = inject(ProcessApi);
   private readonly route = inject(ActivatedRoute);
   private readonly router = inject(Router);
   private readonly dialogs = inject(UiDialogService);

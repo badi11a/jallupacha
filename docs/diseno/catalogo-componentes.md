@@ -56,7 +56,7 @@ El formulario modal conserva errores de otros campos al corregir uno, asocia ayu
 
 **Longitud de texto (C-046):** contador y validación comparten `countCharacters(value, lengthMode = 'utf16')`; `UiCharCounterComponent.lengthMode` y `UiDialogField.lengthMode` usan ese mismo valor predeterminado. Ambos recortan extremos para medir el valor enviado. `utf16` cuenta unidades UTF-16; `validator` conserva el cálculo de la versión instalada de validator/class-validator (pares sustitutos y secuencias de presentación descontados), sin contar grafemas ni normalizar tildes. `nativeMaxLength(field)` aplica `maxlength` solo al modo UTF-16; para `validator` se valida al enviar y se conservan errores y foco. El atributo nativo mide el texto bruto, incluidos espacios exteriores: es una restricción de entrada conservadora, no una medida del valor recortado. No cambiar límites ni criterios del servidor desde el kit.
 
-**Migración del contador:** su valor predeterminado anterior usaba el cálculo `validator`; los consumidores que necesiten conservarlo deben indicar `lengthMode="validator"` o pasar ese segundo argumento a la función. La aplicación vigente no consume el contador ni formularios de `UiDialogService.form`; los formularios de procesos/riesgos/catálogos del flujo vigente usan UTF-16 en `mvp-v14.validation.ts`. Los DTO de `process`/`structure` que usan `MaxLength` requieren el modo `validator` si se consumen en otro formulario. No se modifican esos contratos ni la persistencia.
+**Migración del contador:** su valor predeterminado anterior usaba el cálculo `validator`; los consumidores que necesiten conservarlo deben indicar `lengthMode="validator"` o pasar ese segundo argumento a la función. La aplicación vigente no consume el contador ni formularios de `UiDialogService.form`; los formularios de procesos/riesgos/catálogos del flujo vigente usan UTF-16 en `common/input-validation.ts`. Los DTO de `process`/`structure` que usan `MaxLength` requieren el modo `validator` si se consumen en otro formulario. No se modifican esos contratos ni la persistencia.
 
 ## 4. Títulos, foco y retorno
 
@@ -96,7 +96,7 @@ Estado común: **piloto en evaluación**, conforme a STD-UX-001 `5.3. Ninguno qu
 | Navegación y migas | Regresiones de títulos/historial y consultas de las migas. | Distribución horizontal del piloto no se universaliza. Retorno explícito requiere comprobación del consumidor. |
 | Tablas y paginación | Regresiones de extremos/eventos y estructura CSS documentada. | Lectura asistiva, tablas complejas y totales del consumidor pendientes. |
 
-Los resultados ejecutados y su alcance exacto están en [C-039](../trazabilidad/historico/correcciones_legacy.md#c-039--contratos-y-patrones-del-design-system). Los antecedentes conservan sus límites; no se trasladan como aprobación de nuevos estados.
+Los resultados ejecutados y su alcance exacto de C-039 se recuperan desde el historial de Git. Los antecedentes conservan sus límites; no se trasladan como aprobación de nuevos estados.
 
 ## 7. Extensión y adopción
 

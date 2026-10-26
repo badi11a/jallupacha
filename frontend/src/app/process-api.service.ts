@@ -101,9 +101,9 @@ export function errorMessage(error: unknown): string {
 }
 
 @Injectable({ providedIn: 'root' })
-export class MvpV14Api {
+export class ProcessApi {
   private readonly http = inject(HttpClient);
-  private readonly base = '/api/mvp-v14';
+  private readonly base = '/api/management';
 
   map(): Observable<ProcessMap> { return this.http.get<ProcessMap>(`${this.base}/map`); }
   listProcesses(filters: Record<string, string>): Observable<ProcessListItem[]> {

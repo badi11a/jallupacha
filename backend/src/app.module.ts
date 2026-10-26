@@ -1,69 +1,25 @@
 import { Module } from '@nestjs/common';
 import { APP_GUARD } from '@nestjs/core';
 import { ThrottlerGuard, ThrottlerModule } from '@nestjs/throttler';
-import { DataSource } from 'typeorm';
-import { AuditController } from './audit/audit.controller';
-import { AuditService } from './audit/audit.service';
-import { AuthController } from './auth/auth.controller';
+import { configuredRateLimit } from './common/config';
+import { DatabaseModule } from './database/database.module';
+import { AuthModule } from './auth/auth.module';
 import { AuthGuard } from './auth/auth.guard';
-import { SessionService } from './auth/session.service';
-import { databaseOptions, configuredRateLimit } from './common/config';
-import { UsersController } from './identity/users.controller';
-import { CatalogController } from './structure/catalog.controller';
-import { CatalogService } from './structure/catalog.service';
-import { ProcessController } from './process/process.controller';
-import { ProcessMapController } from './process/process-map.controller';
-import { ProcessMapService } from './process/process-map.service';
-import { ProcessService } from './process/process.service';
-import { RiskCatalogController } from './risk/risk-catalog.controller';
-import { RiskController } from './risk/risk.controller';
-import { RiskService } from './risk/risk.service';
-import { MvpV14Controller } from './mvp-v14/mvp-v14.controller';
-import { MvpV14Service } from './mvp-v14/mvp-v14.service';
-
-const options = databaseOptions();
-const rateLimit = configuredRateLimit();
-const dataSource = new DataSource(options);
+import { AuditModule } from './audit/audit.module';
+import { IdentityModule } from './identity/identity.module';
+import { StructureModule } from './structure/structure.module';
+import { ProcessModule } from './process/process.module';
+import { RiskModule } from './risk/risk.module';
 
 @Module({
-  imports: [
-    ThrottlerModule.forRoot([{
-      name: 'default',
-      ttl: rateLimit.ttl,
-      limit: rateLimit.limit
-    }])
-  ],
-  controllers: [
-    AuthController,
-    UsersController,
-    CatalogController,
-    AuditController,
-    ProcessController,
-    ProcessMapController,
-    RiskController,
-    RiskCatalogController,
-    MvpV14Controller
-  ],
-  providers: [
-    { provide: DataSource, useValue: dataSource },
-    {
-      provide: 'DATABASE_SHUTDOWN',
-      useFactory: () => ({
-        onModuleDestroy: async () => {
-          if (dataSource.isInitialized) await dataSource.destroy();
-        }
-      })
-    },
-    AuditService,
-    SessionService,
-    CatalogService,
-    ProcessService,
-    ProcessMapService,
-    RiskService,
-    AuthGuard,
-    MvpV14Service,
-    { provide: APP_GUARD, useClass: ThrottlerGuard },
-    { provide: APP_GUARD, useExisting: AuthGuard }
-  ]
+ imports: [
+  DatabaseModule,
+  ThrottlerModule.forRoot([{ name: 'default', ...configuredRateLimit() }]),
+  AuditModule, AuthModule, IdentityModule, StructureModule, ProcessModule, RiskModule
+ ],
+ providers: [
+  { provide: APP_GUARD, useClass: ThrottlerGuard },
+  { provide: APP_GUARD, useExisting: AuthGuard }
+ ]
 })
 export class AppModule {}

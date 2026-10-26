@@ -1,15 +1,15 @@
 import { EntityManager } from 'typeorm';
-import { loadMvpV14Content, MVP_V14_MACROPROCESS_TYPES } from './mvp-v14-content';
-import { requiredOracleIdentifier } from './mvp-v14-schema';
+import { loadInitialContent, INITIAL_MACROPROCESS_TYPES } from './initial-content';
+import { requiredOracleIdentifier } from './schema';
 
 interface IdRow {
   id: number | string;
 }
 
-export async function seedMvpV14(manager: EntityManager): Promise<void> {
+export async function seedProcesses(manager: EntityManager): Promise<void> {
   const schema = requiredOracleIdentifier('ORACLE_SCHEMA');
   const table = (name: string) => `"${schema}"."${name}"`;
-  const macroprocesses = loadMvpV14Content();
+  const macroprocesses = loadInitialContent();
   const typeIds = new Map<string, number>();
   const macroprocessIds = new Map<string, number>();
   const processTypeIds = new Map<string, number>();
@@ -34,7 +34,7 @@ export async function seedMvpV14(manager: EntityManager): Promise<void> {
     }
   }
 
-  for (const macroprocessType of MVP_V14_MACROPROCESS_TYPES) {
+  for (const macroprocessType of INITIAL_MACROPROCESS_TYPES) {
     await manager.query(
       `INSERT INTO ${table('MACROPROCESS_TYPE')} (CODE, NAME, SORT_ORDER, IS_ACTIVE) VALUES (:1, :2, :3, 1)`,
       [macroprocessType.code, macroprocessType.name, macroprocessType.sortOrder]
@@ -43,7 +43,7 @@ export async function seedMvpV14(manager: EntityManager): Promise<void> {
   }
 
   const sortOrderByType = new Map<string, number>();
-  for (let index = 0; index < macroprocesses.length; index += 1) {
+  for (let index = 0;index < macroprocesses.length;index += 1) {
     const macroprocess = macroprocesses[index];
     const macroprocessTypeId = typeIds.get(macroprocess.typeCode);
     if (!macroprocessTypeId) throw new Error(`Missing seeded macroprocess type: ${macroprocess.typeCode}`);
@@ -70,7 +70,7 @@ export async function seedMvpV14(manager: EntityManager): Promise<void> {
   const unitIds = new Map<string, number>();
   const unitNames = unique(macroprocesses.flatMap((macroprocess) => macroprocess.processes)
     .flatMap((process) => [process.responsibleUnit, ...process.participantUnits]));
-  for (let index = 0; index < unitNames.length; index += 1) {
+  for (let index = 0;index < unitNames.length;index += 1) {
     const unitCode = `UNIDAD_${String(index + 1).padStart(2, '0')}`;
     await manager.query(
       `INSERT INTO ${table('ORGANIZATIONAL_UNIT')} (CODE, NAME, IS_ACTIVE) VALUES (:1, :2, 1)`,

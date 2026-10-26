@@ -11,7 +11,7 @@ import { UserProfileEntity } from '../identity/user-profile.entity';
 import { UserEntity } from '../identity/user.entity';
 import { RiskLevelEntity } from '../risk/risk-level.entity';
 import { RiskTypeEntity } from '../risk/risk-type.entity';
-import { seedMvpV14 } from './mvp-v14-seed';
+import { seedProcesses } from './seed-processes';
 
 const PROFILES = [
   { code: 'ADMIN', name: 'Administrador' },
@@ -119,7 +119,7 @@ export async function seed(): Promise<void> {
         `SELECT COUNT(*) AS "total" FROM ${qualifiedTable('PROCESS')}`
       );
       if (Number(processCount[0].total) === 0) {
-        await seedMvpV14(manager);
+        await seedProcesses(manager);
       } else {
         console.info('Generic process content was not loaded because processes already exist.');
       }

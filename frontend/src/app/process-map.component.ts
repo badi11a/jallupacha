@@ -3,18 +3,18 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { AuthService } from './auth.service';
 import { UiMessageComponent } from './shared/ui';
-import { MvpV14Api, MapFamily, MapMacroprocess } from './mvp-v14-api.service';
+import { ProcessApi, MapFamily, MapMacroprocess } from './process-api.service';
 
 const normalize = (value: string) => value.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase().trim();
 
 @Component({
   selector: 'app-process-map',
   imports: [RouterLink, UiMessageComponent],
-  templateUrl: './mvp-v14-demo.component.html',
-  styleUrl: './mvp-v14-demo.component.css'
+  templateUrl: './process-map.component.html',
+  styleUrl: './process-map.component.css'
 })
-export class MvpV14DemoComponent implements OnInit {
-  private readonly api = inject(MvpV14Api);
+export class ProcessMapComponent implements OnInit {
+  private readonly api = inject(ProcessApi);
   private readonly router = inject(Router);
   private readonly route = inject(ActivatedRoute);
   private readonly destroyRef = inject(DestroyRef);

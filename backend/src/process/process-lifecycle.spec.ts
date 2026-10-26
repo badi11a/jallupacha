@@ -2,10 +2,12 @@ import { BadRequestException, ConflictException, ForbiddenException, NotFoundExc
 import { DataSource } from 'typeorm';
 import { AuditService } from '../audit/audit.service';
 import { AuthenticatedUser } from '../common/auth.types';
-import { MvpV14Service } from './mvp-v14.service';
+import { ProcessRecordsService } from './process-records.service';
+import { ProcessLifecycleService } from './process-lifecycle.service';
 
-describe('MvpV14Service - Process Lifecycle (REQ-07, REQ-09, REQ-56)', () => {
-  let service: MvpV14Service;
+describe('ProcessLifecycleService - Process Lifecycle (REQ-07, REQ-09, REQ-56)', () => {
+  let service: ProcessLifecycleService;
+  let records: ProcessRecordsService;
   let dataSource: Partial<DataSource>;
   let audit: Partial<AuditService>;
   let mockManager: any;
@@ -21,7 +23,8 @@ describe('MvpV14Service - Process Lifecycle (REQ-07, REQ-09, REQ-56)', () => {
     audit = {
       record: jest.fn()
     };
-    service = new MvpV14Service(dataSource as DataSource, audit as AuditService);
+    records = new ProcessRecordsService(dataSource as DataSource);
+    service = new ProcessLifecycleService(dataSource as DataSource, audit as AuditService, records);
   });
 
   describe('submitProcess (REQ-05)', () => {
@@ -41,7 +44,7 @@ describe('MvpV14Service - Process Lifecycle (REQ-07, REQ-09, REQ-56)', () => {
         .mockResolvedValueOnce([]); // update version status
 
       // Mock processDetail for completeness
-      jest.spyOn(service, 'processDetail').mockResolvedValueOnce({
+      jest.spyOn(records, 'processDetail').mockResolvedValueOnce({
         completeness: { complete: true, missing: [] }
       } as any);
 

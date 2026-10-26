@@ -3,7 +3,7 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, NavigationEnd, Router, RouterLink } from '@angular/router';
 import { Subject, catchError, distinctUntilChanged, filter, forkJoin, map, of, startWith, switchMap } from 'rxjs';
-import { MvpV14Api, MapMacroprocess, ProcessListItem, UnitItem, errorMessage } from './mvp-v14-api.service';
+import { ProcessApi, MapMacroprocess, ProcessListItem, UnitItem, errorMessage } from './process-api.service';
 import { UiBadgeComponent, UiBadgeTone, UiBreadcrumbsComponent, UiMessageComponent } from './shared/ui';
 
 @Component({
@@ -201,7 +201,7 @@ import { UiBadgeComponent, UiBadgeTone, UiBreadcrumbsComponent, UiMessageCompone
   `
 })
 export class MacroprocessDetailComponent implements OnInit {
-  private readonly api = inject(MvpV14Api);
+  private readonly api = inject(ProcessApi);
   private readonly route = inject(ActivatedRoute);
   private readonly router = inject(Router);
   private readonly destroyRef = inject(DestroyRef);

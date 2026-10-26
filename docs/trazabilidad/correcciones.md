@@ -1,56 +1,6 @@
-# Registro de correcciones y cambios verificables (v15)
+# Registro de correcciones y cambios verificables v15
 
-> **Archivo histórico:** Las anotaciones C-001 a C-039 (correspondientes a los ciclos previos v13/v14 consolidados en la purga autorizada C-040) se encuentran archivadas en [docs/historico/correcciones_legacy.md](historico/correcciones_legacy.md).
-
-## C-040 — Purga autorizada de archivos generados, históricos y referencias temporales
-
-**Autorización:** el responsable solicita purgar archivos y confirma expresamente incluir «históricos y referencias». Se conservan planillas fuente, migraciones, código y pruebas, dependencias instaladas, configuración/credenciales locales y registro de correcciones. Los documentos históricos versionados permanecen recuperables desde Git; esta tarea no reescribe ese historial.
-
-**Clasificación y comportamiento esperado:** mantenimiento documental y de archivos generados, sin cambio funcional. Retirar ocho documentos superados de v13/v14 y la referencia HTML temporal, corregir enlaces activos y trasladar las instrucciones operativas todavía aplicables a arquitectura v15 §6 antes de retirar su fuente. Conservar reglas del design-system y ejemplos en el patrón de formularios. Los nombres de documentos/capturas citados en correcciones previas son referencias históricas, no archivos vigentes ni enlaces de operación.
-
-**Revisión previa (misma IA autora):** la purga no cambia requisitos, principios PT, reglas R/PUX, permisos, autenticación, datos persistidos ni firmas del kit. No se ejecutan instaladores o comandos de base de datos. Los directorios generados se eliminan solo tras comprobar sus rutas absolutas dentro del proyecto o del directorio temporal propio de esta conversación, sin seguir puntos de reanálisis. No se detienen servicios del usuario.
-
-**Purga ejecutada:**
-
-- Ocho documentos históricos: `adaptacion_visual_mvp_v14.md`, `arquitectura.md`, `arquitectura_mvp_v14.md`, `especificacion.md`, `incremento02_REQ05_REQ06_v1_1228.md`, `incremento03_ciclo_procesos.md`, `mvp_v14.md` y `release01_navegable.md`, todos bajo `docs/`.
-- Referencia temporal `docs/design-system/controles.html`, su carpeta vacía y dos `.gitkeep` vacíos en carpetas que ya contienen código.
-- Compilaciones `frontend/dist` y `backend/dist`, caché `frontend/.angular` y dos logs QA. Los archivos generados se recrean con las herramientas normales del proyecto cuando se necesiten; no se han eliminado dependencias instaladas.
-- Caché de compilación Node, dos auxiliares de servidor y tres capturas de esta conversación, dentro de su directorio temporal propio. Las capturas retiradas son `design-system-controles.png`, `formulario-protegido.png` y `proteccion-ediciones.png`; no se tocan artefactos de otras conversaciones. Las rutas mencionadas en C-032 y C-039 quedan como identificación histórica de evidencia retirada, no como archivos disponibles.
-- Total contabilizado: 3.014 archivos y 27.905.365 bytes (aproximadamente 28 MB), contando documentos, placeholders, temporales y archivos generados. Sin fallos de eliminación.
-
-**Consolidación y verificación:**
-
-- Instrucciones operativas vigentes consolidadas antes de retirar su fuente en `docs/arquitectura_v15.md` §6: permisos Oracle, separación de cuentas, instalación/reinicio autorizado, entorno de pruebas, TLS, respaldos y configuración segura. No se ejecutó ninguna de esas operaciones.
-- Actualizados AGENTS.md, README y documentos vigentes para no remitir a fuentes retiradas. Se conserva el patrón de formularios con sus ejemplos, contratos, fundamentos y principios del design-system.
-- Comparación SHA256 de 197 archivos iniciales: 11 retirados, nueve documentos modificados por la consolidación y 177 archivos conservados, incluido todo el código fuente, pruebas, tokens, migraciones y ambas planillas. Sin archivos nuevos ni cambio funcional.
-- Verificación final: 50 enlaces locales en nueve documentos Markdown, sin destinos inexistentes; `git diff --check` sin errores. Bloque PT-01 a PT-14 conservado y ningún destino previsto de purga permanece. Las referencias textuales históricas no se convierten en instrucciones vigentes.
-- No se ejecutaron pruebas funcionales, Oracle, contraste ni recompilación: el código permanece idéntico y recompilar recrearía los archivos generados retirados. No se reutilizan los resultados de C-039 como pruebas de esta purga.
-
-**Estado:** purga y consolidación completas; revisión de la misma IA autora, sin integración ni despliegue. No se hace commit ni se reescribe el historial de Git. Esta limpieza no cambia los pendientes de evaluación o adopción del design-system.
-
-## C-041 — Retiro de códigos visibles en las tarjetas del mapa
-
-**Clasificación y autorización:** defecto de especificación/diseño de C-036, cuya decisión de mostrar códigos retira expresamente el responsable. Fuentes: instrucción del responsable, arquitectura v15 §5.2, REQ-19 y STD-UX-001 R-12. La búsqueda por código o nombre no implica que las tarjetas deban mostrar el identificador.
-
-**Comportamiento esperado y revisión previa (misma IA autora):** las tarjetas muestran nombre, cantidad de procesos y descripción disponible, sin código visible. Se corrige primero arquitectura v15 y se revoca el criterio de C-036. Se conservan datos, búsqueda por código/nombre, destinos y filtros de retorno. No se cambia la planilla, el alcance de requisitos ni el estándar genérico del kit.
-
-**Verificaciones previstas:** actualizar la regresión del mapa para comprobar ausencia del código en la tarjeta, presencia del nombre/contador, búsqueda por código/nombre y enlace al macroproceso. Ejecutar la suite afectada y revisión del cambio. Registrar por separado contraste y revisión visual, sin atribuir resultados no ejecutados.
-
-**Corrección implementada:** retirados el elemento visible del código y su estilo sin uso en `mvp-v14-demo.component.html/.css`. La regresión existente en `mvp-v14-interface.spec.ts` exige que la tarjeta no contenga `MP1`, mantiene nombre y contador y continúa buscando por código y nombre. C-036 queda expresamente revocada en este punto, conservando la trazabilidad histórica.
-
-**Tarea y reglas aplicables:** cualquier perfil autenticado que explora `/mapa` y abre un macroproceso. PUX-02/03/05; R-09.1 y R-09.3 (nombre y destino reconocibles), R-12.1/3/5 (datos y contador conservados, identificación comprensible). Se mantienen los accesos equivalentes ya inventariados en arquitectura §5.1; este cambio no añade, elimina ni redirige enlaces (R-10), ni modifica el retorno (R-11).
-
-**Evidencia y revisión del 2026-10-22, entorno local Windows:**
-
-| Comprobación | Estado y evidencia |
-| --- | --- |
-| Texto y recorrido funcional automatizado | **Aprobado en la comprobación:** `npm test --workspace frontend -- --include src/app/mvp-v14-interface.spec.ts`, 10 pruebas aprobadas. Incluye tarjeta sin código, nombre/contador, búsqueda por código/nombre, destino del enlace y filtros del recorrido. Render Angular en jsdom; no acredita revisión humana. |
-| Contraste | **Aprobado en la comprobación:** `npm run check:contrast --workspace frontend`, 44 combinaciones conformes. Se conserva la paleta y los estilos restantes; la comprobación no acredita toda combinación posible del frontend. |
-| Revisión visual en navegador | **No probado:** no se ejecutó inspección visual, reajuste ni ampliación en navegador para este retiro. |
-| Revisión de implementación y documentos | **Aprobado en la comprobación:** revisión de la misma IA autora; eliminado el elemento y selector sin uso, sin alterar lógica de búsqueda, datos, permisos, rutas, tokens o contratos. `git diff --check` sin errores de espacios; se preservan cambios previos. No es revisión independiente. |
-| Oracle y regresión backend | **No aplica:** no se modifica persistencia, SQL, API ni comportamiento del servidor. |
-
-**Estado:** retiro aplicado y regresión aprobada; revisión visual pendiente, sin declaración de conformidad UX integral. Sin commit, integración ni despliegue.
+Los registros retirados y sus evidencias históricas se recuperan desde Git. La limpieza autorizada no reescribe el historial ni convierte resultados anteriores en verificaciones de este cambio.
 
 ## C-042 — Descripciones propias de macroprocesos desde la semilla hasta el mapa
 
@@ -61,78 +11,6 @@
 **Comportamiento esperado y revisión previa (misma IA autora):** los 11 macroprocesos iniciales reciben descripciones específicas, neutrales y fieles a sus procesos. Cargador y semilla conservan y persisten ese campo; la API lo devuelve y ambas vistas lo muestran bajo el nombre antes de los contadores. Ausencia o blanco no genera texto ficticio. Primero se actualizan criterios de REQ-02 y especificación/arquitectura v15 y se precisa R-12.1, sin cambiar jerarquía, permisos, procesos ni datos de negocio relacionados. No se modifica ninguna migración aplicada ni se reinstala la base de datos.
 
 **Verificaciones previstas:** contenido de los 11 registros, persistencia y lectura en Oracle, respuesta del mapa, descripción y ausencia de texto genérico en ambas vistas, ausencia/blancos, regresión del recorrido y contraste. Registrar por separado revisión visual y límites de la evidencia. Accesos y retorno conservan arquitectura §5.1 (R-09 a R-11).
-
-## C-043 — Estandarización de asistencia y ayuda contextual (R-13)
-
-**Clasificación y autorización:** defecto de especificación/diseño e implementación. La dispersión y ubicación inconsistente de los botones de ayuda en distintas vistas (dentro de toolbars de búsqueda, intercalados erráticamente entre botones transaccionales o de cambio de ciclo de vida del proceso, o el despliegue de modales bloqueantes `confirm()` para definiciones de una sola línea) degradaban la ergonomía, accesibilidad y predictibilidad de la interfaz. Autorizado expresamente por el responsable para estandarizar principios, directrices, especificación y arquitectura antes de modificar el código.
-
-**Fuentes:** STD-UX-001 (regla R-13 incorporada), AGENTS.md, `docs/marco_estandar_ux_institucional.md`, `docs/catalogo-componentes.md`, `docs/design-system.md`, `docs/arquitectura_v15.md`, PT-01, PT-02, PT-03, WCAG 2.2 AA.
-
-**Documentos corregidos previamente (document-first):**
-
-1. `AGENTS.md`: Incorporación de la regla obligatoria de Asistencia y Ayuda Contextual Estandarizada (R-13).
-2. `docs/marco_estandar_ux_institucional.md`: Especificación formal de R-13 estructurada en tres niveles estrictos:
-   - *Nivel 1 (Global de módulo/sistema):* en barra superior `ui-module-nav`, alineada al extremo derecho contigua a controles de sesión.
-   - *Nivel 2 (Vista o pantalla):* en cabecera del panel o franja contextual superior (`panelActions` o bloque de orientación). Se implementa con botón secundario discreto (`.help-button`) y diálogo modal accesible (`UiDialogService.confirm`). Queda estrictamente prohibido incrustar botones de ayuda dentro de barras de búsqueda/filtros o intercalarlos entre botones transaccionales o de cambio de ciclo de vida (guardar, solicitar revisión, aprobar, retirar).
-   - *Nivel 3 (Micro-ayuda de campo o indicador):* contigua a la etiqueta (`<label>`) o título mediante micro-botón circular (`.info-icon-btn` de 18-20 px), con asistencia no bloqueante mediante tooltip o texto contextual accesible (`title`, `aria-label`, `aria-describedby`). Prohibido lanzar modales bloqueantes `confirm()` para definiciones de una línea.
-   - Actualización de los 4 arquetipos visuales y adición de la comprobación R-13 a la matriz de verificación §6.2.
-3. `docs/catalogo-componentes.md`: Especificación técnica del patrón de asistencia y ayuda (.help-button e .info-icon-btn) en §5.
-4. `docs/design-system.md`: Especificación de diseño, estilos, dimensiones y tokens para `.help-button` e `.info-icon-btn`.
-5. `docs/arquitectura_v15.md`: Incorporación en la arquitectura de interfaz §5.
-
-**Código e interfaces corregidas:**
-
-1. `frontend/src/app/shared/ui/styles/base.css`: Definición transversal de las clases `.help-button` e `.info-icon-btn` con foco visible, contraste normativo y comportamiento accesible.
-2. `frontend/src/app/mvp-v14-demo.component.html` y `.css`: Botón de ayuda movido fuera de `.map-toolbar` (barra de filtros) a `.map-heading` (cabecera contextual del mapa de procesos).
-3. `frontend/src/app/macroprocess-detail.component.ts`: Botón de ayuda unificado como `.help-button` en `.top-nav-bar`; micro-ayuda de "TIPO DE PROCESO" convertida a `.info-icon-btn` no bloqueante con `title`/`aria-label` (eliminado el modal intrusivo `openTypeHelp()`).
-4. `frontend/src/app/process-detail.component.ts`: Botón de ayuda contextual reubicado en `.top-nav-tools` y separado de las acciones de ciclo de vida en `.workflow-actions-bar`. Micro-botones `?` de "TIPO DE PROCESO", "MACROPROCESO", "ÁREA DE NEGOCIO" y "Nivel de riesgo" convertidos a `.info-icon-btn` no bloqueantes (eliminados los diálogos bloqueantes de una línea). Preservadas las protecciones de edición y guardado conforme a C-032.
-5. `frontend/src/app/mvp-v14-interface.spec.ts`: Regresión añadida para comprobar que el botón de ayuda del mapa se ubica en `.map-heading` y no en `.map-toolbar`.
-6. `frontend/src/app/process-lifecycle.spec.ts`: Regresión añadida para comprobar que en la ficha del proceso el botón de ayuda está en `.top-nav-tools`, separado de `.workflow-actions-bar`, y que los indicadores emplean micro-ayuda accesible no bloqueante.
-
-**Evidencia de verificación (entorno local Windows):**
-
-| Comprobación | Estado y evidencia |
-| --- | --- |
-| Pruebas automatizadas frontend | **Aprobado en la comprobación:** `npm test --workspace frontend`, 10 archivos de prueba y 96 pruebas aprobadas (100% de éxito). Incluye pruebas unitarias de UI, formularios, navegación, auditoría, usuarios, ciclo de vida, protección de ediciones e interfaz. |
-| Contraste normativo WCAG 2.2 AA | **Aprobado en la comprobación:** `npm run check:contrast --workspace frontend`, 44 combinaciones conformes (todas superan ratios 4.5:1 texto normal y 3:1 componentes de interfaz/foco). |
-| Reglas de navegación y UX | **Aprobado en la comprobación:** regla R-13 cumplida en sus tres niveles en todas las vistas afectadas; preservadas R-07.2 (protección de ediciones), R-09/R-10/R-11 (rutas, accesos equivalentes y retorno). |
-| Backend y persistencia | **No aplica:** la estandarización es estrictamente de presentación, directrices y experiencia de usuario frontend; no altera persistencia ni endpoints. |
-
-**Estado:** Directrices y código corregidos y verificados. Sin commit, integración ni despliegue.
-
-## C-044 — Retiro integral de asistencia y controles de ayuda de la interfaz
-
-**Clasificación y autorización:** cambio de producto y especificación/diseño expresamente ordenado por el responsable el 2026-10-23. Se revoca por completo la incorporación de botones, modales y micro-ayudas contextuales en la interfaz del producto, procediendo a su eliminación tanto de las definiciones normativas como de toda la implementación frontend.
-
-**Fuentes:** instrucción directa del responsable; revocación de R-13 en STD-UX-001; PT-01, PT-02, PT-03.
-
-**Documentos corregidos (document-first):**
-
-1. `AGENTS.md`: Eliminada la regla R-13 de asistencia y ayuda contextual de las directrices para desarrolladores y agentes.
-2. `docs/marco_estandar_ux_institucional.md`: Eliminada la regla R-13 de los principios PUX-01, PUX-02, PUX-06 y de la matriz de verificación §6.2. Eliminada la sección formal de R-13 y ajustados los arquetipos 1, 2, 3 y 4 y el diagrama Mermaid para reflejar cabeceras y paneles limpios sin controles de ayuda.
-3. `docs/catalogo-componentes.md`: Eliminado el patrón de «Asistencia y Ayuda» (`.help-button` e `.info-icon-btn`) de la tabla de patrones compartidos en §5.
-4. `docs/design-system.md`: Eliminada la sección de estilos y especificaciones para controles de asistencia.
-5. `docs/arquitectura_v15.md`: Eliminada la arquitectura de asistencia contextual de §5.
-
-**Código e interfaces corregidas:**
-
-1. `frontend/src/app/shared/ui/styles/base.css`: Eliminadas las clases `.help-button` e `.info-icon-btn`.
-2. `frontend/src/app/mvp-v14-demo.component.html` y `.ts`: Eliminado el botón «Ayuda» del encabezado del mapa (`.map-heading`), el método `help()` y la inyección no utilizada de `UiDialogService`.
-3. `frontend/src/app/macroprocess-detail.component.ts`: Eliminado el botón «Ayuda» de la cabecera, la micro-ayuda de «TIPO DE PROCESO», los estilos locales asociados, el método `openHelp()` y la inyección de `UiDialogService`.
-4. `frontend/src/app/process-detail.component.ts`: Eliminado el botón «Ayuda» de la barra contextual superior (`.top-nav-tools`), eliminados los 4 micro-botones de «TIPO DE PROCESO», «MACROPROCESO», «ÁREA DE NEGOCIO» y «Nivel de riesgo», los estilos asociados y el método `openHelp()`. Preservadas intactas las protecciones de guardado y edición (C-032).
-5. `frontend/src/app/mvp-v14-interface.spec.ts`: Actualizada la prueba del mapa para verificar ausencia de `.help-button` en lugar de abrir el modal de ayuda.
-6. `frontend/src/app/process-lifecycle.spec.ts`: Actualizada la prueba para verificar que no se renderizan botones de ayuda ni micro-ayuda en el detalle del proceso (`.help-button` e `.info-icon-btn` ausentes).
-
-**Evidencia de verificación (entorno local Windows):**
-
-| Comprobación | Estado y evidencia |
-| --- | --- |
-| Pruebas automatizadas frontend | **Aprobado en la comprobación:** `npm test --workspace frontend`, 10 suites y 96 pruebas aprobadas (100% de éxito). |
-| Contraste normativo WCAG 2.2 AA | **Aprobado en la comprobación:** `npm run check:contrast --workspace frontend`, 44 combinaciones conformes. |
-| Integridad de interfaz y navegación | **Aprobado en la comprobación:** navegación, cabeceras, filtros y formularios operan de forma limpia y despojada de controles de ayuda, manteniendo intactas las protecciones de edición (R-07.2) y los recorridos (R-09 a R-11). |
-| Backend y persistencia | **No aplica:** cambio estrictamente visual y de presentación frontend. |
-
-**Estado:** Retiro completado y verificado. Sin commit, integración ni despliegue.
 
 ## C-045 — Consumo consistente de tokens dimensionales del kit
 
@@ -197,3 +75,54 @@
 **Revisión final registrada:** misma IA autora, no independiente. Revisados contrato público, consumidores, reglas de ámbito, cascada, paleta, fallback de longitud, ausencia de nuevas dependencias y conservación del trabajo local previo. El cambio exige `ui-root` en consumidores del CSS anterior y selección explícita de `validator` si necesitan preservar ese criterio del contador; ambas adaptaciones quedan documentadas. Los estilos del anfitrión aún pueden entrar al ámbito, por lo que cada nueva integración requiere revisión. La muestra acredita aislamiento en ese contexto y no adopción institucional ni conformidad WCAG integral.
 
 **Estado:** corrección implementada y comprobaciones técnicas y visuales anteriores aprobadas en su alcance. Pendientes de evaluación humana/entorno: ampliación real al 200 %, tecnologías de asistencia y uso en un segundo producto real; el responsable mantiene la decisión de adopción. Sin commit, integración ni despliegue; no sustituye conformidad de producción. Servidor temporal de la muestra detenido tras la verificación.
+
+## C-047 — Organización por dominios y nomenclatura funcional v15
+
+**Clasificación previa:** defecto de diseño y nomenclatura frente a arquitectura v15 y solicitud explícita del responsable. Se documentó arquitectura §7 antes de implementar. Revisión previa de la misma IA autora: organización por dominio, un backend, preservación de migraciones/planillas y políticas del servidor. Sin ampliación de producto.
+
+
+**Autorización adicional:** conservar las identidades históricas de las migraciones aplicadas y sus dependencias. No modificar las planillas.
+
+**Fuentes y alcance:** solicitud del responsable de retirar la nomenclatura de etapa superada y organizar el proyecto v15; arquitectura §7 corregida antes de implementar. PT-01/02/03/07/08/14; REQ-05/06/07/15/16/19/26/51/54/55. La excepción histórica no autoriza a cambiar el historial de Oracle. No se modifican las planillas ni se amplía el producto.
+
+**Implementación:**
+
+- `AppModule` compone módulos NestJS de base de datos, autenticación, auditoría, identidad, estructura, procesos y riesgos. Una sola instancia compartida de `DataSource`, con cierre de conexión por el módulo de base de datos. Cada dominio declara controladores y servicios; no se crea otra aplicación ni microservicios.
+- La captura se reparte entre tipos, unidades, ficha, mapa, ciclo de vida, relaciones y riesgos. Validación y traducción de errores se comparten sin duplicar un servicio completo. Las 42 operaciones trasladadas conservan sus cuerpos, consultas y transacciones; solo se sustituyen referencias a la función de manejo de errores y al servicio de ficha en el ciclo de vida.
+- El contrato de captura cambia a `/api/management`; cliente, pruebas y documentación se actualizan juntos. Los contratos institucionales paginados existentes continúan registrados con sus políticas y formatos anteriores; su consolidación completa no forma parte de esta corrección. Se elimina el controlador público de captura y se fijan políticas explícitas por operación y CSRF en escrituras. Retiro solo para `ADMIN`; escritura de riesgos solo para `RISK_MANAGER`, coherente con v15. El resto de perfiles puede leer la ficha completa.
+- Frontend con `ProcessApi`, `ProcessMapComponent` y prueba funcional de interfaz. Se conservan rutas visibles, navegación común, contexto de retorno, guardas de descarte y kit. Se ajustan exclusivamente los controles de escritura de riesgos a la política del servidor; los fixtures de edición que ejercitan varias capacidades declaran sus perfiles explícitamente. Se añade una regresión de visibilidad para los cinco perfiles.
+- Herramientas y semillas con nombres funcionales. Se retira la copia duplicada de la migración inicial situada fuera del directorio de migraciones; la migración aplicada permanece íntegra. El instalador explícito usa la migración histórica conservada y el servicio común de grants, cuya fuente sigue siendo `grant-runtime.sql`. Se retira la lista paralela de permisos en TypeScript. Las variables de instalación pasan a `SCHEMA_*`, documentadas en `.env.example`, y sus comprobaciones se centralizan en `common/config.ts`, antes de abrir conexiones. No se ejecutan instalación, reset, migraciones ni grants.
+- Retirados del árbol activo los registros superados que contenían la nomenclatura eliminada, sin reescribir resultados históricos como si fueran actuales. Se recuperan desde Git. Corregidos README, índice, arquitectura, referencias de componentes y enlaces; se conserva la evidencia restante con sus límites.
+- OpenAPI regenerado con versión documental `15`, prefijo `/api`, login y rutas de captura vigentes. Los nombres históricos restantes se limitan a dos migraciones, su dependencia congelada y las referencias de identidad necesarias en instalación y reconciliación.
+
+**Tarea y revisión UX (STD-UX-001 §6):** acceso desde mapa o búsqueda a ficha, edición y retorno, para los cinco perfiles; riesgo como subformulario solo para su gestor. Los accesos equivalentes siguen siendo mapa, listado, jerarquía y relaciones; la reorganización no añade menús ni destinos visibles. Contenedor común, contenido propio de ruta y host de diálogos se conservan por separado. Aplican R-01.1/1.3/1.4 (estructura y consistencia), R-04/R-05 (estado y errores), R-07.2 (cambios no guardados), R-08.1–4 (accesibilidad) y R-09 a R-11 (identidad, accesos y retorno). No se presume conformidad integral.
+
+**Evidencia ejecutada el 2026-10-24, Windows local:**
+
+| Comprobación | Estado y resultado |
+| --- | --- |
+| Composición de módulos y regresiones backend | **Aprobado en su alcance:** `node ../node_modules/jest/bin/jest.js --runInBand --forceExit`, desde backend; 13 suites y 62 pruebas. Incluye resolución de módulos con una base de datos simulada, sin abrir conexión, y cuatro comprobaciones de confirmación, opt-in y separación de cuentas del instalador. |
+| Autorización por HTTP en controladores reales | **Aprobado en su alcance:** Jest con `test/jest-e2e.json`, `--runInBand --forceExit --runTestsByPath` y las suites `authorization`, `processes`, `demo-session` y `management-authorization`; cuatro suites y 110 pruebas aprobadas. Las 91 nuevas comprueban las 24 operaciones de captura: 401 sin sesión, 403 sin perfil o CSRF, despacho permitido y actor autenticado en aprobación; incluyen rechazo del Dueño en aprobación/retiro/riesgos y del Admin sin perfil de riesgos. Servicios y persistencia simulados; no acredita Oracle. Ejecución final con Node 24.22.1 del runtime de herramientas; los demás comandos de proyecto usaron Node 24.15.0. |
+| Regresiones frontend y compatibilidad del kit | **Aprobado en su alcance:** `npm test --workspace frontend`, diez suites y 99 pruebas; tres comprobaciones de convivencia CSS ejecutadas por `pretest`. Render Angular en jsdom, navegación, sesión, descarte, formularios y visibilidad de acciones de riesgos según perfiles. |
+| Tipos y compilación | **Aprobado en su alcance:** TypeScript backend completo con `--noEmit --incremental false`, incluido test; compilación limpia de backend y frontend mediante `npm run build`. Se retiró únicamente la salida generada anterior del backend, tras comprobar su ruta dentro del proyecto, para evitar archivos huérfanos de fuentes renombradas. |
+| Conservación de lógica y fuentes inmutables | **Aprobado por comparación estructural:** 42 métodos equivalentes después de normalizar únicamente las dos referencias trasladadas. Nueve archivos de migración/dependencia congelada idénticos a sus copias previas; dos planillas idénticas byte por byte frente a Git. Veinte archivos del kit, plantilla y CSS del mapa idénticos. Evidencia auxiliar en `C:/Users/altir/.codex/visualizations/2026/10/24/01a17056-41d0-7093-ada6-5f8f6b0afe19/organization-verification.json`. |
+| Nomenclatura y documentación de API | **Aprobado en su alcance:** búsqueda en fuentes, nombres y documentación activa, con excepción acotada a las identidades históricas autorizadas. Generación OpenAPI correcta: 46 rutas, incluido `/api/auth/login` y las rutas `/api/management`. Se conservan fuentes de requisitos. |
+| Contraste | **Aprobado en las combinaciones comprobadas:** `node frontend/scripts/check-contrast.mjs`, 44 pares. Tokens y estilos del kit conservados; no acredita contraste efectivo de todas las pantallas. |
+| Textos, accesos y recorrido | **Aprobado mediante regresiones Angular y comparación estática:** rutas visibles, mapa, ficha, navegación común, formularios y retorno conservados; controles de riesgos alineados con servidor. El mapa conserva exactamente plantilla y CSS; ningún texto de entorno se añade a la interfaz. |
+| Revisión visual, teclado, ampliación y tecnologías de asistencia | **No probado en navegador en esta corrección.** La equivalencia de fuentes y jsdom no sustituyen esas comprobaciones. |
+| Persistencia, grants e instalación Oracle | **No probado en esta corrección:** no se conectó a Oracle ni se ejecutaron escrituras, instalación, migraciones o grants. Los comandos históricos renombrados no se consideran una instalación v15 completa. La integración del instalador con la fuente canónica de permisos necesita verificación Oracle en esquema dedicado antes de usarse. |
+| Revisión final y alcance | **Aprobado por la misma IA autora, no independiente:** módulos, inyección, controles, contrato cliente/servidor, preservación de reglas y ausencia de modificaciones a migraciones, planillas y paleta. `git diff --check` correcto; revisión de enlaces locales y pendientes documentados. Sin revisión humana de producción. |
+
+**Incidencias de verificación:** varios intentos con el ejecutor local terminaron con código 1 sin diagnóstico; las suites aisladas aprobaron y la ejecución agrupada final aprobó las 110 pruebas con el runtime indicado. No se atribuye causa ni se declara resuelta esa intermitencia. Las ejecuciones Jest usaron `--forceExit`; no acreditan ausencia de manejadores abiertos. Una regresión frontend inicial falló por usar en plantilla un método que su simulador no exponía; se mantuvo el contrato existente `hasAnyProfile` con un único perfil y la suite final aprobó 99 pruebas. Un chequeo de tipos detectó el parámetro genérico incorrecto de una prueba tabular; corregido y verificado antes del cierre.
+
+**Estado:** implementación y comprobaciones técnicas anteriores terminadas; revisión visual manual, validación Oracle del instalador/permisos, revisión independiente y condiciones de producción pendientes. Permanecen fuera del alcance Argon2id, proveedor local, auditoría integral y consolidación completa de contratos paginados/captura. Sin commit, integración ni despliegue. El registro no declara conformidad total con v15, seguridad ni WCAG.
+
+### Revisión y preparación de PR — 2026-10-26
+
+**Autorización:** el responsable solicita guardar los cambios actuales mediante commit y PR hacia `main`. Se prepara la rama `codex/consolidacion-v15-c047`; el PR incluye los 20 commits locales anteriores a C-047 que aún no están en `origin/main`. La solicitud no incluye integración ni despliegue. El PR se presenta como borrador por los pendientes ya documentados.
+
+**Revisión IA previa al commit:** lectura de arquitectura §7, composición de módulos, contrato `/api/management`, políticas de los controladores, cliente Angular, rutas y guardas. Sin cambios de alcance en esta preparación. Las migraciones versionadas y las planillas no tienen modificaciones locales; el kit y su paleta tampoco cambian respecto de HEAD. La autenticación implementada todavía usa scrypt, frente a Argon2id exigido por REQ-25; se conserva como pendiente explícito, sin declararlo conforme. Revisión no independiente; no sustituye conformidad humana de producción.
+
+**Verificaciones ejecutadas en esta revisión:** compilación de backend y frontend aprobada; 99 pruebas Angular en diez suites, tres pruebas de aislamiento CSS y 44 combinaciones de contraste de tokens aprobadas. La suite HTTP `management-authorization.e2e-spec.ts` aprobó sus 91 casos con servicios simulados. El primer intento Angular se detuvo antes de ejecutar casos por EPERM en temporales; la repetición aprobó con TEMP/TMP definidos solo para ese proceso en una carpeta escribible. La primera ejecución HTTP encontró EACCES en bucle local; la repetición fuera del entorno restringido aprobó. No se ejecutaron pruebas Oracle ni revisión visual, ampliación o tecnologías de asistencia; se mantienen los límites de C-047 y del catálogo. Node 24.15.0; npm del entorno 12.2.0, distinto del 11.12.x declarado por el proyecto.
+
+**Comprobación adicional para el commit:** 13 suites backend y 62 pruebas aprobadas con `node ../node_modules/jest/bin/jest.js --runInBand`, sin `--forceExit`. El intento inicial en entorno restringido aprobó 53 casos y encontró EACCES en las nueve pruebas que usan HTTP local; la repetición completa fuera de ese entorno aprobó los 62 casos. La comprobación del índice detectó una línea vacía sobrante al final de `process-record.fields.ts`; se retiró sin cambiar comportamiento. Se conserva pendiente la integración en `main` y el despliegue.
