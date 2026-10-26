@@ -3,7 +3,7 @@ import { AuditComponent } from './audit.component';
 import { adminGuard, authGuard, guestGuard } from './auth.guard';
 import { LoginComponent } from './login.component';
 import { MacroprocessDetailComponent } from './macroprocess-detail.component';
-import { MvpV14DemoComponent } from './mvp-v14-demo.component';
+import { ProcessMapComponent } from './process-map.component';
 import { NotFoundComponent } from './not-found.component';
 import { ProcessDetailComponent } from './process-detail.component';
 import { ProcessFormComponent } from './process-form.component';
@@ -23,7 +23,7 @@ export const APP_NAME = 'Sistema de Procesos Institucionales';
 export const routes: Routes = [
   { path: '', pathMatch: 'full', redirectTo: 'mapa' },
   { title: 'Acceso Institucional', path: 'login', component: LoginComponent, canActivate: [guestGuard] },
-  { title: 'Mapa de procesos', path: 'mapa', component: MvpV14DemoComponent, canActivate: [authGuard] },
+  { title: 'Mapa de procesos', path: 'mapa', component: ProcessMapComponent, canActivate: [authGuard] },
   { title: 'Detalle de macroproceso', path: 'mapa/macroprocesos/:id', component: MacroprocessDetailComponent, canActivate: [authGuard] },
   { title: 'Procesos', path: 'procesos', component: ProcessListComponent, canActivate: [authGuard] },
   { title: 'Nuevo proceso', path: 'procesos/nuevo', component: ProcessFormComponent, canActivate: [authGuard], canDeactivate: [unsavedChangesGuard] },

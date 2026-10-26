@@ -1,13 +1,13 @@
 import { readFileSync } from 'fs';
 import { join } from 'path';
 
-export const MVP_V14_MACROPROCESS_TYPES = [
+export const INITIAL_MACROPROCESS_TYPES = [
   { code: 'ESTRATEGICOS', name: 'Estratégicos', sortOrder: 1 },
   { code: 'MISIONALES', name: 'Misionales', sortOrder: 2 },
   { code: 'APOYO', name: 'De apoyo', sortOrder: 3 }
 ] as const;
 
-export interface MvpV14RiskContent {
+export interface InitialRiskContent {
   description: string;
   cause: string;
   consequence: string;
@@ -15,7 +15,7 @@ export interface MvpV14RiskContent {
   level: 'Bajo' | 'Medio' | 'Alto' | 'Crítico';
 }
 
-export interface MvpV14ProcessContent {
+export interface InitialProcessContent {
   code: string;
   type: string;
   name: string;
@@ -24,21 +24,21 @@ export interface MvpV14ProcessContent {
   scope: string;
   responsibleUnit: string;
   participantUnits: string[];
-  risk: MvpV14RiskContent;
+  risk: InitialRiskContent;
 }
 
-export interface MvpV14MacroprocessContent {
-  typeCode: (typeof MVP_V14_MACROPROCESS_TYPES)[number]['code'];
+export interface InitialMacroprocessContent {
+  typeCode: (typeof INITIAL_MACROPROCESS_TYPES)[number]['code'];
   name: string;
   description: string;
-  processes: MvpV14ProcessContent[];
+  processes: InitialProcessContent[];
 }
 
 interface LegacyMacroprocessContent {
   name: string;
   description: string;
-  typeCode?: (typeof MVP_V14_MACROPROCESS_TYPES)[number]['code'];
-  processes: MvpV14ProcessContent[];
+  typeCode?: (typeof INITIAL_MACROPROCESS_TYPES)[number]['code'];
+  processes: InitialProcessContent[];
 }
 
 interface LegacyContentPackage {
@@ -46,40 +46,40 @@ interface LegacyContentPackage {
   macroprocesses: LegacyMacroprocessContent[];
 }
 
-const TYPE_CODE_BY_MACROPROCESS_NAME: Record<string, MvpV14MacroprocessContent['typeCode']> = {
+const TYPE_CODE_BY_MACROPROCESS_NAME: Record<string, InitialMacroprocessContent['typeCode']> = {
   'Estratégicos': 'ESTRATEGICOS',
   'Misionales': 'MISIONALES',
   'De apoyo': 'APOYO'
 };
 
-export function loadMvpV14Content(): MvpV14MacroprocessContent[] {
+export function loadInitialContent(): InitialMacroprocessContent[] {
   const value = JSON.parse(readFileSync(join(__dirname, 'generic-content.json'), 'utf8')) as unknown;
   if (!isLegacyContentPackage(value)) {
-    throw new Error('generic-content.json does not match the supported MVP v14 demonstration content.');
+    throw new Error('generic-content.json does not match the supported initial schema demonstration content.');
   }
 
   const macroprocesses = value.macroprocesses.map((macroprocess) => {
     const typeCode = macroprocess.typeCode ?? TYPE_CODE_BY_MACROPROCESS_NAME[macroprocess.name];
     if (!typeCode) {
-      throw new Error(`MVP v14 has no macroprocess type mapping for: ${macroprocess.name}`);
+      throw new Error(`initial schema has no macroprocess type mapping for: ${macroprocess.name}`);
     }
     for (const process of macroprocess.processes) {
       if (!['Bajo', 'Medio', 'Alto', 'Crítico'].includes(process.risk.level)) {
-        throw new Error(`Unsupported MVP v14 risk level in ${process.name}: ${process.risk.level}`);
+        throw new Error(`Unsupported initial schema risk level in ${process.name}: ${process.risk.level}`);
       }
     }
     return { typeCode, name: macroprocess.name, description: macroprocess.description.trim(), processes: macroprocess.processes };
   });
 
   const presentTypeCodes = new Set(macroprocesses.map((macroprocess) => macroprocess.typeCode));
-  if (!MVP_V14_MACROPROCESS_TYPES.every((type) => presentTypeCodes.has(type.code))) {
-    throw new Error('MVP v14 demonstration content must cover every fixed macroprocess type.');
+  if (!INITIAL_MACROPROCESS_TYPES.every((type) => presentTypeCodes.has(type.code))) {
+    throw new Error('initial schema demonstration content must cover every fixed macroprocess type.');
   }
 
   const numbers = macroprocesses.flatMap((macroprocess) => macroprocess.processes)
     .map((process) => Number(process.code.slice(2))).sort((a, b) => a - b);
   if (numbers.some((number, index) => number !== index + 1)) {
-    throw new Error('MVP v14 demonstration process codes must be unique and contiguous from PR1.');
+    throw new Error('initial schema demonstration process codes must be unique and contiguous from PR1.');
   }
   return macroprocesses;
 }

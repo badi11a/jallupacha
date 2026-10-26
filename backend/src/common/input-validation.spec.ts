@@ -1,9 +1,7 @@
 import { BadRequestException } from '@nestjs/common';
-import {
-  asBody, foldText, oneOf, optionalId, optionalText, rejectUnknownKeys, requiredText, RISK_LEVELS
-} from './mvp-v14.validation';
+import { asBody, foldText, oneOf, optionalId, optionalText, rejectUnknownKeys, requiredText, RISK_LEVELS } from './input-validation';
 
-describe('MVP v14 input validation', () => {
+describe('v15 input validation', () => {
   it('rejects bodies that are not objects and unknown fields', () => {
     expect(() => asBody(null)).toThrow(BadRequestException);
     expect(() => asBody([])).toThrow(BadRequestException);

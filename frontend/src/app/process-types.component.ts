@@ -1,6 +1,6 @@
 import { Component, ElementRef, OnInit, inject, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { MvpV14Api, ProcessTypeItem, errorMessage } from './mvp-v14-api.service';
+import { ProcessApi, ProcessTypeItem, errorMessage } from './process-api.service';
 
 import { UiBadgeComponent, UiBreadcrumbsComponent, UiDialogService, UiMessageComponent, UiPanelComponent, focusFirstInvalid } from './shared/ui';
 import { LeavesWithConfirmation } from './unsaved-changes.guard';
@@ -66,7 +66,7 @@ import { LeavesWithConfirmation } from './unsaved-changes.guard';
   `
 })
 export class ProcessTypesComponent implements OnInit, LeavesWithConfirmation {
-  private readonly api = inject(MvpV14Api);
+  private readonly api = inject(ProcessApi);
   private readonly dialogs = inject(UiDialogService);
   private readonly element = inject<ElementRef<HTMLElement>>(ElementRef);
   readonly types = signal<ProcessTypeItem[]>([]);

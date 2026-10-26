@@ -7,7 +7,7 @@ import { adminGuard, authGuard, guestGuard } from './auth.guard';
 import { authInterceptor } from './auth.interceptor';
 import { AuthService, USER_STORAGE_KEY } from './auth.service';
 import { LoginComponent } from './login.component';
-import { MvpV14DemoComponent } from './mvp-v14-demo.component';
+import { ProcessMapComponent } from './process-map.component';
 import { ProcessListComponent } from './process-list.component';
 
 @Component({ selector: 'app-dummy-protected', standalone: true, template: '<p>Protected content</p>' })
@@ -24,7 +24,7 @@ describe('Autenticación Local Institucional v15 (REQ-25)', () => {
   beforeEach(() => {
     sessionStorage.clear();
     TestBed.configureTestingModule({
-      imports: [LoginComponent, DummyProtectedComponent, DummyPublicComponent, MvpV14DemoComponent, ProcessListComponent],
+      imports: [LoginComponent, DummyProtectedComponent, DummyPublicComponent, ProcessMapComponent, ProcessListComponent],
       providers: [
         provideHttpClient(),
         provideHttpClientTesting(),
@@ -226,9 +226,9 @@ describe('Autenticación Local Institucional v15 (REQ-25)', () => {
         email: 'consulta@example.test',
         profiles: ['CONSULTATION']
       });
-      const fixture = TestBed.createComponent(MvpV14DemoComponent);
+      const fixture = TestBed.createComponent(ProcessMapComponent);
       fixture.detectChanges();
-      httpMock.expectOne('/api/mvp-v14/map').flush({ macroprocessTypes: [] });
+      httpMock.expectOne('/api/management/map').flush({ macroprocessTypes: [] });
 
       fixture.componentInstance.map.set([
         {
@@ -254,9 +254,9 @@ describe('Autenticación Local Institucional v15 (REQ-25)', () => {
         email: 'owner@example.test',
         profiles: ['PROCESS_OWNER']
       });
-      const fixture = TestBed.createComponent(MvpV14DemoComponent);
+      const fixture = TestBed.createComponent(ProcessMapComponent);
       fixture.detectChanges();
-      httpMock.expectOne('/api/mvp-v14/map').flush({ macroprocessTypes: [] });
+      httpMock.expectOne('/api/management/map').flush({ macroprocessTypes: [] });
 
       fixture.componentInstance.map.set([
         {
@@ -284,9 +284,9 @@ describe('Autenticación Local Institucional v15 (REQ-25)', () => {
       });
       const fixture = TestBed.createComponent(ProcessListComponent);
       fixture.detectChanges();
-      httpMock.expectOne('/api/mvp-v14/process-types').flush([]);
-      httpMock.expectOne('/api/mvp-v14/units').flush([]);
-      httpMock.expectOne('/api/mvp-v14/processes').flush([]);
+      httpMock.expectOne('/api/management/process-types').flush([]);
+      httpMock.expectOne('/api/management/units').flush([]);
+      httpMock.expectOne('/api/management/processes').flush([]);
       fixture.detectChanges();
 
       const el = fixture.nativeElement as HTMLElement;
@@ -304,9 +304,9 @@ describe('Autenticación Local Institucional v15 (REQ-25)', () => {
       });
       const fixture = TestBed.createComponent(ProcessListComponent);
       fixture.detectChanges();
-      httpMock.expectOne('/api/mvp-v14/process-types').flush([]);
-      httpMock.expectOne('/api/mvp-v14/units').flush([]);
-      httpMock.expectOne('/api/mvp-v14/processes').flush([]);
+      httpMock.expectOne('/api/management/process-types').flush([]);
+      httpMock.expectOne('/api/management/units').flush([]);
+      httpMock.expectOne('/api/management/processes').flush([]);
       fixture.detectChanges();
 
       const el = fixture.nativeElement as HTMLElement;

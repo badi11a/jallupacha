@@ -6,7 +6,7 @@ import { Router, provideRouter } from '@angular/router';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { AppComponent } from './app.component';
 import { routes } from './app.routes';
-import { FICHA_FIELDS, FichaKey, ProcessDetail, ProcessTypeItem, UnitItem } from './mvp-v14-api.service';
+import { FICHA_FIELDS, FichaKey, ProcessDetail, ProcessTypeItem, UnitItem } from './process-api.service';
 
 const UNITS: UnitItem[] = [1, 2].map(id => ({
   id, code: `U${id}`, name: `Unidad ${id}`, isActive: true, parentUnitId: null, processCount: 0
@@ -36,7 +36,7 @@ describe('Protección de ediciones — C-032, R-04/R-05/R-07', () => {
 
   beforeEach(() => {
     sessionStorage.setItem('jallupacha_user', JSON.stringify({
-      userId: 1, displayName: 'Usuario de prueba', email: 'admin@example.test', profiles: ['ADMIN']
+      userId: 1, displayName: 'Usuario de prueba', email: 'admin@example.test', profiles: ['ADMIN', 'RISK_MANAGER']
     }));
     TestBed.configureTestingModule({
       imports: [AppComponent],
@@ -98,7 +98,7 @@ describe('Protección de ediciones — C-032, R-04/R-05/R-07', () => {
   async function openDetail(): Promise<void> {
     await router.navigateByUrl('/procesos/4');
     fixture.detectChanges();
-    http.expectOne('/api/mvp-v14/processes/4').flush(structuredClone(DETAIL));
+    http.expectOne('/api/management/processes/4').flush(structuredClone(DETAIL));
     await settle();
   }
 
@@ -118,7 +118,7 @@ describe('Protección de ediciones — C-032, R-04/R-05/R-07', () => {
     async function openCatalog(): Promise<void> {
       await router.navigateByUrl(catalog.route);
       fixture.detectChanges();
-      http.expectOne(`/api/mvp-v14/${catalog.endpoint}`).flush(catalog.rows);
+      http.expectOne(`/api/management/${catalog.endpoint}`).flush(catalog.rows);
       await settle();
     }
 
@@ -162,7 +162,7 @@ describe('Protección de ediciones — C-032, R-04/R-05/R-07', () => {
       await type('input[name=name]', 'Nombre conservado');
       const form = root.querySelector('form')!;
       submit(form);
-      const save = http.expectOne({ method: 'PATCH', url: `/api/mvp-v14/${catalog.endpoint}/1` });
+      const save = http.expectOne({ method: 'PATCH', url: `/api/management/${catalog.endpoint}/1` });
       await settle();
       expect((form.querySelector('input') as HTMLInputElement).disabled).toBe(true);
       expect(root.textContent).toContain('Guardando cambios…');
@@ -175,7 +175,7 @@ describe('Protección de ediciones — C-032, R-04/R-05/R-07', () => {
       expect((form.querySelector('input') as HTMLInputElement).disabled).toBe(false);
       submit(form);
       http.expectOne(req => req.method === 'PATCH').flush({});
-      http.expectOne(`/api/mvp-v14/${catalog.endpoint}`).flush(catalog.rows);
+      http.expectOne(`/api/management/${catalog.endpoint}`).flush(catalog.rows);
       await settle();
       expect(root.querySelector('form')).toBeNull();
     });
@@ -240,7 +240,7 @@ describe('Protección de ediciones — C-032, R-04/R-05/R-07', () => {
       http.expectNone(req => req.method === 'PATCH');
       await expectPendingBlocksExit('/procesos/4');
       save.flush({});
-      const reload = http.expectOne('/api/mvp-v14/processes/4');
+      const reload = http.expectOne('/api/management/processes/4');
       await expectPendingBlocksExit('/procesos/4');
       reload.flush(structuredClone(DETAIL));
       await settle();
@@ -262,7 +262,7 @@ describe('Protección de ediciones — C-032, R-04/R-05/R-07', () => {
     await click('Editar', section('Relaciones con otros procesos').querySelector('article')!);
     submit(root.querySelector('form[aria-label="Editar relación"]')!);
     http.expectOne(req => req.method === 'PATCH').flush({});
-    http.expectOne('/api/mvp-v14/processes/4').flush({ message: 'No fue posible actualizar la vista.' }, { status: 503, statusText: 'Unavailable' });
+    http.expectOne('/api/management/processes/4').flush({ message: 'No fue posible actualizar la vista.' }, { status: 503, statusText: 'Unavailable' });
     await settle();
     expect((root.querySelector('textarea[name=description]') as HTMLTextAreaElement).value).toBe('Riesgo conservado');
     expect(root.querySelector('form[aria-label="Editar riesgo"]')?.closest('[inert]')).toBeNull();
@@ -271,10 +271,10 @@ describe('Protección de ediciones — C-032, R-04/R-05/R-07', () => {
 
   async function openProcessForm(): Promise<void> {
     await router.navigateByUrl('/procesos/4/editar'); fixture.detectChanges();
-    http.expectOne('/api/mvp-v14/process-types').flush(TYPES);
-    http.expectOne('/api/mvp-v14/units').flush(UNITS);
-    http.expectOne('/api/mvp-v14/processes').flush([]);
-    http.expectOne('/api/mvp-v14/processes/4').flush({ ...structuredClone(DETAIL), status: 'Borrador' });
+    http.expectOne('/api/management/process-types').flush(TYPES);
+    http.expectOne('/api/management/units').flush(UNITS);
+    http.expectOne('/api/management/processes').flush([]);
+    http.expectOne('/api/management/processes/4').flush({ ...structuredClone(DETAIL), status: 'Borrador' });
     await settle();
   }
 
@@ -283,7 +283,7 @@ describe('Protección de ediciones — C-032, R-04/R-05/R-07', () => {
     await type('#field-name', 'Nombre de proceso conservado');
     const form = root.querySelector('form')!;
     submit(form);
-    const save = http.expectOne({ method: 'PATCH', url: '/api/mvp-v14/processes/4' });
+    const save = http.expectOne({ method: 'PATCH', url: '/api/management/processes/4' });
     expect(form.querySelector('fieldset')?.disabled).toBe(true);
     expect(root.textContent).toContain('Guardando proceso…');
     submit(form);
@@ -296,7 +296,7 @@ describe('Protección de ediciones — C-032, R-04/R-05/R-07', () => {
     submit(form);
     http.expectOne(req => req.method === 'PATCH').flush({ id: 4 });
     await settle();
-    http.expectOne('/api/mvp-v14/processes/4').flush(structuredClone(DETAIL));
+    http.expectOne('/api/management/processes/4').flush(structuredClone(DETAIL));
     await settle();
     expect(router.url).toBe('/procesos/4');
     expect(root.querySelector('dialog')).toBeNull();

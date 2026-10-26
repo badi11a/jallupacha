@@ -1,11 +1,11 @@
--- Revisión de estructura del MVP v14 (solo lectura).
+-- Revisión de estructura del base de esquema (solo lectura).
 -- Ejecutar conectado como propietario del esquema, por ejemplo PROCESOS en QA.
 
 SET PAGESIZE 200
 SET LINESIZE 220
 SET LONG 20000
 
-PROMPT === Tablas del MVP v14 ===
+PROMPT === Tablas del base de esquema ===
 SELECT table_name, num_rows, last_analyzed
   FROM user_tables
  WHERE table_name IN (

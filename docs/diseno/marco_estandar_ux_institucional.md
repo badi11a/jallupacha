@@ -259,7 +259,7 @@ Esta sección identifica decisiones del producto y puntos de evaluación del pil
 
 ### 4.1. Contexto del Piloto y Trazabilidad de Decisiones
 1. **Piloto de Operador Único (`C-011`, Antecedente Histórico v14):**
-   Durante el MVP v14 se autorizó un entorno de operador único. La especificación v15 supera esa excepción y exige autenticación institucional, perfiles y ciclo de vida. El cumplimiento técnico de esos requisitos se verifica por separado; esta guía UX no lo acredita.
+   La especificación v15 exige autenticación institucional, perfiles y ciclo de vida. El cumplimiento técnico de esos requisitos se verifica por separado; esta guía UX no lo acredita.
 2. **Evolución de la Estructura de Navegación del Módulo (arquitectura v15 vigente):**
    Durante el piloto mono-operador v14 se retiró la estructura de shell fija para mantener la fidelidad del lienzo visual. Al reactivarse el modelo multiusuario en v15, se adopta una **navegación local de módulo horizontal, plana y no fija** (`ui-module-nav`), ubicada sobre el contenido, que provee acceso directo a las áreas autorizadas (*Mapa*, *Procesos*, y para `ADMIN`: *Unidades internas*, *Tipos de proceso*, *Usuarios*, *Auditoría*), manteniendo el área de lienzo despejada y sin competir con las cabeceras de la intranet anfitriona.
 3. **Neutralidad de Datos (`AGENTS.md`):**  
@@ -271,7 +271,7 @@ Esta sección identifica decisiones del producto y puntos de evaluación del pil
 
 | Arquetipo Institucional | Implementación Particular en Jallupacha | Componente de Referencia |
 |---|---|---|
-| **Lienzo Visual (Arquetipo 1)** | **Mapa de Procesos Institucional (`/mapa`):** Organizado en tres familias fijas (*Estratégicos*, *Misionales*, *De apoyo*) con flujo horizontal SIPOC (Contexto $\rightarrow$ Familias $\rightarrow$ Resultados), buscador reactivo superior y pie con métricas de visualización y enlace a *Buscar procesos*. | `MvpV14DemoComponent` |
+| **Lienzo Visual (Arquetipo 1)** | **Mapa de Procesos Institucional (`/mapa`):** Organizado en tres familias fijas (*Estratégicos*, *Misionales*, *De apoyo*) con flujo horizontal SIPOC (Contexto $\rightarrow$ Familias $\rightarrow$ Resultados), buscador reactivo superior y pie con métricas de visualización. | `ProcessMapComponent` |
 | **Registro Tabular (Arquetipo 2)** | **Catálogos (`/procesos`, `/unidades`, `/tipos-de-proceso`):** Paneles con identificación, acciones contextuales y tablas. La jerarquía de las migas se evalúa con R-02; no se prescribe el mapa como padre de todos los catálogos ni se reintroducen accesos cruzados retirados en C-029. | `ProcessListComponent`, `UnitsComponent`, `ProcessTypesComponent` |
 | **Ficha 360° (Arquetipo 3)** | **Ficha de Proceso (`/procesos/:id`):** Identificación, propósito, gobernanza, campos y editores de riesgos y relaciones. El medidor representa nivel de riesgo, no el campo criticidad; su validez se evalúa por separado. La grilla de tres tarjetas es una elección local. | `ProcessDetailComponent` |
 | **Formulario Estructurado (Arquetipo 4)** | **Captura de Procesos (`/procesos/nuevo`, `:id/editar`):** Formulario con secciones temáticas (`ui-section`) para clasificación, identificación, unidades internas con vinculación dinámica de participantes y campos técnicos extendidos. | `ProcessFormComponent` |

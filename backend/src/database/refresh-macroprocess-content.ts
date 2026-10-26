@@ -2,7 +2,7 @@ import 'dotenv/config';
 import { DataSource, EntityManager } from 'typeorm';
 import { databaseOptions } from '../common/config';
 import { qualifiedTable } from '../common/database';
-import { loadMvpV14Content } from './mvp-v14-content';
+import { loadInitialContent } from './initial-content';
 
 const previousNames: Record<string, string> = {
   'Gestión de Personas y Abastecimiento': 'Gestión del Talento y Personas',
@@ -11,7 +11,7 @@ const previousNames: Record<string, string> = {
 
 /** Refreshes only recognized seed records, preserving descriptions already entered. */
 export async function refreshMacroprocessContent(manager: EntityManager): Promise<number> {
-  const content = loadMvpV14Content();
+  const content = loadInitialContent();
   const pending: Array<{ id: number; name: string; description: string }> = [];
   for (const [index, macro] of content.entries()) {
     const code = `MP${index + 1}`;

@@ -1,6 +1,6 @@
 import { Component, ElementRef, OnInit, inject, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { MvpV14Api, UnitItem, errorMessage } from './mvp-v14-api.service';
+import { ProcessApi, UnitItem, errorMessage } from './process-api.service';
 
 import { UiBadgeComponent, UiBreadcrumbsComponent, UiDialogService, UiMessageComponent, UiPanelComponent, focusFirstInvalid } from './shared/ui';
 import { LeavesWithConfirmation } from './unsaved-changes.guard';
@@ -64,7 +64,7 @@ import { LeavesWithConfirmation } from './unsaved-changes.guard';
   `
 })
 export class UnitsComponent implements OnInit, LeavesWithConfirmation {
-  private readonly api = inject(MvpV14Api);
+  private readonly api = inject(ProcessApi);
   private readonly dialogs = inject(UiDialogService);
   private readonly element = inject<ElementRef<HTMLElement>>(ElementRef);
   readonly units = signal<UnitItem[]>([]);

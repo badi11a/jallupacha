@@ -23,10 +23,11 @@ async function generateOpenApi(): Promise<void> {
   const { AppModule } = await import('./app.module');
   const app = await NestFactory.create(AppModule, { logger: false });
   try {
+    app.setGlobalPrefix('api');
     const config = new DocumentBuilder()
       .setTitle('Jallupacha API')
       .setDescription('API institucional de gestión de procesos. Requiere sesión y perfiles autorizados, salvo endpoints de autenticación pública documentados explícitamente.')
-      .setVersion('0.1.0')
+      .setVersion('15')
       .addCookieAuth('jallupacha_session')
       .build();
     const document = SwaggerModule.createDocument(app, config);

@@ -1,4 +1,4 @@
--- Revisión de carga e integridad del MVP v14 (solo lectura).
+-- Revisión de carga e integridad del base de esquema (solo lectura).
 -- Ejecutar conectado como propietario del esquema, por ejemplo PROCESOS en QA.
 
 SET PAGESIZE 200
