@@ -1,3 +1,7 @@
+import { MatButtonModule } from '@angular/material/button';
+import { MatFormFieldModule } from '@angular/material/form-field';
+import { MatInputModule } from '@angular/material/input';
+import { UiMaterialInputDirective } from '../../shared/ui';
 import { Component, DestroyRef, OnInit, inject, signal } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { FormsModule } from '@angular/forms';
@@ -9,7 +13,7 @@ import { UiBadgeComponent, UiBreadcrumbsComponent, UiMessageComponent, UiPanelCo
 
 @Component({
   selector: 'app-process-list',
-  imports: [FormsModule, RouterLink, UiBadgeComponent, UiBreadcrumbsComponent, UiMessageComponent, UiPanelComponent],
+  imports: [MatButtonModule, MatFormFieldModule, MatInputModule, UiMaterialInputDirective, FormsModule, RouterLink, UiBadgeComponent, UiBreadcrumbsComponent, UiMessageComponent, UiPanelComponent],
   styles: [`
     .filters { align-items: end; margin-bottom: var(--ui-space-4); }
     td a { font-weight: 600; }
@@ -19,34 +23,34 @@ import { UiBadgeComponent, UiBreadcrumbsComponent, UiMessageComponent, UiPanelCo
     <ui-breadcrumbs [items]="[{ label: 'Procesos' }]" />
     <ui-panel headingId="processes-title" eyebrow="PROCESOS" heading="Procesos">
       @if (auth.hasAnyProfile('ADMIN', 'PROCESS_OWNER')) {
-        <a panelActions class="primary-button" routerLink="/procesos/nuevo">Nuevo proceso</a>
+        <a matButton="filled" panelActions class="primary-button" routerLink="/procesos/nuevo">Nuevo proceso</a>
       }
-      @if (error()) { <ui-message kind="error">{{ error() }}</ui-message><button type="button" class="quiet-button" (click)="search()">Reintentar búsqueda</button> }
-      @if (catalogError()) { <ui-message kind="error">{{ catalogError() }}</ui-message><button type="button" class="quiet-button" (click)="loadFilters()">Reintentar filtros</button> }
+      @if (error()) { <ui-message kind="error">{{ error() }}</ui-message><button matButton="outlined" type="button" class="quiet-button" (click)="search()">Reintentar búsqueda</button> }
+      @if (catalogError()) { <ui-message kind="error">{{ catalogError() }}</ui-message><button matButton="outlined" type="button" class="quiet-button" (click)="loadFilters()">Reintentar filtros</button> }
       <form class="ui-form-grid filters" (ngSubmit)="search()" role="search" aria-label="Buscar procesos">
         <label class="field">Buscar
-          <input name="q" type="search" placeholder="Código, nombre, alias, responsable o descripción" [(ngModel)]="q" />
+          <mat-form-field appearance="outline" subscriptSizing="dynamic"><input matInput name="q" type="search" placeholder="Código, nombre, alias, responsable o descripción" [(ngModel)]="q" /></mat-form-field>
         </label>
         <label class="field">Macroproceso
-          <select name="macro" [(ngModel)]="macroprocessId" (ngModelChange)="processTypeId = ''">
+          <mat-form-field appearance="outline" subscriptSizing="dynamic"><select matNativeControl name="macro" [(ngModel)]="macroprocessId" (ngModelChange)="processTypeId = ''">
             <option value="">Todos</option>
             @for (macro of macroOptions(); track macro.id) { <option [value]="macro.id">{{ macro.code }} · {{ macro.name }}</option> }
-          </select>
+          </select></mat-form-field>
         </label>
         <label class="field">Tipo de proceso
-          <select name="type" [(ngModel)]="processTypeId">
+          <mat-form-field appearance="outline" subscriptSizing="dynamic"><select matNativeControl name="type" [(ngModel)]="processTypeId">
             <option value="">Todos</option>
             @for (type of typeOptions(); track type.id) { <option [value]="type.id">{{ type.name }}</option> }
-          </select>
+          </select></mat-form-field>
         </label>
         <label class="field">Unidad interna
-          <select name="unit" [(ngModel)]="unitId">
+          <mat-form-field appearance="outline" subscriptSizing="dynamic"><select matNativeControl name="unit" [(ngModel)]="unitId">
             <option value="">Todas</option>
             @for (unit of units(); track unit.id) { <option [value]="unit.id">{{ unit.name }}</option> }
-          </select>
+          </select></mat-form-field>
         </label>
-        <div class="ui-form-actions"><button class="primary-button" type="submit">Buscar</button>
-          <button class="quiet-button" type="button" (click)="clear()">Limpiar</button></div>
+        <div class="ui-form-actions"><button matButton="filled" class="primary-button" type="submit">Buscar</button>
+          <button matButton="outlined" class="quiet-button" type="button" (click)="clear()">Limpiar</button></div>
       </form>
       @if (loading()) { <p class="helper" role="status">Cargando información…</p> }
       @else if (!error()) {

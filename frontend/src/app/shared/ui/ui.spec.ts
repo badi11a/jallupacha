@@ -1,3 +1,4 @@
+import { ComponentFixture as DialogFixture, DeferBlockState } from '@angular/core/testing';
 import { ApplicationRef, Component, ElementRef, inject, provideZoneChangeDetection, signal } from '@angular/core';
 import { TestBed } from '@angular/core/testing';
 import { provideRouter } from '@angular/router';
@@ -63,7 +64,7 @@ class KitPartsComponent {
 }
 
 function buttonByText(root: HTMLElement, text: string): HTMLButtonElement {
-  return [...root.querySelectorAll('button')].find((button) => button.textContent?.trim() === text) as HTMLButtonElement;
+  return [...root.querySelectorAll('button'), ...document.querySelectorAll('[role="dialog"] button')].find((button) => button.textContent?.trim() === text) as HTMLButtonElement;
 }
 
 describe('shared/ui', () => {
@@ -143,23 +144,31 @@ describe('shared/ui', () => {
   it('resolves a confirmation dialog with confirm or cancel', async () => {
     const fixture = TestBed.createComponent(HostComponent);
     fixture.detectChanges();
+    await fixture.whenStable();
+    await loadDialogs(fixture);
     const dialogs = TestBed.inject(UiDialogService);
     const root = fixture.nativeElement as HTMLElement;
 
     const accepted = dialogs.confirm({ title: 'Retirar', message: '¿Retirar «A»?', confirmLabel: 'Retirar', tone: 'danger' });
     fixture.detectChanges();
-    const dialog = root.querySelector('dialog') as HTMLDialogElement;
-    expect(dialog.hasAttribute('open')).toBe(true);
+    await fixture.whenStable();
+    await loadDialogs(fixture);
+    const dialog = document.querySelector('[role="dialog"]') as HTMLDialogElement;
+    expect(dialog.getAttribute('role')).toBe('dialog');
     expect(dialog.getAttribute('aria-labelledby')).toBe('ui-dialog-title');
     expect(dialog.textContent).toContain('¿Retirar «A»?');
-    expect(buttonByText(root, 'Retirar').className).toBe('danger-button');
+    expect(buttonByText(root, 'Retirar').classList.contains('danger-button')).toBe(true);
     buttonByText(root, 'Retirar').click();
     await expect(accepted).resolves.toBe(true);
     fixture.detectChanges();
-    expect(root.querySelector('dialog')).toBeNull();
+    await fixture.whenStable();
+    await loadDialogs(fixture);
+    expect(document.querySelector('[role="dialog"]')).toBeNull();
 
     const declined = dialogs.confirm({ title: 'Retirar', message: '¿Retirar «B»?' });
     fixture.detectChanges();
+    await fixture.whenStable();
+    await loadDialogs(fixture);
     buttonByText(root, 'Cancelar').click();
     await expect(declined).resolves.toBe(false);
   });
@@ -167,6 +176,8 @@ describe('shared/ui', () => {
   it('validates form dialog fields before resolving trimmed values', async () => {
     const fixture = TestBed.createComponent(HostComponent);
     fixture.detectChanges();
+    await fixture.whenStable();
+    await loadDialogs(fixture);
     const dialogs = TestBed.inject(UiDialogService);
     const root = fixture.nativeElement as HTMLElement;
     let result: UiDialogValues | null | undefined;
@@ -178,9 +189,11 @@ describe('shared/ui', () => {
       ]
     }).then((values) => (result = values));
     fixture.detectChanges();
+    await fixture.whenStable();
+    await loadDialogs(fixture);
 
-    const name = root.querySelector('#ui-dialog-field-name') as HTMLInputElement;
-    const order = root.querySelector('#ui-dialog-field-order') as HTMLInputElement;
+    const name = document.querySelector('#ui-dialog-field-name') as HTMLInputElement;
+    const order = document.querySelector('#ui-dialog-field-order') as HTMLInputElement;
     expect(name.value).toBe('Actual');
     expect(order.value).toBe('2');
     name.value = '   ';
@@ -190,14 +203,19 @@ describe('shared/ui', () => {
     buttonByText(root, 'Guardar').click();
     fixture.detectChanges();
     await fixture.whenStable();
+    await loadDialogs(fixture);
+    await fixture.whenStable();
+    await loadDialogs(fixture);
     expect(result).toBeUndefined();
     expect(name.getAttribute('aria-invalid')).toBe('true');
-    expect(root.querySelector('#ui-dialog-field-name-error')?.textContent).toContain('Complete este campo.');
-    expect(root.querySelector('#ui-dialog-field-order-error')?.textContent).toContain('Ingrese un valor entre 0 y 9.');
+    expect(document.querySelector('#ui-dialog-field-name-error')?.textContent).toContain('Complete este campo.');
+    expect(document.querySelector('#ui-dialog-field-order-error')?.textContent).toContain('Ingrese un valor entre 0 y 9.');
 
     name.value = '  Nuevo  ';
     name.dispatchEvent(new Event('input'));
     fixture.detectChanges();
+    await fixture.whenStable();
+    await loadDialogs(fixture);
     expect(name.getAttribute('aria-invalid')).toBeNull();
     expect(order.getAttribute('aria-invalid')).toBe('true');
     expect(order.getAttribute('aria-describedby')).toContain('ui-dialog-field-order-error');
@@ -205,6 +223,7 @@ describe('shared/ui', () => {
     order.dispatchEvent(new Event('input'));
     buttonByText(root, 'Guardar').click();
     await fixture.whenStable();
+    await loadDialogs(fixture);
     expect(result).toEqual({ name: 'Nuevo', order: 7 });
   });
 
@@ -213,6 +232,27 @@ describe('shared/ui', () => {
     const first = dialogs.confirm({ title: 'Uno', message: 'Primero' });
     void dialogs.confirm({ title: 'Dos', message: 'Segundo' });
     await expect(first).resolves.toBe(false);
+  });
+
+  it('keeps a replacement request active after the previous Material overlay closes', async () => {
+    const fixture = TestBed.createComponent(HostComponent);
+    fixture.detectChanges();
+    await loadDialogs(fixture);
+    const dialogs = TestBed.inject(UiDialogService);
+    const first = dialogs.confirm({ title: 'Primero', message: 'Primero' });
+    fixture.detectChanges();
+    await fixture.whenStable();
+    const second = dialogs.form({ title: 'Segundo', fields: [{ key: 'name', label: 'Nombre' }] });
+    fixture.detectChanges();
+    await fixture.whenStable();
+    fixture.detectChanges();
+    await expect(first).resolves.toBe(false);
+    expect(dialogs.active()?.kind).toBe('form');
+    await expect.poll(() => document.querySelectorAll('[role="dialog"]').length).toBe(1);
+    expect(document.querySelector('[role="dialog"]')?.textContent).toContain('Segundo');
+    buttonByText(document.body, 'Cancelar').click();
+    await expect(second).resolves.toBeNull();
+    fixture.destroy();
   });
 
   it('counts normalized input with the declared server criterion', () => {
@@ -263,23 +303,31 @@ describe('shared/ui', () => {
 
     const fixture = TestBed.createComponent(HostComponent);
     fixture.detectChanges();
+    await fixture.whenStable();
+    await loadDialogs(fixture);
     const dialogs = TestBed.inject(UiDialogService);
     const answer = dialogs.form({ title: 'Editar registro', fields: [
       { key: 'text', label: 'Texto', maxLength: 1, lengthMode: 'validator', required: true }
     ] });
     fixture.detectChanges();
+    await fixture.whenStable();
+    await loadDialogs(fixture);
     const root = fixture.nativeElement as HTMLElement;
-    const input = root.querySelector('dialog input') as HTMLInputElement;
+    const input = document.querySelector('[role="dialog"] input') as HTMLInputElement;
     expect(input.hasAttribute('maxlength')).toBe(false);
     input.value = '😀😀';
     input.dispatchEvent(new Event('input'));
     buttonByText(root, 'Guardar').click();
     fixture.detectChanges();
+    await fixture.whenStable();
+    await loadDialogs(fixture);
     expect(input.getAttribute('aria-invalid')).toBe('true');
     expect(document.activeElement).toBe(input);
     input.value = ' 😀 ';
     input.dispatchEvent(new Event('input'));
     fixture.detectChanges();
+    await fixture.whenStable();
+    await loadDialogs(fixture);
     expect(input.hasAttribute('aria-invalid')).toBe(false);
     buttonByText(root, 'Guardar').click();
     await expect(answer).resolves.toEqual({ text: '😀' });
@@ -322,6 +370,8 @@ describe('shared/ui', () => {
   it('returns focus to the control that opened a dialog once it closes (C-007 R2)', async () => {
     const fixture = TestBed.createComponent(HostComponent);
     fixture.detectChanges();
+    await fixture.whenStable();
+    await loadDialogs(fixture);
     const root = fixture.nativeElement as HTMLElement;
     const opener = buttonByText(root, 'Acción');
     opener.focus();
@@ -329,16 +379,21 @@ describe('shared/ui', () => {
 
     const answer = dialogs.confirm({ title: 'Confirmar', message: '¿Continuar?' });
     fixture.detectChanges();
-    expect(root.querySelector('dialog')?.contains(document.activeElement)).toBe(true);
+    await fixture.whenStable();
+    await loadDialogs(fixture);
+    expect(document.querySelector('[role="dialog"]')?.contains(document.activeElement)).toBe(true);
     // Un <dialog> modal real impide enfocar fuera de él: cuando el foco vuelve ya no debe estar abierto.
     let dialogOpenOnFocus: boolean | null = null;
-    opener.addEventListener('focus', () => (dialogOpenOnFocus = !!root.querySelector('dialog[open]')), { once: true });
+    opener.addEventListener('focus', () => (dialogOpenOnFocus = !!document.querySelector('[role="dialog"]')), { once: true });
     buttonByText(root, 'Cancelar').click();
     await answer;
     fixture.detectChanges();
+    await fixture.whenStable();
+    await loadDialogs(fixture);
     TestBed.inject(ApplicationRef).tick();
     await fixture.whenStable();
-    expect(root.querySelector('dialog')).toBeNull();
+    await loadDialogs(fixture);
+    expect(document.querySelector('[role="dialog"]')).toBeNull();
     expect(document.activeElement).toBe(opener);
     expect(dialogOpenOnFocus).toBe(false);
     fixture.destroy();
@@ -356,3 +411,9 @@ describe('shared/ui', () => {
     expect(errors).toEqual({ n: 'Ingrese un número entero.', t: 'Use como máximo 3 caracteres.' });
   });
 });
+
+/** Unit tests load the real deferred outlet deterministically; browser checks cover lazy loading. */
+async function loadDialogs(fixture: DialogFixture<unknown>): Promise<void> {
+  for (const block of await fixture.getDeferBlocks()) await block.render(DeferBlockState.Complete);
+  fixture.detectChanges();
+}

@@ -1,3 +1,4 @@
+import { ComponentFixture as DialogFixture, DeferBlockState } from '@angular/core/testing';
 import { provideHttpClient } from '@angular/common/http';
 import { HttpTestingController, provideHttpClientTesting } from '@angular/common/http/testing';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
@@ -62,6 +63,7 @@ describe('Protección de ediciones — C-032, R-04/R-05/R-07', () => {
   });
 
   async function settle(): Promise<void> {
+    await loadDialogs(fixture);
     await fixture.whenStable();
     fixture.detectChanges();
   }
@@ -69,6 +71,7 @@ describe('Protección de ediciones — C-032, R-04/R-05/R-07', () => {
   async function renderPendingNavigation(): Promise<void> {
     // La navegación espera la confirmación: no esperar estabilidad hasta resolver el diálogo.
     await new Promise<void>(resolve => setTimeout(resolve, 0));
+    await loadDialogs(fixture);
     fixture.detectChanges();
   }
 
@@ -114,7 +117,7 @@ describe('Protección de ediciones — C-032, R-04/R-05/R-07', () => {
     http.expectNone('/api/auth/logout');
     expect(TestBed.inject(AuthService).isAuthenticated()).toBe(true);
     expect(sessionStorage.getItem('jallupacha_user')).toBeNull();
-    expect(root.querySelector('dialog')).toBeNull();
+    expect(document.querySelector('[role="dialog"]')).toBeNull();
   }
 
   for (const catalog of [
@@ -131,21 +134,21 @@ describe('Protección de ediciones — C-032, R-04/R-05/R-07', () => {
     it(`${catalog.endpoint}: reemplazo limpio inmediato y cambio de registro con descarte aceptado o cancelado`, async () => {
       await openCatalog();
       await click('Editar', root.querySelectorAll('tbody tr')[0]);
-      expect(root.querySelector('dialog')).toBeNull();
+      expect(document.querySelector('[role="dialog"]')).toBeNull();
       await type('input[name=name]', 'Edición pendiente');
       await click('Editar', root.querySelectorAll('tbody tr')[0]);
       expect((root.querySelector('input[name=name]') as HTMLInputElement).value).toBe('Edición pendiente');
-      expect(root.querySelector('dialog')).toBeNull();
+      expect(document.querySelector('[role="dialog"]')).toBeNull();
       await click('Editar', root.querySelectorAll('tbody tr')[1]);
-      expect(root.querySelectorAll('dialog')).toHaveLength(1);
-      await click('Continuar editando', root.querySelector('dialog')!);
+      expect(document.querySelectorAll('[role="dialog"]')).toHaveLength(1);
+      await click('Continuar editando', document.querySelector('[role="dialog"]')!);
       expect((root.querySelector('input[name=name]') as HTMLInputElement).value).toBe('Edición pendiente');
       await click('Editar', root.querySelectorAll('tbody tr')[1]);
-      await click('Descartar cambios', root.querySelector('dialog')!);
+      await click('Descartar cambios', document.querySelector('[role="dialog"]')!);
       expect((root.querySelector('input[name=name]') as HTMLInputElement).value).toBe(catalog.second);
       await click('Cancelar', root.querySelector('form')!);
       expect(root.querySelector('form')).toBeNull();
-      expect(root.querySelector('dialog')).toBeNull();
+      expect(document.querySelector('[role="dialog"]')).toBeNull();
     });
 
     it(`${catalog.endpoint}: iniciar un registro nuevo protege la edición y descarta solo al confirmar`, async () => {
@@ -153,13 +156,13 @@ describe('Protección de ediciones — C-032, R-04/R-05/R-07', () => {
       await click('Editar', root.querySelectorAll('tbody tr')[0]);
       await type('input[name=name]', 'Pendiente');
       await click(catalog.create);
-      await click('Continuar editando', root.querySelector('dialog')!);
+      await click('Continuar editando', document.querySelector('[role="dialog"]')!);
       expect((root.querySelector('input[name=name]') as HTMLInputElement).value).toBe('Pendiente');
       await click(catalog.create);
-      await click('Descartar cambios', root.querySelector('dialog')!);
+      await click('Descartar cambios', document.querySelector('[role="dialog"]')!);
       expect((root.querySelector('input[name=name]') as HTMLInputElement).value).toBe('');
       await click('Cancelar', root.querySelector('form')!);
-      expect(root.querySelector('dialog')).toBeNull();
+      expect(document.querySelector('[role="dialog"]')).toBeNull();
     });
 
     it(`${catalog.endpoint}: guardado pendiente bloquea salida, doble envío y cambios; el fallo conserva datos y permite reintentar`, async () => {
@@ -192,10 +195,10 @@ describe('Protección de ediciones — C-032, R-04/R-05/R-07', () => {
     await click('Editar', section('Riesgos').querySelectorAll('article')[0]);
     await type('textarea[name=description]', 'Riesgo pendiente');
     await click('Editar', section('Riesgos').querySelector('article')!);
-    await click('Continuar editando', root.querySelector('dialog')!);
+    await click('Continuar editando', document.querySelector('[role="dialog"]')!);
     expect((root.querySelector('textarea[name=description]') as HTMLTextAreaElement).value).toBe('Riesgo pendiente');
     await click('Editar', section('Riesgos').querySelector('article')!);
-    await click('Descartar cambios', root.querySelector('dialog')!);
+    await click('Descartar cambios', document.querySelector('[role="dialog"]')!);
     expect((root.querySelector('textarea[name=description]') as HTMLTextAreaElement).value).toBe('Riesgo 2');
   });
 
@@ -205,10 +208,10 @@ describe('Protección de ediciones — C-032, R-04/R-05/R-07', () => {
     await click('Editar', relations.querySelectorAll('article')[0]);
     await type('textarea[name=relationDescription]', 'Relación pendiente');
     await click('Editar', relations.querySelector('article')!);
-    await click('Continuar editando', root.querySelector('dialog')!);
+    await click('Continuar editando', document.querySelector('[role="dialog"]')!);
     expect((root.querySelector('textarea[name=relationDescription]') as HTMLTextAreaElement).value).toBe('Relación pendiente');
     await click('Editar', relations.querySelector('article')!);
-    await click('Descartar cambios', root.querySelector('dialog')!);
+    await click('Descartar cambios', document.querySelector('[role="dialog"]')!);
     expect((root.querySelector('textarea[name=relationDescription]') as HTMLTextAreaElement).value).toBe('Relación 2');
   });
 
@@ -220,14 +223,14 @@ describe('Protección de ediciones — C-032, R-04/R-05/R-07', () => {
     expect((root.querySelector('textarea[name=rejectionReason]') as HTMLTextAreaElement).value).toBe('Observaciones pendientes');
     const reject = root.querySelector('section[aria-labelledby=reject-title]')!;
     await click('Cancelar', reject);
-    await click('Continuar editando', root.querySelector('dialog')!);
+    await click('Continuar editando', document.querySelector('[role="dialog"]')!);
     expect((root.querySelector('textarea[name=rejectionReason]') as HTMLTextAreaElement).value).toBe('Observaciones pendientes');
     await click('Cancelar', reject);
-    await click('Descartar cambios', root.querySelector('dialog')!);
+    await click('Descartar cambios', document.querySelector('[role="dialog"]')!);
     expect(root.querySelector('textarea[name=rejectionReason]')).toBeNull();
     await click('Rechazar con observaciones');
     await click('Cancelar', root.querySelector('section[aria-labelledby=reject-title]')!);
-    expect(root.querySelector('dialog')).toBeNull();
+    expect(document.querySelector('[role="dialog"]')).toBeNull();
   });
 
   for (const saved of ['risk', 'relation'] as const) {
@@ -255,7 +258,7 @@ describe('Protección de ediciones — C-032, R-04/R-05/R-07', () => {
       expect((root.querySelector(selector) as HTMLTextAreaElement).value).toBe(saved === 'risk' ? 'Relación pendiente' : 'Riesgo pendiente');
       const navigation = router.navigateByUrl('/mapa');
       await renderPendingNavigation();
-      await click('Continuar editando', root.querySelector('dialog')!);
+      await click('Continuar editando', document.querySelector('[role="dialog"]')!);
       expect(await navigation).toBe(false);
       expect(router.url).toBe('/procesos/4');
     });
@@ -318,7 +321,7 @@ describe('Protección de ediciones — C-032, R-04/R-05/R-07', () => {
     expect(form.isDirty()).toBe(false);
     expect(counter.hidden).toBe(true);
     await click('Cancelar');
-    expect(root.querySelector('dialog')).toBeNull();
+    expect(document.querySelector('[role="dialog"]')).toBeNull();
     http.expectOne('/api/management/processes/4').flush(structuredClone(DETAIL));
     await settle();
   });
@@ -339,7 +342,7 @@ describe('Protección de ediciones — C-032, R-04/R-05/R-07', () => {
     const responsible = root.querySelector('#field-resp-unit') as HTMLSelectElement;
     expect(responsible.selectedOptions[0]?.textContent).toContain('Unidad 2 (inactiva)');
     await click('Cancelar');
-    expect(root.querySelector('dialog')).toBeNull();
+    expect(document.querySelector('[role="dialog"]')).toBeNull();
     http.expectOne('/api/management/processes/4').flush(structuredClone(DETAIL));
     await settle();
   });
@@ -384,7 +387,7 @@ describe('Protección de ediciones — C-032, R-04/R-05/R-07', () => {
     http.expectOne('/api/management/processes/4').flush(structuredClone(DETAIL));
     await settle();
     expect(router.url).toBe('/procesos/4');
-    expect(root.querySelector('dialog')).toBeNull();
+    expect(document.querySelector('[role="dialog"]')).toBeNull();
   });
 
   it('proceso: si el destino de guardado no se abre, nuevas modificaciones vuelven a quedar protegidas', async () => {
@@ -398,7 +401,7 @@ describe('Protección de ediciones — C-032, R-04/R-05/R-07', () => {
     await type('#field-name', 'Cambio posterior');
     const navigation = router.navigateByUrl('/mapa');
     await renderPendingNavigation();
-    await click('Continuar editando', root.querySelector('dialog')!);
+    await click('Continuar editando', document.querySelector('[role="dialog"]')!);
     expect(await navigation).toBe(false);
     expect((root.querySelector('#field-name') as HTMLInputElement).value).toBe('Cambio posterior');
   });
@@ -424,3 +427,9 @@ describe('Protección de ediciones — C-032, R-04/R-05/R-07', () => {
     expect(root.textContent).toContain('Persona 2');
   });
 });
+
+/** Unit tests load the real deferred outlet deterministically; browser checks cover lazy loading. */
+async function loadDialogs(fixture: DialogFixture<unknown>): Promise<void> {
+  for (const block of await fixture.getDeferBlocks()) await block.render(DeferBlockState.Complete);
+  fixture.detectChanges();
+}

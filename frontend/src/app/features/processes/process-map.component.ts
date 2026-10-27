@@ -1,3 +1,7 @@
+import { MatButtonModule } from '@angular/material/button';
+import { MatFormFieldModule } from '@angular/material/form-field';
+import { MatInputModule } from '@angular/material/input';
+import { UiMaterialInputDirective } from '../../shared/ui';
 import { Component, DestroyRef, OnInit, inject, signal } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
@@ -9,7 +13,7 @@ const normalize = (value: string) => value.normalize('NFD').replace(/[\u0300-\u0
 
 @Component({
   selector: 'app-process-map',
-  imports: [RouterLink, UiMessageComponent],
+  imports: [MatButtonModule, MatFormFieldModule, MatInputModule, UiMaterialInputDirective, RouterLink, UiMessageComponent],
   templateUrl: './process-map.component.html',
   styleUrl: './process-map.component.css'
 })

@@ -1,20 +1,24 @@
+import { MatButtonModule } from '@angular/material/button';
+import { MatFormFieldModule } from '@angular/material/form-field';
+import { MatInputModule } from '@angular/material/input';
+import { UiMaterialInputDirective } from '../../shared/ui';
 import { Component, ElementRef, inject, signal } from '@angular/core';
 import { FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { LeavesWithConfirmation, PendingChanges } from '../../core/platform';
 import { UiDialogService, UiMessageComponent, focusFirstInvalid } from '../../shared/ui';
 
-@Component({ imports: [ReactiveFormsModule, UiMessageComponent], template: `
+@Component({ imports: [MatButtonModule, MatFormFieldModule, MatInputModule, UiMaterialInputDirective, ReactiveFormsModule, UiMessageComponent], template: `
   <h1>Ejemplo de formulario</h1>
   <p>Muestra de interacción sin persistencia. Los datos se conservan solo en esta pantalla.</p>
   @if (notice()) { <ui-message kind="success">{{ notice() }}</ui-message> }
   <form class="ui-form" [formGroup]="form" (ngSubmit)="save()" novalidate>
     <div class="field"><label for="example-name">Nombre (obligatorio)</label>
-      <input id="example-name" formControlName="name" required maxlength="120"
-        [attr.aria-invalid]="invalid() ? true : null" [attr.aria-describedby]="invalid() ? 'example-error' : null" />
+      <mat-form-field appearance="outline" subscriptSizing="dynamic"><input matInput [uiInvalid]="invalid() ? true : null" id="example-name" formControlName="name" required maxlength="120"
+        [attr.aria-invalid]="invalid() ? true : null" [aria-describedby]="invalid() ? 'example-error' : ''" /></mat-form-field>
       @if (invalid()) { <p class="field-error" id="example-error">Ingrese un nombre de hasta 120 caracteres.</p> }
     </div>
-    <div class="ui-form-actions"><button type="submit" class="primary-button">Confirmar ejemplo</button>
-      <button type="button" class="quiet-button" (click)="cancel()">Cancelar</button></div>
+    <div class="ui-form-actions"><button matButton="filled" type="submit" class="primary-button">Confirmar ejemplo</button>
+      <button matButton="outlined" type="button" class="quiet-button" (click)="cancel()">Cancelar</button></div>
   </form>` })
 export class ExampleComponent implements LeavesWithConfirmation {
   private readonly dialogs = inject(UiDialogService);

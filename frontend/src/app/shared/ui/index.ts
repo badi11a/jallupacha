@@ -1,4 +1,5 @@
 // API pública del kit de interfaz. Las aplicaciones importan solo desde aquí.
+export { UiMaterialInputDirective } from './material-input.directive';
 export { UiBadgeComponent, type UiBadgeTone } from './badge.component';
 export { UiBreadcrumbsComponent, type UiBreadcrumb } from './breadcrumbs.component';
 export { UiCharCounterComponent, charCountState, countCharacters, type UiCharCountState } from './char-counter.component';
