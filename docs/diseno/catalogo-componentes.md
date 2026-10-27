@@ -1,6 +1,6 @@
 # Catálogo de componentes — Sistema de diseño digital
 
-**Revisión:** C-050, 2026-10-27. **Estado:** contratos del kit y base 0.2.0 en validación técnica; adopción institucional fuera del alcance de esta revisión.
+**Revisión:** C-052, 2026-10-27. **Estado:** contratos del kit y base 0.2.1 en validación técnica; adopción institucional fuera del alcance de esta revisión.
 
 La API se coteja con [el punto de entrada público](../../frontend/src/app/shared/ui/index.ts). Disponible no significa validado con usuarios. [STD-UX-001](marco_estandar_ux_institucional.md) establece reglas y evaluación; [fundamentos](design-system.md), identidad y tokens. Rutas, permisos, contenido y reglas de negocio pertenecen a cada producto.
 
@@ -122,4 +122,4 @@ La muestra `frontend/test/fixtures/ui-compatibility.html` convive con controles 
 
 Antes de adaptar otro producto: comprobar controles externos antes/después de cargar el kit, variables locales, foco y teclado, textos largos, errores, tablas, ancho de 320 píxeles y ampliación real al 200 %. Los resultados de DOM automatizado no acreditan esas comprobaciones de navegador. Identificar consumidores y adaptar `ui-root`, restablecimiento y criterio de longitud en el mismo cambio cuando cambie este contrato. Se mantiene el estado de piloto; el soporte institucional y la evaluación con tecnologías de asistencia se tratan en la adopción correspondiente, fuera del trabajo activo delimitado en C-049.
 
-C-048: el destino predeterminado de identidad del módulo pasó a la raíz neutral. Jallupacha sigue proporcionando /mapa explícitamente; consumidores que dependían del valor implícito anterior deben declarar su destino. En ese cambio se introdujo la base 0.1.0. La versión actual del generador y del contrato es 0.2.0, conforme a la migración C-050.
+C-048: el destino predeterminado de identidad del módulo pasó a la raíz neutral. Jallupacha sigue proporcionando /mapa explícitamente; consumidores que dependían del valor implícito anterior deben declarar su destino. En ese cambio se introdujo la base 0.1.0. La versión actual del generador y del contrato es 0.2.1: C-050 amplió paginación en 0.2.0 y C-052 corrige la dependencia de tipos para instalar/probar el consumidor de forma independiente, sin cambiar APIs visuales.

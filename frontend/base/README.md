@@ -4,6 +4,8 @@ Contrato: [STD-FE-001](../../docs/diseno/base-frontend.md). Versión y fuentes c
 
 C-050: versión 0.2.0 por API aditiva de paginación (`summaryMode` y nombre accesible). Se conserva el resumen predeterminado; el modo `pages` presenta el total de páginas. Los consumidores 0.1.0 se revisan y migran explícitamente; el generador no los sobrescribe. Manifiesto, paquete generado, lockfile y documentos de plantilla declaran la misma versión.
 
+C-052: versión actual **0.2.1**, corrección compatible de instalación independiente. `@types/node` se declara como dependencia de desarrollo para los tipos que exige `tsconfig.spec.json`. Los consumidores 0.2.0 revisan paquete y lockfile, incorporan la dependencia y verifican instalación/pruebas/compilación fuera del árbol del producto; el generador no los sobrescribe. No cambia la API del núcleo o del kit. Las verificaciones anteriores dentro de directorios descendientes podían resolver tipos del backend desde un ancestro y no acreditan esa independencia.
+
 Desde la raíz del repositorio:
 
 ```text

@@ -1,6 +1,6 @@
 {
   "name": "angular-frontend-base",
-  "version": "0.2.0",
+  "version": "0.2.1",
   "status": "validation",
   "dependencyOverrides": { "vite": "8.3.5" },
   "sharedRoots": ["src/app/core/platform", "src/app/shared/ui"],
