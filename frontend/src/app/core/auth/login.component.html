@@ -1,0 +1,26 @@
+<section class="login-panel" aria-labelledby="login-title">
+  <span class="eyebrow">Sistema de Procesos Institucionales</span>
+  <h1 id="login-title">Acceso Institucional</h1>
+  <p>Ingrese sus credenciales institucionales para acceder a la plataforma.</p>
+  @if (errorMessage()) { <ui-message kind="error">{{ errorMessage() }}</ui-message> }
+  @if (submitting()) { <p role="status">Iniciando sesión…</p> }
+  <form class="ui-form" [formGroup]="form" (ngSubmit)="onSubmit()" [attr.aria-busy]="submitting()" novalidate>
+    <div class="field">
+      <label for="login-email">Correo institucional (obligatorio)</label>
+      <input id="login-email" type="email" autocomplete="username" required formControlName="email"
+        [attr.aria-invalid]="fieldError('email') ? true : null"
+        [attr.aria-describedby]="fieldError('email') ? 'login-email-error' : null" />
+      @if (fieldError('email'); as error) { <p class="field-error" id="login-email-error">{{ error }}</p> }
+    </div>
+    <div class="field">
+      <label for="login-password">Contraseña (obligatorio)</label>
+      <input id="login-password" type="password" autocomplete="current-password" required formControlName="password"
+        [attr.aria-invalid]="fieldError('password') ? true : null"
+        [attr.aria-describedby]="fieldError('password') ? 'login-password-error' : null" />
+      @if (fieldError('password'); as error) { <p class="field-error" id="login-password-error">{{ error }}</p> }
+    </div>
+    <button class="primary-button" type="submit" [disabled]="submitting() || !email.trim() || !password">
+      {{ submitting() ? 'Iniciando sesión…' : 'Ingresar' }}
+    </button>
+  </form>
+</section>

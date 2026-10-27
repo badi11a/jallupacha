@@ -1,0 +1,68 @@
+@let d = detail();
+<section class="governance" aria-labelledby="governance-title">
+        <h2 id="governance-title" class="governance-heading">Gobernanza del proceso</h2>
+        <p class="governance-subheading">Unidades y personas encargadas de ejecutar, coordinar y participar en el proceso.</p>
+
+        <div class="gov-grid">
+          <!-- Tarjeta 1: Unidad Responsable -->
+          <article class="gov-card" aria-labelledby="gov-unit-resp-title">
+            <div class="gov-card-header">
+              <span class="gov-eyebrow">UNIDAD RESPONSABLE</span>
+              <h3 id="gov-unit-resp-title" class="gov-title">{{ responsibleUnit()?.name || 'Sin unidad asignada' }}</h3>
+              @if (responsibleUnit() && !responsibleUnit()!.isActive) {
+                <div class="gov-badge-row"><ui-badge tone="warning">Inactiva</ui-badge></div>
+              }
+              <p class="gov-desc">
+                {{ responsibleUnit()?.function || 'Sin función registrada.' }}
+              </p>
+            </div>
+            <div class="gov-card-footer">
+
+
+            </div>
+          </article>
+
+          <!-- Tarjeta 2: Responsable del Proceso -->
+          <article class="gov-card" aria-labelledby="gov-resp-person-title">
+            <div class="gov-card-header">
+              <span class="gov-eyebrow">RESPONSABLE DEL PROCESO</span>
+              <h3 id="gov-resp-person-title" class="gov-title">{{ d.responsible || 'Sin información' }}</h3>
+
+            </div>
+            <div class="gov-card-footer">
+
+
+              <div class="gov-meta-item">
+                <span class="gov-meta-label">Elaborador:</span>
+                <span class="gov-meta-value">{{ d.elaborator || 'Sin información' }}</span>
+              </div>
+            </div>
+          </article>
+
+          <!-- Tarjeta 3: Unidades Participantes -->
+          <article class="gov-card" aria-labelledby="gov-part-units-title">
+            <div class="gov-card-header">
+              <span class="gov-eyebrow">UNIDADES PARTICIPANTES</span>
+              <h3 id="gov-part-units-title" class="gov-title">Participación institucional</h3>
+              <p class="gov-desc">Unidades que colaboran, proveen información o intervienen en las distintas etapas del proceso.</p>
+            </div>
+            <div class="gov-pills-wrap">
+              @for (unit of participantUnits(); track unit.unitId) {
+                <div class="gov-participant-chip">
+                  <div class="participant-pill">
+                    <span>{{ unit.name }}</span>
+                    @if (!unit.isActive) {
+                      <ui-badge tone="warning">Inactiva</ui-badge>
+                    }
+                  </div>
+                  @if (unit.function) {
+                    <p class="participant-func">{{ unit.function }}</p>
+                  }
+                </div>
+              } @empty {
+                <p class="gov-empty">Sin unidades participantes registradas.</p>
+              }
+            </div>
+          </article>
+        </div>
+      </section>

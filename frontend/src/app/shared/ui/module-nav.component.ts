@@ -120,7 +120,7 @@ export class UiModuleNavComponent {
   private readonly router = inject(Router);
 
   readonly appName = input.required<string>();
-  readonly appLink = input<string>('/mapa');
+  readonly appLink = input<string>('/');
   readonly navLabel = input<string>('Navegación del módulo');
   readonly items = input.required<UiModuleNavItem[]>();
 

@@ -2,11 +2,14 @@ import { provideHttpClient } from '@angular/common/http';
 import { HttpTestingController, provideHttpClientTesting } from '@angular/common/http/testing';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { provideZoneChangeDetection } from '@angular/core';
+import { By } from '@angular/platform-browser';
 import { Router, provideRouter } from '@angular/router';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { AppComponent } from './app.component';
 import { routes } from './app.routes';
-import { FICHA_FIELDS, FichaKey, ProcessDetail, ProcessTypeItem, UnitItem } from './process-api.service';
+import { AuthService } from './core/auth/auth.service';
+import { FICHA_FIELDS, FichaKey, ProcessDetail, ProcessTypeItem, UnitItem } from './features/processes/process-api.service';
+import { ProcessFormComponent } from './features/processes/process-form.component';
 
 const UNITS: UnitItem[] = [1, 2].map(id => ({
   id, code: `U${id}`, name: `Unidad ${id}`, isActive: true, parentUnitId: null, processCount: 0
@@ -42,6 +45,8 @@ describe('Protección de ediciones — C-032, R-04/R-05/R-07', () => {
       imports: [AppComponent],
       providers: [provideZoneChangeDetection(), provideRouter(routes), provideHttpClient(), provideHttpClientTesting()]
     });
+    const identity = JSON.parse(sessionStorage.getItem('jallupacha_user')!);
+    TestBed.inject(AuthService).currentUser.set(identity);
     fixture = TestBed.createComponent(AppComponent);
     root = fixture.nativeElement;
     http = TestBed.inject(HttpTestingController);
@@ -107,7 +112,8 @@ describe('Protección de ediciones — C-032, R-04/R-05/R-07', () => {
     expect(router.url).toBe(url);
     await click('Cerrar sesión');
     http.expectNone('/api/auth/logout');
-    expect(sessionStorage.getItem('jallupacha_user')).not.toBeNull();
+    expect(TestBed.inject(AuthService).isAuthenticated()).toBe(true);
+    expect(sessionStorage.getItem('jallupacha_user')).toBeNull();
     expect(root.querySelector('dialog')).toBeNull();
   }
 
@@ -266,7 +272,7 @@ describe('Protección de ediciones — C-032, R-04/R-05/R-07', () => {
     await settle();
     expect((root.querySelector('textarea[name=description]') as HTMLTextAreaElement).value).toBe('Riesgo conservado');
     expect(root.querySelector('form[aria-label="Editar riesgo"]')?.closest('[inert]')).toBeNull();
-    expect(root.textContent).toContain('No fue posible actualizar la vista.');
+    expect(root.textContent).toContain('No se pudo completar la operación.');
   });
 
   async function openProcessForm(): Promise<void> {
@@ -277,6 +283,85 @@ describe('Protección de ediciones — C-032, R-04/R-05/R-07', () => {
     http.expectOne('/api/management/processes/4').flush({ ...structuredClone(DETAIL), status: 'Borrador' });
     await settle();
   }
+
+  it('C-050: un reintento fallido desactiva la captura previamente cargada y bloquea guardado', async () => {
+    await openProcessForm();
+    const form = fixture.debugElement.query(By.directive(ProcessFormComponent)).componentInstance as ProcessFormComponent;
+    expect(form.isDirty()).toBe(false);
+    form.ngOnInit(); fixture.detectChanges();
+    form.save(); http.expectNone(request => request.method === 'PATCH');
+    const detail = http.expectOne('/api/management/processes/4');
+    http.expectOne('/api/management/process-types').flush(TYPES);
+    http.expectOne('/api/management/units').flush(UNITS);
+    http.expectOne('/api/management/processes').flush({}, { status: 503, statusText: 'Unavailable' });
+    await settle();
+    expect(detail.cancelled).toBe(true);
+    expect(form.isDirty()).toBe(false);
+    form.save(); http.expectNone(request => request.method === 'PATCH');
+    expect(root.querySelector('#field-name')).toBeNull();
+  });
+
+  it('C-050: contador asociado mide texto recortado UTF-16 y revertir valores deja la captura limpia', async () => {
+    await openProcessForm();
+    const form = fixture.debugElement.query(By.directive(ProcessFormComponent)).componentInstance as ProcessFormComponent;
+    const field = root.querySelector<HTMLTextAreaElement>('#field-description')!;
+    const counter = root.querySelector<HTMLElement>('#counter-description')!;
+    expect(field.maxLength).toBe(4000);
+    expect(field.getAttribute('aria-describedby')).toBe(counter.id);
+    expect(field.labels?.[0].contains(counter)).toBe(false);
+    expect(counter.hidden).toBe(true);
+    await type('#field-description', '  ' + '😀'.repeat(1799) + 'e\u0301' + '  ');
+    expect(counter.hidden).toBe(false);
+    expect(counter.textContent).toContain('3.600 / 4.000');
+    expect(form.isDirty()).toBe(true);
+    await type('#field-description', '');
+    expect(form.isDirty()).toBe(false);
+    expect(counter.hidden).toBe(true);
+    await click('Cancelar');
+    expect(root.querySelector('dialog')).toBeNull();
+    http.expectOne('/api/management/processes/4').flush(structuredClone(DETAIL));
+    await settle();
+  });
+
+  it('C-049: carga ficha y catálogos en paralelo y espera todos antes de habilitar la edición', async () => {
+    await router.navigateByUrl('/procesos/4/editar'); fixture.detectChanges();
+    const detail = http.expectOne('/api/management/processes/4');
+    const types = http.expectOne('/api/management/process-types');
+    const units = http.expectOne('/api/management/units');
+    const processes = http.expectOne('/api/management/processes');
+    detail.flush({ ...structuredClone(DETAIL), status: 'Borrador', units: [{ unitId: 2, name: 'Unidad 2', role: 'RESPONSABLE' }] });
+    await settle();
+    expect(root.querySelector('#field-name')).toBeNull();
+    types.flush(TYPES); processes.flush([]);
+    units.flush(UNITS.map(unit => ({ ...unit, isActive: unit.id === 1 })));
+    await settle();
+    expect((root.querySelector('#field-name') as HTMLInputElement).value).toBe(DETAIL.name);
+    const responsible = root.querySelector('#field-resp-unit') as HTMLSelectElement;
+    expect(responsible.selectedOptions[0]?.textContent).toContain('Unidad 2 (inactiva)');
+    await click('Cancelar');
+    expect(root.querySelector('dialog')).toBeNull();
+    http.expectOne('/api/management/processes/4').flush(structuredClone(DETAIL));
+    await settle();
+  });
+
+  it('C-049: un fallo cancela las otras lecturas y el reintento no habilita un formulario vacío', async () => {
+    await router.navigateByUrl('/procesos/4/editar'); fixture.detectChanges();
+    const detail = http.expectOne('/api/management/processes/4');
+    http.expectOne('/api/management/process-types').flush(TYPES);
+    http.expectOne('/api/management/units').flush(UNITS);
+    http.expectOne('/api/management/processes').flush({}, { status: 503, statusText: 'Unavailable' });
+    await settle();
+    expect(detail.cancelled).toBe(true);
+    expect(root.querySelector('#field-name')).toBeNull();
+    http.expectNone(request => request.method === 'PATCH');
+    await click('Reintentar carga del formulario');
+    http.expectOne('/api/management/processes/4').flush(structuredClone(DETAIL));
+    http.expectOne('/api/management/process-types').flush(TYPES);
+    http.expectOne('/api/management/units').flush(UNITS);
+    http.expectOne('/api/management/processes').flush([]);
+    await settle();
+    expect((root.querySelector('#field-name') as HTMLInputElement).value).toBe(DETAIL.name);
+  });
 
   it('proceso: mantiene datos y sesión durante guardado pendiente; un fallo permite reintentar y completar la navegación', async () => {
     await openProcessForm();

@@ -2,9 +2,9 @@ import { TestBed } from '@angular/core/testing';
 import { provideRouter } from '@angular/router';
 import { of } from 'rxjs';
 import { describe, expect, it, vi, beforeEach } from 'vitest';
-import { AuthService, ProfileCode } from './auth.service';
-import { ProcessApi, ProcessDetail } from './process-api.service';
-import { ProcessDetailComponent } from './process-detail.component';
+import { AuthService, ProfileCode } from './core/auth/auth.service';
+import { ProcessApi, ProcessDetail } from './features/processes/process-api.service';
+import { ProcessDetailComponent } from './features/processes/process-detail.component';
 import { UiDialogService } from './shared/ui';
 
 describe('Process Lifecycle & Validation (REQ-07, REQ-09, REQ-56)', () => {

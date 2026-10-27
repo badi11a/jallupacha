@@ -1,2 +1,2 @@
 /* Restablecimiento opcional del documento anfitrión. Omitir en integraciones embebidas. */
-body.ui-page { margin: 0; min-width: 320px; }
+body.ui-page { margin: 0; min-width: 0; }

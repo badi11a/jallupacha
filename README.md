@@ -16,10 +16,15 @@ backend/src/
   risk/               Riesgos y sus catálogos
   common/             Configuración, validación y controles compartidos
 frontend/src/app/
-  process-map.*       Mapa de procesos
-  process-api.*       Cliente de captura
-  process-*           Búsqueda, ficha y edición
+  core/platform/      Núcleo configurable de sesión, HTTP y cambios pendientes
+  core/auth/          Adaptación de identidad y navegación del producto
+  features/processes/ Mapa, búsqueda, ficha y edición
+  features/catalogs/  Unidades y tipos de proceso
+  features/users/     Usuarios y perfiles
+  features/audit/     Consulta de auditoría
   shared/ui/          Componentes genéricos y tokens
+frontend/base/        Manifiesto y plantilla neutral versionada
+frontend/tools/       Generador y verificaciones de arquitectura/seguridad
 ```
 
 Cada dominio declara sus controladores y servicios en su módulo. Los servicios de captura separan estructura, ficha, ciclo de vida, riesgos y relaciones. Se mantiene un backend.
@@ -48,6 +53,8 @@ Se conservan las identidades de migraciones aplicadas y sus dependencias por dec
 npm test --workspace backend
 npm run test:e2e --workspace backend -- --runTestsByPath test/authorization.e2e-spec.ts test/processes.e2e-spec.ts test/demo-session.e2e-spec.ts test/management-authorization.e2e-spec.ts
 npm test --workspace frontend
+npm run check:source --workspace frontend
+npm run test:base --workspace frontend
 npm run check:contrast --workspace frontend
 npm run build
 npm run docs:openapi --workspace backend
@@ -57,10 +64,12 @@ Las pruebas Oracle requieren un esquema dedicado y configuración explícita; no
 
 ## Estado y documentación
 
-La versión de la especificación no equivale a una certificación de cumplimiento. Permanecen pendientes de cierre la coherencia de autenticación con Argon2id y proveedor local, la auditoría integral, validación Oracle y de instalación, CI de seguridad, carga y aceptación institucional. El kit de interfaz conserva sus propios pendientes de evaluación y adopción; no se presume conformidad WCAG integral.
+La versión de la especificación no equivale a una certificación de cumplimiento. Permanecen pendientes de cierre la coherencia de autenticación con Argon2id y proveedor local, la auditoría integral, validación Oracle y de instalación, CI de seguridad, carga y aceptación institucional. La base frontend 0.2.1 conserva la consolidación y verificaciones técnicas registradas en C-048 a C-050 e incorpora la corrección de dependencia de tipos de C-052 para su instalación independiente; los límites de evidencia y condiciones de adopción del kit están en su catálogo. No se presume conformidad WCAG integral.
 
 - [Documentación](docs/README.md)
 - [Reglas de desarrollo](AGENTS.md)
 - [Guía UX](docs/diseno/marco_estandar_ux_institucional.md)
+- [Base frontend y criterios SDD](docs/diseno/base-frontend.md)
+- [Generación y mantenimiento de la plantilla](frontend/base/README.md)
 - [Correcciones y verificaciones](docs/trazabilidad/correcciones.md)
 - [Licencia](LICENSE)

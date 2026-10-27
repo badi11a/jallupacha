@@ -1,0 +1,94 @@
+
+    <ui-breadcrumbs [items]="[{ label: 'Usuarios y perfiles' }]" />
+    <ui-panel headingId="users-title" eyebrow="ADMINISTRACIÓN" heading="Gestión de usuarios y perfiles">
+
+      @if (error()) { <ui-message kind="error">{{ error() }}</ui-message> }
+      @if (notice()) { <ui-message kind="success">{{ notice() }}</ui-message> }
+      @if (saving()) { <p class="helper" role="status">Guardando perfiles…</p> }
+
+      @if (editingUser(); as target) {
+        <section class="profile-editor" aria-labelledby="editor-title">
+          <h2 id="editor-title">Asignar perfiles: {{ target.displayName }} ({{ target.email }})</h2>
+          <p class="helper">Seleccione los perfiles institucionales correspondientes a este usuario.</p>
+          <fieldset class="profile-checkboxes" tabindex="-1" [disabled]="saving()" [attr.aria-busy]="saving()" [attr.aria-invalid]="profileError() ? true : null" [attr.aria-describedby]="profileError() ? 'profile-error' : null">
+            <legend class="visually-hidden">Perfiles institucionales</legend>
+            @for (prof of availableProfiles; track prof.code) {
+              <label class="profile-card">
+                <input
+                  type="checkbox"
+                  [checked]="isSelected(prof.code)"
+                  (change)="toggleProfile(prof.code)"
+                />
+                <div class="profile-info">
+                  <strong>{{ prof.name }}</strong>
+                  <p>{{ prof.description }}</p>
+                </div>
+              </label>
+            }
+          </fieldset>
+          @if (profileError()) { <p id="profile-error" class="field-error" role="alert">{{ profileError() }}</p> }
+          <div class="ui-form-actions editor-actions">
+            <button class="primary-button" type="button" [disabled]="saving()" (click)="saveProfiles()">
+              {{ saving() ? 'Guardando…' : 'Guardar perfiles' }}
+            </button>
+            <button class="quiet-button" type="button" [disabled]="saving()" (click)="cancelEdit()">
+              Cancelar
+            </button>
+          </div>
+        </section>
+      }
+
+      @if (loading()) {
+        <p class="helper" role="status">Cargando usuarios…</p>
+      } @else if (loadFailed()) { <button type="button" class="quiet-button" (click)="loadUsers()">Reintentar carga de usuarios</button> }
+      @else {
+        <div class="table-scroll" tabindex="0" role="region" aria-label="Usuarios y perfiles">
+          <table>
+            <caption class="visually-hidden">Listado de usuarios institucionales y sus perfiles</caption>
+            <thead>
+              <tr>
+                <th scope="col">ID</th>
+                <th scope="col">Nombre</th>
+                <th scope="col">Correo institucional</th>
+                <th scope="col">Perfiles asignados</th>
+                <th scope="col">Acciones</th>
+              </tr>
+            </thead>
+            <tbody>
+              @for (user of users(); track user.id) {
+                <tr>
+                  <td>{{ user.id }}</td>
+                  <td><strong>{{ user.displayName }}</strong></td>
+                  <td>{{ user.email }}</td>
+                  <td>
+                    <div class="badges-list">
+                      @for (code of parseProfiles(user.profiles); track code) {
+                        <ui-badge [tone]="getProfileTone(code)">{{ getProfileName(code) }}</ui-badge>
+                      } @empty {
+                        <span class="helper">Sin perfiles</span>
+                      }
+                    </div>
+                  </td>
+                  <td>
+                    @if (isSelf(user.id)) {
+                      <span class="self-tag">(Usuario actual)</span>
+                    } @else {
+                      <button
+                        type="button"
+                        class="text-button"
+                        [disabled]="saving() || editingUser()?.id === user.id"
+                        (click)="startEdit(user)"
+                      >
+                        Modificar perfiles
+                      </button>
+                    }
+                  </td>
+                </tr>
+              } @empty {
+                <tr><td colspan="5">No se encontraron usuarios activos en el sistema.</td></tr>
+              }
+            </tbody>
+          </table>
+        </div>
+      }
+    </ui-panel>

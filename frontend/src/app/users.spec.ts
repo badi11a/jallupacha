@@ -3,10 +3,10 @@ import { TestBed } from '@angular/core/testing';
 import { provideRouter } from '@angular/router';
 import { of, throwError } from 'rxjs';
 import { describe, expect, it, vi, beforeEach } from 'vitest';
-import { AuthService, ProfileCode } from './auth.service';
+import { AuthService, ProfileCode } from './core/auth/auth.service';
 import { UiDialogService } from './shared/ui';
-import { UsersComponent } from './users.component';
-import { UsersService } from './users.service';
+import { UsersComponent } from './features/users/users.component';
+import { UsersService } from './features/users/users.service';
 
 describe('UsersComponent (REQ-26)', () => {
   let mockUsersService: Partial<UsersService>;

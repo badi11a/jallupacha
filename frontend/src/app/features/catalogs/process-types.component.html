@@ -1,0 +1,49 @@
+
+    <ui-breadcrumbs [items]="[{ label: 'Tipos de proceso' }]" />
+    <ui-panel headingId="types-title" eyebrow="CATÁLOGO" heading="Tipos de proceso">
+      <button panelActions class="primary-button" type="button" [disabled]="saving()" (click)="startCreate()">Nuevo tipo de proceso</button>
+      <p class="helper">Cada macroproceso puede tener los tipos de proceso que se necesiten.</p>
+      @if (error()) { <ui-message kind="error">{{ error() }}</ui-message> }
+      @if (notice()) { <ui-message kind="success">{{ notice() }}</ui-message> }
+      @if (saving()) { <p class="helper" role="status">Guardando cambios…</p> }
+      @if (editing() !== null) {
+        <form novalidate class="ui-form ui-form-grid catalog-editor" (ngSubmit)="save()" [attr.aria-busy]="saving()" [attr.aria-label]="editing() === 0 ? 'Nuevo tipo de proceso' : 'Editar tipo de proceso'">
+          <label class="field">Macroproceso (obligatorio)
+            <select id="catalog-macro" name="macro" [(ngModel)]="macroprocessId" (ngModelChange)="fieldErrors.set({})" [attr.aria-invalid]="fieldErrors()['macro'] ? true : null" [attr.aria-describedby]="fieldErrors()['macro'] ? 'catalog-error-macro' : null" [disabled]="saving() || editing() !== 0">
+              <option [ngValue]="null">Seleccione…</option>
+              @for (macro of macros(); track macro.id) { <option [ngValue]="macro.id">{{ macro.code }} · {{ macro.name }}</option> }
+            </select>
+            @if (fieldErrors()['macro']) { <span id="catalog-error-macro" class="field-error" role="alert">{{ fieldErrors()['macro'] }}</span> }
+          </label>
+          <label class="field">Nombre (obligatorio)<input id="catalog-name" name="name" maxlength="120" [(ngModel)]="name" (ngModelChange)="fieldErrors.set({})" [attr.aria-invalid]="fieldErrors()['name'] ? true : null" [attr.aria-describedby]="fieldErrors()['name'] ? 'catalog-error-name' : null" [disabled]="saving()" required />@if (fieldErrors()['name']) { <span id="catalog-error-name" class="field-error" role="alert">{{ fieldErrors()['name'] }}</span> }</label>
+          <div class="ui-form-actions">
+            <button class="primary-button" type="submit" [disabled]="saving()">{{ saving() ? 'Guardando…' : 'Guardar tipo' }}</button>
+            <button class="quiet-button" type="button" [disabled]="saving()" (click)="cancel()">Cancelar</button>
+          </div>
+        </form>
+      }
+      @if (loading()) { <p class="helper" role="status">Cargando información…</p> }
+      @else if (loadFailed()) { <button type="button" class="quiet-button" (click)="load()">Reintentar carga</button> }
+      @else {
+        <div class="table-scroll" tabindex="0" role="region" aria-label="Tipos de proceso">
+          <table>
+            <caption class="visually-hidden">Tipos de proceso</caption>
+            <thead><tr><th scope="col">Macroproceso</th><th scope="col">Tipo de proceso</th><th scope="col">Procesos activos</th><th scope="col">Estado</th><th scope="col">Acciones</th></tr></thead>
+            <tbody>
+              @for (type of types(); track type.id) {
+                <tr>
+                  <td>{{ type.macroprocessCode }} · {{ type.macroprocessName }}</td>
+                  <td>{{ type.name }}</td>
+                  <td>{{ type.processCount }}</td>
+                  <td><ui-badge [tone]="type.isActive ? 'success' : 'neutral'">{{ type.isActive ? 'Activo' : 'Inactivo' }}</ui-badge></td>
+                  <td class="ui-form-actions">
+                    <button class="quiet-button" type="button" [disabled]="saving()" (click)="startEdit(type)">Editar</button>
+                    @if (type.isActive) { <button class="quiet-button" type="button" [disabled]="saving()" (click)="deactivate(type)">Desactivar</button> }
+                  </td>
+                </tr>
+              } @empty { <tr><td colspan="5">No hay tipos de proceso.</td></tr> }
+            </tbody>
+          </table>
+        </div>
+      }
+    </ui-panel>

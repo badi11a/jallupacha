@@ -1,0 +1,4740 @@
+{
+  "label": "before",
+  "timestamp": "2026-10-27T13:28:22.712Z",
+  "node": "v24.15.0",
+  "browser": "156.0.8078.48",
+  "platform": "win32",
+  "conditions": {
+    "viewport": "1440x900",
+    "samples": 12,
+    "excludedWarmups": 1,
+    "fixtureRows": 120,
+    "apiDelayMs": 20,
+    "fixture": "generic loopback, no Oracle",
+    "transfer": "HTTP uncompressed; ResourceTiming includes headers",
+    "cold": "new context without disk cache per sample",
+    "warm": "same document, modules previously visited",
+    "completion": "route-specific visible content plus two animation frames; in-browser clock",
+    "apiDuration": "sum of durations; parallel API requests may overlap"
+  },
+  "files": [
+    {
+      "name": "chunk-5vNY5gEc.js",
+      "bytes": 10319,
+      "gzipBytes": 3464,
+      "sha256": "8368b609a0975e426b6099fe303f1650d7d50e21fc6b56f72d422105dd5f8239"
+    },
+    {
+      "name": "chunk-Badr9nY4.js",
+      "bytes": 9940,
+      "gzipBytes": 3947,
+      "sha256": "3dabeb089b6dee3a9d1a0b81efc2c5377a32ce3197fc683d6358e143d4f601cc"
+    },
+    {
+      "name": "chunk-BKtXTUrk.js",
+      "bytes": 16829,
+      "gzipBytes": 5143,
+      "sha256": "8643b0cdc375f8055da64e3ec284571149aae5e892fa043af3538eca3e85e523"
+    },
+    {
+      "name": "chunk-BnmdTomQ.js",
+      "bytes": 9848,
+      "gzipBytes": 3541,
+      "sha256": "f6c4c4d844d6feb9c25ac3f062cb0fcca43072736d4858bcf3834965fcbfc829"
+    },
+    {
+      "name": "chunk-CKn-Mj_7.js",
+      "bytes": 10871,
+      "gzipBytes": 3931,
+      "sha256": "eee73ab92c03bd6a8fca63deeaacc34b6bc38278c167a4cbe5c24aa5442ae36d"
+    },
+    {
+      "name": "chunk-CsbENt44.js",
+      "bytes": 8008,
+      "gzipBytes": 3087,
+      "sha256": "12c6eb9d1ffd3a6bb46db14eb3d351f32b472b0213bb462e5aaa992de62f07d0"
+    },
+    {
+      "name": "chunk-DEdViTze.js",
+      "bytes": 45225,
+      "gzipBytes": 10995,
+      "sha256": "48b3f85ab35a394de1a6d2851043320945dfeb9cc8b748e689c0db3f56139045"
+    },
+    {
+      "name": "chunk-DgJdF5xS.js",
+      "bytes": 721,
+      "gzipBytes": 472,
+      "sha256": "0e3f5841243d4c3b4b3db429a10a78de34b3f0971e5ef6f0624540de8a60b6ac"
+    },
+    {
+      "name": "chunk-DXfiCODI.js",
+      "bytes": 13863,
+      "gzipBytes": 4370,
+      "sha256": "9addaa7460c0b0d825bb9b957386198d97182ea0688dff14e09a81ebcccf65ba"
+    },
+    {
+      "name": "chunk-D_6mW-hx.js",
+      "bytes": 4434,
+      "gzipBytes": 1205,
+      "sha256": "6f11f75220498266b89278dc470c0849aabacecdad22e8b4baf3f8f5811cccc2"
+    },
+    {
+      "name": "chunk-kclxOUCv.js",
+      "bytes": 19913,
+      "gzipBytes": 5820,
+      "sha256": "24fd582cdc2011b1775d512e71cd1e7fbc7c198b7f9d486e75c7eafc2b2c6de5"
+    },
+    {
+      "name": "main-2AS72IX2.js",
+      "bytes": 352004,
+      "gzipBytes": 104368,
+      "sha256": "dfe42312e9e60a5363cf14a5520ab03e15fce7d31e0114ecabbfa9bce7286680"
+    },
+    {
+      "name": "polyfills-IA5XWQYN.js",
+      "bytes": 34585,
+      "gzipBytes": 12470,
+      "sha256": "15c6f58707b9b19116fde3a3f6a0ce9cf83427d64a91e95cb91fe1056c3da616"
+    },
+    {
+      "name": "styles-CCFDSH6V.css",
+      "bytes": 20685,
+      "gzipBytes": 4192,
+      "sha256": "c79f80e30e5a18167c421b76b9cb43a0e2d930e00bbab58289b21fc013df3f0a"
+    }
+  ],
+  "summary": {
+    "startup-cold": {
+      "samples": 12,
+      "medianMs": 292.10000002384186,
+      "minMs": 278.30000001192093,
+      "maxMs": 317,
+      "medianRequests": 8,
+      "medianApiRequests": 2,
+      "medianTransferBytes": 468074,
+      "medianApiDurationSumMs": 56.00000002980232,
+      "medianLongTaskMs": 0
+    },
+    "list-first": {
+      "samples": 12,
+      "medianMs": 127.94999998807907,
+      "minMs": 125.60000002384186,
+      "maxMs": 146.10000002384186,
+      "medianRequests": 5,
+      "medianApiRequests": 3,
+      "medianTransferBytes": 45316,
+      "medianApiDurationSumMs": 81.15000003576279,
+      "medianLongTaskMs": 0
+    },
+    "search-first": {
+      "samples": 12,
+      "medianMs": 102.0499999821186,
+      "minMs": 84.10000002384186,
+      "maxMs": 107,
+      "medianRequests": 2,
+      "medianApiRequests": 1,
+      "medianTransferBytes": 36117,
+      "medianApiDurationSumMs": 31.55000004172325,
+      "medianLongTaskMs": 0
+    },
+    "detail-first": {
+      "samples": 12,
+      "medianMs": 97.59999999403954,
+      "minMs": 79.90000003576279,
+      "maxMs": 114.39999997615814,
+      "medianRequests": 4,
+      "medianApiRequests": 1,
+      "medianTransferBytes": 51839,
+      "medianApiDurationSumMs": 30.900000005960464,
+      "medianLongTaskMs": 0
+    },
+    "form-first": {
+      "samples": 12,
+      "medianMs": 130.40000000596046,
+      "minMs": 113.89999997615814,
+      "maxMs": 152.4000000357628,
+      "medianRequests": 6,
+      "medianApiRequests": 4,
+      "medianTransferBytes": 55208,
+      "medianApiDurationSumMs": 123.9500000178814,
+      "medianLongTaskMs": 0
+    },
+    "map-warm": {
+      "samples": 12,
+      "medianMs": 92.34999999403954,
+      "minMs": 70,
+      "maxMs": 101.90000003576279,
+      "medianRequests": 2,
+      "medianApiRequests": 1,
+      "medianTransferBytes": 36368,
+      "medianApiDurationSumMs": 36,
+      "medianLongTaskMs": 0
+    },
+    "list-warm": {
+      "samples": 12,
+      "medianMs": 98.25,
+      "minMs": 93.10000002384186,
+      "maxMs": 117.89999997615814,
+      "medianRequests": 4,
+      "medianApiRequests": 3,
+      "medianTransferBytes": 37008,
+      "medianApiDurationSumMs": 85.84999999403954,
+      "medianLongTaskMs": 0
+    },
+    "search-warm": {
+      "samples": 12,
+      "medianMs": 88.59999999403954,
+      "minMs": 85,
+      "maxMs": 97.60000002384186,
+      "medianRequests": 2,
+      "medianApiRequests": 1,
+      "medianTransferBytes": 36117,
+      "medianApiDurationSumMs": 31.299999982118607,
+      "medianLongTaskMs": 0
+    },
+    "detail-warm": {
+      "samples": 12,
+      "medianMs": 80.44999998807907,
+      "minMs": 64.5,
+      "maxMs": 87.80000001192093,
+      "medianRequests": 2,
+      "medianApiRequests": 1,
+      "medianTransferBytes": 5293,
+      "medianApiDurationSumMs": 25.399999976158142,
+      "medianLongTaskMs": 0
+    },
+    "form-warm": {
+      "samples": 12,
+      "medianMs": 115.24999997019768,
+      "minMs": 113,
+      "maxMs": 136.30000001192093,
+      "medianRequests": 5,
+      "medianApiRequests": 4,
+      "medianTransferBytes": 38079,
+      "medianApiDurationSumMs": 108.80000001192093,
+      "medianLongTaskMs": 0
+    }
+  },
+  "errors": [],
+  "transportNotifications": [
+    {
+      "iteration": 1,
+      "scenario": "form-warm",
+      "requestedDuring": "form-warm",
+      "kind": "request",
+      "status": 200,
+      "path": "/api/management/process-types",
+      "message": "net::ERR_ABORTED",
+      "classification": "abort-after-received-response",
+      "receivedBodyBytes": 188
+    },
+    {
+      "iteration": 2,
+      "scenario": "form-warm",
+      "requestedDuring": "form-warm",
+      "kind": "request",
+      "status": 200,
+      "path": "/api/management/process-types",
+      "message": "net::ERR_ABORTED",
+      "classification": "abort-after-received-response",
+      "receivedBodyBytes": 188
+    },
+    {
+      "iteration": 3,
+      "scenario": "search-warm",
+      "requestedDuring": "search-warm",
+      "kind": "request",
+      "status": 200,
+      "path": "/api/management/processes",
+      "message": "net::ERR_ABORTED",
+      "classification": "abort-after-received-response",
+      "receivedBodyBytes": 31595
+    },
+    {
+      "iteration": 6,
+      "scenario": "form-warm",
+      "requestedDuring": "form-warm",
+      "kind": "request",
+      "status": 200,
+      "path": "/api/management/units",
+      "message": "net::ERR_ABORTED",
+      "classification": "abort-after-received-response",
+      "receivedBodyBytes": 103
+    },
+    {
+      "iteration": 10,
+      "scenario": "list-warm",
+      "requestedDuring": "list-warm",
+      "kind": "request",
+      "status": 200,
+      "path": "/api/management/process-types",
+      "message": "net::ERR_ABORTED",
+      "classification": "abort-after-received-response",
+      "receivedBodyBytes": 188
+    },
+    {
+      "iteration": 10,
+      "scenario": "list-warm",
+      "requestedDuring": "list-warm",
+      "kind": "request",
+      "status": 200,
+      "path": "/api/management/units",
+      "message": "net::ERR_ABORTED",
+      "classification": "abort-after-received-response",
+      "receivedBodyBytes": 103
+    },
+    {
+      "iteration": 11,
+      "scenario": "form-warm",
+      "requestedDuring": "form-warm",
+      "kind": "request",
+      "status": 200,
+      "path": "/api/management/process-types",
+      "message": "net::ERR_ABORTED",
+      "classification": "abort-after-received-response",
+      "receivedBodyBytes": 188
+    }
+  ],
+  "records": [
+    {
+      "iteration": 0,
+      "scenario": "startup-cold",
+      "durationMs": 293.30000001192093,
+      "resources": [
+        {
+          "path": "/polyfills-IA5XWQYN.js",
+          "api": false,
+          "durationMs": 7.799999952316284,
+          "bytes": 34885,
+          "bodyBytes": 34585
+        },
+        {
+          "path": "/main-2AS72IX2.js",
+          "api": false,
+          "durationMs": 11.700000047683716,
+          "bytes": 352304,
+          "bodyBytes": 352004
+        },
+        {
+          "path": "/styles-CCFDSH6V.css",
+          "api": false,
+          "durationMs": 11,
+          "bytes": 20985,
+          "bodyBytes": 20685
+        },
+        {
+          "path": "/api/auth/me",
+          "api": true,
+          "durationMs": 26.700000047683716,
+          "bytes": 413,
+          "bodyBytes": 113
+        },
+        {
+          "path": "/favicon.ico",
+          "api": false,
+          "durationMs": 4.400000035762787,
+          "bytes": 4222,
+          "bodyBytes": 3922
+        },
+        {
+          "path": "/chunk-DXfiCODI.js",
+          "api": false,
+          "durationMs": 3.5,
+          "bytes": 14163,
+          "bodyBytes": 13863
+        },
+        {
+          "path": "/chunk-D_6mW-hx.js",
+          "api": false,
+          "durationMs": 2.399999976158142,
+          "bytes": 4734,
+          "bodyBytes": 4434
+        },
+        {
+          "path": "/api/management/map",
+          "api": true,
+          "durationMs": 30.5,
+          "bytes": 32146,
+          "bodyBytes": 31846
+        }
+      ],
+      "documentBytes": 4222,
+      "longTaskMs": 0
+    },
+    {
+      "iteration": 0,
+      "scenario": "list-first",
+      "durationMs": 127.5,
+      "resources": [
+        {
+          "path": "/chunk-CsbENt44.js",
+          "api": false,
+          "durationMs": 3.699999988079071,
+          "bytes": 8308,
+          "bodyBytes": 8008
+        },
+        {
+          "path": "/api/management/process-types",
+          "api": true,
+          "durationMs": 26.19999998807907,
+          "bytes": 488,
+          "bodyBytes": 188
+        },
+        {
+          "path": "/api/management/units",
+          "api": true,
+          "durationMs": 25,
+          "bytes": 403,
+          "bodyBytes": 103
+        },
+        {
+          "path": "/api/management/processes",
+          "api": true,
+          "durationMs": 39.59999996423721,
+          "bytes": 31895,
+          "bodyBytes": 31595
+        },
+        {
+          "path": "/favicon.ico",
+          "api": false,
+          "durationMs": 9.300000011920929,
+          "bytes": 4222,
+          "bodyBytes": 3922
+        }
+      ],
+      "documentBytes": 0,
+      "longTaskMs": 0
+    },
+    {
+      "iteration": 0,
+      "scenario": "search-first",
+      "durationMs": 92,
+      "resources": [
+        {
+          "path": "/api/management/processes",
+          "api": true,
+          "durationMs": 23.400000035762787,
+          "bytes": 31895,
+          "bodyBytes": 31595
+        },
+        {
+          "path": "/favicon.ico",
+          "api": false,
+          "durationMs": 6.100000023841858,
+          "bytes": 4222,
+          "bodyBytes": 3922
+        }
+      ],
+      "documentBytes": 0,
+      "longTaskMs": 0
+    },
+    {
+      "iteration": 0,
+      "scenario": "detail-first",
+      "durationMs": 97.60000002384186,
+      "resources": [
+        {
+          "path": "/chunk-DEdViTze.js",
+          "api": false,
+          "durationMs": 3.399999976158142,
+          "bytes": 45525,
+          "bodyBytes": 45225
+        },
+        {
+          "path": "/chunk-DgJdF5xS.js",
+          "api": false,
+          "durationMs": 3.300000011920929,
+          "bytes": 1021,
+          "bodyBytes": 721
+        },
+        {
+          "path": "/api/management/processes/1",
+          "api": true,
+          "durationMs": 38,
+          "bytes": 1071,
+          "bodyBytes": 771
+        },
+        {
+          "path": "/favicon.ico",
+          "api": false,
+          "durationMs": 6,
+          "bytes": 4222,
+          "bodyBytes": 3922
+        }
+      ],
+      "documentBytes": 0,
+      "longTaskMs": 0
+    },
+    {
+      "iteration": 0,
+      "scenario": "form-first",
+      "durationMs": 130.5,
+      "resources": [
+        {
+          "path": "/chunk-BKtXTUrk.js",
+          "api": false,
+          "durationMs": 3.800000011920929,
+          "bytes": 17129,
+          "bodyBytes": 16829
+        },
+        {
+          "path": "/api/management/process-types",
+          "api": true,
+          "durationMs": 27.30000001192093,
+          "bytes": 488,
+          "bodyBytes": 188
+        },
+        {
+          "path": "/api/management/units",
+          "api": true,
+          "durationMs": 27.5,
+          "bytes": 403,
+          "bodyBytes": 103
+        },
+        {
+          "path": "/api/management/processes",
+          "api": true,
+          "durationMs": 27.099999964237213,
+          "bytes": 31895,
+          "bodyBytes": 31595
+        },
+        {
+          "path": "/favicon.ico",
+          "api": false,
+          "durationMs": 5.5,
+          "bytes": 4222,
+          "bodyBytes": 3922
+        },
+        {
+          "path": "/api/management/processes/1",
+          "api": true,
+          "durationMs": 35.5,
+          "bytes": 1071,
+          "bodyBytes": 771
+        }
+      ],
+      "documentBytes": 0,
+      "longTaskMs": 0
+    },
+    {
+      "iteration": 0,
+      "scenario": "map-warm",
+      "durationMs": 92.5,
+      "resources": [
+        {
+          "path": "/api/management/map",
+          "api": true,
+          "durationMs": 36,
+          "bytes": 32146,
+          "bodyBytes": 31846
+        },
+        {
+          "path": "/favicon.ico",
+          "api": false,
+          "durationMs": 7.199999988079071,
+          "bytes": 4222,
+          "bodyBytes": 3922
+        }
+      ],
+      "documentBytes": 0,
+      "longTaskMs": 0
+    },
+    {
+      "iteration": 0,
+      "scenario": "list-warm",
+      "durationMs": 96.30000001192093,
+      "resources": [
+        {
+          "path": "/api/management/process-types",
+          "api": true,
+          "durationMs": 27,
+          "bytes": 488,
+          "bodyBytes": 188
+        },
+        {
+          "path": "/api/management/units",
+          "api": true,
+          "durationMs": 27.19999998807907,
+          "bytes": 403,
+          "bodyBytes": 103
+        },
+        {
+          "path": "/api/management/processes",
+          "api": true,
+          "durationMs": 26.80000001192093,
+          "bytes": 31895,
+          "bodyBytes": 31595
+        },
+        {
+          "path": "/favicon.ico",
+          "api": false,
+          "durationMs": 6.599999964237213,
+          "bytes": 4222,
+          "bodyBytes": 3922
+        }
+      ],
+      "documentBytes": 0,
+      "longTaskMs": 0
+    },
+    {
+      "iteration": 0,
+      "scenario": "search-warm",
+      "durationMs": 86.59999996423721,
+      "resources": [
+        {
+          "path": "/api/management/processes",
+          "api": true,
+          "durationMs": 28.100000023841858,
+          "bytes": 31895,
+          "bodyBytes": 31595
+        },
+        {
+          "path": "/favicon.ico",
+          "api": false,
+          "durationMs": 7.400000035762787,
+          "bytes": 4222,
+          "bodyBytes": 3922
+        }
+      ],
+      "documentBytes": 0,
+      "longTaskMs": 0
+    },
+    {
+      "iteration": 0,
+      "scenario": "detail-warm",
+      "durationMs": 79.5,
+      "resources": [
+        {
+          "path": "/api/management/processes/1",
+          "api": true,
+          "durationMs": 25.599999964237213,
+          "bytes": 1071,
+          "bodyBytes": 771
+        },
+        {
+          "path": "/favicon.ico",
+          "api": false,
+          "durationMs": 7.700000047683716,
+          "bytes": 4222,
+          "bodyBytes": 3922
+        }
+      ],
+      "documentBytes": 0,
+      "longTaskMs": 0
+    },
+    {
+      "iteration": 0,
+      "scenario": "form-warm",
+      "durationMs": 113.69999998807907,
+      "resources": [
+        {
+          "path": "/api/management/process-types",
+          "api": true,
+          "durationMs": 25.299999952316284,
+          "bytes": 488,
+          "bodyBytes": 188
+        },
+        {
+          "path": "/api/management/units",
+          "api": true,
+          "durationMs": 25.799999952316284,
+          "bytes": 403,
+          "bodyBytes": 103
+        },
+        {
+          "path": "/api/management/processes",
+          "api": true,
+          "durationMs": 26.399999976158142,
+          "bytes": 31895,
+          "bodyBytes": 31595
+        },
+        {
+          "path": "/favicon.ico",
+          "api": false,
+          "durationMs": 5,
+          "bytes": 4222,
+          "bodyBytes": 3922
+        },
+        {
+          "path": "/api/management/processes/1",
+          "api": true,
+          "durationMs": 27.600000023841858,
+          "bytes": 1071,
+          "bodyBytes": 771
+        }
+      ],
+      "documentBytes": 0,
+      "longTaskMs": 0
+    },
+    {
+      "iteration": 1,
+      "scenario": "startup-cold",
+      "durationMs": 285,
+      "resources": [
+        {
+          "path": "/polyfills-IA5XWQYN.js",
+          "api": false,
+          "durationMs": 17.600000023841858,
+          "bytes": 34885,
+          "bodyBytes": 34585
+        },
+        {
+          "path": "/main-2AS72IX2.js",
+          "api": false,
+          "durationMs": 24.5,
+          "bytes": 352304,
+          "bodyBytes": 352004
+        },
+        {
+          "path": "/styles-CCFDSH6V.css",
+          "api": false,
+          "durationMs": 14.600000023841858,
+          "bytes": 20985,
+          "bodyBytes": 20685
+        },
+        {
+          "path": "/api/auth/me",
+          "api": true,
+          "durationMs": 23.899999976158142,
+          "bytes": 413,
+          "bodyBytes": 113
+        },
+        {
+          "path": "/favicon.ico",
+          "api": false,
+          "durationMs": 4.400000035762787,
+          "bytes": 4222,
+          "bodyBytes": 3922
+        },
+        {
+          "path": "/chunk-DXfiCODI.js",
+          "api": false,
+          "durationMs": 3.300000011920929,
+          "bytes": 14163,
+          "bodyBytes": 13863
+        },
+        {
+          "path": "/chunk-D_6mW-hx.js",
+          "api": false,
+          "durationMs": 3.699999988079071,
+          "bytes": 4734,
+          "bodyBytes": 4434
+        },
+        {
+          "path": "/api/management/map",
+          "api": true,
+          "durationMs": 22.399999976158142,
+          "bytes": 32146,
+          "bodyBytes": 31846
+        }
+      ],
+      "documentBytes": 4222,
+      "longTaskMs": 0
+    },
+    {
+      "iteration": 1,
+      "scenario": "list-first",
+      "durationMs": 127.10000002384186,
+      "resources": [
+        {
+          "path": "/chunk-CsbENt44.js",
+          "api": false,
+          "durationMs": 4.400000035762787,
+          "bytes": 8308,
+          "bodyBytes": 8008
+        },
+        {
+          "path": "/api/management/process-types",
+          "api": true,
+          "durationMs": 27.5,
+          "bytes": 488,
+          "bodyBytes": 188
+        },
+        {
+          "path": "/api/management/units",
+          "api": true,
+          "durationMs": 27.400000035762787,
+          "bytes": 403,
+          "bodyBytes": 103
+        },
+        {
+          "path": "/api/management/processes",
+          "api": true,
+          "durationMs": 26.700000047683716,
+          "bytes": 31895,
+          "bodyBytes": 31595
+        },
+        {
+          "path": "/favicon.ico",
+          "api": false,
+          "durationMs": 11,
+          "bytes": 4222,
+          "bodyBytes": 3922
+        }
+      ],
+      "documentBytes": 0,
+      "longTaskMs": 0
+    },
+    {
+      "iteration": 1,
+      "scenario": "search-first",
+      "durationMs": 102.39999997615814,
+      "resources": [
+        {
+          "path": "/api/management/processes",
+          "api": true,
+          "durationMs": 38.299999952316284,
+          "bytes": 31895,
+          "bodyBytes": 31595
+        },
+        {
+          "path": "/favicon.ico",
+          "api": false,
+          "durationMs": 4.5,
+          "bytes": 4222,
+          "bodyBytes": 3922
+        }
+      ],
+      "documentBytes": 0,
+      "longTaskMs": 0
+    },
+    {
+      "iteration": 1,
+      "scenario": "detail-first",
+      "durationMs": 113.40000003576279,
+      "resources": [
+        {
+          "path": "/chunk-DEdViTze.js",
+          "api": false,
+          "durationMs": 5.699999988079071,
+          "bytes": 45525,
+          "bodyBytes": 45225
+        },
+        {
+          "path": "/chunk-DgJdF5xS.js",
+          "api": false,
+          "durationMs": 4.399999976158142,
+          "bytes": 1021,
+          "bodyBytes": 721
+        },
+        {
+          "path": "/api/management/processes/1",
+          "api": true,
+          "durationMs": 33.10000002384186,
+          "bytes": 1071,
+          "bodyBytes": 771
+        },
+        {
+          "path": "/favicon.ico",
+          "api": false,
+          "durationMs": 7.799999952316284,
+          "bytes": 4222,
+          "bodyBytes": 3922
+        }
+      ],
+      "documentBytes": 0,
+      "longTaskMs": 0
+    },
+    {
+      "iteration": 1,
+      "scenario": "form-first",
+      "durationMs": 129.5,
+      "resources": [
+        {
+          "path": "/chunk-BKtXTUrk.js",
+          "api": false,
+          "durationMs": 6.200000047683716,
+          "bytes": 17129,
+          "bodyBytes": 16829
+        },
+        {
+          "path": "/api/management/process-types",
+          "api": true,
+          "durationMs": 33.30000001192093,
+          "bytes": 488,
+          "bodyBytes": 188
+        },
+        {
+          "path": "/api/management/units",
+          "api": true,
+          "durationMs": 33.19999998807907,
+          "bytes": 403,
+          "bodyBytes": 103
+        },
+        {
+          "path": "/api/management/processes",
+          "api": true,
+          "durationMs": 33,
+          "bytes": 31895,
+          "bodyBytes": 31595
+        },
+        {
+          "path": "/favicon.ico",
+          "api": false,
+          "durationMs": 6.400000035762787,
+          "bytes": 4222,
+          "bodyBytes": 3922
+        },
+        {
+          "path": "/api/management/processes/1",
+          "api": true,
+          "durationMs": 25.100000023841858,
+          "bytes": 1071,
+          "bodyBytes": 771
+        }
+      ],
+      "documentBytes": 0,
+      "longTaskMs": 0
+    },
+    {
+      "iteration": 1,
+      "scenario": "map-warm",
+      "durationMs": 76.30000001192093,
+      "resources": [
+        {
+          "path": "/api/management/map",
+          "api": true,
+          "durationMs": 29.5,
+          "bytes": 32146,
+          "bodyBytes": 31846
+        },
+        {
+          "path": "/favicon.ico",
+          "api": false,
+          "durationMs": 5.699999988079071,
+          "bytes": 4222,
+          "bodyBytes": 3922
+        }
+      ],
+      "documentBytes": 0,
+      "longTaskMs": 0
+    },
+    {
+      "iteration": 1,
+      "scenario": "list-warm",
+      "durationMs": 96.89999997615814,
+      "resources": [
+        {
+          "path": "/api/management/process-types",
+          "api": true,
+          "durationMs": 25.600000023841858,
+          "bytes": 488,
+          "bodyBytes": 188
+        },
+        {
+          "path": "/api/management/units",
+          "api": true,
+          "durationMs": 25.69999998807907,
+          "bytes": 403,
+          "bodyBytes": 103
+        },
+        {
+          "path": "/api/management/processes",
+          "api": true,
+          "durationMs": 25.5,
+          "bytes": 31895,
+          "bodyBytes": 31595
+        },
+        {
+          "path": "/favicon.ico",
+          "api": false,
+          "durationMs": 4.899999976158142,
+          "bytes": 4222,
+          "bodyBytes": 3922
+        }
+      ],
+      "documentBytes": 0,
+      "longTaskMs": 0
+    },
+    {
+      "iteration": 1,
+      "scenario": "search-warm",
+      "durationMs": 89.30000001192093,
+      "resources": [
+        {
+          "path": "/api/management/processes",
+          "api": true,
+          "durationMs": 30.69999998807907,
+          "bytes": 31895,
+          "bodyBytes": 31595
+        },
+        {
+          "path": "/favicon.ico",
+          "api": false,
+          "durationMs": 5.699999988079071,
+          "bytes": 4222,
+          "bodyBytes": 3922
+        }
+      ],
+      "documentBytes": 0,
+      "longTaskMs": 0
+    },
+    {
+      "iteration": 1,
+      "scenario": "detail-warm",
+      "durationMs": 77.60000002384186,
+      "resources": [
+        {
+          "path": "/api/management/processes/1",
+          "api": true,
+          "durationMs": 24.69999998807907,
+          "bytes": 1071,
+          "bodyBytes": 771
+        },
+        {
+          "path": "/favicon.ico",
+          "api": false,
+          "durationMs": 6.699999988079071,
+          "bytes": 4222,
+          "bodyBytes": 3922
+        }
+      ],
+      "documentBytes": 0,
+      "longTaskMs": 0
+    },
+    {
+      "iteration": 1,
+      "scenario": "form-warm",
+      "durationMs": 128.80000001192093,
+      "resources": [
+        {
+          "path": "/api/management/process-types",
+          "api": true,
+          "durationMs": 24,
+          "bytes": 488,
+          "bodyBytes": 188
+        },
+        {
+          "path": "/api/management/units",
+          "api": true,
+          "durationMs": 28.69999998807907,
+          "bytes": 403,
+          "bodyBytes": 103
+        },
+        {
+          "path": "/api/management/processes",
+          "api": true,
+          "durationMs": 28.5,
+          "bytes": 31895,
+          "bodyBytes": 31595
+        },
+        {
+          "path": "/favicon.ico",
+          "api": false,
+          "durationMs": 7.900000035762787,
+          "bytes": 4222,
+          "bodyBytes": 3922
+        },
+        {
+          "path": "/api/management/processes/1",
+          "api": true,
+          "durationMs": 39.19999998807907,
+          "bytes": 1071,
+          "bodyBytes": 771
+        }
+      ],
+      "documentBytes": 0,
+      "longTaskMs": 0
+    },
+    {
+      "iteration": 2,
+      "scenario": "startup-cold",
+      "durationMs": 317,
+      "resources": [
+        {
+          "path": "/polyfills-IA5XWQYN.js",
+          "api": false,
+          "durationMs": 15,
+          "bytes": 34885,
+          "bodyBytes": 34585
+        },
+        {
+          "path": "/main-2AS72IX2.js",
+          "api": false,
+          "durationMs": 34.60000002384186,
+          "bytes": 352304,
+          "bodyBytes": 352004
+        },
+        {
+          "path": "/styles-CCFDSH6V.css",
+          "api": false,
+          "durationMs": 12,
+          "bytes": 20985,
+          "bodyBytes": 20685
+        },
+        {
+          "path": "/api/auth/me",
+          "api": true,
+          "durationMs": 26.400000035762787,
+          "bytes": 413,
+          "bodyBytes": 113
+        },
+        {
+          "path": "/favicon.ico",
+          "api": false,
+          "durationMs": 5.099999964237213,
+          "bytes": 4222,
+          "bodyBytes": 3922
+        },
+        {
+          "path": "/chunk-DXfiCODI.js",
+          "api": false,
+          "durationMs": 4,
+          "bytes": 14163,
+          "bodyBytes": 13863
+        },
+        {
+          "path": "/chunk-D_6mW-hx.js",
+          "api": false,
+          "durationMs": 3.900000035762787,
+          "bytes": 4734,
+          "bodyBytes": 4434
+        },
+        {
+          "path": "/api/management/map",
+          "api": true,
+          "durationMs": 37.69999998807907,
+          "bytes": 32146,
+          "bodyBytes": 31846
+        }
+      ],
+      "documentBytes": 4222,
+      "longTaskMs": 0
+    },
+    {
+      "iteration": 2,
+      "scenario": "list-first",
+      "durationMs": 143.69999998807907,
+      "resources": [
+        {
+          "path": "/chunk-CsbENt44.js",
+          "api": false,
+          "durationMs": 4.100000023841858,
+          "bytes": 8308,
+          "bodyBytes": 8008
+        },
+        {
+          "path": "/api/management/process-types",
+          "api": true,
+          "durationMs": 23.599999964237213,
+          "bytes": 488,
+          "bodyBytes": 188
+        },
+        {
+          "path": "/api/management/units",
+          "api": true,
+          "durationMs": 23.30000001192093,
+          "bytes": 403,
+          "bodyBytes": 103
+        },
+        {
+          "path": "/api/management/processes",
+          "api": true,
+          "durationMs": 37.60000002384186,
+          "bytes": 31895,
+          "bodyBytes": 31595
+        },
+        {
+          "path": "/favicon.ico",
+          "api": false,
+          "durationMs": 8.100000023841858,
+          "bytes": 4222,
+          "bodyBytes": 3922
+        }
+      ],
+      "documentBytes": 0,
+      "longTaskMs": 0
+    },
+    {
+      "iteration": 2,
+      "scenario": "search-first",
+      "durationMs": 107,
+      "resources": [
+        {
+          "path": "/api/management/processes",
+          "api": true,
+          "durationMs": 38,
+          "bytes": 31895,
+          "bodyBytes": 31595
+        },
+        {
+          "path": "/favicon.ico",
+          "api": false,
+          "durationMs": 5.699999988079071,
+          "bytes": 4222,
+          "bodyBytes": 3922
+        }
+      ],
+      "documentBytes": 0,
+      "longTaskMs": 0
+    },
+    {
+      "iteration": 2,
+      "scenario": "detail-first",
+      "durationMs": 113.69999998807907,
+      "resources": [
+        {
+          "path": "/chunk-DEdViTze.js",
+          "api": false,
+          "durationMs": 5.399999976158142,
+          "bytes": 45525,
+          "bodyBytes": 45225
+        },
+        {
+          "path": "/chunk-DgJdF5xS.js",
+          "api": false,
+          "durationMs": 4.299999952316284,
+          "bytes": 1021,
+          "bodyBytes": 721
+        },
+        {
+          "path": "/api/management/processes/1",
+          "api": true,
+          "durationMs": 42.60000002384186,
+          "bytes": 1071,
+          "bodyBytes": 771
+        },
+        {
+          "path": "/favicon.ico",
+          "api": false,
+          "durationMs": 5.5,
+          "bytes": 4222,
+          "bodyBytes": 3922
+        }
+      ],
+      "documentBytes": 0,
+      "longTaskMs": 0
+    },
+    {
+      "iteration": 2,
+      "scenario": "form-first",
+      "durationMs": 130.30000001192093,
+      "resources": [
+        {
+          "path": "/chunk-BKtXTUrk.js",
+          "api": false,
+          "durationMs": 3.799999952316284,
+          "bytes": 17129,
+          "bodyBytes": 16829
+        },
+        {
+          "path": "/api/management/process-types",
+          "api": true,
+          "durationMs": 33.19999998807907,
+          "bytes": 488,
+          "bodyBytes": 188
+        },
+        {
+          "path": "/api/management/units",
+          "api": true,
+          "durationMs": 33.30000001192093,
+          "bytes": 403,
+          "bodyBytes": 103
+        },
+        {
+          "path": "/api/management/processes",
+          "api": true,
+          "durationMs": 33.09999996423721,
+          "bytes": 31895,
+          "bodyBytes": 31595
+        },
+        {
+          "path": "/favicon.ico",
+          "api": false,
+          "durationMs": 5.5,
+          "bytes": 4222,
+          "bodyBytes": 3922
+        },
+        {
+          "path": "/api/management/processes/1",
+          "api": true,
+          "durationMs": 28.100000023841858,
+          "bytes": 1071,
+          "bodyBytes": 771
+        }
+      ],
+      "documentBytes": 0,
+      "longTaskMs": 0
+    },
+    {
+      "iteration": 2,
+      "scenario": "map-warm",
+      "durationMs": 99.60000002384186,
+      "resources": [
+        {
+          "path": "/api/management/map",
+          "api": true,
+          "durationMs": 37.89999997615814,
+          "bytes": 32146,
+          "bodyBytes": 31846
+        },
+        {
+          "path": "/favicon.ico",
+          "api": false,
+          "durationMs": 6.599999964237213,
+          "bytes": 4222,
+          "bodyBytes": 3922
+        }
+      ],
+      "documentBytes": 0,
+      "longTaskMs": 0
+    },
+    {
+      "iteration": 2,
+      "scenario": "list-warm",
+      "durationMs": 107.10000002384186,
+      "resources": [
+        {
+          "path": "/api/management/process-types",
+          "api": true,
+          "durationMs": 39.89999997615814,
+          "bytes": 488,
+          "bodyBytes": 188
+        },
+        {
+          "path": "/api/management/units",
+          "api": true,
+          "durationMs": 39.60000002384186,
+          "bytes": 403,
+          "bodyBytes": 103
+        },
+        {
+          "path": "/api/management/processes",
+          "api": true,
+          "durationMs": 39.10000002384186,
+          "bytes": 31895,
+          "bodyBytes": 31595
+        },
+        {
+          "path": "/favicon.ico",
+          "api": false,
+          "durationMs": 5,
+          "bytes": 4222,
+          "bodyBytes": 3922
+        }
+      ],
+      "documentBytes": 0,
+      "longTaskMs": 0
+    },
+    {
+      "iteration": 2,
+      "scenario": "search-warm",
+      "durationMs": 85,
+      "resources": [
+        {
+          "path": "/api/management/processes",
+          "api": true,
+          "durationMs": 32.19999998807907,
+          "bytes": 31895,
+          "bodyBytes": 31595
+        },
+        {
+          "path": "/favicon.ico",
+          "api": false,
+          "durationMs": 4.800000011920929,
+          "bytes": 4222,
+          "bodyBytes": 3922
+        }
+      ],
+      "documentBytes": 0,
+      "longTaskMs": 0
+    },
+    {
+      "iteration": 2,
+      "scenario": "detail-warm",
+      "durationMs": 80.80000001192093,
+      "resources": [
+        {
+          "path": "/api/management/processes/1",
+          "api": true,
+          "durationMs": 23.5,
+          "bytes": 1071,
+          "bodyBytes": 771
+        },
+        {
+          "path": "/favicon.ico",
+          "api": false,
+          "durationMs": 6.399999976158142,
+          "bytes": 4222,
+          "bodyBytes": 3922
+        }
+      ],
+      "documentBytes": 0,
+      "longTaskMs": 0
+    },
+    {
+      "iteration": 2,
+      "scenario": "form-warm",
+      "durationMs": 114.29999995231628,
+      "resources": [
+        {
+          "path": "/api/management/process-types",
+          "api": true,
+          "durationMs": 26.19999998807907,
+          "bytes": 488,
+          "bodyBytes": 188
+        },
+        {
+          "path": "/api/management/units",
+          "api": true,
+          "durationMs": 26.19999998807907,
+          "bytes": 403,
+          "bodyBytes": 103
+        },
+        {
+          "path": "/api/management/processes",
+          "api": true,
+          "durationMs": 27,
+          "bytes": 31895,
+          "bodyBytes": 31595
+        },
+        {
+          "path": "/favicon.ico",
+          "api": false,
+          "durationMs": 7.099999964237213,
+          "bytes": 4222,
+          "bodyBytes": 3922
+        },
+        {
+          "path": "/api/management/processes/1",
+          "api": true,
+          "durationMs": 28.700000047683716,
+          "bytes": 1071,
+          "bodyBytes": 771
+        }
+      ],
+      "documentBytes": 0,
+      "longTaskMs": 0
+    },
+    {
+      "iteration": 3,
+      "scenario": "startup-cold",
+      "durationMs": 295.39999997615814,
+      "resources": [
+        {
+          "path": "/polyfills-IA5XWQYN.js",
+          "api": false,
+          "durationMs": 16.599999964237213,
+          "bytes": 34885,
+          "bodyBytes": 34585
+        },
+        {
+          "path": "/main-2AS72IX2.js",
+          "api": false,
+          "durationMs": 23.399999976158142,
+          "bytes": 352304,
+          "bodyBytes": 352004
+        },
+        {
+          "path": "/styles-CCFDSH6V.css",
+          "api": false,
+          "durationMs": 15.800000011920929,
+          "bytes": 20985,
+          "bodyBytes": 20685
+        },
+        {
+          "path": "/api/auth/me",
+          "api": true,
+          "durationMs": 22.69999998807907,
+          "bytes": 413,
+          "bodyBytes": 113
+        },
+        {
+          "path": "/favicon.ico",
+          "api": false,
+          "durationMs": 4.5,
+          "bytes": 4222,
+          "bodyBytes": 3922
+        },
+        {
+          "path": "/chunk-DXfiCODI.js",
+          "api": false,
+          "durationMs": 3.800000011920929,
+          "bytes": 14163,
+          "bodyBytes": 13863
+        },
+        {
+          "path": "/chunk-D_6mW-hx.js",
+          "api": false,
+          "durationMs": 3.799999952316284,
+          "bytes": 4734,
+          "bodyBytes": 4434
+        },
+        {
+          "path": "/api/management/map",
+          "api": true,
+          "durationMs": 27.5,
+          "bytes": 32146,
+          "bodyBytes": 31846
+        }
+      ],
+      "documentBytes": 4222,
+      "longTaskMs": 0
+    },
+    {
+      "iteration": 3,
+      "scenario": "list-first",
+      "durationMs": 128.4000000357628,
+      "resources": [
+        {
+          "path": "/chunk-CsbENt44.js",
+          "api": false,
+          "durationMs": 4,
+          "bytes": 8308,
+          "bodyBytes": 8008
+        },
+        {
+          "path": "/api/management/process-types",
+          "api": true,
+          "durationMs": 23.399999976158142,
+          "bytes": 488,
+          "bodyBytes": 188
+        },
+        {
+          "path": "/api/management/units",
+          "api": true,
+          "durationMs": 23.900000035762787,
+          "bytes": 403,
+          "bodyBytes": 103
+        },
+        {
+          "path": "/api/management/processes",
+          "api": true,
+          "durationMs": 23.299999952316284,
+          "bytes": 31895,
+          "bodyBytes": 31595
+        },
+        {
+          "path": "/favicon.ico",
+          "api": false,
+          "durationMs": 6,
+          "bytes": 4222,
+          "bodyBytes": 3922
+        }
+      ],
+      "documentBytes": 0,
+      "longTaskMs": 0
+    },
+    {
+      "iteration": 3,
+      "scenario": "search-first",
+      "durationMs": 104,
+      "resources": [
+        {
+          "path": "/api/management/processes",
+          "api": true,
+          "durationMs": 34.19999998807907,
+          "bytes": 31895,
+          "bodyBytes": 31595
+        },
+        {
+          "path": "/favicon.ico",
+          "api": false,
+          "durationMs": 4.900000035762787,
+          "bytes": 4222,
+          "bodyBytes": 3922
+        }
+      ],
+      "documentBytes": 0,
+      "longTaskMs": 0
+    },
+    {
+      "iteration": 3,
+      "scenario": "detail-first",
+      "durationMs": 113.59999996423721,
+      "resources": [
+        {
+          "path": "/chunk-DEdViTze.js",
+          "api": false,
+          "durationMs": 3.299999952316284,
+          "bytes": 45525,
+          "bodyBytes": 45225
+        },
+        {
+          "path": "/chunk-DgJdF5xS.js",
+          "api": false,
+          "durationMs": 2.599999964237213,
+          "bytes": 1021,
+          "bodyBytes": 721
+        },
+        {
+          "path": "/api/management/processes/1",
+          "api": true,
+          "durationMs": 37.39999997615814,
+          "bytes": 1071,
+          "bodyBytes": 771
+        },
+        {
+          "path": "/favicon.ico",
+          "api": false,
+          "durationMs": 5.800000011920929,
+          "bytes": 4222,
+          "bodyBytes": 3922
+        }
+      ],
+      "documentBytes": 0,
+      "longTaskMs": 0
+    },
+    {
+      "iteration": 3,
+      "scenario": "form-first",
+      "durationMs": 130.4000000357628,
+      "resources": [
+        {
+          "path": "/chunk-BKtXTUrk.js",
+          "api": false,
+          "durationMs": 3.899999976158142,
+          "bytes": 17129,
+          "bodyBytes": 16829
+        },
+        {
+          "path": "/api/management/process-types",
+          "api": true,
+          "durationMs": 24.399999976158142,
+          "bytes": 488,
+          "bodyBytes": 188
+        },
+        {
+          "path": "/api/management/units",
+          "api": true,
+          "durationMs": 24.19999998807907,
+          "bytes": 403,
+          "bodyBytes": 103
+        },
+        {
+          "path": "/api/management/processes",
+          "api": true,
+          "durationMs": 24.400000035762787,
+          "bytes": 31895,
+          "bodyBytes": 31595
+        },
+        {
+          "path": "/favicon.ico",
+          "api": false,
+          "durationMs": 5,
+          "bytes": 4222,
+          "bodyBytes": 3922
+        },
+        {
+          "path": "/api/management/processes/1",
+          "api": true,
+          "durationMs": 35.10000002384186,
+          "bytes": 1071,
+          "bodyBytes": 771
+        }
+      ],
+      "documentBytes": 0,
+      "longTaskMs": 0
+    },
+    {
+      "iteration": 3,
+      "scenario": "map-warm",
+      "durationMs": 91.10000002384186,
+      "resources": [
+        {
+          "path": "/api/management/map",
+          "api": true,
+          "durationMs": 36.10000002384186,
+          "bytes": 32146,
+          "bodyBytes": 31846
+        },
+        {
+          "path": "/favicon.ico",
+          "api": false,
+          "durationMs": 5.899999976158142,
+          "bytes": 4222,
+          "bodyBytes": 3922
+        }
+      ],
+      "documentBytes": 0,
+      "longTaskMs": 0
+    },
+    {
+      "iteration": 3,
+      "scenario": "list-warm",
+      "durationMs": 113.60000002384186,
+      "resources": [
+        {
+          "path": "/api/management/process-types",
+          "api": true,
+          "durationMs": 38.5,
+          "bytes": 488,
+          "bodyBytes": 188
+        },
+        {
+          "path": "/api/management/units",
+          "api": true,
+          "durationMs": 39.39999997615814,
+          "bytes": 403,
+          "bodyBytes": 103
+        },
+        {
+          "path": "/api/management/processes",
+          "api": true,
+          "durationMs": 38.69999998807907,
+          "bytes": 31895,
+          "bodyBytes": 31595
+        },
+        {
+          "path": "/favicon.ico",
+          "api": false,
+          "durationMs": 5.299999952316284,
+          "bytes": 4222,
+          "bodyBytes": 3922
+        }
+      ],
+      "documentBytes": 0,
+      "longTaskMs": 0
+    },
+    {
+      "iteration": 3,
+      "scenario": "search-warm",
+      "durationMs": 96.69999998807907,
+      "resources": [
+        {
+          "path": "/api/management/processes",
+          "api": true,
+          "durationMs": 31.899999976158142,
+          "bytes": 31895,
+          "bodyBytes": 31595
+        },
+        {
+          "path": "/favicon.ico",
+          "api": false,
+          "durationMs": 8.099999964237213,
+          "bytes": 4222,
+          "bodyBytes": 3922
+        }
+      ],
+      "documentBytes": 0,
+      "longTaskMs": 0
+    },
+    {
+      "iteration": 3,
+      "scenario": "detail-warm",
+      "durationMs": 87.80000001192093,
+      "resources": [
+        {
+          "path": "/api/management/processes/1",
+          "api": true,
+          "durationMs": 31.599999964237213,
+          "bytes": 1071,
+          "bodyBytes": 771
+        },
+        {
+          "path": "/favicon.ico",
+          "api": false,
+          "durationMs": 9.399999976158142,
+          "bytes": 4222,
+          "bodyBytes": 3922
+        }
+      ],
+      "documentBytes": 0,
+      "longTaskMs": 0
+    },
+    {
+      "iteration": 3,
+      "scenario": "form-warm",
+      "durationMs": 121.5,
+      "resources": [
+        {
+          "path": "/api/management/process-types",
+          "api": true,
+          "durationMs": 22.899999976158142,
+          "bytes": 488,
+          "bodyBytes": 188
+        },
+        {
+          "path": "/api/management/units",
+          "api": true,
+          "durationMs": 32.39999997615814,
+          "bytes": 403,
+          "bodyBytes": 103
+        },
+        {
+          "path": "/api/management/processes",
+          "api": true,
+          "durationMs": 32.39999997615814,
+          "bytes": 31895,
+          "bodyBytes": 31595
+        },
+        {
+          "path": "/favicon.ico",
+          "api": false,
+          "durationMs": 5.599999964237213,
+          "bytes": 4222,
+          "bodyBytes": 3922
+        },
+        {
+          "path": "/api/management/processes/1",
+          "api": true,
+          "durationMs": 29,
+          "bytes": 1071,
+          "bodyBytes": 771
+        }
+      ],
+      "documentBytes": 0,
+      "longTaskMs": 0
+    },
+    {
+      "iteration": 4,
+      "scenario": "startup-cold",
+      "durationMs": 290.9000000357628,
+      "resources": [
+        {
+          "path": "/polyfills-IA5XWQYN.js",
+          "api": false,
+          "durationMs": 14.900000035762787,
+          "bytes": 34885,
+          "bodyBytes": 34585
+        },
+        {
+          "path": "/main-2AS72IX2.js",
+          "api": false,
+          "durationMs": 21.69999998807907,
+          "bytes": 352304,
+          "bodyBytes": 352004
+        },
+        {
+          "path": "/styles-CCFDSH6V.css",
+          "api": false,
+          "durationMs": 13.5,
+          "bytes": 20985,
+          "bodyBytes": 20685
+        },
+        {
+          "path": "/api/auth/me",
+          "api": true,
+          "durationMs": 25.80000001192093,
+          "bytes": 413,
+          "bodyBytes": 113
+        },
+        {
+          "path": "/favicon.ico",
+          "api": false,
+          "durationMs": 4.599999964237213,
+          "bytes": 4222,
+          "bodyBytes": 3922
+        },
+        {
+          "path": "/chunk-DXfiCODI.js",
+          "api": false,
+          "durationMs": 3.899999976158142,
+          "bytes": 14163,
+          "bodyBytes": 13863
+        },
+        {
+          "path": "/chunk-D_6mW-hx.js",
+          "api": false,
+          "durationMs": 3.199999988079071,
+          "bytes": 4734,
+          "bodyBytes": 4434
+        },
+        {
+          "path": "/api/management/map",
+          "api": true,
+          "durationMs": 27.5,
+          "bytes": 32146,
+          "bodyBytes": 31846
+        }
+      ],
+      "documentBytes": 4222,
+      "longTaskMs": 0
+    },
+    {
+      "iteration": 4,
+      "scenario": "list-first",
+      "durationMs": 128,
+      "resources": [
+        {
+          "path": "/chunk-CsbENt44.js",
+          "api": false,
+          "durationMs": 3.800000011920929,
+          "bytes": 8308,
+          "bodyBytes": 8008
+        },
+        {
+          "path": "/api/management/process-types",
+          "api": true,
+          "durationMs": 22.69999998807907,
+          "bytes": 488,
+          "bodyBytes": 188
+        },
+        {
+          "path": "/api/management/units",
+          "api": true,
+          "durationMs": 22.400000035762787,
+          "bytes": 403,
+          "bodyBytes": 103
+        },
+        {
+          "path": "/api/management/processes",
+          "api": true,
+          "durationMs": 24,
+          "bytes": 31895,
+          "bodyBytes": 31595
+        },
+        {
+          "path": "/favicon.ico",
+          "api": false,
+          "durationMs": 7,
+          "bytes": 4222,
+          "bodyBytes": 3922
+        }
+      ],
+      "documentBytes": 0,
+      "longTaskMs": 0
+    },
+    {
+      "iteration": 4,
+      "scenario": "search-first",
+      "durationMs": 84.10000002384186,
+      "resources": [
+        {
+          "path": "/api/management/processes",
+          "api": true,
+          "durationMs": 25.099999964237213,
+          "bytes": 31895,
+          "bodyBytes": 31595
+        },
+        {
+          "path": "/favicon.ico",
+          "api": false,
+          "durationMs": 5.800000011920929,
+          "bytes": 4222,
+          "bodyBytes": 3922
+        }
+      ],
+      "documentBytes": 0,
+      "longTaskMs": 0
+    },
+    {
+      "iteration": 4,
+      "scenario": "detail-first",
+      "durationMs": 81.10000002384186,
+      "resources": [
+        {
+          "path": "/chunk-DEdViTze.js",
+          "api": false,
+          "durationMs": 3.899999976158142,
+          "bytes": 45525,
+          "bodyBytes": 45225
+        },
+        {
+          "path": "/chunk-DgJdF5xS.js",
+          "api": false,
+          "durationMs": 3.300000011920929,
+          "bytes": 1021,
+          "bodyBytes": 721
+        },
+        {
+          "path": "/api/management/processes/1",
+          "api": true,
+          "durationMs": 24.80000001192093,
+          "bytes": 1071,
+          "bodyBytes": 771
+        },
+        {
+          "path": "/favicon.ico",
+          "api": false,
+          "durationMs": 6.300000011920929,
+          "bytes": 4222,
+          "bodyBytes": 3922
+        }
+      ],
+      "documentBytes": 0,
+      "longTaskMs": 0
+    },
+    {
+      "iteration": 4,
+      "scenario": "form-first",
+      "durationMs": 147.19999998807907,
+      "resources": [
+        {
+          "path": "/chunk-BKtXTUrk.js",
+          "api": false,
+          "durationMs": 3.5,
+          "bytes": 17129,
+          "bodyBytes": 16829
+        },
+        {
+          "path": "/api/management/process-types",
+          "api": true,
+          "durationMs": 31.599999964237213,
+          "bytes": 488,
+          "bodyBytes": 188
+        },
+        {
+          "path": "/api/management/units",
+          "api": true,
+          "durationMs": 31.30000001192093,
+          "bytes": 403,
+          "bodyBytes": 103
+        },
+        {
+          "path": "/api/management/processes",
+          "api": true,
+          "durationMs": 32.10000002384186,
+          "bytes": 31895,
+          "bodyBytes": 31595
+        },
+        {
+          "path": "/favicon.ico",
+          "api": false,
+          "durationMs": 6.600000023841858,
+          "bytes": 4222,
+          "bodyBytes": 3922
+        },
+        {
+          "path": "/api/management/processes/1",
+          "api": true,
+          "durationMs": 39.39999997615814,
+          "bytes": 1071,
+          "bodyBytes": 771
+        }
+      ],
+      "documentBytes": 0,
+      "longTaskMs": 0
+    },
+    {
+      "iteration": 4,
+      "scenario": "map-warm",
+      "durationMs": 77.5,
+      "resources": [
+        {
+          "path": "/api/management/map",
+          "api": true,
+          "durationMs": 26.599999964237213,
+          "bytes": 32146,
+          "bodyBytes": 31846
+        },
+        {
+          "path": "/favicon.ico",
+          "api": false,
+          "durationMs": 6,
+          "bytes": 4222,
+          "bodyBytes": 3922
+        }
+      ],
+      "documentBytes": 0,
+      "longTaskMs": 0
+    },
+    {
+      "iteration": 4,
+      "scenario": "list-warm",
+      "durationMs": 96.5,
+      "resources": [
+        {
+          "path": "/api/management/process-types",
+          "api": true,
+          "durationMs": 30.5,
+          "bytes": 488,
+          "bodyBytes": 188
+        },
+        {
+          "path": "/api/management/units",
+          "api": true,
+          "durationMs": 30.100000023841858,
+          "bytes": 403,
+          "bodyBytes": 103
+        },
+        {
+          "path": "/api/management/processes",
+          "api": true,
+          "durationMs": 30.099999964237213,
+          "bytes": 31895,
+          "bodyBytes": 31595
+        },
+        {
+          "path": "/favicon.ico",
+          "api": false,
+          "durationMs": 5.800000011920929,
+          "bytes": 4222,
+          "bodyBytes": 3922
+        }
+      ],
+      "documentBytes": 0,
+      "longTaskMs": 0
+    },
+    {
+      "iteration": 4,
+      "scenario": "search-warm",
+      "durationMs": 85.69999998807907,
+      "resources": [
+        {
+          "path": "/api/management/processes",
+          "api": true,
+          "durationMs": 35,
+          "bytes": 31895,
+          "bodyBytes": 31595
+        },
+        {
+          "path": "/favicon.ico",
+          "api": false,
+          "durationMs": 8.299999952316284,
+          "bytes": 4222,
+          "bodyBytes": 3922
+        }
+      ],
+      "documentBytes": 0,
+      "longTaskMs": 0
+    },
+    {
+      "iteration": 4,
+      "scenario": "detail-warm",
+      "durationMs": 80.59999996423721,
+      "resources": [
+        {
+          "path": "/api/management/processes/1",
+          "api": true,
+          "durationMs": 26.100000023841858,
+          "bytes": 1071,
+          "bodyBytes": 771
+        },
+        {
+          "path": "/favicon.ico",
+          "api": false,
+          "durationMs": 6,
+          "bytes": 4222,
+          "bodyBytes": 3922
+        }
+      ],
+      "documentBytes": 0,
+      "longTaskMs": 0
+    },
+    {
+      "iteration": 4,
+      "scenario": "form-warm",
+      "durationMs": 114.19999998807907,
+      "resources": [
+        {
+          "path": "/api/management/process-types",
+          "api": true,
+          "durationMs": 24.80000001192093,
+          "bytes": 488,
+          "bodyBytes": 188
+        },
+        {
+          "path": "/api/management/units",
+          "api": true,
+          "durationMs": 24.69999998807907,
+          "bytes": 403,
+          "bodyBytes": 103
+        },
+        {
+          "path": "/api/management/processes",
+          "api": true,
+          "durationMs": 24.5,
+          "bytes": 31895,
+          "bodyBytes": 31595
+        },
+        {
+          "path": "/favicon.ico",
+          "api": false,
+          "durationMs": 4.599999964237213,
+          "bytes": 4222,
+          "bodyBytes": 3922
+        },
+        {
+          "path": "/api/management/processes/1",
+          "api": true,
+          "durationMs": 23.30000001192093,
+          "bytes": 1071,
+          "bodyBytes": 771
+        }
+      ],
+      "documentBytes": 0,
+      "longTaskMs": 0
+    },
+    {
+      "iteration": 5,
+      "scenario": "startup-cold",
+      "durationMs": 284.2999999523163,
+      "resources": [
+        {
+          "path": "/polyfills-IA5XWQYN.js",
+          "api": false,
+          "durationMs": 17.599999964237213,
+          "bytes": 34885,
+          "bodyBytes": 34585
+        },
+        {
+          "path": "/main-2AS72IX2.js",
+          "api": false,
+          "durationMs": 24.099999964237213,
+          "bytes": 352304,
+          "bodyBytes": 352004
+        },
+        {
+          "path": "/styles-CCFDSH6V.css",
+          "api": false,
+          "durationMs": 20,
+          "bytes": 20985,
+          "bodyBytes": 20685
+        },
+        {
+          "path": "/api/auth/me",
+          "api": true,
+          "durationMs": 25.299999952316284,
+          "bytes": 413,
+          "bodyBytes": 113
+        },
+        {
+          "path": "/favicon.ico",
+          "api": false,
+          "durationMs": 4.900000035762787,
+          "bytes": 4222,
+          "bodyBytes": 3922
+        },
+        {
+          "path": "/chunk-DXfiCODI.js",
+          "api": false,
+          "durationMs": 3.5,
+          "bytes": 14163,
+          "bodyBytes": 13863
+        },
+        {
+          "path": "/chunk-D_6mW-hx.js",
+          "api": false,
+          "durationMs": 3.900000035762787,
+          "bytes": 4734,
+          "bodyBytes": 4434
+        },
+        {
+          "path": "/api/management/map",
+          "api": true,
+          "durationMs": 23.099999964237213,
+          "bytes": 32146,
+          "bodyBytes": 31846
+        }
+      ],
+      "documentBytes": 4222,
+      "longTaskMs": 0
+    },
+    {
+      "iteration": 5,
+      "scenario": "list-first",
+      "durationMs": 127.89999997615814,
+      "resources": [
+        {
+          "path": "/chunk-CsbENt44.js",
+          "api": false,
+          "durationMs": 4.099999964237213,
+          "bytes": 8308,
+          "bodyBytes": 8008
+        },
+        {
+          "path": "/api/management/process-types",
+          "api": true,
+          "durationMs": 22.399999976158142,
+          "bytes": 488,
+          "bodyBytes": 188
+        },
+        {
+          "path": "/api/management/units",
+          "api": true,
+          "durationMs": 24.30000001192093,
+          "bytes": 403,
+          "bodyBytes": 103
+        },
+        {
+          "path": "/api/management/processes",
+          "api": true,
+          "durationMs": 25.900000035762787,
+          "bytes": 31895,
+          "bodyBytes": 31595
+        },
+        {
+          "path": "/favicon.ico",
+          "api": false,
+          "durationMs": 7.900000035762787,
+          "bytes": 4222,
+          "bodyBytes": 3922
+        }
+      ],
+      "documentBytes": 0,
+      "longTaskMs": 0
+    },
+    {
+      "iteration": 5,
+      "scenario": "search-first",
+      "durationMs": 95.69999998807907,
+      "resources": [
+        {
+          "path": "/api/management/processes",
+          "api": true,
+          "durationMs": 24,
+          "bytes": 31895,
+          "bodyBytes": 31595
+        },
+        {
+          "path": "/favicon.ico",
+          "api": false,
+          "durationMs": 7.800000011920929,
+          "bytes": 4222,
+          "bodyBytes": 3922
+        }
+      ],
+      "documentBytes": 0,
+      "longTaskMs": 0
+    },
+    {
+      "iteration": 5,
+      "scenario": "detail-first",
+      "durationMs": 97.59999996423721,
+      "resources": [
+        {
+          "path": "/chunk-DEdViTze.js",
+          "api": false,
+          "durationMs": 4,
+          "bytes": 45525,
+          "bodyBytes": 45225
+        },
+        {
+          "path": "/chunk-DgJdF5xS.js",
+          "api": false,
+          "durationMs": 3.5,
+          "bytes": 1021,
+          "bodyBytes": 721
+        },
+        {
+          "path": "/api/management/processes/1",
+          "api": true,
+          "durationMs": 24,
+          "bytes": 1071,
+          "bodyBytes": 771
+        },
+        {
+          "path": "/favicon.ico",
+          "api": false,
+          "durationMs": 5.299999952316284,
+          "bytes": 4222,
+          "bodyBytes": 3922
+        }
+      ],
+      "documentBytes": 0,
+      "longTaskMs": 0
+    },
+    {
+      "iteration": 5,
+      "scenario": "form-first",
+      "durationMs": 130.19999998807907,
+      "resources": [
+        {
+          "path": "/chunk-BKtXTUrk.js",
+          "api": false,
+          "durationMs": 4.100000023841858,
+          "bytes": 17129,
+          "bodyBytes": 16829
+        },
+        {
+          "path": "/api/management/process-types",
+          "api": true,
+          "durationMs": 29.69999998807907,
+          "bytes": 488,
+          "bodyBytes": 188
+        },
+        {
+          "path": "/api/management/units",
+          "api": true,
+          "durationMs": 30,
+          "bytes": 403,
+          "bodyBytes": 103
+        },
+        {
+          "path": "/api/management/processes",
+          "api": true,
+          "durationMs": 29.600000023841858,
+          "bytes": 31895,
+          "bodyBytes": 31595
+        },
+        {
+          "path": "/favicon.ico",
+          "api": false,
+          "durationMs": 6,
+          "bytes": 4222,
+          "bodyBytes": 3922
+        },
+        {
+          "path": "/api/management/processes/1",
+          "api": true,
+          "durationMs": 28.100000023841858,
+          "bytes": 1071,
+          "bodyBytes": 771
+        }
+      ],
+      "documentBytes": 0,
+      "longTaskMs": 0
+    },
+    {
+      "iteration": 5,
+      "scenario": "map-warm",
+      "durationMs": 96,
+      "resources": [
+        {
+          "path": "/api/management/map",
+          "api": true,
+          "durationMs": 36,
+          "bytes": 32146,
+          "bodyBytes": 31846
+        },
+        {
+          "path": "/favicon.ico",
+          "api": false,
+          "durationMs": 5.600000023841858,
+          "bytes": 4222,
+          "bodyBytes": 3922
+        }
+      ],
+      "documentBytes": 0,
+      "longTaskMs": 0
+    },
+    {
+      "iteration": 5,
+      "scenario": "list-warm",
+      "durationMs": 117.89999997615814,
+      "resources": [
+        {
+          "path": "/api/management/process-types",
+          "api": true,
+          "durationMs": 24.69999998807907,
+          "bytes": 488,
+          "bodyBytes": 188
+        },
+        {
+          "path": "/api/management/units",
+          "api": true,
+          "durationMs": 37.89999997615814,
+          "bytes": 403,
+          "bodyBytes": 103
+        },
+        {
+          "path": "/api/management/processes",
+          "api": true,
+          "durationMs": 37.299999952316284,
+          "bytes": 31895,
+          "bodyBytes": 31595
+        },
+        {
+          "path": "/favicon.ico",
+          "api": false,
+          "durationMs": 6.5,
+          "bytes": 4222,
+          "bodyBytes": 3922
+        }
+      ],
+      "documentBytes": 0,
+      "longTaskMs": 0
+    },
+    {
+      "iteration": 5,
+      "scenario": "search-warm",
+      "durationMs": 97.60000002384186,
+      "resources": [
+        {
+          "path": "/api/management/processes",
+          "api": true,
+          "durationMs": 27.69999998807907,
+          "bytes": 31895,
+          "bodyBytes": 31595
+        },
+        {
+          "path": "/favicon.ico",
+          "api": false,
+          "durationMs": 6.600000023841858,
+          "bytes": 4222,
+          "bodyBytes": 3922
+        }
+      ],
+      "documentBytes": 0,
+      "longTaskMs": 0
+    },
+    {
+      "iteration": 5,
+      "scenario": "detail-warm",
+      "durationMs": 80.69999998807907,
+      "resources": [
+        {
+          "path": "/api/management/processes/1",
+          "api": true,
+          "durationMs": 30.69999998807907,
+          "bytes": 1071,
+          "bodyBytes": 771
+        },
+        {
+          "path": "/favicon.ico",
+          "api": false,
+          "durationMs": 7.100000023841858,
+          "bytes": 4222,
+          "bodyBytes": 3922
+        }
+      ],
+      "documentBytes": 0,
+      "longTaskMs": 0
+    },
+    {
+      "iteration": 5,
+      "scenario": "form-warm",
+      "durationMs": 130.19999998807907,
+      "resources": [
+        {
+          "path": "/api/management/process-types",
+          "api": true,
+          "durationMs": 25.30000001192093,
+          "bytes": 488,
+          "bodyBytes": 188
+        },
+        {
+          "path": "/api/management/units",
+          "api": true,
+          "durationMs": 24.900000035762787,
+          "bytes": 403,
+          "bodyBytes": 103
+        },
+        {
+          "path": "/api/management/processes",
+          "api": true,
+          "durationMs": 40.80000001192093,
+          "bytes": 31895,
+          "bodyBytes": 31595
+        },
+        {
+          "path": "/favicon.ico",
+          "api": false,
+          "durationMs": 4.700000047683716,
+          "bytes": 4222,
+          "bodyBytes": 3922
+        },
+        {
+          "path": "/api/management/processes/1",
+          "api": true,
+          "durationMs": 25.700000047683716,
+          "bytes": 1071,
+          "bodyBytes": 771
+        }
+      ],
+      "documentBytes": 0,
+      "longTaskMs": 0
+    },
+    {
+      "iteration": 6,
+      "scenario": "startup-cold",
+      "durationMs": 304.89999997615814,
+      "resources": [
+        {
+          "path": "/polyfills-IA5XWQYN.js",
+          "api": false,
+          "durationMs": 14.5,
+          "bytes": 34885,
+          "bodyBytes": 34585
+        },
+        {
+          "path": "/main-2AS72IX2.js",
+          "api": false,
+          "durationMs": 21.600000023841858,
+          "bytes": 352304,
+          "bodyBytes": 352004
+        },
+        {
+          "path": "/styles-CCFDSH6V.css",
+          "api": false,
+          "durationMs": 12.699999988079071,
+          "bytes": 20985,
+          "bodyBytes": 20685
+        },
+        {
+          "path": "/api/auth/me",
+          "api": true,
+          "durationMs": 39.30000001192093,
+          "bytes": 413,
+          "bodyBytes": 113
+        },
+        {
+          "path": "/favicon.ico",
+          "api": false,
+          "durationMs": 4.400000035762787,
+          "bytes": 4222,
+          "bodyBytes": 3922
+        },
+        {
+          "path": "/chunk-DXfiCODI.js",
+          "api": false,
+          "durationMs": 3.599999964237213,
+          "bytes": 14163,
+          "bodyBytes": 13863
+        },
+        {
+          "path": "/chunk-D_6mW-hx.js",
+          "api": false,
+          "durationMs": 4,
+          "bytes": 4734,
+          "bodyBytes": 4434
+        },
+        {
+          "path": "/api/management/map",
+          "api": true,
+          "durationMs": 26.69999998807907,
+          "bytes": 32146,
+          "bodyBytes": 31846
+        }
+      ],
+      "documentBytes": 4222,
+      "longTaskMs": 0
+    },
+    {
+      "iteration": 6,
+      "scenario": "list-first",
+      "durationMs": 143.5999999642372,
+      "resources": [
+        {
+          "path": "/chunk-CsbENt44.js",
+          "api": false,
+          "durationMs": 3.600000023841858,
+          "bytes": 8308,
+          "bodyBytes": 8008
+        },
+        {
+          "path": "/api/management/process-types",
+          "api": true,
+          "durationMs": 27.900000035762787,
+          "bytes": 488,
+          "bodyBytes": 188
+        },
+        {
+          "path": "/api/management/units",
+          "api": true,
+          "durationMs": 27.19999998807907,
+          "bytes": 403,
+          "bodyBytes": 103
+        },
+        {
+          "path": "/api/management/processes",
+          "api": true,
+          "durationMs": 25.599999964237213,
+          "bytes": 31895,
+          "bodyBytes": 31595
+        },
+        {
+          "path": "/favicon.ico",
+          "api": false,
+          "durationMs": 9.800000011920929,
+          "bytes": 4222,
+          "bodyBytes": 3922
+        }
+      ],
+      "documentBytes": 0,
+      "longTaskMs": 0
+    },
+    {
+      "iteration": 6,
+      "scenario": "search-first",
+      "durationMs": 101.69999998807907,
+      "resources": [
+        {
+          "path": "/api/management/processes",
+          "api": true,
+          "durationMs": 30.900000035762787,
+          "bytes": 31895,
+          "bodyBytes": 31595
+        },
+        {
+          "path": "/favicon.ico",
+          "api": false,
+          "durationMs": 6.200000047683716,
+          "bytes": 4222,
+          "bodyBytes": 3922
+        }
+      ],
+      "documentBytes": 0,
+      "longTaskMs": 0
+    },
+    {
+      "iteration": 6,
+      "scenario": "detail-first",
+      "durationMs": 97,
+      "resources": [
+        {
+          "path": "/chunk-DEdViTze.js",
+          "api": false,
+          "durationMs": 4.100000023841858,
+          "bytes": 45525,
+          "bodyBytes": 45225
+        },
+        {
+          "path": "/chunk-DgJdF5xS.js",
+          "api": false,
+          "durationMs": 2.800000011920929,
+          "bytes": 1021,
+          "bodyBytes": 721
+        },
+        {
+          "path": "/api/management/processes/1",
+          "api": true,
+          "durationMs": 31.600000023841858,
+          "bytes": 1071,
+          "bodyBytes": 771
+        },
+        {
+          "path": "/favicon.ico",
+          "api": false,
+          "durationMs": 5.099999964237213,
+          "bytes": 4222,
+          "bodyBytes": 3922
+        }
+      ],
+      "documentBytes": 0,
+      "longTaskMs": 0
+    },
+    {
+      "iteration": 6,
+      "scenario": "form-first",
+      "durationMs": 113.89999997615814,
+      "resources": [
+        {
+          "path": "/chunk-BKtXTUrk.js",
+          "api": false,
+          "durationMs": 4.100000023841858,
+          "bytes": 17129,
+          "bodyBytes": 16829
+        },
+        {
+          "path": "/api/management/process-types",
+          "api": true,
+          "durationMs": 26.5,
+          "bytes": 488,
+          "bodyBytes": 188
+        },
+        {
+          "path": "/api/management/units",
+          "api": true,
+          "durationMs": 26.19999998807907,
+          "bytes": 403,
+          "bodyBytes": 103
+        },
+        {
+          "path": "/api/management/processes",
+          "api": true,
+          "durationMs": 26,
+          "bytes": 31895,
+          "bodyBytes": 31595
+        },
+        {
+          "path": "/favicon.ico",
+          "api": false,
+          "durationMs": 4.400000035762787,
+          "bytes": 4222,
+          "bodyBytes": 3922
+        },
+        {
+          "path": "/api/management/processes/1",
+          "api": true,
+          "durationMs": 27.399999976158142,
+          "bytes": 1071,
+          "bodyBytes": 771
+        }
+      ],
+      "documentBytes": 0,
+      "longTaskMs": 0
+    },
+    {
+      "iteration": 6,
+      "scenario": "map-warm",
+      "durationMs": 92.19999998807907,
+      "resources": [
+        {
+          "path": "/api/management/map",
+          "api": true,
+          "durationMs": 37,
+          "bytes": 32146,
+          "bodyBytes": 31846
+        },
+        {
+          "path": "/favicon.ico",
+          "api": false,
+          "durationMs": 5.699999988079071,
+          "bytes": 4222,
+          "bodyBytes": 3922
+        }
+      ],
+      "documentBytes": 0,
+      "longTaskMs": 0
+    },
+    {
+      "iteration": 6,
+      "scenario": "list-warm",
+      "durationMs": 98.40000003576279,
+      "resources": [
+        {
+          "path": "/api/management/process-types",
+          "api": true,
+          "durationMs": 25.200000047683716,
+          "bytes": 488,
+          "bodyBytes": 188
+        },
+        {
+          "path": "/api/management/units",
+          "api": true,
+          "durationMs": 26.399999976158142,
+          "bytes": 403,
+          "bodyBytes": 103
+        },
+        {
+          "path": "/api/management/processes",
+          "api": true,
+          "durationMs": 26.099999964237213,
+          "bytes": 31895,
+          "bodyBytes": 31595
+        },
+        {
+          "path": "/favicon.ico",
+          "api": false,
+          "durationMs": 5.299999952316284,
+          "bytes": 4222,
+          "bodyBytes": 3922
+        }
+      ],
+      "documentBytes": 0,
+      "longTaskMs": 0
+    },
+    {
+      "iteration": 6,
+      "scenario": "search-warm",
+      "durationMs": 87.89999997615814,
+      "resources": [
+        {
+          "path": "/api/management/processes",
+          "api": true,
+          "durationMs": 29.5,
+          "bytes": 31895,
+          "bodyBytes": 31595
+        },
+        {
+          "path": "/favicon.ico",
+          "api": false,
+          "durationMs": 6.899999976158142,
+          "bytes": 4222,
+          "bodyBytes": 3922
+        }
+      ],
+      "documentBytes": 0,
+      "longTaskMs": 0
+    },
+    {
+      "iteration": 6,
+      "scenario": "detail-warm",
+      "durationMs": 64.5,
+      "resources": [
+        {
+          "path": "/api/management/processes/1",
+          "api": true,
+          "durationMs": 23.5,
+          "bytes": 1071,
+          "bodyBytes": 771
+        },
+        {
+          "path": "/favicon.ico",
+          "api": false,
+          "durationMs": 6.400000035762787,
+          "bytes": 4222,
+          "bodyBytes": 3922
+        }
+      ],
+      "documentBytes": 0,
+      "longTaskMs": 0
+    },
+    {
+      "iteration": 6,
+      "scenario": "form-warm",
+      "durationMs": 114.19999998807907,
+      "resources": [
+        {
+          "path": "/api/management/process-types",
+          "api": true,
+          "durationMs": 26.100000023841858,
+          "bytes": 488,
+          "bodyBytes": 188
+        },
+        {
+          "path": "/api/management/units",
+          "api": true,
+          "durationMs": 26,
+          "bytes": 403,
+          "bodyBytes": 103
+        },
+        {
+          "path": "/api/management/processes",
+          "api": true,
+          "durationMs": 26,
+          "bytes": 31895,
+          "bodyBytes": 31595
+        },
+        {
+          "path": "/favicon.ico",
+          "api": false,
+          "durationMs": 5.699999988079071,
+          "bytes": 4222,
+          "bodyBytes": 3922
+        },
+        {
+          "path": "/api/management/processes/1",
+          "api": true,
+          "durationMs": 37.5,
+          "bytes": 1071,
+          "bodyBytes": 771
+        }
+      ],
+      "documentBytes": 0,
+      "longTaskMs": 0
+    },
+    {
+      "iteration": 7,
+      "scenario": "startup-cold",
+      "durationMs": 278.30000001192093,
+      "resources": [
+        {
+          "path": "/polyfills-IA5XWQYN.js",
+          "api": false,
+          "durationMs": 16,
+          "bytes": 34885,
+          "bodyBytes": 34585
+        },
+        {
+          "path": "/main-2AS72IX2.js",
+          "api": false,
+          "durationMs": 22.5,
+          "bytes": 352304,
+          "bodyBytes": 352004
+        },
+        {
+          "path": "/styles-CCFDSH6V.css",
+          "api": false,
+          "durationMs": 15.399999976158142,
+          "bytes": 20985,
+          "bodyBytes": 20685
+        },
+        {
+          "path": "/api/auth/me",
+          "api": true,
+          "durationMs": 24,
+          "bytes": 413,
+          "bodyBytes": 113
+        },
+        {
+          "path": "/favicon.ico",
+          "api": false,
+          "durationMs": 5.099999964237213,
+          "bytes": 4222,
+          "bodyBytes": 3922
+        },
+        {
+          "path": "/chunk-DXfiCODI.js",
+          "api": false,
+          "durationMs": 4,
+          "bytes": 14163,
+          "bodyBytes": 13863
+        },
+        {
+          "path": "/chunk-D_6mW-hx.js",
+          "api": false,
+          "durationMs": 3,
+          "bytes": 4734,
+          "bodyBytes": 4434
+        },
+        {
+          "path": "/api/management/map",
+          "api": true,
+          "durationMs": 30.30000001192093,
+          "bytes": 32146,
+          "bodyBytes": 31846
+        }
+      ],
+      "documentBytes": 4222,
+      "longTaskMs": 0
+    },
+    {
+      "iteration": 7,
+      "scenario": "list-first",
+      "durationMs": 127.5,
+      "resources": [
+        {
+          "path": "/chunk-CsbENt44.js",
+          "api": false,
+          "durationMs": 3.600000023841858,
+          "bytes": 8308,
+          "bodyBytes": 8008
+        },
+        {
+          "path": "/api/management/process-types",
+          "api": true,
+          "durationMs": 22.600000023841858,
+          "bytes": 488,
+          "bodyBytes": 188
+        },
+        {
+          "path": "/api/management/units",
+          "api": true,
+          "durationMs": 22.30000001192093,
+          "bytes": 403,
+          "bodyBytes": 103
+        },
+        {
+          "path": "/api/management/processes",
+          "api": true,
+          "durationMs": 28,
+          "bytes": 31895,
+          "bodyBytes": 31595
+        },
+        {
+          "path": "/favicon.ico",
+          "api": false,
+          "durationMs": 6.5,
+          "bytes": 4222,
+          "bodyBytes": 3922
+        }
+      ],
+      "documentBytes": 0,
+      "longTaskMs": 0
+    },
+    {
+      "iteration": 7,
+      "scenario": "search-first",
+      "durationMs": 103.5,
+      "resources": [
+        {
+          "path": "/api/management/processes",
+          "api": true,
+          "durationMs": 33.10000002384186,
+          "bytes": 31895,
+          "bodyBytes": 31595
+        },
+        {
+          "path": "/favicon.ico",
+          "api": false,
+          "durationMs": 4.599999964237213,
+          "bytes": 4222,
+          "bodyBytes": 3922
+        }
+      ],
+      "documentBytes": 0,
+      "longTaskMs": 0
+    },
+    {
+      "iteration": 7,
+      "scenario": "detail-first",
+      "durationMs": 113.19999998807907,
+      "resources": [
+        {
+          "path": "/chunk-DEdViTze.js",
+          "api": false,
+          "durationMs": 4.199999988079071,
+          "bytes": 45525,
+          "bodyBytes": 45225
+        },
+        {
+          "path": "/chunk-DgJdF5xS.js",
+          "api": false,
+          "durationMs": 3.400000035762787,
+          "bytes": 1021,
+          "bodyBytes": 721
+        },
+        {
+          "path": "/api/management/processes/1",
+          "api": true,
+          "durationMs": 30.19999998807907,
+          "bytes": 1071,
+          "bodyBytes": 771
+        },
+        {
+          "path": "/favicon.ico",
+          "api": false,
+          "durationMs": 6.100000023841858,
+          "bytes": 4222,
+          "bodyBytes": 3922
+        }
+      ],
+      "documentBytes": 0,
+      "longTaskMs": 0
+    },
+    {
+      "iteration": 7,
+      "scenario": "form-first",
+      "durationMs": 152.4000000357628,
+      "resources": [
+        {
+          "path": "/chunk-BKtXTUrk.js",
+          "api": false,
+          "durationMs": 4.199999988079071,
+          "bytes": 17129,
+          "bodyBytes": 16829
+        },
+        {
+          "path": "/api/management/process-types",
+          "api": true,
+          "durationMs": 29.600000023841858,
+          "bytes": 488,
+          "bodyBytes": 188
+        },
+        {
+          "path": "/api/management/units",
+          "api": true,
+          "durationMs": 29,
+          "bytes": 403,
+          "bodyBytes": 103
+        },
+        {
+          "path": "/api/management/processes",
+          "api": true,
+          "durationMs": 29.19999998807907,
+          "bytes": 31895,
+          "bodyBytes": 31595
+        },
+        {
+          "path": "/favicon.ico",
+          "api": false,
+          "durationMs": 6.5,
+          "bytes": 4222,
+          "bodyBytes": 3922
+        },
+        {
+          "path": "/api/management/processes/1",
+          "api": true,
+          "durationMs": 35.5,
+          "bytes": 1071,
+          "bodyBytes": 771
+        }
+      ],
+      "documentBytes": 0,
+      "longTaskMs": 0
+    },
+    {
+      "iteration": 7,
+      "scenario": "map-warm",
+      "durationMs": 70,
+      "resources": [
+        {
+          "path": "/api/management/map",
+          "api": true,
+          "durationMs": 26.900000035762787,
+          "bytes": 32146,
+          "bodyBytes": 31846
+        },
+        {
+          "path": "/favicon.ico",
+          "api": false,
+          "durationMs": 7.299999952316284,
+          "bytes": 4222,
+          "bodyBytes": 3922
+        }
+      ],
+      "documentBytes": 0,
+      "longTaskMs": 0
+    },
+    {
+      "iteration": 7,
+      "scenario": "list-warm",
+      "durationMs": 93.10000002384186,
+      "resources": [
+        {
+          "path": "/api/management/process-types",
+          "api": true,
+          "durationMs": 22,
+          "bytes": 488,
+          "bodyBytes": 188
+        },
+        {
+          "path": "/api/management/units",
+          "api": true,
+          "durationMs": 36.80000001192093,
+          "bytes": 403,
+          "bodyBytes": 103
+        },
+        {
+          "path": "/api/management/processes",
+          "api": true,
+          "durationMs": 36.19999998807907,
+          "bytes": 31895,
+          "bodyBytes": 31595
+        },
+        {
+          "path": "/favicon.ico",
+          "api": false,
+          "durationMs": 6.300000011920929,
+          "bytes": 4222,
+          "bodyBytes": 3922
+        }
+      ],
+      "documentBytes": 0,
+      "longTaskMs": 0
+    },
+    {
+      "iteration": 7,
+      "scenario": "search-warm",
+      "durationMs": 85.39999997615814,
+      "resources": [
+        {
+          "path": "/api/management/processes",
+          "api": true,
+          "durationMs": 32.80000001192093,
+          "bytes": 31895,
+          "bodyBytes": 31595
+        },
+        {
+          "path": "/favicon.ico",
+          "api": false,
+          "durationMs": 5.100000023841858,
+          "bytes": 4222,
+          "bodyBytes": 3922
+        }
+      ],
+      "documentBytes": 0,
+      "longTaskMs": 0
+    },
+    {
+      "iteration": 7,
+      "scenario": "detail-warm",
+      "durationMs": 79.80000001192093,
+      "resources": [
+        {
+          "path": "/api/management/processes/1",
+          "api": true,
+          "durationMs": 22.899999976158142,
+          "bytes": 1071,
+          "bodyBytes": 771
+        },
+        {
+          "path": "/favicon.ico",
+          "api": false,
+          "durationMs": 5.199999988079071,
+          "bytes": 4222,
+          "bodyBytes": 3922
+        }
+      ],
+      "documentBytes": 0,
+      "longTaskMs": 0
+    },
+    {
+      "iteration": 7,
+      "scenario": "form-warm",
+      "durationMs": 136.30000001192093,
+      "resources": [
+        {
+          "path": "/api/management/process-types",
+          "api": true,
+          "durationMs": 26.899999976158142,
+          "bytes": 488,
+          "bodyBytes": 188
+        },
+        {
+          "path": "/api/management/units",
+          "api": true,
+          "durationMs": 26.600000023841858,
+          "bytes": 403,
+          "bodyBytes": 103
+        },
+        {
+          "path": "/api/management/processes",
+          "api": true,
+          "durationMs": 26.599999964237213,
+          "bytes": 31895,
+          "bodyBytes": 31595
+        },
+        {
+          "path": "/favicon.ico",
+          "api": false,
+          "durationMs": 5.199999988079071,
+          "bytes": 4222,
+          "bodyBytes": 3922
+        },
+        {
+          "path": "/api/management/processes/1",
+          "api": true,
+          "durationMs": 37.19999998807907,
+          "bytes": 1071,
+          "bodyBytes": 771
+        }
+      ],
+      "documentBytes": 0,
+      "longTaskMs": 0
+    },
+    {
+      "iteration": 8,
+      "scenario": "startup-cold",
+      "durationMs": 284.4000000357628,
+      "resources": [
+        {
+          "path": "/polyfills-IA5XWQYN.js",
+          "api": false,
+          "durationMs": 18.5,
+          "bytes": 34885,
+          "bodyBytes": 34585
+        },
+        {
+          "path": "/main-2AS72IX2.js",
+          "api": false,
+          "durationMs": 26.100000023841858,
+          "bytes": 352304,
+          "bodyBytes": 352004
+        },
+        {
+          "path": "/styles-CCFDSH6V.css",
+          "api": false,
+          "durationMs": 17.400000035762787,
+          "bytes": 20985,
+          "bodyBytes": 20685
+        },
+        {
+          "path": "/api/auth/me",
+          "api": true,
+          "durationMs": 32.5,
+          "bytes": 413,
+          "bodyBytes": 113
+        },
+        {
+          "path": "/favicon.ico",
+          "api": false,
+          "durationMs": 4.700000047683716,
+          "bytes": 4222,
+          "bodyBytes": 3922
+        },
+        {
+          "path": "/chunk-DXfiCODI.js",
+          "api": false,
+          "durationMs": 4.399999976158142,
+          "bytes": 14163,
+          "bodyBytes": 13863
+        },
+        {
+          "path": "/chunk-D_6mW-hx.js",
+          "api": false,
+          "durationMs": 3.299999952316284,
+          "bytes": 4734,
+          "bodyBytes": 4434
+        },
+        {
+          "path": "/api/management/map",
+          "api": true,
+          "durationMs": 27.899999976158142,
+          "bytes": 32146,
+          "bodyBytes": 31846
+        }
+      ],
+      "documentBytes": 4222,
+      "longTaskMs": 0
+    },
+    {
+      "iteration": 8,
+      "scenario": "list-first",
+      "durationMs": 127.59999996423721,
+      "resources": [
+        {
+          "path": "/chunk-CsbENt44.js",
+          "api": false,
+          "durationMs": 3.799999952316284,
+          "bytes": 8308,
+          "bodyBytes": 8008
+        },
+        {
+          "path": "/api/management/process-types",
+          "api": true,
+          "durationMs": 27.100000023841858,
+          "bytes": 488,
+          "bodyBytes": 188
+        },
+        {
+          "path": "/api/management/units",
+          "api": true,
+          "durationMs": 27.600000023841858,
+          "bytes": 403,
+          "bodyBytes": 103
+        },
+        {
+          "path": "/api/management/processes",
+          "api": true,
+          "durationMs": 27.299999952316284,
+          "bytes": 31895,
+          "bodyBytes": 31595
+        },
+        {
+          "path": "/favicon.ico",
+          "api": false,
+          "durationMs": 5.699999988079071,
+          "bytes": 4222,
+          "bodyBytes": 3922
+        }
+      ],
+      "documentBytes": 0,
+      "longTaskMs": 0
+    },
+    {
+      "iteration": 8,
+      "scenario": "search-first",
+      "durationMs": 105.90000003576279,
+      "resources": [
+        {
+          "path": "/api/management/processes",
+          "api": true,
+          "durationMs": 36.40000003576279,
+          "bytes": 31895,
+          "bodyBytes": 31595
+        },
+        {
+          "path": "/favicon.ico",
+          "api": false,
+          "durationMs": 5,
+          "bytes": 4222,
+          "bodyBytes": 3922
+        }
+      ],
+      "documentBytes": 0,
+      "longTaskMs": 0
+    },
+    {
+      "iteration": 8,
+      "scenario": "detail-first",
+      "durationMs": 79.90000003576279,
+      "resources": [
+        {
+          "path": "/chunk-DEdViTze.js",
+          "api": false,
+          "durationMs": 3.300000011920929,
+          "bytes": 45525,
+          "bodyBytes": 45225
+        },
+        {
+          "path": "/chunk-DgJdF5xS.js",
+          "api": false,
+          "durationMs": 3.199999988079071,
+          "bytes": 1021,
+          "bodyBytes": 721
+        },
+        {
+          "path": "/api/management/processes/1",
+          "api": true,
+          "durationMs": 23,
+          "bytes": 1071,
+          "bodyBytes": 771
+        },
+        {
+          "path": "/favicon.ico",
+          "api": false,
+          "durationMs": 5.899999976158142,
+          "bytes": 4222,
+          "bodyBytes": 3922
+        }
+      ],
+      "documentBytes": 0,
+      "longTaskMs": 0
+    },
+    {
+      "iteration": 8,
+      "scenario": "form-first",
+      "durationMs": 129.80000001192093,
+      "resources": [
+        {
+          "path": "/chunk-BKtXTUrk.js",
+          "api": false,
+          "durationMs": 4.399999976158142,
+          "bytes": 17129,
+          "bodyBytes": 16829
+        },
+        {
+          "path": "/api/management/process-types",
+          "api": true,
+          "durationMs": 29.80000001192093,
+          "bytes": 488,
+          "bodyBytes": 188
+        },
+        {
+          "path": "/api/management/units",
+          "api": true,
+          "durationMs": 29.5,
+          "bytes": 403,
+          "bodyBytes": 103
+        },
+        {
+          "path": "/api/management/processes",
+          "api": true,
+          "durationMs": 29.5,
+          "bytes": 31895,
+          "bodyBytes": 31595
+        },
+        {
+          "path": "/favicon.ico",
+          "api": false,
+          "durationMs": 5.400000035762787,
+          "bytes": 4222,
+          "bodyBytes": 3922
+        },
+        {
+          "path": "/api/management/processes/1",
+          "api": true,
+          "durationMs": 23.30000001192093,
+          "bytes": 1071,
+          "bodyBytes": 771
+        }
+      ],
+      "documentBytes": 0,
+      "longTaskMs": 0
+    },
+    {
+      "iteration": 8,
+      "scenario": "map-warm",
+      "durationMs": 101.90000003576279,
+      "resources": [
+        {
+          "path": "/api/management/map",
+          "api": true,
+          "durationMs": 37.700000047683716,
+          "bytes": 32146,
+          "bodyBytes": 31846
+        },
+        {
+          "path": "/favicon.ico",
+          "api": false,
+          "durationMs": 6.900000035762787,
+          "bytes": 4222,
+          "bodyBytes": 3922
+        }
+      ],
+      "documentBytes": 0,
+      "longTaskMs": 0
+    },
+    {
+      "iteration": 8,
+      "scenario": "list-warm",
+      "durationMs": 105.69999998807907,
+      "resources": [
+        {
+          "path": "/api/management/process-types",
+          "api": true,
+          "durationMs": 34.19999998807907,
+          "bytes": 488,
+          "bodyBytes": 188
+        },
+        {
+          "path": "/api/management/units",
+          "api": true,
+          "durationMs": 36.90000003576279,
+          "bytes": 403,
+          "bodyBytes": 103
+        },
+        {
+          "path": "/api/management/processes",
+          "api": true,
+          "durationMs": 38.30000001192093,
+          "bytes": 31895,
+          "bodyBytes": 31595
+        },
+        {
+          "path": "/favicon.ico",
+          "api": false,
+          "durationMs": 4.400000035762787,
+          "bytes": 4222,
+          "bodyBytes": 3922
+        }
+      ],
+      "documentBytes": 0,
+      "longTaskMs": 0
+    },
+    {
+      "iteration": 8,
+      "scenario": "search-warm",
+      "durationMs": 94.09999996423721,
+      "resources": [
+        {
+          "path": "/api/management/processes",
+          "api": true,
+          "durationMs": 24.599999964237213,
+          "bytes": 31895,
+          "bodyBytes": 31595
+        },
+        {
+          "path": "/favicon.ico",
+          "api": false,
+          "durationMs": 6,
+          "bytes": 4222,
+          "bodyBytes": 3922
+        }
+      ],
+      "documentBytes": 0,
+      "longTaskMs": 0
+    },
+    {
+      "iteration": 8,
+      "scenario": "detail-warm",
+      "durationMs": 79.69999998807907,
+      "resources": [
+        {
+          "path": "/api/management/processes/1",
+          "api": true,
+          "durationMs": 30.900000035762787,
+          "bytes": 1071,
+          "bodyBytes": 771
+        },
+        {
+          "path": "/favicon.ico",
+          "api": false,
+          "durationMs": 7.900000035762787,
+          "bytes": 4222,
+          "bodyBytes": 3922
+        }
+      ],
+      "documentBytes": 0,
+      "longTaskMs": 0
+    },
+    {
+      "iteration": 8,
+      "scenario": "form-warm",
+      "durationMs": 113,
+      "resources": [
+        {
+          "path": "/api/management/process-types",
+          "api": true,
+          "durationMs": 26.100000023841858,
+          "bytes": 488,
+          "bodyBytes": 188
+        },
+        {
+          "path": "/api/management/units",
+          "api": true,
+          "durationMs": 25.69999998807907,
+          "bytes": 403,
+          "bodyBytes": 103
+        },
+        {
+          "path": "/api/management/processes",
+          "api": true,
+          "durationMs": 25.399999976158142,
+          "bytes": 31895,
+          "bodyBytes": 31595
+        },
+        {
+          "path": "/favicon.ico",
+          "api": false,
+          "durationMs": 5.399999976158142,
+          "bytes": 4222,
+          "bodyBytes": 3922
+        },
+        {
+          "path": "/api/management/processes/1",
+          "api": true,
+          "durationMs": 26.799999952316284,
+          "bytes": 1071,
+          "bodyBytes": 771
+        }
+      ],
+      "documentBytes": 0,
+      "longTaskMs": 0
+    },
+    {
+      "iteration": 9,
+      "scenario": "startup-cold",
+      "durationMs": 298.10000002384186,
+      "resources": [
+        {
+          "path": "/polyfills-IA5XWQYN.js",
+          "api": false,
+          "durationMs": 16.69999998807907,
+          "bytes": 34885,
+          "bodyBytes": 34585
+        },
+        {
+          "path": "/main-2AS72IX2.js",
+          "api": false,
+          "durationMs": 41.5,
+          "bytes": 352304,
+          "bodyBytes": 352004
+        },
+        {
+          "path": "/styles-CCFDSH6V.css",
+          "api": false,
+          "durationMs": 16.099999964237213,
+          "bytes": 20985,
+          "bodyBytes": 20685
+        },
+        {
+          "path": "/api/auth/me",
+          "api": true,
+          "durationMs": 29.399999976158142,
+          "bytes": 413,
+          "bodyBytes": 113
+        },
+        {
+          "path": "/favicon.ico",
+          "api": false,
+          "durationMs": 5.399999976158142,
+          "bytes": 4222,
+          "bodyBytes": 3922
+        },
+        {
+          "path": "/chunk-DXfiCODI.js",
+          "api": false,
+          "durationMs": 3.600000023841858,
+          "bytes": 14163,
+          "bodyBytes": 13863
+        },
+        {
+          "path": "/chunk-D_6mW-hx.js",
+          "api": false,
+          "durationMs": 3.299999952316284,
+          "bytes": 4734,
+          "bodyBytes": 4434
+        },
+        {
+          "path": "/api/management/map",
+          "api": true,
+          "durationMs": 29.5,
+          "bytes": 32146,
+          "bodyBytes": 31846
+        }
+      ],
+      "documentBytes": 4222,
+      "longTaskMs": 0
+    },
+    {
+      "iteration": 9,
+      "scenario": "list-first",
+      "durationMs": 142.30000001192093,
+      "resources": [
+        {
+          "path": "/chunk-CsbENt44.js",
+          "api": false,
+          "durationMs": 4,
+          "bytes": 8308,
+          "bodyBytes": 8008
+        },
+        {
+          "path": "/api/management/process-types",
+          "api": true,
+          "durationMs": 34.19999998807907,
+          "bytes": 488,
+          "bodyBytes": 188
+        },
+        {
+          "path": "/api/management/units",
+          "api": true,
+          "durationMs": 33.60000002384186,
+          "bytes": 403,
+          "bodyBytes": 103
+        },
+        {
+          "path": "/api/management/processes",
+          "api": true,
+          "durationMs": 33.30000001192093,
+          "bytes": 31895,
+          "bodyBytes": 31595
+        },
+        {
+          "path": "/favicon.ico",
+          "api": false,
+          "durationMs": 7.100000023841858,
+          "bytes": 4222,
+          "bodyBytes": 3922
+        }
+      ],
+      "documentBytes": 0,
+      "longTaskMs": 0
+    },
+    {
+      "iteration": 9,
+      "scenario": "search-first",
+      "durationMs": 103.5,
+      "resources": [
+        {
+          "path": "/api/management/processes",
+          "api": true,
+          "durationMs": 29.19999998807907,
+          "bytes": 31895,
+          "bodyBytes": 31595
+        },
+        {
+          "path": "/favicon.ico",
+          "api": false,
+          "durationMs": 6.600000023841858,
+          "bytes": 4222,
+          "bodyBytes": 3922
+        }
+      ],
+      "documentBytes": 0,
+      "longTaskMs": 0
+    },
+    {
+      "iteration": 9,
+      "scenario": "detail-first",
+      "durationMs": 97.09999996423721,
+      "resources": [
+        {
+          "path": "/chunk-DEdViTze.js",
+          "api": false,
+          "durationMs": 5.600000023841858,
+          "bytes": 45525,
+          "bodyBytes": 45225
+        },
+        {
+          "path": "/chunk-DgJdF5xS.js",
+          "api": false,
+          "durationMs": 4.199999988079071,
+          "bytes": 1021,
+          "bodyBytes": 721
+        },
+        {
+          "path": "/api/management/processes/1",
+          "api": true,
+          "durationMs": 26.19999998807907,
+          "bytes": 1071,
+          "bodyBytes": 771
+        },
+        {
+          "path": "/favicon.ico",
+          "api": false,
+          "durationMs": 11,
+          "bytes": 4222,
+          "bodyBytes": 3922
+        }
+      ],
+      "documentBytes": 0,
+      "longTaskMs": 0
+    },
+    {
+      "iteration": 9,
+      "scenario": "form-first",
+      "durationMs": 130.39999997615814,
+      "resources": [
+        {
+          "path": "/chunk-BKtXTUrk.js",
+          "api": false,
+          "durationMs": 4.100000023841858,
+          "bytes": 17129,
+          "bodyBytes": 16829
+        },
+        {
+          "path": "/api/management/process-types",
+          "api": true,
+          "durationMs": 32.10000002384186,
+          "bytes": 488,
+          "bodyBytes": 188
+        },
+        {
+          "path": "/api/management/units",
+          "api": true,
+          "durationMs": 32.10000002384186,
+          "bytes": 403,
+          "bodyBytes": 103
+        },
+        {
+          "path": "/api/management/processes",
+          "api": true,
+          "durationMs": 31.69999998807907,
+          "bytes": 31895,
+          "bodyBytes": 31595
+        },
+        {
+          "path": "/favicon.ico",
+          "api": false,
+          "durationMs": 5,
+          "bytes": 4222,
+          "bodyBytes": 3922
+        },
+        {
+          "path": "/api/management/processes/1",
+          "api": true,
+          "durationMs": 29.599999964237213,
+          "bytes": 1071,
+          "bodyBytes": 771
+        }
+      ],
+      "documentBytes": 0,
+      "longTaskMs": 0
+    },
+    {
+      "iteration": 9,
+      "scenario": "map-warm",
+      "durationMs": 93.19999998807907,
+      "resources": [
+        {
+          "path": "/api/management/map",
+          "api": true,
+          "durationMs": 38,
+          "bytes": 32146,
+          "bodyBytes": 31846
+        },
+        {
+          "path": "/favicon.ico",
+          "api": false,
+          "durationMs": 6.400000035762787,
+          "bytes": 4222,
+          "bodyBytes": 3922
+        }
+      ],
+      "documentBytes": 0,
+      "longTaskMs": 0
+    },
+    {
+      "iteration": 9,
+      "scenario": "list-warm",
+      "durationMs": 97.69999998807907,
+      "resources": [
+        {
+          "path": "/api/management/process-types",
+          "api": true,
+          "durationMs": 22.600000023841858,
+          "bytes": 488,
+          "bodyBytes": 188
+        },
+        {
+          "path": "/api/management/units",
+          "api": true,
+          "durationMs": 23.19999998807907,
+          "bytes": 403,
+          "bodyBytes": 103
+        },
+        {
+          "path": "/api/management/processes",
+          "api": true,
+          "durationMs": 22.80000001192093,
+          "bytes": 31895,
+          "bodyBytes": 31595
+        },
+        {
+          "path": "/favicon.ico",
+          "api": false,
+          "durationMs": 5.699999988079071,
+          "bytes": 4222,
+          "bodyBytes": 3922
+        }
+      ],
+      "documentBytes": 0,
+      "longTaskMs": 0
+    },
+    {
+      "iteration": 9,
+      "scenario": "search-warm",
+      "durationMs": 95.19999998807907,
+      "resources": [
+        {
+          "path": "/api/management/processes",
+          "api": true,
+          "durationMs": 34.5,
+          "bytes": 31895,
+          "bodyBytes": 31595
+        },
+        {
+          "path": "/favicon.ico",
+          "api": false,
+          "durationMs": 8.699999988079071,
+          "bytes": 4222,
+          "bodyBytes": 3922
+        }
+      ],
+      "documentBytes": 0,
+      "longTaskMs": 0
+    },
+    {
+      "iteration": 9,
+      "scenario": "detail-warm",
+      "durationMs": 87.09999996423721,
+      "resources": [
+        {
+          "path": "/api/management/processes/1",
+          "api": true,
+          "durationMs": 25.19999998807907,
+          "bytes": 1071,
+          "bodyBytes": 771
+        },
+        {
+          "path": "/favicon.ico",
+          "api": false,
+          "durationMs": 5.399999976158142,
+          "bytes": 4222,
+          "bodyBytes": 3922
+        }
+      ],
+      "documentBytes": 0,
+      "longTaskMs": 0
+    },
+    {
+      "iteration": 9,
+      "scenario": "form-warm",
+      "durationMs": 116.19999998807907,
+      "resources": [
+        {
+          "path": "/api/management/process-types",
+          "api": true,
+          "durationMs": 27.5,
+          "bytes": 488,
+          "bodyBytes": 188
+        },
+        {
+          "path": "/api/management/units",
+          "api": true,
+          "durationMs": 27.30000001192093,
+          "bytes": 403,
+          "bodyBytes": 103
+        },
+        {
+          "path": "/api/management/processes",
+          "api": true,
+          "durationMs": 27.5,
+          "bytes": 31895,
+          "bodyBytes": 31595
+        },
+        {
+          "path": "/favicon.ico",
+          "api": false,
+          "durationMs": 5.300000011920929,
+          "bytes": 4222,
+          "bodyBytes": 3922
+        },
+        {
+          "path": "/api/management/processes/1",
+          "api": true,
+          "durationMs": 27.19999998807907,
+          "bytes": 1071,
+          "bodyBytes": 771
+        }
+      ],
+      "documentBytes": 0,
+      "longTaskMs": 0
+    },
+    {
+      "iteration": 10,
+      "scenario": "startup-cold",
+      "durationMs": 279.39999997615814,
+      "resources": [
+        {
+          "path": "/polyfills-IA5XWQYN.js",
+          "api": false,
+          "durationMs": 15.800000011920929,
+          "bytes": 34885,
+          "bodyBytes": 34585
+        },
+        {
+          "path": "/main-2AS72IX2.js",
+          "api": false,
+          "durationMs": 22.30000001192093,
+          "bytes": 352304,
+          "bodyBytes": 352004
+        },
+        {
+          "path": "/styles-CCFDSH6V.css",
+          "api": false,
+          "durationMs": 14.299999952316284,
+          "bytes": 20985,
+          "bodyBytes": 20685
+        },
+        {
+          "path": "/api/auth/me",
+          "api": true,
+          "durationMs": 29.5,
+          "bytes": 413,
+          "bodyBytes": 113
+        },
+        {
+          "path": "/favicon.ico",
+          "api": false,
+          "durationMs": 4.5,
+          "bytes": 4222,
+          "bodyBytes": 3922
+        },
+        {
+          "path": "/chunk-DXfiCODI.js",
+          "api": false,
+          "durationMs": 4.100000023841858,
+          "bytes": 14163,
+          "bodyBytes": 13863
+        },
+        {
+          "path": "/chunk-D_6mW-hx.js",
+          "api": false,
+          "durationMs": 3.199999988079071,
+          "bytes": 4734,
+          "bodyBytes": 4434
+        },
+        {
+          "path": "/api/management/map",
+          "api": true,
+          "durationMs": 25.30000001192093,
+          "bytes": 32146,
+          "bodyBytes": 31846
+        }
+      ],
+      "documentBytes": 4222,
+      "longTaskMs": 0
+    },
+    {
+      "iteration": 10,
+      "scenario": "list-first",
+      "durationMs": 125.60000002384186,
+      "resources": [
+        {
+          "path": "/chunk-CsbENt44.js",
+          "api": false,
+          "durationMs": 3.899999976158142,
+          "bytes": 8308,
+          "bodyBytes": 8008
+        },
+        {
+          "path": "/api/management/process-types",
+          "api": true,
+          "durationMs": 24.19999998807907,
+          "bytes": 488,
+          "bodyBytes": 188
+        },
+        {
+          "path": "/api/management/units",
+          "api": true,
+          "durationMs": 24,
+          "bytes": 403,
+          "bodyBytes": 103
+        },
+        {
+          "path": "/api/management/processes",
+          "api": true,
+          "durationMs": 23.799999952316284,
+          "bytes": 31895,
+          "bodyBytes": 31595
+        },
+        {
+          "path": "/favicon.ico",
+          "api": false,
+          "durationMs": 6,
+          "bytes": 4222,
+          "bodyBytes": 3922
+        }
+      ],
+      "documentBytes": 0,
+      "longTaskMs": 0
+    },
+    {
+      "iteration": 10,
+      "scenario": "search-first",
+      "durationMs": 97,
+      "resources": [
+        {
+          "path": "/api/management/processes",
+          "api": true,
+          "durationMs": 25.400000035762787,
+          "bytes": 31895,
+          "bodyBytes": 31595
+        },
+        {
+          "path": "/favicon.ico",
+          "api": false,
+          "durationMs": 5.5,
+          "bytes": 4222,
+          "bodyBytes": 3922
+        }
+      ],
+      "documentBytes": 0,
+      "longTaskMs": 0
+    },
+    {
+      "iteration": 10,
+      "scenario": "detail-first",
+      "durationMs": 114.39999997615814,
+      "resources": [
+        {
+          "path": "/chunk-DEdViTze.js",
+          "api": false,
+          "durationMs": 5,
+          "bytes": 45525,
+          "bodyBytes": 45225
+        },
+        {
+          "path": "/chunk-DgJdF5xS.js",
+          "api": false,
+          "durationMs": 4,
+          "bytes": 1021,
+          "bodyBytes": 721
+        },
+        {
+          "path": "/api/management/processes/1",
+          "api": true,
+          "durationMs": 32.09999996423721,
+          "bytes": 1071,
+          "bodyBytes": 771
+        },
+        {
+          "path": "/favicon.ico",
+          "api": false,
+          "durationMs": 7.599999964237213,
+          "bytes": 4222,
+          "bodyBytes": 3922
+        }
+      ],
+      "documentBytes": 0,
+      "longTaskMs": 0
+    },
+    {
+      "iteration": 10,
+      "scenario": "form-first",
+      "durationMs": 146.89999997615814,
+      "resources": [
+        {
+          "path": "/chunk-BKtXTUrk.js",
+          "api": false,
+          "durationMs": 4.5,
+          "bytes": 17129,
+          "bodyBytes": 16829
+        },
+        {
+          "path": "/api/management/process-types",
+          "api": true,
+          "durationMs": 33,
+          "bytes": 488,
+          "bodyBytes": 188
+        },
+        {
+          "path": "/api/management/units",
+          "api": true,
+          "durationMs": 32.80000001192093,
+          "bytes": 403,
+          "bodyBytes": 103
+        },
+        {
+          "path": "/api/management/processes",
+          "api": true,
+          "durationMs": 32.5,
+          "bytes": 31895,
+          "bodyBytes": 31595
+        },
+        {
+          "path": "/favicon.ico",
+          "api": false,
+          "durationMs": 7.199999988079071,
+          "bytes": 4222,
+          "bodyBytes": 3922
+        },
+        {
+          "path": "/api/management/processes/1",
+          "api": true,
+          "durationMs": 26.5,
+          "bytes": 1071,
+          "bodyBytes": 771
+        }
+      ],
+      "documentBytes": 0,
+      "longTaskMs": 0
+    },
+    {
+      "iteration": 10,
+      "scenario": "map-warm",
+      "durationMs": 92.5,
+      "resources": [
+        {
+          "path": "/api/management/map",
+          "api": true,
+          "durationMs": 35.09999996423721,
+          "bytes": 32146,
+          "bodyBytes": 31846
+        },
+        {
+          "path": "/favicon.ico",
+          "api": false,
+          "durationMs": 5.300000011920929,
+          "bytes": 4222,
+          "bodyBytes": 3922
+        }
+      ],
+      "documentBytes": 0,
+      "longTaskMs": 0
+    },
+    {
+      "iteration": 10,
+      "scenario": "list-warm",
+      "durationMs": 101.59999996423721,
+      "resources": [
+        {
+          "path": "/api/management/process-types",
+          "api": true,
+          "durationMs": 24.5,
+          "bytes": 488,
+          "bodyBytes": 188
+        },
+        {
+          "path": "/api/management/units",
+          "api": true,
+          "durationMs": 24.200000047683716,
+          "bytes": 403,
+          "bodyBytes": 103
+        },
+        {
+          "path": "/api/management/processes",
+          "api": true,
+          "durationMs": 24.30000001192093,
+          "bytes": 31895,
+          "bodyBytes": 31595
+        },
+        {
+          "path": "/favicon.ico",
+          "api": false,
+          "durationMs": 6.5,
+          "bytes": 4222,
+          "bodyBytes": 3922
+        }
+      ],
+      "documentBytes": 0,
+      "longTaskMs": 0
+    },
+    {
+      "iteration": 10,
+      "scenario": "search-warm",
+      "durationMs": 89.59999996423721,
+      "resources": [
+        {
+          "path": "/api/management/processes",
+          "api": true,
+          "durationMs": 27.899999976158142,
+          "bytes": 31895,
+          "bodyBytes": 31595
+        },
+        {
+          "path": "/favicon.ico",
+          "api": false,
+          "durationMs": 4.700000047683716,
+          "bytes": 4222,
+          "bodyBytes": 3922
+        }
+      ],
+      "documentBytes": 0,
+      "longTaskMs": 0
+    },
+    {
+      "iteration": 10,
+      "scenario": "detail-warm",
+      "durationMs": 80.80000001192093,
+      "resources": [
+        {
+          "path": "/api/management/processes/1",
+          "api": true,
+          "durationMs": 30.5,
+          "bytes": 1071,
+          "bodyBytes": 771
+        },
+        {
+          "path": "/favicon.ico",
+          "api": false,
+          "durationMs": 5.799999952316284,
+          "bytes": 4222,
+          "bodyBytes": 3922
+        }
+      ],
+      "documentBytes": 0,
+      "longTaskMs": 0
+    },
+    {
+      "iteration": 10,
+      "scenario": "form-warm",
+      "durationMs": 114,
+      "resources": [
+        {
+          "path": "/api/management/process-types",
+          "api": true,
+          "durationMs": 25.599999964237213,
+          "bytes": 488,
+          "bodyBytes": 188
+        },
+        {
+          "path": "/api/management/units",
+          "api": true,
+          "durationMs": 25.899999976158142,
+          "bytes": 403,
+          "bodyBytes": 103
+        },
+        {
+          "path": "/api/management/processes",
+          "api": true,
+          "durationMs": 25.600000023841858,
+          "bytes": 31895,
+          "bodyBytes": 31595
+        },
+        {
+          "path": "/favicon.ico",
+          "api": false,
+          "durationMs": 5.399999976158142,
+          "bytes": 4222,
+          "bodyBytes": 3922
+        },
+        {
+          "path": "/api/management/processes/1",
+          "api": true,
+          "durationMs": 27.400000035762787,
+          "bytes": 1071,
+          "bodyBytes": 771
+        }
+      ],
+      "documentBytes": 0,
+      "longTaskMs": 0
+    },
+    {
+      "iteration": 11,
+      "scenario": "startup-cold",
+      "durationMs": 311,
+      "resources": [
+        {
+          "path": "/polyfills-IA5XWQYN.js",
+          "api": false,
+          "durationMs": 14.799999952316284,
+          "bytes": 34885,
+          "bodyBytes": 34585
+        },
+        {
+          "path": "/main-2AS72IX2.js",
+          "api": false,
+          "durationMs": 42.90000003576279,
+          "bytes": 352304,
+          "bodyBytes": 352004
+        },
+        {
+          "path": "/styles-CCFDSH6V.css",
+          "api": false,
+          "durationMs": 13.400000035762787,
+          "bytes": 20985,
+          "bodyBytes": 20685
+        },
+        {
+          "path": "/api/auth/me",
+          "api": true,
+          "durationMs": 33.19999998807907,
+          "bytes": 413,
+          "bodyBytes": 113
+        },
+        {
+          "path": "/favicon.ico",
+          "api": false,
+          "durationMs": 4.399999976158142,
+          "bytes": 4222,
+          "bodyBytes": 3922
+        },
+        {
+          "path": "/chunk-DXfiCODI.js",
+          "api": false,
+          "durationMs": 4.900000035762787,
+          "bytes": 14163,
+          "bodyBytes": 13863
+        },
+        {
+          "path": "/chunk-D_6mW-hx.js",
+          "api": false,
+          "durationMs": 3.899999976158142,
+          "bytes": 4734,
+          "bodyBytes": 4434
+        },
+        {
+          "path": "/api/management/map",
+          "api": true,
+          "durationMs": 33.19999998807907,
+          "bytes": 32146,
+          "bodyBytes": 31846
+        }
+      ],
+      "documentBytes": 4222,
+      "longTaskMs": 0
+    },
+    {
+      "iteration": 11,
+      "scenario": "list-first",
+      "durationMs": 146.10000002384186,
+      "resources": [
+        {
+          "path": "/chunk-CsbENt44.js",
+          "api": false,
+          "durationMs": 3.799999952316284,
+          "bytes": 8308,
+          "bodyBytes": 8008
+        },
+        {
+          "path": "/api/management/process-types",
+          "api": true,
+          "durationMs": 23.69999998807907,
+          "bytes": 488,
+          "bodyBytes": 188
+        },
+        {
+          "path": "/api/management/units",
+          "api": true,
+          "durationMs": 23.599999964237213,
+          "bytes": 403,
+          "bodyBytes": 103
+        },
+        {
+          "path": "/api/management/processes",
+          "api": true,
+          "durationMs": 38.19999998807907,
+          "bytes": 31895,
+          "bodyBytes": 31595
+        },
+        {
+          "path": "/favicon.ico",
+          "api": false,
+          "durationMs": 6.800000011920929,
+          "bytes": 4222,
+          "bodyBytes": 3922
+        }
+      ],
+      "documentBytes": 0,
+      "longTaskMs": 0
+    },
+    {
+      "iteration": 11,
+      "scenario": "search-first",
+      "durationMs": 97,
+      "resources": [
+        {
+          "path": "/api/management/processes",
+          "api": true,
+          "durationMs": 32.200000047683716,
+          "bytes": 31895,
+          "bodyBytes": 31595
+        },
+        {
+          "path": "/favicon.ico",
+          "api": false,
+          "durationMs": 5.400000035762787,
+          "bytes": 4222,
+          "bodyBytes": 3922
+        }
+      ],
+      "documentBytes": 0,
+      "longTaskMs": 0
+    },
+    {
+      "iteration": 11,
+      "scenario": "detail-first",
+      "durationMs": 97.30000001192093,
+      "resources": [
+        {
+          "path": "/chunk-DEdViTze.js",
+          "api": false,
+          "durationMs": 6.099999964237213,
+          "bytes": 45525,
+          "bodyBytes": 45225
+        },
+        {
+          "path": "/chunk-DgJdF5xS.js",
+          "api": false,
+          "durationMs": 4.100000023841858,
+          "bytes": 1021,
+          "bodyBytes": 721
+        },
+        {
+          "path": "/api/management/processes/1",
+          "api": true,
+          "durationMs": 25.399999976158142,
+          "bytes": 1071,
+          "bodyBytes": 771
+        },
+        {
+          "path": "/favicon.ico",
+          "api": false,
+          "durationMs": 6,
+          "bytes": 4222,
+          "bodyBytes": 3922
+        }
+      ],
+      "documentBytes": 0,
+      "longTaskMs": 0
+    },
+    {
+      "iteration": 11,
+      "scenario": "form-first",
+      "durationMs": 146.69999998807907,
+      "resources": [
+        {
+          "path": "/chunk-BKtXTUrk.js",
+          "api": false,
+          "durationMs": 4.199999988079071,
+          "bytes": 17129,
+          "bodyBytes": 16829
+        },
+        {
+          "path": "/api/management/process-types",
+          "api": true,
+          "durationMs": 30.5,
+          "bytes": 488,
+          "bodyBytes": 188
+        },
+        {
+          "path": "/api/management/units",
+          "api": true,
+          "durationMs": 30.69999998807907,
+          "bytes": 403,
+          "bodyBytes": 103
+        },
+        {
+          "path": "/api/management/processes",
+          "api": true,
+          "durationMs": 31.100000023841858,
+          "bytes": 31895,
+          "bodyBytes": 31595
+        },
+        {
+          "path": "/favicon.ico",
+          "api": false,
+          "durationMs": 4.5,
+          "bytes": 4222,
+          "bodyBytes": 3922
+        },
+        {
+          "path": "/api/management/processes/1",
+          "api": true,
+          "durationMs": 36.59999996423721,
+          "bytes": 1071,
+          "bodyBytes": 771
+        }
+      ],
+      "documentBytes": 0,
+      "longTaskMs": 0
+    },
+    {
+      "iteration": 11,
+      "scenario": "map-warm",
+      "durationMs": 90.30000001192093,
+      "resources": [
+        {
+          "path": "/api/management/map",
+          "api": true,
+          "durationMs": 34.30000001192093,
+          "bytes": 32146,
+          "bodyBytes": 31846
+        },
+        {
+          "path": "/favicon.ico",
+          "api": false,
+          "durationMs": 7.199999988079071,
+          "bytes": 4222,
+          "bodyBytes": 3922
+        }
+      ],
+      "documentBytes": 0,
+      "longTaskMs": 0
+    },
+    {
+      "iteration": 11,
+      "scenario": "list-warm",
+      "durationMs": 98.09999996423721,
+      "resources": [
+        {
+          "path": "/api/management/process-types",
+          "api": true,
+          "durationMs": 25.30000001192093,
+          "bytes": 488,
+          "bodyBytes": 188
+        },
+        {
+          "path": "/api/management/units",
+          "api": true,
+          "durationMs": 25.099999964237213,
+          "bytes": 403,
+          "bodyBytes": 103
+        },
+        {
+          "path": "/api/management/processes",
+          "api": true,
+          "durationMs": 24.80000001192093,
+          "bytes": 31895,
+          "bodyBytes": 31595
+        },
+        {
+          "path": "/favicon.ico",
+          "api": false,
+          "durationMs": 5.899999976158142,
+          "bytes": 4222,
+          "bodyBytes": 3922
+        }
+      ],
+      "documentBytes": 0,
+      "longTaskMs": 0
+    },
+    {
+      "iteration": 11,
+      "scenario": "search-warm",
+      "durationMs": 87.19999998807907,
+      "resources": [
+        {
+          "path": "/api/management/processes",
+          "api": true,
+          "durationMs": 35.5,
+          "bytes": 31895,
+          "bodyBytes": 31595
+        },
+        {
+          "path": "/favicon.ico",
+          "api": false,
+          "durationMs": 5.5,
+          "bytes": 4222,
+          "bodyBytes": 3922
+        }
+      ],
+      "documentBytes": 0,
+      "longTaskMs": 0
+    },
+    {
+      "iteration": 11,
+      "scenario": "detail-warm",
+      "durationMs": 80.30000001192093,
+      "resources": [
+        {
+          "path": "/api/management/processes/1",
+          "api": true,
+          "durationMs": 24,
+          "bytes": 1071,
+          "bodyBytes": 771
+        },
+        {
+          "path": "/favicon.ico",
+          "api": false,
+          "durationMs": 5.200000047683716,
+          "bytes": 4222,
+          "bodyBytes": 3922
+        }
+      ],
+      "documentBytes": 0,
+      "longTaskMs": 0
+    },
+    {
+      "iteration": 11,
+      "scenario": "form-warm",
+      "durationMs": 121.80000001192093,
+      "resources": [
+        {
+          "path": "/api/management/process-types",
+          "api": true,
+          "durationMs": 26.099999964237213,
+          "bytes": 488,
+          "bodyBytes": 188
+        },
+        {
+          "path": "/api/management/units",
+          "api": true,
+          "durationMs": 26.100000023841858,
+          "bytes": 403,
+          "bodyBytes": 103
+        },
+        {
+          "path": "/api/management/processes",
+          "api": true,
+          "durationMs": 26,
+          "bytes": 31895,
+          "bodyBytes": 31595
+        },
+        {
+          "path": "/favicon.ico",
+          "api": false,
+          "durationMs": 4.899999976158142,
+          "bytes": 4222,
+          "bodyBytes": 3922
+        },
+        {
+          "path": "/api/management/processes/1",
+          "api": true,
+          "durationMs": 27.600000023841858,
+          "bytes": 1071,
+          "bodyBytes": 771
+        }
+      ],
+      "documentBytes": 0,
+      "longTaskMs": 0
+    }
+  ]
+}

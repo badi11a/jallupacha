@@ -1,0 +1,111 @@
+
+    <ui-breadcrumbs [items]="[{ label: 'Procesos', link: '/procesos' }, { label: editingId ? 'Editar proceso' : 'Nuevo proceso' }]" />
+    <ui-panel headingId="form-title" eyebrow="PROCESO" [heading]="editingId ? 'Editar ficha del proceso' : 'Nuevo proceso'">
+      <p class="helper">El nombre y la clasificación son obligatorios. El proceso se guarda como borrador; los campos mínimos faltantes se informan en la ficha.</p>
+      @if (error()) { <ui-message kind="error">{{ error() }}</ui-message> }
+      @if (loading()) { <p class="helper" role="status">Cargando información…</p> }
+      @else if (loadFailed()) { <button type="button" class="quiet-button" (click)="ngOnInit()">Reintentar carga del formulario</button> }
+      @else {
+        @if (saving()) { <p class="helper" role="status">Guardando proceso…</p> }
+        <form class="ui-form" novalidate (ngSubmit)="save()" [attr.aria-busy]="saving()">
+          <fieldset class="ui-form-fields" [disabled]="saving()">
+          <legend class="visually-hidden">Ficha del proceso</legend>
+          <ui-section heading="Clasificación">
+            <div class="ui-form-grid">
+              <label class="field" for="field-macro">Macroproceso (obligatorio)
+                <select id="field-macro" name="macro" [(ngModel)]="macroprocessId" (ngModelChange)="processTypeId = null; clearFieldError('macro')" [attr.aria-invalid]="fieldErrors()['macro'] ? true : null" [attr.aria-describedby]="fieldErrors()['macro'] ? 'error-macro' : null">
+                  <option [ngValue]="null">Seleccione…</option>
+                  @for (macro of macros(); track macro.id) { <option [ngValue]="macro.id">{{ macro.code }} · {{ macro.name }}</option> }
+                </select>
+                @if (fieldErrors()['macro']) {
+                  <p id="error-macro" class="field-error" role="alert">{{ fieldErrors()['macro'] }}</p>
+                }
+              </label>
+              <label class="field" for="field-type">Tipo de proceso (obligatorio)
+                <select id="field-type" name="type" [(ngModel)]="processTypeId" (ngModelChange)="clearFieldError('type')" [disabled]="macroprocessId === null" [attr.aria-invalid]="fieldErrors()['type'] ? true : null" [attr.aria-describedby]="fieldErrors()['type'] ? 'error-type' : null">
+                  <option [ngValue]="null">Seleccione…</option>
+                  @for (type of typeOptions(); track type.id) { <option [ngValue]="type.id">{{ type.name }}</option> }
+                </select>
+                @if (fieldErrors()['type']) {
+                  <p id="error-type" class="field-error" role="alert">{{ fieldErrors()['type'] }}</p>
+                }
+              </label>
+              <label class="field" for="field-parent">Proceso padre (opcional)
+                <select id="field-parent" name="parent" [(ngModel)]="parentProcessId">
+                  <option [ngValue]="null">Sin proceso padre</option>
+                  @for (option of parentOptions(); track option.id) { <option [ngValue]="option.id">{{ option.code }} · {{ option.name }}</option> }
+                </select>
+              </label>
+            </div>
+          </ui-section>
+
+          <ui-section heading="Identificación">
+            <div class="ui-form-grid">
+              <label for="field-name" class="field wide">Nombre (obligatorio)
+                <input id="field-name" name="name" maxlength="250" [(ngModel)]="values['name']" (input)="clearFieldError('name')" [attr.aria-invalid]="fieldErrors()['name'] ? true : null" [attr.aria-describedby]="fieldErrors()['name'] ? 'error-name' : null" required />
+                @if (fieldErrors()['name']) {
+                  <p id="error-name" class="field-error" role="alert">{{ fieldErrors()['name'] }}</p>
+                }
+              </label>
+              @for (field of shortFields; track field.key) {
+                <label class="field" [for]="'field-' + field.key">{{ field.label }}<input [id]="'field-' + field.key" [name]="field.key" maxlength="250" [(ngModel)]="values[field.key]" /></label>
+              }
+            </div>
+          </ui-section>
+
+          <ui-section heading="Unidades internas">
+            <div class="ui-form-grid">
+              <label class="field" for="field-resp-unit">Unidad responsable
+                <select id="field-resp-unit" name="responsibleUnit" [(ngModel)]="responsibleUnitId">
+                  <option [ngValue]="null">Sin unidad responsable</option>
+                  @for (unit of units(); track unit.id) { <option [ngValue]="unit.id">{{ unit.name }}{{ unit.isActive ? '' : ' (inactiva)' }}</option> }
+                </select>
+              </label>
+            </div>
+            <h3>Unidades participantes</h3>
+            @for (row of participants; track $index) {
+              <div class="participant">
+                <label class="field" [for]="'pu' + $index">Unidad (obligatorio)
+                  <select [id]="'pu' + $index" [name]="'pu' + $index" [(ngModel)]="row.unitId" (ngModelChange)="clearFieldError('pu_' + $index)" [attr.aria-invalid]="fieldErrors()['pu_' + $index] ? true : null" [attr.aria-describedby]="fieldErrors()['pu_' + $index] ? 'error-pu-' + $index : null">
+                    <option [ngValue]="null">Seleccione…</option>
+                    @for (unit of units(); track unit.id) { <option [ngValue]="unit.id">{{ unit.name }}{{ unit.isActive ? '' : ' (inactiva)' }}</option> }
+                  </select>
+                  @if (fieldErrors()['pu_' + $index]) {
+                    <p [id]="'error-pu-' + $index" class="field-error" role="alert">{{ fieldErrors()['pu_' + $index] }}</p>
+                  }
+                </label>
+                <label class="field" [for]="'pf' + $index">Función en el proceso (obligatorio)
+                  <input [id]="'pf' + $index" [name]="'pf' + $index" maxlength="500" [(ngModel)]="row.function" (input)="clearFieldError('pf_' + $index)" [attr.aria-invalid]="fieldErrors()['pf_' + $index] ? true : null" [attr.aria-describedby]="fieldErrors()['pf_' + $index] ? 'error-pf-' + $index : null" />
+                  @if (fieldErrors()['pf_' + $index]) {
+                    <p [id]="'error-pf-' + $index" class="field-error" role="alert">{{ fieldErrors()['pf_' + $index] }}</p>
+                  }
+                </label>
+                <button class="quiet-button" type="button" (click)="removeParticipant($index)">Quitar</button>
+              </div>
+            }
+            <button class="quiet-button" type="button" (click)="addParticipant()">Agregar unidad participante</button>
+          </ui-section>
+
+          @for (group of longGroups; track group) {
+            <ui-section [heading]="group">
+              <div class="ui-form-grid">
+                @for (field of longFieldsOf(group); track field.key) {
+                  <div class="field wide">
+                    <label [for]="'field-' + field.key">{{ field.label }}</label>
+                    <textarea [id]="'field-' + field.key" [name]="field.key" rows="3" maxlength="4000"
+                      [attr.aria-describedby]="'counter-' + field.key" [(ngModel)]="values[field.key]"></textarea>
+                    <ui-char-counter [id]="'counter-' + field.key" [value]="values[field.key] ?? ''" [max]="4000" lengthMode="utf16" />
+                  </div>
+                }
+              </div>
+            </ui-section>
+          }
+
+          <div class="ui-form-actions">
+            <button class="primary-button" type="submit" [disabled]="saving()">{{ saving() ? 'Guardando…' : 'Guardar proceso' }}</button>
+            <button class="text-button" type="button" (click)="cancel()">Cancelar</button>
+          </div>
+          </fieldset>
+        </form>
+      }
+    </ui-panel>

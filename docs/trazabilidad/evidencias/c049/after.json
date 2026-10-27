@@ -1,0 +1,4076 @@
+{
+  "label": "after",
+  "timestamp": "2026-10-27T13:28:51.511Z",
+  "node": "v24.15.0",
+  "browser": "156.0.8078.48",
+  "platform": "win32",
+  "conditions": {
+    "viewport": "1440x900",
+    "samples": 12,
+    "excludedWarmups": 1,
+    "fixtureRows": 120,
+    "apiDelayMs": 20,
+    "fixture": "generic loopback, no Oracle",
+    "transfer": "HTTP uncompressed; ResourceTiming includes headers",
+    "cold": "new context without disk cache per sample",
+    "warm": "same document, modules previously visited",
+    "completion": "route-specific visible content plus two animation frames; in-browser clock",
+    "apiDuration": "sum of durations; parallel API requests may overlap"
+  },
+  "files": [
+    {
+      "name": "chunk-8RaqNOHc.js",
+      "bytes": 721,
+      "gzipBytes": 472,
+      "sha256": "6fc23e324af78485f23a40a561e8eb04b867564cc1893ae339d4c4ce9bdba22f"
+    },
+    {
+      "name": "chunk-aEvSLXkv.js",
+      "bytes": 16270,
+      "gzipBytes": 4967,
+      "sha256": "c763b4a6db4aa0af1d440e7b0b580ff534507fd20af35d58d862bcafc5c7542d"
+    },
+    {
+      "name": "chunk-BrJBPIOu.js",
+      "bytes": 4434,
+      "gzipBytes": 1205,
+      "sha256": "531b7f57f8452eb307d89216e28828bd1fb3b8dd383833c8be7d6c6e0ada59a2"
+    },
+    {
+      "name": "chunk-DFWg7HaR.js",
+      "bytes": 13826,
+      "gzipBytes": 4368,
+      "sha256": "6283a79a63f0f19bcf5e769d8bb494a828e4d4f450828c2c0beed601a3ba528d"
+    },
+    {
+      "name": "chunk-DioXTvGc.js",
+      "bytes": 9624,
+      "gzipBytes": 3428,
+      "sha256": "23c937270d2010c0d082e9236200ae0fe9170700afaa310a39a9e9486a7de6cd"
+    },
+    {
+      "name": "chunk-DMkhgUV6.js",
+      "bytes": 10095,
+      "gzipBytes": 3346,
+      "sha256": "057e1474b080ef8c62d75cb11c2a7921549bd8f8991063311ec5865a0079f87e"
+    },
+    {
+      "name": "chunk-DNwIvOh_.js",
+      "bytes": 19913,
+      "gzipBytes": 5821,
+      "sha256": "88d0f3cb5bae79fa9b612ee36e42b63ac65d062076ae227429f1c9aaafdbe81a"
+    },
+    {
+      "name": "chunk-Dpv8Tcxc.js",
+      "bytes": 10944,
+      "gzipBytes": 3961,
+      "sha256": "83d80ce66464f98d9b27ef397a0c61caf57df013a2b263a16211de53b88ff617"
+    },
+    {
+      "name": "chunk-DxeDbfRx.js",
+      "bytes": 9729,
+      "gzipBytes": 3925,
+      "sha256": "ac4987e28a2b9e0ba2527f1ffc56f55a99a9bd6e252b8c22c517c8792e08b252"
+    },
+    {
+      "name": "chunk-t8iRyEGh.js",
+      "bytes": 7652,
+      "gzipBytes": 2964,
+      "sha256": "448feee74c6f556bf809e476d58c58bd098d1e58094386354e60d511b810c23f"
+    },
+    {
+      "name": "chunk-WLrCstJ4.js",
+      "bytes": 44864,
+      "gzipBytes": 10937,
+      "sha256": "d9ef9dca7df80aed34535ad5e5e3056427262264c023991432627760e28e731a"
+    },
+    {
+      "name": "main-AFFLH5YE.js",
+      "bytes": 352004,
+      "gzipBytes": 104370,
+      "sha256": "d2ca38e154ef49eabafbf4d60e9af5d54956baf3d86d675056ed353a9eeb5875"
+    },
+    {
+      "name": "polyfills-IA5XWQYN.js",
+      "bytes": 34585,
+      "gzipBytes": 12470,
+      "sha256": "15c6f58707b9b19116fde3a3f6a0ce9cf83427d64a91e95cb91fe1056c3da616"
+    },
+    {
+      "name": "styles-2Z2A5363.css",
+      "bytes": 16991,
+      "gzipBytes": 3560,
+      "sha256": "0d8c7342b3ca087fe439c9f92a041a2e88a06a4d4cfa3f382adc39f241585351"
+    }
+  ],
+  "summary": {
+    "startup-cold": {
+      "samples": 12,
+      "medianMs": 301.5999999642372,
+      "minMs": 278.69999998807907,
+      "maxMs": 316.10000002384186,
+      "medianRequests": 7,
+      "medianApiRequests": 2,
+      "medianTransferBytes": 460157,
+      "medianApiDurationSumMs": 57.150000005960464,
+      "medianLongTaskMs": 0
+    },
+    "list-first": {
+      "samples": 12,
+      "medianMs": 127.80000001192093,
+      "minMs": 126.39999997615814,
+      "maxMs": 145.19999998807907,
+      "medianRequests": 4,
+      "medianApiRequests": 3,
+      "medianTransferBytes": 40738,
+      "medianApiDurationSumMs": 77.30000001192093,
+      "medianLongTaskMs": 0
+    },
+    "search-first": {
+      "samples": 12,
+      "medianMs": 103.80000001192093,
+      "minMs": 86.70000004768372,
+      "maxMs": 121.80000001192093,
+      "medianRequests": 1,
+      "medianApiRequests": 1,
+      "medianTransferBytes": 31895,
+      "medianApiDurationSumMs": 31.44999998807907,
+      "medianLongTaskMs": 0
+    },
+    "detail-first": {
+      "samples": 12,
+      "medianMs": 113.24999997019768,
+      "minMs": 80.80000001192093,
+      "maxMs": 115.89999997615814,
+      "medianRequests": 3,
+      "medianApiRequests": 1,
+      "medianTransferBytes": 47256,
+      "medianApiDurationSumMs": 29.94999998807907,
+      "medianLongTaskMs": 0
+    },
+    "form-first": {
+      "samples": 12,
+      "medianMs": 97.15000000596046,
+      "minMs": 94.29999995231628,
+      "maxMs": 128.0999999642372,
+      "medianRequests": 5,
+      "medianApiRequests": 4,
+      "medianTransferBytes": 50427,
+      "medianApiDurationSumMs": 125.39999997615814,
+      "medianLongTaskMs": 0
+    },
+    "map-warm": {
+      "samples": 12,
+      "medianMs": 92.19999998807907,
+      "minMs": 76.80000001192093,
+      "maxMs": 100,
+      "medianRequests": 1,
+      "medianApiRequests": 1,
+      "medianTransferBytes": 32146,
+      "medianApiDurationSumMs": 37.19999998807907,
+      "medianLongTaskMs": 0
+    },
+    "list-warm": {
+      "samples": 12,
+      "medianMs": 106.55000004172325,
+      "minMs": 97,
+      "maxMs": 138.5999999642372,
+      "medianRequests": 3,
+      "medianApiRequests": 3,
+      "medianTransferBytes": 32786,
+      "medianApiDurationSumMs": 96,
+      "medianLongTaskMs": 0
+    },
+    "search-warm": {
+      "samples": 12,
+      "medianMs": 94.40000000596046,
+      "minMs": 79.90000003576279,
+      "maxMs": 111.69999998807907,
+      "medianRequests": 1,
+      "medianApiRequests": 1,
+      "medianTransferBytes": 31895,
+      "medianApiDurationSumMs": 29.900000005960464,
+      "medianLongTaskMs": 0
+    },
+    "detail-warm": {
+      "samples": 12,
+      "medianMs": 80.7999999821186,
+      "minMs": 78.09999996423721,
+      "maxMs": 92,
+      "medianRequests": 1,
+      "medianApiRequests": 1,
+      "medianTransferBytes": 1071,
+      "medianApiDurationSumMs": 27.650000035762787,
+      "medianLongTaskMs": 0
+    },
+    "form-warm": {
+      "samples": 12,
+      "medianMs": 97.15000000596046,
+      "minMs": 79.69999998807907,
+      "maxMs": 114.19999998807907,
+      "medianRequests": 4,
+      "medianApiRequests": 4,
+      "medianTransferBytes": 33857,
+      "medianApiDurationSumMs": 128.69999995827675,
+      "medianLongTaskMs": 0
+    }
+  },
+  "errors": [],
+  "transportNotifications": [
+    {
+      "iteration": -1,
+      "scenario": "form-first",
+      "requestedDuring": "form-first",
+      "kind": "request",
+      "status": 200,
+      "path": "/api/management/process-types",
+      "message": "net::ERR_ABORTED",
+      "classification": "abort-after-received-response",
+      "receivedBodyBytes": 188
+    },
+    {
+      "iteration": 0,
+      "scenario": "search-warm",
+      "requestedDuring": "search-warm",
+      "kind": "request",
+      "status": 200,
+      "path": "/api/management/processes",
+      "message": "net::ERR_ABORTED",
+      "classification": "abort-after-received-response",
+      "receivedBodyBytes": 31595
+    },
+    {
+      "iteration": 1,
+      "scenario": "list-warm",
+      "requestedDuring": "list-warm",
+      "kind": "request",
+      "status": 200,
+      "path": "/api/management/units",
+      "message": "net::ERR_ABORTED",
+      "classification": "abort-after-received-response",
+      "receivedBodyBytes": 103
+    },
+    {
+      "iteration": 1,
+      "scenario": "list-warm",
+      "requestedDuring": "list-warm",
+      "kind": "request",
+      "status": 200,
+      "path": "/api/management/processes",
+      "message": "net::ERR_ABORTED",
+      "classification": "abort-after-received-response",
+      "receivedBodyBytes": 31595
+    },
+    {
+      "iteration": 2,
+      "scenario": "list-first",
+      "requestedDuring": "list-first",
+      "kind": "request",
+      "status": 200,
+      "path": "/api/management/process-types",
+      "message": "net::ERR_ABORTED",
+      "classification": "abort-after-received-response",
+      "receivedBodyBytes": 188
+    },
+    {
+      "iteration": 2,
+      "scenario": "list-first",
+      "requestedDuring": "list-first",
+      "kind": "request",
+      "status": 200,
+      "path": "/api/management/units",
+      "message": "net::ERR_ABORTED",
+      "classification": "abort-after-received-response",
+      "receivedBodyBytes": 103
+    },
+    {
+      "iteration": 2,
+      "scenario": "form-first",
+      "requestedDuring": "form-first",
+      "kind": "request",
+      "status": 200,
+      "path": "/api/management/process-types",
+      "message": "net::ERR_ABORTED",
+      "classification": "abort-after-received-response",
+      "receivedBodyBytes": 188
+    },
+    {
+      "iteration": 2,
+      "scenario": "form-first",
+      "requestedDuring": "form-first",
+      "kind": "request",
+      "status": 200,
+      "path": "/api/management/units",
+      "message": "net::ERR_ABORTED",
+      "classification": "abort-after-received-response",
+      "receivedBodyBytes": 103
+    },
+    {
+      "iteration": 2,
+      "scenario": "list-warm",
+      "requestedDuring": "list-warm",
+      "kind": "request",
+      "status": 200,
+      "path": "/api/management/process-types",
+      "message": "net::ERR_ABORTED",
+      "classification": "abort-after-received-response",
+      "receivedBodyBytes": 188
+    },
+    {
+      "iteration": 2,
+      "scenario": "search-warm",
+      "requestedDuring": "search-warm",
+      "kind": "request",
+      "status": 200,
+      "path": "/api/management/processes",
+      "message": "net::ERR_ABORTED",
+      "classification": "abort-after-received-response",
+      "receivedBodyBytes": 31595
+    },
+    {
+      "iteration": 6,
+      "scenario": "list-warm",
+      "requestedDuring": "list-warm",
+      "kind": "request",
+      "status": 200,
+      "path": "/api/management/process-types",
+      "message": "net::ERR_ABORTED",
+      "classification": "abort-after-received-response",
+      "receivedBodyBytes": 188
+    },
+    {
+      "iteration": 6,
+      "scenario": "list-warm",
+      "requestedDuring": "list-warm",
+      "kind": "request",
+      "status": 200,
+      "path": "/api/management/processes",
+      "message": "net::ERR_ABORTED",
+      "classification": "abort-after-received-response",
+      "receivedBodyBytes": 31595
+    },
+    {
+      "iteration": 6,
+      "scenario": "list-warm",
+      "requestedDuring": "list-warm",
+      "kind": "request",
+      "status": 200,
+      "path": "/api/management/units",
+      "message": "net::ERR_ABORTED",
+      "classification": "abort-after-received-response",
+      "receivedBodyBytes": 103
+    },
+    {
+      "iteration": 6,
+      "scenario": "form-warm",
+      "requestedDuring": "form-warm",
+      "kind": "request",
+      "status": 200,
+      "path": "/api/management/units",
+      "message": "net::ERR_ABORTED",
+      "classification": "abort-after-received-response",
+      "receivedBodyBytes": 103
+    },
+    {
+      "iteration": 6,
+      "scenario": "form-warm",
+      "requestedDuring": "form-warm",
+      "kind": "request",
+      "status": 200,
+      "path": "/api/management/processes/1",
+      "message": "net::ERR_ABORTED",
+      "classification": "abort-after-received-response",
+      "receivedBodyBytes": 771
+    },
+    {
+      "iteration": 6,
+      "scenario": "form-warm",
+      "requestedDuring": "form-warm",
+      "kind": "request",
+      "status": 200,
+      "path": "/api/management/processes",
+      "message": "net::ERR_ABORTED",
+      "classification": "abort-after-received-response",
+      "receivedBodyBytes": 31595
+    },
+    {
+      "iteration": 7,
+      "scenario": "form-first",
+      "requestedDuring": "form-first",
+      "kind": "request",
+      "status": 200,
+      "path": "/api/management/process-types",
+      "message": "net::ERR_ABORTED",
+      "classification": "abort-after-received-response",
+      "receivedBodyBytes": 188
+    },
+    {
+      "iteration": 9,
+      "scenario": "form-first",
+      "requestedDuring": "form-first",
+      "kind": "request",
+      "status": 200,
+      "path": "/api/management/units",
+      "message": "net::ERR_ABORTED",
+      "classification": "abort-after-received-response",
+      "receivedBodyBytes": 103
+    },
+    {
+      "iteration": 9,
+      "scenario": "form-first",
+      "requestedDuring": "form-first",
+      "kind": "request",
+      "status": 200,
+      "path": "/api/management/processes",
+      "message": "net::ERR_ABORTED",
+      "classification": "abort-after-received-response",
+      "receivedBodyBytes": 31595
+    },
+    {
+      "iteration": 9,
+      "scenario": "form-warm",
+      "requestedDuring": "form-warm",
+      "kind": "request",
+      "status": 200,
+      "path": "/api/management/processes",
+      "message": "net::ERR_ABORTED",
+      "classification": "abort-after-received-response",
+      "receivedBodyBytes": 31595
+    },
+    {
+      "iteration": 9,
+      "scenario": "form-warm",
+      "requestedDuring": "form-warm",
+      "kind": "request",
+      "status": 200,
+      "path": "/api/management/process-types",
+      "message": "net::ERR_ABORTED",
+      "classification": "abort-after-received-response",
+      "receivedBodyBytes": 188
+    },
+    {
+      "iteration": 9,
+      "scenario": "form-warm",
+      "requestedDuring": "form-warm",
+      "kind": "request",
+      "status": 200,
+      "path": "/api/management/processes/1",
+      "message": "net::ERR_ABORTED",
+      "classification": "abort-after-received-response",
+      "receivedBodyBytes": 771
+    },
+    {
+      "iteration": 11,
+      "scenario": "list-warm",
+      "requestedDuring": "list-warm",
+      "kind": "request",
+      "status": 200,
+      "path": "/api/management/process-types",
+      "message": "net::ERR_ABORTED",
+      "classification": "abort-after-received-response",
+      "receivedBodyBytes": 188
+    }
+  ],
+  "records": [
+    {
+      "iteration": 0,
+      "scenario": "startup-cold",
+      "durationMs": 282.19999998807907,
+      "resources": [
+        {
+          "path": "/polyfills-IA5XWQYN.js",
+          "api": false,
+          "durationMs": 9.199999988079071,
+          "bytes": 34885,
+          "bodyBytes": 34585
+        },
+        {
+          "path": "/main-AFFLH5YE.js",
+          "api": false,
+          "durationMs": 12.599999964237213,
+          "bytes": 352304,
+          "bodyBytes": 352004
+        },
+        {
+          "path": "/styles-2Z2A5363.css",
+          "api": false,
+          "durationMs": 11,
+          "bytes": 17291,
+          "bodyBytes": 16991
+        },
+        {
+          "path": "/api/auth/me",
+          "api": true,
+          "durationMs": 30.30000001192093,
+          "bytes": 413,
+          "bodyBytes": 113
+        },
+        {
+          "path": "/chunk-DFWg7HaR.js",
+          "api": false,
+          "durationMs": 3.199999988079071,
+          "bytes": 14126,
+          "bodyBytes": 13826
+        },
+        {
+          "path": "/chunk-BrJBPIOu.js",
+          "api": false,
+          "durationMs": 3.100000023841858,
+          "bytes": 4734,
+          "bodyBytes": 4434
+        },
+        {
+          "path": "/api/management/map",
+          "api": true,
+          "durationMs": 24.200000047683716,
+          "bytes": 32146,
+          "bodyBytes": 31846
+        }
+      ],
+      "documentBytes": 4258,
+      "longTaskMs": 0
+    },
+    {
+      "iteration": 0,
+      "scenario": "list-first",
+      "durationMs": 135.89999997615814,
+      "resources": [
+        {
+          "path": "/chunk-t8iRyEGh.js",
+          "api": false,
+          "durationMs": 3.800000011920929,
+          "bytes": 7952,
+          "bodyBytes": 7652
+        },
+        {
+          "path": "/api/management/process-types",
+          "api": true,
+          "durationMs": 24.299999952316284,
+          "bytes": 488,
+          "bodyBytes": 188
+        },
+        {
+          "path": "/api/management/units",
+          "api": true,
+          "durationMs": 25.200000047683716,
+          "bytes": 403,
+          "bodyBytes": 103
+        },
+        {
+          "path": "/api/management/processes",
+          "api": true,
+          "durationMs": 26.099999964237213,
+          "bytes": 31895,
+          "bodyBytes": 31595
+        }
+      ],
+      "documentBytes": 0,
+      "longTaskMs": 0
+    },
+    {
+      "iteration": 0,
+      "scenario": "search-first",
+      "durationMs": 102.60000002384186,
+      "resources": [
+        {
+          "path": "/api/management/processes",
+          "api": true,
+          "durationMs": 30.5,
+          "bytes": 31895,
+          "bodyBytes": 31595
+        }
+      ],
+      "documentBytes": 0,
+      "longTaskMs": 0
+    },
+    {
+      "iteration": 0,
+      "scenario": "detail-first",
+      "durationMs": 113.09999996423721,
+      "resources": [
+        {
+          "path": "/chunk-WLrCstJ4.js",
+          "api": false,
+          "durationMs": 6.099999964237213,
+          "bytes": 45164,
+          "bodyBytes": 44864
+        },
+        {
+          "path": "/chunk-8RaqNOHc.js",
+          "api": false,
+          "durationMs": 3.699999988079071,
+          "bytes": 1021,
+          "bodyBytes": 721
+        },
+        {
+          "path": "/api/management/processes/1",
+          "api": true,
+          "durationMs": 26.399999976158142,
+          "bytes": 1071,
+          "bodyBytes": 771
+        }
+      ],
+      "documentBytes": 0,
+      "longTaskMs": 0
+    },
+    {
+      "iteration": 0,
+      "scenario": "form-first",
+      "durationMs": 97.30000001192093,
+      "resources": [
+        {
+          "path": "/chunk-aEvSLXkv.js",
+          "api": false,
+          "durationMs": 4,
+          "bytes": 16570,
+          "bodyBytes": 16270
+        },
+        {
+          "path": "/api/management/process-types",
+          "api": true,
+          "durationMs": 30.599999964237213,
+          "bytes": 488,
+          "bodyBytes": 188
+        },
+        {
+          "path": "/api/management/units",
+          "api": true,
+          "durationMs": 31.399999976158142,
+          "bytes": 403,
+          "bodyBytes": 103
+        },
+        {
+          "path": "/api/management/processes",
+          "api": true,
+          "durationMs": 32.80000001192093,
+          "bytes": 31895,
+          "bodyBytes": 31595
+        },
+        {
+          "path": "/api/management/processes/1",
+          "api": true,
+          "durationMs": 33.5,
+          "bytes": 1071,
+          "bodyBytes": 771
+        }
+      ],
+      "documentBytes": 0,
+      "longTaskMs": 0
+    },
+    {
+      "iteration": 0,
+      "scenario": "map-warm",
+      "durationMs": 84.89999997615814,
+      "resources": [
+        {
+          "path": "/api/management/map",
+          "api": true,
+          "durationMs": 37.30000001192093,
+          "bytes": 32146,
+          "bodyBytes": 31846
+        }
+      ],
+      "documentBytes": 0,
+      "longTaskMs": 0
+    },
+    {
+      "iteration": 0,
+      "scenario": "list-warm",
+      "durationMs": 105.40000003576279,
+      "resources": [
+        {
+          "path": "/api/management/process-types",
+          "api": true,
+          "durationMs": 32.19999998807907,
+          "bytes": 488,
+          "bodyBytes": 188
+        },
+        {
+          "path": "/api/management/units",
+          "api": true,
+          "durationMs": 32.30000001192093,
+          "bytes": 403,
+          "bodyBytes": 103
+        },
+        {
+          "path": "/api/management/processes",
+          "api": true,
+          "durationMs": 32.30000001192093,
+          "bytes": 31895,
+          "bodyBytes": 31595
+        }
+      ],
+      "documentBytes": 0,
+      "longTaskMs": 0
+    },
+    {
+      "iteration": 0,
+      "scenario": "search-warm",
+      "durationMs": 111.69999998807907,
+      "resources": [
+        {
+          "path": "/api/management/processes",
+          "api": true,
+          "durationMs": 34.40000003576279,
+          "bytes": 31895,
+          "bodyBytes": 31595
+        }
+      ],
+      "documentBytes": 0,
+      "longTaskMs": 0
+    },
+    {
+      "iteration": 0,
+      "scenario": "detail-warm",
+      "durationMs": 80.80000001192093,
+      "resources": [
+        {
+          "path": "/api/management/processes/1",
+          "api": true,
+          "durationMs": 30,
+          "bytes": 1071,
+          "bodyBytes": 771
+        }
+      ],
+      "documentBytes": 0,
+      "longTaskMs": 0
+    },
+    {
+      "iteration": 0,
+      "scenario": "form-warm",
+      "durationMs": 96.19999998807907,
+      "resources": [
+        {
+          "path": "/api/management/process-types",
+          "api": true,
+          "durationMs": 37.5,
+          "bytes": 488,
+          "bodyBytes": 188
+        },
+        {
+          "path": "/api/management/units",
+          "api": true,
+          "durationMs": 37.19999998807907,
+          "bytes": 403,
+          "bodyBytes": 103
+        },
+        {
+          "path": "/api/management/processes",
+          "api": true,
+          "durationMs": 37.80000001192093,
+          "bytes": 31895,
+          "bodyBytes": 31595
+        },
+        {
+          "path": "/api/management/processes/1",
+          "api": true,
+          "durationMs": 37.19999998807907,
+          "bytes": 1071,
+          "bodyBytes": 771
+        }
+      ],
+      "documentBytes": 0,
+      "longTaskMs": 0
+    },
+    {
+      "iteration": 1,
+      "scenario": "startup-cold",
+      "durationMs": 311.5,
+      "resources": [
+        {
+          "path": "/polyfills-IA5XWQYN.js",
+          "api": false,
+          "durationMs": 16.200000047683716,
+          "bytes": 34885,
+          "bodyBytes": 34585
+        },
+        {
+          "path": "/main-AFFLH5YE.js",
+          "api": false,
+          "durationMs": 37.799999952316284,
+          "bytes": 352304,
+          "bodyBytes": 352004
+        },
+        {
+          "path": "/styles-2Z2A5363.css",
+          "api": false,
+          "durationMs": 14.399999976158142,
+          "bytes": 17291,
+          "bodyBytes": 16991
+        },
+        {
+          "path": "/api/auth/me",
+          "api": true,
+          "durationMs": 33.30000001192093,
+          "bytes": 413,
+          "bodyBytes": 113
+        },
+        {
+          "path": "/chunk-DFWg7HaR.js",
+          "api": false,
+          "durationMs": 4.5,
+          "bytes": 14126,
+          "bodyBytes": 13826
+        },
+        {
+          "path": "/chunk-BrJBPIOu.js",
+          "api": false,
+          "durationMs": 3.899999976158142,
+          "bytes": 4734,
+          "bodyBytes": 4434
+        },
+        {
+          "path": "/api/management/map",
+          "api": true,
+          "durationMs": 36.19999998807907,
+          "bytes": 32146,
+          "bodyBytes": 31846
+        }
+      ],
+      "documentBytes": 4258,
+      "longTaskMs": 0
+    },
+    {
+      "iteration": 1,
+      "scenario": "list-first",
+      "durationMs": 127.90000003576279,
+      "resources": [
+        {
+          "path": "/chunk-t8iRyEGh.js",
+          "api": false,
+          "durationMs": 4,
+          "bytes": 7952,
+          "bodyBytes": 7652
+        },
+        {
+          "path": "/api/management/process-types",
+          "api": true,
+          "durationMs": 23.5,
+          "bytes": 488,
+          "bodyBytes": 188
+        },
+        {
+          "path": "/api/management/units",
+          "api": true,
+          "durationMs": 23.599999964237213,
+          "bytes": 403,
+          "bodyBytes": 103
+        },
+        {
+          "path": "/api/management/processes",
+          "api": true,
+          "durationMs": 23.19999998807907,
+          "bytes": 31895,
+          "bodyBytes": 31595
+        }
+      ],
+      "documentBytes": 0,
+      "longTaskMs": 0
+    },
+    {
+      "iteration": 1,
+      "scenario": "search-first",
+      "durationMs": 86.70000004768372,
+      "resources": [
+        {
+          "path": "/api/management/processes",
+          "api": true,
+          "durationMs": 30.30000001192093,
+          "bytes": 31895,
+          "bodyBytes": 31595
+        }
+      ],
+      "documentBytes": 0,
+      "longTaskMs": 0
+    },
+    {
+      "iteration": 1,
+      "scenario": "detail-first",
+      "durationMs": 97.5,
+      "resources": [
+        {
+          "path": "/chunk-WLrCstJ4.js",
+          "api": false,
+          "durationMs": 5.199999988079071,
+          "bytes": 45164,
+          "bodyBytes": 44864
+        },
+        {
+          "path": "/chunk-8RaqNOHc.js",
+          "api": false,
+          "durationMs": 3.800000011920929,
+          "bytes": 1021,
+          "bodyBytes": 721
+        },
+        {
+          "path": "/api/management/processes/1",
+          "api": true,
+          "durationMs": 24.599999964237213,
+          "bytes": 1071,
+          "bodyBytes": 771
+        }
+      ],
+      "documentBytes": 0,
+      "longTaskMs": 0
+    },
+    {
+      "iteration": 1,
+      "scenario": "form-first",
+      "durationMs": 97.5,
+      "resources": [
+        {
+          "path": "/chunk-aEvSLXkv.js",
+          "api": false,
+          "durationMs": 4.199999988079071,
+          "bytes": 16570,
+          "bodyBytes": 16270
+        },
+        {
+          "path": "/api/management/process-types",
+          "api": true,
+          "durationMs": 30.400000035762787,
+          "bytes": 488,
+          "bodyBytes": 188
+        },
+        {
+          "path": "/api/management/units",
+          "api": true,
+          "durationMs": 30.599999964237213,
+          "bytes": 403,
+          "bodyBytes": 103
+        },
+        {
+          "path": "/api/management/processes",
+          "api": true,
+          "durationMs": 30.80000001192093,
+          "bytes": 31895,
+          "bodyBytes": 31595
+        },
+        {
+          "path": "/api/management/processes/1",
+          "api": true,
+          "durationMs": 30.899999976158142,
+          "bytes": 1071,
+          "bodyBytes": 771
+        }
+      ],
+      "documentBytes": 0,
+      "longTaskMs": 0
+    },
+    {
+      "iteration": 1,
+      "scenario": "map-warm",
+      "durationMs": 93.19999998807907,
+      "resources": [
+        {
+          "path": "/api/management/map",
+          "api": true,
+          "durationMs": 38.89999997615814,
+          "bytes": 32146,
+          "bodyBytes": 31846
+        }
+      ],
+      "documentBytes": 0,
+      "longTaskMs": 0
+    },
+    {
+      "iteration": 1,
+      "scenario": "list-warm",
+      "durationMs": 138.5999999642372,
+      "resources": [
+        {
+          "path": "/api/management/process-types",
+          "api": true,
+          "durationMs": 39.89999997615814,
+          "bytes": 488,
+          "bodyBytes": 188
+        },
+        {
+          "path": "/api/management/units",
+          "api": true,
+          "durationMs": 39.30000001192093,
+          "bytes": 403,
+          "bodyBytes": 103
+        },
+        {
+          "path": "/api/management/processes",
+          "api": true,
+          "durationMs": 38.60000002384186,
+          "bytes": 31895,
+          "bodyBytes": 31595
+        }
+      ],
+      "documentBytes": 0,
+      "longTaskMs": 0
+    },
+    {
+      "iteration": 1,
+      "scenario": "search-warm",
+      "durationMs": 104.5,
+      "resources": [
+        {
+          "path": "/api/management/processes",
+          "api": true,
+          "durationMs": 29,
+          "bytes": 31895,
+          "bodyBytes": 31595
+        }
+      ],
+      "documentBytes": 0,
+      "longTaskMs": 0
+    },
+    {
+      "iteration": 1,
+      "scenario": "detail-warm",
+      "durationMs": 80.79999995231628,
+      "resources": [
+        {
+          "path": "/api/management/processes/1",
+          "api": true,
+          "durationMs": 26.400000035762787,
+          "bytes": 1071,
+          "bodyBytes": 771
+        }
+      ],
+      "documentBytes": 0,
+      "longTaskMs": 0
+    },
+    {
+      "iteration": 1,
+      "scenario": "form-warm",
+      "durationMs": 97.69999998807907,
+      "resources": [
+        {
+          "path": "/api/management/process-types",
+          "api": true,
+          "durationMs": 34.5,
+          "bytes": 488,
+          "bodyBytes": 188
+        },
+        {
+          "path": "/api/management/units",
+          "api": true,
+          "durationMs": 34,
+          "bytes": 403,
+          "bodyBytes": 103
+        },
+        {
+          "path": "/api/management/processes",
+          "api": true,
+          "durationMs": 33.89999997615814,
+          "bytes": 31895,
+          "bodyBytes": 31595
+        },
+        {
+          "path": "/api/management/processes/1",
+          "api": true,
+          "durationMs": 32.799999952316284,
+          "bytes": 1071,
+          "bodyBytes": 771
+        }
+      ],
+      "documentBytes": 0,
+      "longTaskMs": 0
+    },
+    {
+      "iteration": 2,
+      "scenario": "startup-cold",
+      "durationMs": 310.69999998807907,
+      "resources": [
+        {
+          "path": "/polyfills-IA5XWQYN.js",
+          "api": false,
+          "durationMs": 13.599999964237213,
+          "bytes": 34885,
+          "bodyBytes": 34585
+        },
+        {
+          "path": "/main-AFFLH5YE.js",
+          "api": false,
+          "durationMs": 19.80000001192093,
+          "bytes": 352304,
+          "bodyBytes": 352004
+        },
+        {
+          "path": "/styles-2Z2A5363.css",
+          "api": false,
+          "durationMs": 11.800000011920929,
+          "bytes": 17291,
+          "bodyBytes": 16991
+        },
+        {
+          "path": "/api/auth/me",
+          "api": true,
+          "durationMs": 24.700000047683716,
+          "bytes": 413,
+          "bodyBytes": 113
+        },
+        {
+          "path": "/chunk-DFWg7HaR.js",
+          "api": false,
+          "durationMs": 4,
+          "bytes": 14126,
+          "bodyBytes": 13826
+        },
+        {
+          "path": "/chunk-BrJBPIOu.js",
+          "api": false,
+          "durationMs": 3.200000047683716,
+          "bytes": 4734,
+          "bodyBytes": 4434
+        },
+        {
+          "path": "/api/management/map",
+          "api": true,
+          "durationMs": 30.899999976158142,
+          "bytes": 32146,
+          "bodyBytes": 31846
+        }
+      ],
+      "documentBytes": 4258,
+      "longTaskMs": 0
+    },
+    {
+      "iteration": 2,
+      "scenario": "list-first",
+      "durationMs": 127.40000003576279,
+      "resources": [
+        {
+          "path": "/chunk-t8iRyEGh.js",
+          "api": false,
+          "durationMs": 4.300000011920929,
+          "bytes": 7952,
+          "bodyBytes": 7652
+        },
+        {
+          "path": "/api/management/process-types",
+          "api": true,
+          "durationMs": 23.19999998807907,
+          "bytes": 488,
+          "bodyBytes": 188
+        },
+        {
+          "path": "/api/management/units",
+          "api": true,
+          "durationMs": 23,
+          "bytes": 403,
+          "bodyBytes": 103
+        },
+        {
+          "path": "/api/management/processes",
+          "api": true,
+          "durationMs": 37.700000047683716,
+          "bytes": 31895,
+          "bodyBytes": 31595
+        }
+      ],
+      "documentBytes": 0,
+      "longTaskMs": 0
+    },
+    {
+      "iteration": 2,
+      "scenario": "search-first",
+      "durationMs": 105.39999997615814,
+      "resources": [
+        {
+          "path": "/api/management/processes",
+          "api": true,
+          "durationMs": 36.89999997615814,
+          "bytes": 31895,
+          "bodyBytes": 31595
+        }
+      ],
+      "documentBytes": 0,
+      "longTaskMs": 0
+    },
+    {
+      "iteration": 2,
+      "scenario": "detail-first",
+      "durationMs": 114.89999997615814,
+      "resources": [
+        {
+          "path": "/chunk-WLrCstJ4.js",
+          "api": false,
+          "durationMs": 4.200000047683716,
+          "bytes": 45164,
+          "bodyBytes": 44864
+        },
+        {
+          "path": "/chunk-8RaqNOHc.js",
+          "api": false,
+          "durationMs": 3.100000023841858,
+          "bytes": 1021,
+          "bodyBytes": 721
+        },
+        {
+          "path": "/api/management/processes/1",
+          "api": true,
+          "durationMs": 30.100000023841858,
+          "bytes": 1071,
+          "bodyBytes": 771
+        }
+      ],
+      "documentBytes": 0,
+      "longTaskMs": 0
+    },
+    {
+      "iteration": 2,
+      "scenario": "form-first",
+      "durationMs": 128.0999999642372,
+      "resources": [
+        {
+          "path": "/chunk-aEvSLXkv.js",
+          "api": false,
+          "durationMs": 4.5,
+          "bytes": 16570,
+          "bodyBytes": 16270
+        },
+        {
+          "path": "/api/management/process-types",
+          "api": true,
+          "durationMs": 30.599999964237213,
+          "bytes": 488,
+          "bodyBytes": 188
+        },
+        {
+          "path": "/api/management/units",
+          "api": true,
+          "durationMs": 30.100000023841858,
+          "bytes": 403,
+          "bodyBytes": 103
+        },
+        {
+          "path": "/api/management/processes",
+          "api": true,
+          "durationMs": 45.59999996423721,
+          "bytes": 31895,
+          "bodyBytes": 31595
+        },
+        {
+          "path": "/api/management/processes/1",
+          "api": true,
+          "durationMs": 44.5,
+          "bytes": 1071,
+          "bodyBytes": 771
+        }
+      ],
+      "documentBytes": 0,
+      "longTaskMs": 0
+    },
+    {
+      "iteration": 2,
+      "scenario": "map-warm",
+      "durationMs": 93.69999998807907,
+      "resources": [
+        {
+          "path": "/api/management/map",
+          "api": true,
+          "durationMs": 37.09999996423721,
+          "bytes": 32146,
+          "bodyBytes": 31846
+        }
+      ],
+      "documentBytes": 0,
+      "longTaskMs": 0
+    },
+    {
+      "iteration": 2,
+      "scenario": "list-warm",
+      "durationMs": 129.39999997615814,
+      "resources": [
+        {
+          "path": "/api/management/process-types",
+          "api": true,
+          "durationMs": 40.39999997615814,
+          "bytes": 488,
+          "bodyBytes": 188
+        },
+        {
+          "path": "/api/management/units",
+          "api": true,
+          "durationMs": 39.89999997615814,
+          "bytes": 403,
+          "bodyBytes": 103
+        },
+        {
+          "path": "/api/management/processes",
+          "api": true,
+          "durationMs": 39.30000001192093,
+          "bytes": 31895,
+          "bodyBytes": 31595
+        }
+      ],
+      "documentBytes": 0,
+      "longTaskMs": 0
+    },
+    {
+      "iteration": 2,
+      "scenario": "search-warm",
+      "durationMs": 102.30000001192093,
+      "resources": [
+        {
+          "path": "/api/management/processes",
+          "api": true,
+          "durationMs": 30.80000001192093,
+          "bytes": 31895,
+          "bodyBytes": 31595
+        }
+      ],
+      "documentBytes": 0,
+      "longTaskMs": 0
+    },
+    {
+      "iteration": 2,
+      "scenario": "detail-warm",
+      "durationMs": 79.20000004768372,
+      "resources": [
+        {
+          "path": "/api/management/processes/1",
+          "api": true,
+          "durationMs": 23.19999998807907,
+          "bytes": 1071,
+          "bodyBytes": 771
+        }
+      ],
+      "documentBytes": 0,
+      "longTaskMs": 0
+    },
+    {
+      "iteration": 2,
+      "scenario": "form-warm",
+      "durationMs": 97,
+      "resources": [
+        {
+          "path": "/api/management/process-types",
+          "api": true,
+          "durationMs": 32.59999996423721,
+          "bytes": 488,
+          "bodyBytes": 188
+        },
+        {
+          "path": "/api/management/units",
+          "api": true,
+          "durationMs": 32.59999996423721,
+          "bytes": 403,
+          "bodyBytes": 103
+        },
+        {
+          "path": "/api/management/processes",
+          "api": true,
+          "durationMs": 33.60000002384186,
+          "bytes": 31895,
+          "bodyBytes": 31595
+        },
+        {
+          "path": "/api/management/processes/1",
+          "api": true,
+          "durationMs": 32.69999998807907,
+          "bytes": 1071,
+          "bodyBytes": 771
+        }
+      ],
+      "documentBytes": 0,
+      "longTaskMs": 0
+    },
+    {
+      "iteration": 3,
+      "scenario": "startup-cold",
+      "durationMs": 292.80000001192093,
+      "resources": [
+        {
+          "path": "/polyfills-IA5XWQYN.js",
+          "api": false,
+          "durationMs": 15.099999964237213,
+          "bytes": 34885,
+          "bodyBytes": 34585
+        },
+        {
+          "path": "/main-AFFLH5YE.js",
+          "api": false,
+          "durationMs": 21.5,
+          "bytes": 352304,
+          "bodyBytes": 352004
+        },
+        {
+          "path": "/styles-2Z2A5363.css",
+          "api": false,
+          "durationMs": 14.199999988079071,
+          "bytes": 17291,
+          "bodyBytes": 16991
+        },
+        {
+          "path": "/api/auth/me",
+          "api": true,
+          "durationMs": 23.80000001192093,
+          "bytes": 413,
+          "bodyBytes": 113
+        },
+        {
+          "path": "/chunk-DFWg7HaR.js",
+          "api": false,
+          "durationMs": 3.699999988079071,
+          "bytes": 14126,
+          "bodyBytes": 13826
+        },
+        {
+          "path": "/chunk-BrJBPIOu.js",
+          "api": false,
+          "durationMs": 3.199999988079071,
+          "bytes": 4734,
+          "bodyBytes": 4434
+        },
+        {
+          "path": "/api/management/map",
+          "api": true,
+          "durationMs": 28,
+          "bytes": 32146,
+          "bodyBytes": 31846
+        }
+      ],
+      "documentBytes": 4258,
+      "longTaskMs": 0
+    },
+    {
+      "iteration": 3,
+      "scenario": "list-first",
+      "durationMs": 127.69999998807907,
+      "resources": [
+        {
+          "path": "/chunk-t8iRyEGh.js",
+          "api": false,
+          "durationMs": 4.100000023841858,
+          "bytes": 7952,
+          "bodyBytes": 7652
+        },
+        {
+          "path": "/api/management/process-types",
+          "api": true,
+          "durationMs": 24.30000001192093,
+          "bytes": 488,
+          "bodyBytes": 188
+        },
+        {
+          "path": "/api/management/units",
+          "api": true,
+          "durationMs": 24.30000001192093,
+          "bytes": 403,
+          "bodyBytes": 103
+        },
+        {
+          "path": "/api/management/processes",
+          "api": true,
+          "durationMs": 24.69999998807907,
+          "bytes": 31895,
+          "bodyBytes": 31595
+        }
+      ],
+      "documentBytes": 0,
+      "longTaskMs": 0
+    },
+    {
+      "iteration": 3,
+      "scenario": "search-first",
+      "durationMs": 101.20000004768372,
+      "resources": [
+        {
+          "path": "/api/management/processes",
+          "api": true,
+          "durationMs": 31.19999998807907,
+          "bytes": 31895,
+          "bodyBytes": 31595
+        }
+      ],
+      "documentBytes": 0,
+      "longTaskMs": 0
+    },
+    {
+      "iteration": 3,
+      "scenario": "detail-first",
+      "durationMs": 80.80000001192093,
+      "resources": [
+        {
+          "path": "/chunk-WLrCstJ4.js",
+          "api": false,
+          "durationMs": 3.400000035762787,
+          "bytes": 45164,
+          "bodyBytes": 44864
+        },
+        {
+          "path": "/chunk-8RaqNOHc.js",
+          "api": false,
+          "durationMs": 3.5,
+          "bytes": 1021,
+          "bodyBytes": 721
+        },
+        {
+          "path": "/api/management/processes/1",
+          "api": true,
+          "durationMs": 23.400000035762787,
+          "bytes": 1071,
+          "bodyBytes": 771
+        }
+      ],
+      "documentBytes": 0,
+      "longTaskMs": 0
+    },
+    {
+      "iteration": 3,
+      "scenario": "form-first",
+      "durationMs": 97.5,
+      "resources": [
+        {
+          "path": "/chunk-aEvSLXkv.js",
+          "api": false,
+          "durationMs": 4,
+          "bytes": 16570,
+          "bodyBytes": 16270
+        },
+        {
+          "path": "/api/management/process-types",
+          "api": true,
+          "durationMs": 27.899999976158142,
+          "bytes": 488,
+          "bodyBytes": 188
+        },
+        {
+          "path": "/api/management/units",
+          "api": true,
+          "durationMs": 27.80000001192093,
+          "bytes": 403,
+          "bodyBytes": 103
+        },
+        {
+          "path": "/api/management/processes",
+          "api": true,
+          "durationMs": 28.19999998807907,
+          "bytes": 31895,
+          "bodyBytes": 31595
+        },
+        {
+          "path": "/api/management/processes/1",
+          "api": true,
+          "durationMs": 39.19999998807907,
+          "bytes": 1071,
+          "bodyBytes": 771
+        }
+      ],
+      "documentBytes": 0,
+      "longTaskMs": 0
+    },
+    {
+      "iteration": 3,
+      "scenario": "map-warm",
+      "durationMs": 93.79999995231628,
+      "resources": [
+        {
+          "path": "/api/management/map",
+          "api": true,
+          "durationMs": 38.200000047683716,
+          "bytes": 32146,
+          "bodyBytes": 31846
+        }
+      ],
+      "documentBytes": 0,
+      "longTaskMs": 0
+    },
+    {
+      "iteration": 3,
+      "scenario": "list-warm",
+      "durationMs": 97.19999998807907,
+      "resources": [
+        {
+          "path": "/api/management/process-types",
+          "api": true,
+          "durationMs": 31.30000001192093,
+          "bytes": 488,
+          "bodyBytes": 188
+        },
+        {
+          "path": "/api/management/units",
+          "api": true,
+          "durationMs": 31.5,
+          "bytes": 403,
+          "bodyBytes": 103
+        },
+        {
+          "path": "/api/management/processes",
+          "api": true,
+          "durationMs": 32.39999997615814,
+          "bytes": 31895,
+          "bodyBytes": 31595
+        }
+      ],
+      "documentBytes": 0,
+      "longTaskMs": 0
+    },
+    {
+      "iteration": 3,
+      "scenario": "search-warm",
+      "durationMs": 86.69999998807907,
+      "resources": [
+        {
+          "path": "/api/management/processes",
+          "api": true,
+          "durationMs": 34.80000001192093,
+          "bytes": 31895,
+          "bodyBytes": 31595
+        }
+      ],
+      "documentBytes": 0,
+      "longTaskMs": 0
+    },
+    {
+      "iteration": 3,
+      "scenario": "detail-warm",
+      "durationMs": 80.90000003576279,
+      "resources": [
+        {
+          "path": "/api/management/processes/1",
+          "api": true,
+          "durationMs": 24.200000047683716,
+          "bytes": 1071,
+          "bodyBytes": 771
+        }
+      ],
+      "documentBytes": 0,
+      "longTaskMs": 0
+    },
+    {
+      "iteration": 3,
+      "scenario": "form-warm",
+      "durationMs": 97.89999997615814,
+      "resources": [
+        {
+          "path": "/api/management/process-types",
+          "api": true,
+          "durationMs": 28.900000035762787,
+          "bytes": 488,
+          "bodyBytes": 188
+        },
+        {
+          "path": "/api/management/units",
+          "api": true,
+          "durationMs": 28,
+          "bytes": 403,
+          "bodyBytes": 103
+        },
+        {
+          "path": "/api/management/processes",
+          "api": true,
+          "durationMs": 27.599999964237213,
+          "bytes": 31895,
+          "bodyBytes": 31595
+        },
+        {
+          "path": "/api/management/processes/1",
+          "api": true,
+          "durationMs": 41.39999997615814,
+          "bytes": 1071,
+          "bodyBytes": 771
+        }
+      ],
+      "documentBytes": 0,
+      "longTaskMs": 0
+    },
+    {
+      "iteration": 4,
+      "scenario": "startup-cold",
+      "durationMs": 304.19999998807907,
+      "resources": [
+        {
+          "path": "/polyfills-IA5XWQYN.js",
+          "api": false,
+          "durationMs": 14.5,
+          "bytes": 34885,
+          "bodyBytes": 34585
+        },
+        {
+          "path": "/main-AFFLH5YE.js",
+          "api": false,
+          "durationMs": 20.30000001192093,
+          "bytes": 352304,
+          "bodyBytes": 352004
+        },
+        {
+          "path": "/styles-2Z2A5363.css",
+          "api": false,
+          "durationMs": 11.600000023841858,
+          "bytes": 17291,
+          "bodyBytes": 16991
+        },
+        {
+          "path": "/api/auth/me",
+          "api": true,
+          "durationMs": 27.80000001192093,
+          "bytes": 413,
+          "bodyBytes": 113
+        },
+        {
+          "path": "/chunk-DFWg7HaR.js",
+          "api": false,
+          "durationMs": 4.300000011920929,
+          "bytes": 14126,
+          "bodyBytes": 13826
+        },
+        {
+          "path": "/chunk-BrJBPIOu.js",
+          "api": false,
+          "durationMs": 3.600000023841858,
+          "bytes": 4734,
+          "bodyBytes": 4434
+        },
+        {
+          "path": "/api/management/map",
+          "api": true,
+          "durationMs": 33.30000001192093,
+          "bytes": 32146,
+          "bodyBytes": 31846
+        }
+      ],
+      "documentBytes": 4258,
+      "longTaskMs": 0
+    },
+    {
+      "iteration": 4,
+      "scenario": "list-first",
+      "durationMs": 128.19999998807907,
+      "resources": [
+        {
+          "path": "/chunk-t8iRyEGh.js",
+          "api": false,
+          "durationMs": 3.699999988079071,
+          "bytes": 7952,
+          "bodyBytes": 7652
+        },
+        {
+          "path": "/api/management/process-types",
+          "api": true,
+          "durationMs": 25.69999998807907,
+          "bytes": 488,
+          "bodyBytes": 188
+        },
+        {
+          "path": "/api/management/units",
+          "api": true,
+          "durationMs": 26.700000047683716,
+          "bytes": 403,
+          "bodyBytes": 103
+        },
+        {
+          "path": "/api/management/processes",
+          "api": true,
+          "durationMs": 26.100000023841858,
+          "bytes": 31895,
+          "bodyBytes": 31595
+        }
+      ],
+      "documentBytes": 0,
+      "longTaskMs": 0
+    },
+    {
+      "iteration": 4,
+      "scenario": "search-first",
+      "durationMs": 110.5,
+      "resources": [
+        {
+          "path": "/api/management/processes",
+          "api": true,
+          "durationMs": 31.69999998807907,
+          "bytes": 31895,
+          "bodyBytes": 31595
+        }
+      ],
+      "documentBytes": 0,
+      "longTaskMs": 0
+    },
+    {
+      "iteration": 4,
+      "scenario": "detail-first",
+      "durationMs": 97.69999998807907,
+      "resources": [
+        {
+          "path": "/chunk-WLrCstJ4.js",
+          "api": false,
+          "durationMs": 3.299999952316284,
+          "bytes": 45164,
+          "bodyBytes": 44864
+        },
+        {
+          "path": "/chunk-8RaqNOHc.js",
+          "api": false,
+          "durationMs": 3.100000023841858,
+          "bytes": 1021,
+          "bodyBytes": 721
+        },
+        {
+          "path": "/api/management/processes/1",
+          "api": true,
+          "durationMs": 29.899999976158142,
+          "bytes": 1071,
+          "bodyBytes": 771
+        }
+      ],
+      "documentBytes": 0,
+      "longTaskMs": 0
+    },
+    {
+      "iteration": 4,
+      "scenario": "form-first",
+      "durationMs": 112.19999998807907,
+      "resources": [
+        {
+          "path": "/chunk-aEvSLXkv.js",
+          "api": false,
+          "durationMs": 4,
+          "bytes": 16570,
+          "bodyBytes": 16270
+        },
+        {
+          "path": "/api/management/process-types",
+          "api": true,
+          "durationMs": 25.30000001192093,
+          "bytes": 488,
+          "bodyBytes": 188
+        },
+        {
+          "path": "/api/management/units",
+          "api": true,
+          "durationMs": 25.399999976158142,
+          "bytes": 403,
+          "bodyBytes": 103
+        },
+        {
+          "path": "/api/management/processes",
+          "api": true,
+          "durationMs": 38.39999997615814,
+          "bytes": 31895,
+          "bodyBytes": 31595
+        },
+        {
+          "path": "/api/management/processes/1",
+          "api": true,
+          "durationMs": 38.60000002384186,
+          "bytes": 1071,
+          "bodyBytes": 771
+        }
+      ],
+      "documentBytes": 0,
+      "longTaskMs": 0
+    },
+    {
+      "iteration": 4,
+      "scenario": "map-warm",
+      "durationMs": 92.19999998807907,
+      "resources": [
+        {
+          "path": "/api/management/map",
+          "api": true,
+          "durationMs": 37.10000002384186,
+          "bytes": 32146,
+          "bodyBytes": 31846
+        }
+      ],
+      "documentBytes": 0,
+      "longTaskMs": 0
+    },
+    {
+      "iteration": 4,
+      "scenario": "list-warm",
+      "durationMs": 97.60000002384186,
+      "resources": [
+        {
+          "path": "/api/management/process-types",
+          "api": true,
+          "durationMs": 25.19999998807907,
+          "bytes": 488,
+          "bodyBytes": 188
+        },
+        {
+          "path": "/api/management/units",
+          "api": true,
+          "durationMs": 25.19999998807907,
+          "bytes": 403,
+          "bodyBytes": 103
+        },
+        {
+          "path": "/api/management/processes",
+          "api": true,
+          "durationMs": 24.5,
+          "bytes": 31895,
+          "bodyBytes": 31595
+        }
+      ],
+      "documentBytes": 0,
+      "longTaskMs": 0
+    },
+    {
+      "iteration": 4,
+      "scenario": "search-warm",
+      "durationMs": 83.5,
+      "resources": [
+        {
+          "path": "/api/management/processes",
+          "api": true,
+          "durationMs": 31.900000035762787,
+          "bytes": 31895,
+          "bodyBytes": 31595
+        }
+      ],
+      "documentBytes": 0,
+      "longTaskMs": 0
+    },
+    {
+      "iteration": 4,
+      "scenario": "detail-warm",
+      "durationMs": 81.30000001192093,
+      "resources": [
+        {
+          "path": "/api/management/processes/1",
+          "api": true,
+          "durationMs": 24.19999998807907,
+          "bytes": 1071,
+          "bodyBytes": 771
+        }
+      ],
+      "documentBytes": 0,
+      "longTaskMs": 0
+    },
+    {
+      "iteration": 4,
+      "scenario": "form-warm",
+      "durationMs": 80.30000001192093,
+      "resources": [
+        {
+          "path": "/api/management/process-types",
+          "api": true,
+          "durationMs": 27.30000001192093,
+          "bytes": 488,
+          "bodyBytes": 188
+        },
+        {
+          "path": "/api/management/units",
+          "api": true,
+          "durationMs": 27.30000001192093,
+          "bytes": 403,
+          "bodyBytes": 103
+        },
+        {
+          "path": "/api/management/processes",
+          "api": true,
+          "durationMs": 27.600000023841858,
+          "bytes": 31895,
+          "bodyBytes": 31595
+        },
+        {
+          "path": "/api/management/processes/1",
+          "api": true,
+          "durationMs": 26.80000001192093,
+          "bytes": 1071,
+          "bodyBytes": 771
+        }
+      ],
+      "documentBytes": 0,
+      "longTaskMs": 0
+    },
+    {
+      "iteration": 5,
+      "scenario": "startup-cold",
+      "durationMs": 278.69999998807907,
+      "resources": [
+        {
+          "path": "/polyfills-IA5XWQYN.js",
+          "api": false,
+          "durationMs": 15.800000011920929,
+          "bytes": 34885,
+          "bodyBytes": 34585
+        },
+        {
+          "path": "/main-AFFLH5YE.js",
+          "api": false,
+          "durationMs": 22.30000001192093,
+          "bytes": 352304,
+          "bodyBytes": 352004
+        },
+        {
+          "path": "/styles-2Z2A5363.css",
+          "api": false,
+          "durationMs": 12.900000035762787,
+          "bytes": 17291,
+          "bodyBytes": 16991
+        },
+        {
+          "path": "/api/auth/me",
+          "api": true,
+          "durationMs": 22.69999998807907,
+          "bytes": 413,
+          "bodyBytes": 113
+        },
+        {
+          "path": "/chunk-DFWg7HaR.js",
+          "api": false,
+          "durationMs": 3.800000011920929,
+          "bytes": 14126,
+          "bodyBytes": 13826
+        },
+        {
+          "path": "/chunk-BrJBPIOu.js",
+          "api": false,
+          "durationMs": 2.900000035762787,
+          "bytes": 4734,
+          "bodyBytes": 4434
+        },
+        {
+          "path": "/api/management/map",
+          "api": true,
+          "durationMs": 36,
+          "bytes": 32146,
+          "bodyBytes": 31846
+        }
+      ],
+      "documentBytes": 4258,
+      "longTaskMs": 0
+    },
+    {
+      "iteration": 5,
+      "scenario": "list-first",
+      "durationMs": 126.39999997615814,
+      "resources": [
+        {
+          "path": "/chunk-t8iRyEGh.js",
+          "api": false,
+          "durationMs": 3.5,
+          "bytes": 7952,
+          "bodyBytes": 7652
+        },
+        {
+          "path": "/api/management/process-types",
+          "api": true,
+          "durationMs": 26,
+          "bytes": 488,
+          "bodyBytes": 188
+        },
+        {
+          "path": "/api/management/units",
+          "api": true,
+          "durationMs": 25.600000023841858,
+          "bytes": 403,
+          "bodyBytes": 103
+        },
+        {
+          "path": "/api/management/processes",
+          "api": true,
+          "durationMs": 24.5,
+          "bytes": 31895,
+          "bodyBytes": 31595
+        }
+      ],
+      "documentBytes": 0,
+      "longTaskMs": 0
+    },
+    {
+      "iteration": 5,
+      "scenario": "search-first",
+      "durationMs": 105.69999998807907,
+      "resources": [
+        {
+          "path": "/api/management/processes",
+          "api": true,
+          "durationMs": 36.59999996423721,
+          "bytes": 31895,
+          "bodyBytes": 31595
+        }
+      ],
+      "documentBytes": 0,
+      "longTaskMs": 0
+    },
+    {
+      "iteration": 5,
+      "scenario": "detail-first",
+      "durationMs": 113.39999997615814,
+      "resources": [
+        {
+          "path": "/chunk-WLrCstJ4.js",
+          "api": false,
+          "durationMs": 3.399999976158142,
+          "bytes": 45164,
+          "bodyBytes": 44864
+        },
+        {
+          "path": "/chunk-8RaqNOHc.js",
+          "api": false,
+          "durationMs": 3.100000023841858,
+          "bytes": 1021,
+          "bodyBytes": 721
+        },
+        {
+          "path": "/api/management/processes/1",
+          "api": true,
+          "durationMs": 30,
+          "bytes": 1071,
+          "bodyBytes": 771
+        }
+      ],
+      "documentBytes": 0,
+      "longTaskMs": 0
+    },
+    {
+      "iteration": 5,
+      "scenario": "form-first",
+      "durationMs": 96.5,
+      "resources": [
+        {
+          "path": "/chunk-aEvSLXkv.js",
+          "api": false,
+          "durationMs": 4.100000023841858,
+          "bytes": 16570,
+          "bodyBytes": 16270
+        },
+        {
+          "path": "/api/management/process-types",
+          "api": true,
+          "durationMs": 33.700000047683716,
+          "bytes": 488,
+          "bodyBytes": 188
+        },
+        {
+          "path": "/api/management/units",
+          "api": true,
+          "durationMs": 33.80000001192093,
+          "bytes": 403,
+          "bodyBytes": 103
+        },
+        {
+          "path": "/api/management/processes",
+          "api": true,
+          "durationMs": 34.59999996423721,
+          "bytes": 31895,
+          "bodyBytes": 31595
+        },
+        {
+          "path": "/api/management/processes/1",
+          "api": true,
+          "durationMs": 33.799999952316284,
+          "bytes": 1071,
+          "bodyBytes": 771
+        }
+      ],
+      "documentBytes": 0,
+      "longTaskMs": 0
+    },
+    {
+      "iteration": 5,
+      "scenario": "map-warm",
+      "durationMs": 91.10000002384186,
+      "resources": [
+        {
+          "path": "/api/management/map",
+          "api": true,
+          "durationMs": 35.5,
+          "bytes": 32146,
+          "bodyBytes": 31846
+        }
+      ],
+      "documentBytes": 0,
+      "longTaskMs": 0
+    },
+    {
+      "iteration": 5,
+      "scenario": "list-warm",
+      "durationMs": 97.39999997615814,
+      "resources": [
+        {
+          "path": "/api/management/process-types",
+          "api": true,
+          "durationMs": 22.900000035762787,
+          "bytes": 488,
+          "bodyBytes": 188
+        },
+        {
+          "path": "/api/management/units",
+          "api": true,
+          "durationMs": 22.599999964237213,
+          "bytes": 403,
+          "bodyBytes": 103
+        },
+        {
+          "path": "/api/management/processes",
+          "api": true,
+          "durationMs": 22.5,
+          "bytes": 31895,
+          "bodyBytes": 31595
+        }
+      ],
+      "documentBytes": 0,
+      "longTaskMs": 0
+    },
+    {
+      "iteration": 5,
+      "scenario": "search-warm",
+      "durationMs": 97.69999998807907,
+      "resources": [
+        {
+          "path": "/api/management/processes",
+          "api": true,
+          "durationMs": 26.099999964237213,
+          "bytes": 31895,
+          "bodyBytes": 31595
+        }
+      ],
+      "documentBytes": 0,
+      "longTaskMs": 0
+    },
+    {
+      "iteration": 5,
+      "scenario": "detail-warm",
+      "durationMs": 79.30000001192093,
+      "resources": [
+        {
+          "path": "/api/management/processes/1",
+          "api": true,
+          "durationMs": 22.900000035762787,
+          "bytes": 1071,
+          "bodyBytes": 771
+        }
+      ],
+      "documentBytes": 0,
+      "longTaskMs": 0
+    },
+    {
+      "iteration": 5,
+      "scenario": "form-warm",
+      "durationMs": 80.70000004768372,
+      "resources": [
+        {
+          "path": "/api/management/process-types",
+          "api": true,
+          "durationMs": 27.899999976158142,
+          "bytes": 488,
+          "bodyBytes": 188
+        },
+        {
+          "path": "/api/management/units",
+          "api": true,
+          "durationMs": 27.69999998807907,
+          "bytes": 403,
+          "bodyBytes": 103
+        },
+        {
+          "path": "/api/management/processes",
+          "api": true,
+          "durationMs": 28.600000023841858,
+          "bytes": 31895,
+          "bodyBytes": 31595
+        },
+        {
+          "path": "/api/management/processes/1",
+          "api": true,
+          "durationMs": 27.900000035762787,
+          "bytes": 1071,
+          "bodyBytes": 771
+        }
+      ],
+      "documentBytes": 0,
+      "longTaskMs": 0
+    },
+    {
+      "iteration": 6,
+      "scenario": "startup-cold",
+      "durationMs": 315.80000001192093,
+      "resources": [
+        {
+          "path": "/polyfills-IA5XWQYN.js",
+          "api": false,
+          "durationMs": 14.699999988079071,
+          "bytes": 34885,
+          "bodyBytes": 34585
+        },
+        {
+          "path": "/main-AFFLH5YE.js",
+          "api": false,
+          "durationMs": 19.900000035762787,
+          "bytes": 352304,
+          "bodyBytes": 352004
+        },
+        {
+          "path": "/styles-2Z2A5363.css",
+          "api": false,
+          "durationMs": 12.400000035762787,
+          "bytes": 17291,
+          "bodyBytes": 16991
+        },
+        {
+          "path": "/api/auth/me",
+          "api": true,
+          "durationMs": 25,
+          "bytes": 413,
+          "bodyBytes": 113
+        },
+        {
+          "path": "/chunk-DFWg7HaR.js",
+          "api": false,
+          "durationMs": 3.600000023841858,
+          "bytes": 14126,
+          "bodyBytes": 13826
+        },
+        {
+          "path": "/chunk-BrJBPIOu.js",
+          "api": false,
+          "durationMs": 4.400000035762787,
+          "bytes": 4734,
+          "bodyBytes": 4434
+        },
+        {
+          "path": "/api/management/map",
+          "api": true,
+          "durationMs": 37,
+          "bytes": 32146,
+          "bodyBytes": 31846
+        }
+      ],
+      "documentBytes": 4258,
+      "longTaskMs": 0
+    },
+    {
+      "iteration": 6,
+      "scenario": "list-first",
+      "durationMs": 128,
+      "resources": [
+        {
+          "path": "/chunk-t8iRyEGh.js",
+          "api": false,
+          "durationMs": 3.800000011920929,
+          "bytes": 7952,
+          "bodyBytes": 7652
+        },
+        {
+          "path": "/api/management/process-types",
+          "api": true,
+          "durationMs": 27.30000001192093,
+          "bytes": 488,
+          "bodyBytes": 188
+        },
+        {
+          "path": "/api/management/units",
+          "api": true,
+          "durationMs": 26.69999998807907,
+          "bytes": 403,
+          "bodyBytes": 103
+        },
+        {
+          "path": "/api/management/processes",
+          "api": true,
+          "durationMs": 24.600000023841858,
+          "bytes": 31895,
+          "bodyBytes": 31595
+        }
+      ],
+      "documentBytes": 0,
+      "longTaskMs": 0
+    },
+    {
+      "iteration": 6,
+      "scenario": "search-first",
+      "durationMs": 97.5,
+      "resources": [
+        {
+          "path": "/api/management/processes",
+          "api": true,
+          "durationMs": 27.400000035762787,
+          "bytes": 31895,
+          "bodyBytes": 31595
+        }
+      ],
+      "documentBytes": 0,
+      "longTaskMs": 0
+    },
+    {
+      "iteration": 6,
+      "scenario": "detail-first",
+      "durationMs": 114.10000002384186,
+      "resources": [
+        {
+          "path": "/chunk-WLrCstJ4.js",
+          "api": false,
+          "durationMs": 3.699999988079071,
+          "bytes": 45164,
+          "bodyBytes": 44864
+        },
+        {
+          "path": "/chunk-8RaqNOHc.js",
+          "api": false,
+          "durationMs": 3.699999988079071,
+          "bytes": 1021,
+          "bodyBytes": 721
+        },
+        {
+          "path": "/api/management/processes/1",
+          "api": true,
+          "durationMs": 28.5,
+          "bytes": 1071,
+          "bodyBytes": 771
+        }
+      ],
+      "documentBytes": 0,
+      "longTaskMs": 0
+    },
+    {
+      "iteration": 6,
+      "scenario": "form-first",
+      "durationMs": 96,
+      "resources": [
+        {
+          "path": "/chunk-aEvSLXkv.js",
+          "api": false,
+          "durationMs": 4.800000011920929,
+          "bytes": 16570,
+          "bodyBytes": 16270
+        },
+        {
+          "path": "/api/management/process-types",
+          "api": true,
+          "durationMs": 22.399999976158142,
+          "bytes": 488,
+          "bodyBytes": 188
+        },
+        {
+          "path": "/api/management/units",
+          "api": true,
+          "durationMs": 30.5,
+          "bytes": 403,
+          "bodyBytes": 103
+        },
+        {
+          "path": "/api/management/processes",
+          "api": true,
+          "durationMs": 31.600000023841858,
+          "bytes": 31895,
+          "bodyBytes": 31595
+        },
+        {
+          "path": "/api/management/processes/1",
+          "api": true,
+          "durationMs": 30.69999998807907,
+          "bytes": 1071,
+          "bodyBytes": 771
+        }
+      ],
+      "documentBytes": 0,
+      "longTaskMs": 0
+    },
+    {
+      "iteration": 6,
+      "scenario": "map-warm",
+      "durationMs": 76.80000001192093,
+      "resources": [
+        {
+          "path": "/api/management/map",
+          "api": true,
+          "durationMs": 24.899999976158142,
+          "bytes": 32146,
+          "bodyBytes": 31846
+        }
+      ],
+      "documentBytes": 0,
+      "longTaskMs": 0
+    },
+    {
+      "iteration": 6,
+      "scenario": "list-warm",
+      "durationMs": 97,
+      "resources": [
+        {
+          "path": "/api/management/process-types",
+          "api": true,
+          "durationMs": 27.600000023841858,
+          "bytes": 488,
+          "bodyBytes": 188
+        },
+        {
+          "path": "/api/management/units",
+          "api": true,
+          "durationMs": 27.400000035762787,
+          "bytes": 403,
+          "bodyBytes": 103
+        },
+        {
+          "path": "/api/management/processes",
+          "api": true,
+          "durationMs": 26.799999952316284,
+          "bytes": 31895,
+          "bodyBytes": 31595
+        }
+      ],
+      "documentBytes": 0,
+      "longTaskMs": 0
+    },
+    {
+      "iteration": 6,
+      "scenario": "search-warm",
+      "durationMs": 96.10000002384186,
+      "resources": [
+        {
+          "path": "/api/management/processes",
+          "api": true,
+          "durationMs": 28.700000047683716,
+          "bytes": 31895,
+          "bodyBytes": 31595
+        }
+      ],
+      "documentBytes": 0,
+      "longTaskMs": 0
+    },
+    {
+      "iteration": 6,
+      "scenario": "detail-warm",
+      "durationMs": 92,
+      "resources": [
+        {
+          "path": "/api/management/processes/1",
+          "api": true,
+          "durationMs": 33.80000001192093,
+          "bytes": 1071,
+          "bodyBytes": 771
+        }
+      ],
+      "documentBytes": 0,
+      "longTaskMs": 0
+    },
+    {
+      "iteration": 6,
+      "scenario": "form-warm",
+      "durationMs": 97.89999997615814,
+      "resources": [
+        {
+          "path": "/api/management/process-types",
+          "api": true,
+          "durationMs": 42,
+          "bytes": 488,
+          "bodyBytes": 188
+        },
+        {
+          "path": "/api/management/units",
+          "api": true,
+          "durationMs": 43,
+          "bytes": 403,
+          "bodyBytes": 103
+        },
+        {
+          "path": "/api/management/processes",
+          "api": true,
+          "durationMs": 43,
+          "bytes": 31895,
+          "bodyBytes": 31595
+        },
+        {
+          "path": "/api/management/processes/1",
+          "api": true,
+          "durationMs": 41.80000001192093,
+          "bytes": 1071,
+          "bodyBytes": 771
+        }
+      ],
+      "documentBytes": 0,
+      "longTaskMs": 0
+    },
+    {
+      "iteration": 7,
+      "scenario": "startup-cold",
+      "durationMs": 316.10000002384186,
+      "resources": [
+        {
+          "path": "/polyfills-IA5XWQYN.js",
+          "api": false,
+          "durationMs": 15.5,
+          "bytes": 34885,
+          "bodyBytes": 34585
+        },
+        {
+          "path": "/main-AFFLH5YE.js",
+          "api": false,
+          "durationMs": 36.09999996423721,
+          "bytes": 352304,
+          "bodyBytes": 352004
+        },
+        {
+          "path": "/styles-2Z2A5363.css",
+          "api": false,
+          "durationMs": 13.799999952316284,
+          "bytes": 17291,
+          "bodyBytes": 16991
+        },
+        {
+          "path": "/api/auth/me",
+          "api": true,
+          "durationMs": 25.80000001192093,
+          "bytes": 413,
+          "bodyBytes": 113
+        },
+        {
+          "path": "/chunk-DFWg7HaR.js",
+          "api": false,
+          "durationMs": 3.800000011920929,
+          "bytes": 14126,
+          "bodyBytes": 13826
+        },
+        {
+          "path": "/chunk-BrJBPIOu.js",
+          "api": false,
+          "durationMs": 3.300000011920929,
+          "bytes": 4734,
+          "bodyBytes": 4434
+        },
+        {
+          "path": "/api/management/map",
+          "api": true,
+          "durationMs": 36.5,
+          "bytes": 32146,
+          "bodyBytes": 31846
+        }
+      ],
+      "documentBytes": 4258,
+      "longTaskMs": 0
+    },
+    {
+      "iteration": 7,
+      "scenario": "list-first",
+      "durationMs": 128.39999997615814,
+      "resources": [
+        {
+          "path": "/chunk-t8iRyEGh.js",
+          "api": false,
+          "durationMs": 3.699999988079071,
+          "bytes": 7952,
+          "bodyBytes": 7652
+        },
+        {
+          "path": "/api/management/process-types",
+          "api": true,
+          "durationMs": 26.80000001192093,
+          "bytes": 488,
+          "bodyBytes": 188
+        },
+        {
+          "path": "/api/management/units",
+          "api": true,
+          "durationMs": 27,
+          "bytes": 403,
+          "bodyBytes": 103
+        },
+        {
+          "path": "/api/management/processes",
+          "api": true,
+          "durationMs": 25.80000001192093,
+          "bytes": 31895,
+          "bodyBytes": 31595
+        }
+      ],
+      "documentBytes": 0,
+      "longTaskMs": 0
+    },
+    {
+      "iteration": 7,
+      "scenario": "search-first",
+      "durationMs": 121.80000001192093,
+      "resources": [
+        {
+          "path": "/api/management/processes",
+          "api": true,
+          "durationMs": 35.39999997615814,
+          "bytes": 31895,
+          "bodyBytes": 31595
+        }
+      ],
+      "documentBytes": 0,
+      "longTaskMs": 0
+    },
+    {
+      "iteration": 7,
+      "scenario": "detail-first",
+      "durationMs": 114.5,
+      "resources": [
+        {
+          "path": "/chunk-WLrCstJ4.js",
+          "api": false,
+          "durationMs": 5.800000011920929,
+          "bytes": 45164,
+          "bodyBytes": 44864
+        },
+        {
+          "path": "/chunk-8RaqNOHc.js",
+          "api": false,
+          "durationMs": 3.699999988079071,
+          "bytes": 1021,
+          "bodyBytes": 721
+        },
+        {
+          "path": "/api/management/processes/1",
+          "api": true,
+          "durationMs": 31,
+          "bytes": 1071,
+          "bodyBytes": 771
+        }
+      ],
+      "documentBytes": 0,
+      "longTaskMs": 0
+    },
+    {
+      "iteration": 7,
+      "scenario": "form-first",
+      "durationMs": 97,
+      "resources": [
+        {
+          "path": "/chunk-aEvSLXkv.js",
+          "api": false,
+          "durationMs": 4.5,
+          "bytes": 16570,
+          "bodyBytes": 16270
+        },
+        {
+          "path": "/api/management/process-types",
+          "api": true,
+          "durationMs": 27,
+          "bytes": 488,
+          "bodyBytes": 188
+        },
+        {
+          "path": "/api/management/units",
+          "api": true,
+          "durationMs": 27.900000035762787,
+          "bytes": 403,
+          "bodyBytes": 103
+        },
+        {
+          "path": "/api/management/processes",
+          "api": true,
+          "durationMs": 28.30000001192093,
+          "bytes": 31895,
+          "bodyBytes": 31595
+        },
+        {
+          "path": "/api/management/processes/1",
+          "api": true,
+          "durationMs": 29.399999976158142,
+          "bytes": 1071,
+          "bodyBytes": 771
+        }
+      ],
+      "documentBytes": 0,
+      "longTaskMs": 0
+    },
+    {
+      "iteration": 7,
+      "scenario": "map-warm",
+      "durationMs": 100,
+      "resources": [
+        {
+          "path": "/api/management/map",
+          "api": true,
+          "durationMs": 37.39999997615814,
+          "bytes": 32146,
+          "bodyBytes": 31846
+        }
+      ],
+      "documentBytes": 0,
+      "longTaskMs": 0
+    },
+    {
+      "iteration": 7,
+      "scenario": "list-warm",
+      "durationMs": 107.70000004768372,
+      "resources": [
+        {
+          "path": "/api/management/process-types",
+          "api": true,
+          "durationMs": 34.39999997615814,
+          "bytes": 488,
+          "bodyBytes": 188
+        },
+        {
+          "path": "/api/management/units",
+          "api": true,
+          "durationMs": 34.200000047683716,
+          "bytes": 403,
+          "bodyBytes": 103
+        },
+        {
+          "path": "/api/management/processes",
+          "api": true,
+          "durationMs": 33.80000001192093,
+          "bytes": 31895,
+          "bodyBytes": 31595
+        }
+      ],
+      "documentBytes": 0,
+      "longTaskMs": 0
+    },
+    {
+      "iteration": 7,
+      "scenario": "search-warm",
+      "durationMs": 92.69999998807907,
+      "resources": [
+        {
+          "path": "/api/management/processes",
+          "api": true,
+          "durationMs": 24,
+          "bytes": 31895,
+          "bodyBytes": 31595
+        }
+      ],
+      "documentBytes": 0,
+      "longTaskMs": 0
+    },
+    {
+      "iteration": 7,
+      "scenario": "detail-warm",
+      "durationMs": 80.69999998807907,
+      "resources": [
+        {
+          "path": "/api/management/processes/1",
+          "api": true,
+          "durationMs": 29.100000023841858,
+          "bytes": 1071,
+          "bodyBytes": 771
+        }
+      ],
+      "documentBytes": 0,
+      "longTaskMs": 0
+    },
+    {
+      "iteration": 7,
+      "scenario": "form-warm",
+      "durationMs": 97.69999998807907,
+      "resources": [
+        {
+          "path": "/api/management/process-types",
+          "api": true,
+          "durationMs": 35.10000002384186,
+          "bytes": 488,
+          "bodyBytes": 188
+        },
+        {
+          "path": "/api/management/units",
+          "api": true,
+          "durationMs": 35.19999998807907,
+          "bytes": 403,
+          "bodyBytes": 103
+        },
+        {
+          "path": "/api/management/processes",
+          "api": true,
+          "durationMs": 35.30000001192093,
+          "bytes": 31895,
+          "bodyBytes": 31595
+        },
+        {
+          "path": "/api/management/processes/1",
+          "api": true,
+          "durationMs": 34.299999952316284,
+          "bytes": 1071,
+          "bodyBytes": 771
+        }
+      ],
+      "documentBytes": 0,
+      "longTaskMs": 0
+    },
+    {
+      "iteration": 8,
+      "scenario": "startup-cold",
+      "durationMs": 304.0999999642372,
+      "resources": [
+        {
+          "path": "/polyfills-IA5XWQYN.js",
+          "api": false,
+          "durationMs": 12.400000035762787,
+          "bytes": 34885,
+          "bodyBytes": 34585
+        },
+        {
+          "path": "/main-AFFLH5YE.js",
+          "api": false,
+          "durationMs": 16.700000047683716,
+          "bytes": 352304,
+          "bodyBytes": 352004
+        },
+        {
+          "path": "/styles-2Z2A5363.css",
+          "api": false,
+          "durationMs": 11,
+          "bytes": 17291,
+          "bodyBytes": 16991
+        },
+        {
+          "path": "/api/auth/me",
+          "api": true,
+          "durationMs": 24.5,
+          "bytes": 413,
+          "bodyBytes": 113
+        },
+        {
+          "path": "/chunk-DFWg7HaR.js",
+          "api": false,
+          "durationMs": 4.299999952316284,
+          "bytes": 14126,
+          "bodyBytes": 13826
+        },
+        {
+          "path": "/chunk-BrJBPIOu.js",
+          "api": false,
+          "durationMs": 3.899999976158142,
+          "bytes": 4734,
+          "bodyBytes": 4434
+        },
+        {
+          "path": "/api/management/map",
+          "api": true,
+          "durationMs": 38,
+          "bytes": 32146,
+          "bodyBytes": 31846
+        }
+      ],
+      "documentBytes": 4258,
+      "longTaskMs": 0
+    },
+    {
+      "iteration": 8,
+      "scenario": "list-first",
+      "durationMs": 126.5,
+      "resources": [
+        {
+          "path": "/chunk-t8iRyEGh.js",
+          "api": false,
+          "durationMs": 3.699999988079071,
+          "bytes": 7952,
+          "bodyBytes": 7652
+        },
+        {
+          "path": "/api/management/process-types",
+          "api": true,
+          "durationMs": 24.200000047683716,
+          "bytes": 488,
+          "bodyBytes": 188
+        },
+        {
+          "path": "/api/management/units",
+          "api": true,
+          "durationMs": 24.600000023841858,
+          "bytes": 403,
+          "bodyBytes": 103
+        },
+        {
+          "path": "/api/management/processes",
+          "api": true,
+          "durationMs": 24.30000001192093,
+          "bytes": 31895,
+          "bodyBytes": 31595
+        }
+      ],
+      "documentBytes": 0,
+      "longTaskMs": 0
+    },
+    {
+      "iteration": 8,
+      "scenario": "search-first",
+      "durationMs": 105,
+      "resources": [
+        {
+          "path": "/api/management/processes",
+          "api": true,
+          "durationMs": 35.40000003576279,
+          "bytes": 31895,
+          "bodyBytes": 31595
+        }
+      ],
+      "documentBytes": 0,
+      "longTaskMs": 0
+    },
+    {
+      "iteration": 8,
+      "scenario": "detail-first",
+      "durationMs": 97.80000001192093,
+      "resources": [
+        {
+          "path": "/chunk-WLrCstJ4.js",
+          "api": false,
+          "durationMs": 3.900000035762787,
+          "bytes": 45164,
+          "bodyBytes": 44864
+        },
+        {
+          "path": "/chunk-8RaqNOHc.js",
+          "api": false,
+          "durationMs": 2.900000035762787,
+          "bytes": 1021,
+          "bodyBytes": 721
+        },
+        {
+          "path": "/api/management/processes/1",
+          "api": true,
+          "durationMs": 30.80000001192093,
+          "bytes": 1071,
+          "bodyBytes": 771
+        }
+      ],
+      "documentBytes": 0,
+      "longTaskMs": 0
+    },
+    {
+      "iteration": 8,
+      "scenario": "form-first",
+      "durationMs": 96.80000001192093,
+      "resources": [
+        {
+          "path": "/chunk-aEvSLXkv.js",
+          "api": false,
+          "durationMs": 3.400000035762787,
+          "bytes": 16570,
+          "bodyBytes": 16270
+        },
+        {
+          "path": "/api/management/process-types",
+          "api": true,
+          "durationMs": 34,
+          "bytes": 488,
+          "bodyBytes": 188
+        },
+        {
+          "path": "/api/management/units",
+          "api": true,
+          "durationMs": 35.39999997615814,
+          "bytes": 403,
+          "bodyBytes": 103
+        },
+        {
+          "path": "/api/management/processes",
+          "api": true,
+          "durationMs": 35,
+          "bytes": 31895,
+          "bodyBytes": 31595
+        },
+        {
+          "path": "/api/management/processes/1",
+          "api": true,
+          "durationMs": 33.89999997615814,
+          "bytes": 1071,
+          "bodyBytes": 771
+        }
+      ],
+      "documentBytes": 0,
+      "longTaskMs": 0
+    },
+    {
+      "iteration": 8,
+      "scenario": "map-warm",
+      "durationMs": 91.5,
+      "resources": [
+        {
+          "path": "/api/management/map",
+          "api": true,
+          "durationMs": 35.80000001192093,
+          "bytes": 32146,
+          "bodyBytes": 31846
+        }
+      ],
+      "documentBytes": 0,
+      "longTaskMs": 0
+    },
+    {
+      "iteration": 8,
+      "scenario": "list-warm",
+      "durationMs": 97.5,
+      "resources": [
+        {
+          "path": "/api/management/process-types",
+          "api": true,
+          "durationMs": 25.200000047683716,
+          "bytes": 488,
+          "bodyBytes": 188
+        },
+        {
+          "path": "/api/management/units",
+          "api": true,
+          "durationMs": 24.700000047683716,
+          "bytes": 403,
+          "bodyBytes": 103
+        },
+        {
+          "path": "/api/management/processes",
+          "api": true,
+          "durationMs": 24.399999976158142,
+          "bytes": 31895,
+          "bodyBytes": 31595
+        }
+      ],
+      "documentBytes": 0,
+      "longTaskMs": 0
+    },
+    {
+      "iteration": 8,
+      "scenario": "search-warm",
+      "durationMs": 102.80000001192093,
+      "resources": [
+        {
+          "path": "/api/management/processes",
+          "api": true,
+          "durationMs": 33.69999998807907,
+          "bytes": 31895,
+          "bodyBytes": 31595
+        }
+      ],
+      "documentBytes": 0,
+      "longTaskMs": 0
+    },
+    {
+      "iteration": 8,
+      "scenario": "detail-warm",
+      "durationMs": 81,
+      "resources": [
+        {
+          "path": "/api/management/processes/1",
+          "api": true,
+          "durationMs": 30,
+          "bytes": 1071,
+          "bodyBytes": 771
+        }
+      ],
+      "documentBytes": 0,
+      "longTaskMs": 0
+    },
+    {
+      "iteration": 8,
+      "scenario": "form-warm",
+      "durationMs": 79.80000001192093,
+      "resources": [
+        {
+          "path": "/api/management/process-types",
+          "api": true,
+          "durationMs": 25.899999976158142,
+          "bytes": 488,
+          "bodyBytes": 188
+        },
+        {
+          "path": "/api/management/units",
+          "api": true,
+          "durationMs": 25.80000001192093,
+          "bytes": 403,
+          "bodyBytes": 103
+        },
+        {
+          "path": "/api/management/processes",
+          "api": true,
+          "durationMs": 26,
+          "bytes": 31895,
+          "bodyBytes": 31595
+        },
+        {
+          "path": "/api/management/processes/1",
+          "api": true,
+          "durationMs": 25.100000023841858,
+          "bytes": 1071,
+          "bodyBytes": 771
+        }
+      ],
+      "documentBytes": 0,
+      "longTaskMs": 0
+    },
+    {
+      "iteration": 9,
+      "scenario": "startup-cold",
+      "durationMs": 295,
+      "resources": [
+        {
+          "path": "/polyfills-IA5XWQYN.js",
+          "api": false,
+          "durationMs": 15.699999988079071,
+          "bytes": 34885,
+          "bodyBytes": 34585
+        },
+        {
+          "path": "/main-AFFLH5YE.js",
+          "api": false,
+          "durationMs": 20.900000035762787,
+          "bytes": 352304,
+          "bodyBytes": 352004
+        },
+        {
+          "path": "/styles-2Z2A5363.css",
+          "api": false,
+          "durationMs": 11.800000011920929,
+          "bytes": 17291,
+          "bodyBytes": 16991
+        },
+        {
+          "path": "/api/auth/me",
+          "api": true,
+          "durationMs": 23.099999964237213,
+          "bytes": 413,
+          "bodyBytes": 113
+        },
+        {
+          "path": "/chunk-DFWg7HaR.js",
+          "api": false,
+          "durationMs": 3.800000011920929,
+          "bytes": 14126,
+          "bodyBytes": 13826
+        },
+        {
+          "path": "/chunk-BrJBPIOu.js",
+          "api": false,
+          "durationMs": 3.5,
+          "bytes": 4734,
+          "bodyBytes": 4434
+        },
+        {
+          "path": "/api/management/map",
+          "api": true,
+          "durationMs": 27.30000001192093,
+          "bytes": 32146,
+          "bodyBytes": 31846
+        }
+      ],
+      "documentBytes": 4258,
+      "longTaskMs": 0
+    },
+    {
+      "iteration": 9,
+      "scenario": "list-first",
+      "durationMs": 126.59999996423721,
+      "resources": [
+        {
+          "path": "/chunk-t8iRyEGh.js",
+          "api": false,
+          "durationMs": 3.800000011920929,
+          "bytes": 7952,
+          "bodyBytes": 7652
+        },
+        {
+          "path": "/api/management/process-types",
+          "api": true,
+          "durationMs": 23.399999976158142,
+          "bytes": 488,
+          "bodyBytes": 188
+        },
+        {
+          "path": "/api/management/units",
+          "api": true,
+          "durationMs": 23.200000047683716,
+          "bytes": 403,
+          "bodyBytes": 103
+        },
+        {
+          "path": "/api/management/processes",
+          "api": true,
+          "durationMs": 23,
+          "bytes": 31895,
+          "bodyBytes": 31595
+        }
+      ],
+      "documentBytes": 0,
+      "longTaskMs": 0
+    },
+    {
+      "iteration": 9,
+      "scenario": "search-first",
+      "durationMs": 96.90000003576279,
+      "resources": [
+        {
+          "path": "/api/management/processes",
+          "api": true,
+          "durationMs": 25,
+          "bytes": 31895,
+          "bodyBytes": 31595
+        }
+      ],
+      "documentBytes": 0,
+      "longTaskMs": 0
+    },
+    {
+      "iteration": 9,
+      "scenario": "detail-first",
+      "durationMs": 115.89999997615814,
+      "resources": [
+        {
+          "path": "/chunk-WLrCstJ4.js",
+          "api": false,
+          "durationMs": 6.199999988079071,
+          "bytes": 45164,
+          "bodyBytes": 44864
+        },
+        {
+          "path": "/chunk-8RaqNOHc.js",
+          "api": false,
+          "durationMs": 4.100000023841858,
+          "bytes": 1021,
+          "bodyBytes": 721
+        },
+        {
+          "path": "/api/management/processes/1",
+          "api": true,
+          "durationMs": 32.5,
+          "bytes": 1071,
+          "bodyBytes": 771
+        }
+      ],
+      "documentBytes": 0,
+      "longTaskMs": 0
+    },
+    {
+      "iteration": 9,
+      "scenario": "form-first",
+      "durationMs": 94.29999995231628,
+      "resources": [
+        {
+          "path": "/chunk-aEvSLXkv.js",
+          "api": false,
+          "durationMs": 4,
+          "bytes": 16570,
+          "bodyBytes": 16270
+        },
+        {
+          "path": "/api/management/process-types",
+          "api": true,
+          "durationMs": 30,
+          "bytes": 488,
+          "bodyBytes": 188
+        },
+        {
+          "path": "/api/management/units",
+          "api": true,
+          "durationMs": 29.69999998807907,
+          "bytes": 403,
+          "bodyBytes": 103
+        },
+        {
+          "path": "/api/management/processes",
+          "api": true,
+          "durationMs": 30.30000001192093,
+          "bytes": 31895,
+          "bodyBytes": 31595
+        },
+        {
+          "path": "/api/management/processes/1",
+          "api": true,
+          "durationMs": 29.600000023841858,
+          "bytes": 1071,
+          "bodyBytes": 771
+        }
+      ],
+      "documentBytes": 0,
+      "longTaskMs": 0
+    },
+    {
+      "iteration": 9,
+      "scenario": "map-warm",
+      "durationMs": 93.59999996423721,
+      "resources": [
+        {
+          "path": "/api/management/map",
+          "api": true,
+          "durationMs": 39.19999998807907,
+          "bytes": 32146,
+          "bodyBytes": 31846
+        }
+      ],
+      "documentBytes": 0,
+      "longTaskMs": 0
+    },
+    {
+      "iteration": 9,
+      "scenario": "list-warm",
+      "durationMs": 112.90000003576279,
+      "resources": [
+        {
+          "path": "/api/management/process-types",
+          "api": true,
+          "durationMs": 37.80000001192093,
+          "bytes": 488,
+          "bodyBytes": 188
+        },
+        {
+          "path": "/api/management/units",
+          "api": true,
+          "durationMs": 38.09999996423721,
+          "bytes": 403,
+          "bodyBytes": 103
+        },
+        {
+          "path": "/api/management/processes",
+          "api": true,
+          "durationMs": 37.39999997615814,
+          "bytes": 31895,
+          "bodyBytes": 31595
+        }
+      ],
+      "documentBytes": 0,
+      "longTaskMs": 0
+    },
+    {
+      "iteration": 9,
+      "scenario": "search-warm",
+      "durationMs": 86.80000001192093,
+      "resources": [
+        {
+          "path": "/api/management/processes",
+          "api": true,
+          "durationMs": 31.5,
+          "bytes": 31895,
+          "bodyBytes": 31595
+        }
+      ],
+      "documentBytes": 0,
+      "longTaskMs": 0
+    },
+    {
+      "iteration": 9,
+      "scenario": "detail-warm",
+      "durationMs": 78.09999996423721,
+      "resources": [
+        {
+          "path": "/api/management/processes/1",
+          "api": true,
+          "durationMs": 28.900000035762787,
+          "bytes": 1071,
+          "bodyBytes": 771
+        }
+      ],
+      "documentBytes": 0,
+      "longTaskMs": 0
+    },
+    {
+      "iteration": 9,
+      "scenario": "form-warm",
+      "durationMs": 114.19999998807907,
+      "resources": [
+        {
+          "path": "/api/management/process-types",
+          "api": true,
+          "durationMs": 43.69999998807907,
+          "bytes": 488,
+          "bodyBytes": 188
+        },
+        {
+          "path": "/api/management/units",
+          "api": true,
+          "durationMs": 42.19999998807907,
+          "bytes": 403,
+          "bodyBytes": 103
+        },
+        {
+          "path": "/api/management/processes",
+          "api": true,
+          "durationMs": 42.799999952316284,
+          "bytes": 31895,
+          "bodyBytes": 31595
+        },
+        {
+          "path": "/api/management/processes/1",
+          "api": true,
+          "durationMs": 42,
+          "bytes": 1071,
+          "bodyBytes": 771
+        }
+      ],
+      "documentBytes": 0,
+      "longTaskMs": 0
+    },
+    {
+      "iteration": 10,
+      "scenario": "startup-cold",
+      "durationMs": 299.0999999642372,
+      "resources": [
+        {
+          "path": "/polyfills-IA5XWQYN.js",
+          "api": false,
+          "durationMs": 16.69999998807907,
+          "bytes": 34885,
+          "bodyBytes": 34585
+        },
+        {
+          "path": "/main-AFFLH5YE.js",
+          "api": false,
+          "durationMs": 41.19999998807907,
+          "bytes": 352304,
+          "bodyBytes": 352004
+        },
+        {
+          "path": "/styles-2Z2A5363.css",
+          "api": false,
+          "durationMs": 14.400000035762787,
+          "bytes": 17291,
+          "bodyBytes": 16991
+        },
+        {
+          "path": "/api/auth/me",
+          "api": true,
+          "durationMs": 25.700000047683716,
+          "bytes": 413,
+          "bodyBytes": 113
+        },
+        {
+          "path": "/chunk-DFWg7HaR.js",
+          "api": false,
+          "durationMs": 3.699999988079071,
+          "bytes": 14126,
+          "bodyBytes": 13826
+        },
+        {
+          "path": "/chunk-BrJBPIOu.js",
+          "api": false,
+          "durationMs": 2.899999976158142,
+          "bytes": 4734,
+          "bodyBytes": 4434
+        },
+        {
+          "path": "/api/management/map",
+          "api": true,
+          "durationMs": 27.5,
+          "bytes": 32146,
+          "bodyBytes": 31846
+        }
+      ],
+      "documentBytes": 4258,
+      "longTaskMs": 0
+    },
+    {
+      "iteration": 10,
+      "scenario": "list-first",
+      "durationMs": 127.40000003576279,
+      "resources": [
+        {
+          "path": "/chunk-t8iRyEGh.js",
+          "api": false,
+          "durationMs": 3.5,
+          "bytes": 7952,
+          "bodyBytes": 7652
+        },
+        {
+          "path": "/api/management/process-types",
+          "api": true,
+          "durationMs": 26.19999998807907,
+          "bytes": 488,
+          "bodyBytes": 188
+        },
+        {
+          "path": "/api/management/units",
+          "api": true,
+          "durationMs": 26.5,
+          "bytes": 403,
+          "bodyBytes": 103
+        },
+        {
+          "path": "/api/management/processes",
+          "api": true,
+          "durationMs": 25.80000001192093,
+          "bytes": 31895,
+          "bodyBytes": 31595
+        }
+      ],
+      "documentBytes": 0,
+      "longTaskMs": 0
+    },
+    {
+      "iteration": 10,
+      "scenario": "search-first",
+      "durationMs": 112.90000003576279,
+      "resources": [
+        {
+          "path": "/api/management/processes",
+          "api": true,
+          "durationMs": 32.69999998807907,
+          "bytes": 31895,
+          "bodyBytes": 31595
+        }
+      ],
+      "documentBytes": 0,
+      "longTaskMs": 0
+    },
+    {
+      "iteration": 10,
+      "scenario": "detail-first",
+      "durationMs": 98,
+      "resources": [
+        {
+          "path": "/chunk-WLrCstJ4.js",
+          "api": false,
+          "durationMs": 3.899999976158142,
+          "bytes": 45164,
+          "bodyBytes": 44864
+        },
+        {
+          "path": "/chunk-8RaqNOHc.js",
+          "api": false,
+          "durationMs": 3,
+          "bytes": 1021,
+          "bodyBytes": 721
+        },
+        {
+          "path": "/api/management/processes/1",
+          "api": true,
+          "durationMs": 25.100000023841858,
+          "bytes": 1071,
+          "bodyBytes": 771
+        }
+      ],
+      "documentBytes": 0,
+      "longTaskMs": 0
+    },
+    {
+      "iteration": 10,
+      "scenario": "form-first",
+      "durationMs": 96,
+      "resources": [
+        {
+          "path": "/chunk-aEvSLXkv.js",
+          "api": false,
+          "durationMs": 4.600000023841858,
+          "bytes": 16570,
+          "bodyBytes": 16270
+        },
+        {
+          "path": "/api/management/process-types",
+          "api": true,
+          "durationMs": 33.19999998807907,
+          "bytes": 488,
+          "bodyBytes": 188
+        },
+        {
+          "path": "/api/management/units",
+          "api": true,
+          "durationMs": 33.40000003576279,
+          "bytes": 403,
+          "bodyBytes": 103
+        },
+        {
+          "path": "/api/management/processes",
+          "api": true,
+          "durationMs": 33.30000001192093,
+          "bytes": 31895,
+          "bodyBytes": 31595
+        },
+        {
+          "path": "/api/management/processes/1",
+          "api": true,
+          "durationMs": 32.700000047683716,
+          "bytes": 1071,
+          "bodyBytes": 771
+        }
+      ],
+      "documentBytes": 0,
+      "longTaskMs": 0
+    },
+    {
+      "iteration": 10,
+      "scenario": "map-warm",
+      "durationMs": 92.19999998807907,
+      "resources": [
+        {
+          "path": "/api/management/map",
+          "api": true,
+          "durationMs": 37.299999952316284,
+          "bytes": 32146,
+          "bodyBytes": 31846
+        }
+      ],
+      "documentBytes": 0,
+      "longTaskMs": 0
+    },
+    {
+      "iteration": 10,
+      "scenario": "list-warm",
+      "durationMs": 119,
+      "resources": [
+        {
+          "path": "/api/management/process-types",
+          "api": true,
+          "durationMs": 23.600000023841858,
+          "bytes": 488,
+          "bodyBytes": 188
+        },
+        {
+          "path": "/api/management/units",
+          "api": true,
+          "durationMs": 38.5,
+          "bytes": 403,
+          "bodyBytes": 103
+        },
+        {
+          "path": "/api/management/processes",
+          "api": true,
+          "durationMs": 38.299999952316284,
+          "bytes": 31895,
+          "bodyBytes": 31595
+        }
+      ],
+      "documentBytes": 0,
+      "longTaskMs": 0
+    },
+    {
+      "iteration": 10,
+      "scenario": "search-warm",
+      "durationMs": 79.90000003576279,
+      "resources": [
+        {
+          "path": "/api/management/processes",
+          "api": true,
+          "durationMs": 26.899999976158142,
+          "bytes": 31895,
+          "bodyBytes": 31595
+        }
+      ],
+      "documentBytes": 0,
+      "longTaskMs": 0
+    },
+    {
+      "iteration": 10,
+      "scenario": "detail-warm",
+      "durationMs": 81,
+      "resources": [
+        {
+          "path": "/api/management/processes/1",
+          "api": true,
+          "durationMs": 33.89999997615814,
+          "bytes": 1071,
+          "bodyBytes": 771
+        }
+      ],
+      "documentBytes": 0,
+      "longTaskMs": 0
+    },
+    {
+      "iteration": 10,
+      "scenario": "form-warm",
+      "durationMs": 97.30000001192093,
+      "resources": [
+        {
+          "path": "/api/management/process-types",
+          "api": true,
+          "durationMs": 25.899999976158142,
+          "bytes": 488,
+          "bodyBytes": 188
+        },
+        {
+          "path": "/api/management/units",
+          "api": true,
+          "durationMs": 25.69999998807907,
+          "bytes": 403,
+          "bodyBytes": 103
+        },
+        {
+          "path": "/api/management/processes",
+          "api": true,
+          "durationMs": 26.100000023841858,
+          "bytes": 31895,
+          "bodyBytes": 31595
+        },
+        {
+          "path": "/api/management/processes/1",
+          "api": true,
+          "durationMs": 25.100000023841858,
+          "bytes": 1071,
+          "bodyBytes": 771
+        }
+      ],
+      "documentBytes": 0,
+      "longTaskMs": 0
+    },
+    {
+      "iteration": 11,
+      "scenario": "startup-cold",
+      "durationMs": 284.4000000357628,
+      "resources": [
+        {
+          "path": "/polyfills-IA5XWQYN.js",
+          "api": false,
+          "durationMs": 15.399999976158142,
+          "bytes": 34885,
+          "bodyBytes": 34585
+        },
+        {
+          "path": "/main-AFFLH5YE.js",
+          "api": false,
+          "durationMs": 34.60000002384186,
+          "bytes": 352304,
+          "bodyBytes": 352004
+        },
+        {
+          "path": "/styles-2Z2A5363.css",
+          "api": false,
+          "durationMs": 13,
+          "bytes": 17291,
+          "bodyBytes": 16991
+        },
+        {
+          "path": "/api/auth/me",
+          "api": true,
+          "durationMs": 23.30000001192093,
+          "bytes": 413,
+          "bodyBytes": 113
+        },
+        {
+          "path": "/chunk-DFWg7HaR.js",
+          "api": false,
+          "durationMs": 3.899999976158142,
+          "bytes": 14126,
+          "bodyBytes": 13826
+        },
+        {
+          "path": "/chunk-BrJBPIOu.js",
+          "api": false,
+          "durationMs": 3.5,
+          "bytes": 4734,
+          "bodyBytes": 4434
+        },
+        {
+          "path": "/api/management/map",
+          "api": true,
+          "durationMs": 23.80000001192093,
+          "bytes": 32146,
+          "bodyBytes": 31846
+        }
+      ],
+      "documentBytes": 4258,
+      "longTaskMs": 0
+    },
+    {
+      "iteration": 11,
+      "scenario": "list-first",
+      "durationMs": 145.19999998807907,
+      "resources": [
+        {
+          "path": "/chunk-t8iRyEGh.js",
+          "api": false,
+          "durationMs": 3.600000023841858,
+          "bytes": 7952,
+          "bodyBytes": 7652
+        },
+        {
+          "path": "/api/management/process-types",
+          "api": true,
+          "durationMs": 33.5,
+          "bytes": 488,
+          "bodyBytes": 188
+        },
+        {
+          "path": "/api/management/units",
+          "api": true,
+          "durationMs": 33,
+          "bytes": 403,
+          "bodyBytes": 103
+        },
+        {
+          "path": "/api/management/processes",
+          "api": true,
+          "durationMs": 32.299999952316284,
+          "bytes": 31895,
+          "bodyBytes": 31595
+        }
+      ],
+      "documentBytes": 0,
+      "longTaskMs": 0
+    },
+    {
+      "iteration": 11,
+      "scenario": "search-first",
+      "durationMs": 94,
+      "resources": [
+        {
+          "path": "/api/management/processes",
+          "api": true,
+          "durationMs": 29.80000001192093,
+          "bytes": 31895,
+          "bodyBytes": 31595
+        }
+      ],
+      "documentBytes": 0,
+      "longTaskMs": 0
+    },
+    {
+      "iteration": 11,
+      "scenario": "detail-first",
+      "durationMs": 114.30000001192093,
+      "resources": [
+        {
+          "path": "/chunk-WLrCstJ4.js",
+          "api": false,
+          "durationMs": 7.199999988079071,
+          "bytes": 45164,
+          "bodyBytes": 44864
+        },
+        {
+          "path": "/chunk-8RaqNOHc.js",
+          "api": false,
+          "durationMs": 3.5,
+          "bytes": 1021,
+          "bodyBytes": 721
+        },
+        {
+          "path": "/api/management/processes/1",
+          "api": true,
+          "durationMs": 36.80000001192093,
+          "bytes": 1071,
+          "bodyBytes": 771
+        }
+      ],
+      "documentBytes": 0,
+      "longTaskMs": 0
+    },
+    {
+      "iteration": 11,
+      "scenario": "form-first",
+      "durationMs": 99.40000003576279,
+      "resources": [
+        {
+          "path": "/chunk-aEvSLXkv.js",
+          "api": false,
+          "durationMs": 3.900000035762787,
+          "bytes": 16570,
+          "bodyBytes": 16270
+        },
+        {
+          "path": "/api/management/process-types",
+          "api": true,
+          "durationMs": 27.599999964237213,
+          "bytes": 488,
+          "bodyBytes": 188
+        },
+        {
+          "path": "/api/management/units",
+          "api": true,
+          "durationMs": 27.69999998807907,
+          "bytes": 403,
+          "bodyBytes": 103
+        },
+        {
+          "path": "/api/management/processes",
+          "api": true,
+          "durationMs": 28,
+          "bytes": 31895,
+          "bodyBytes": 31595
+        },
+        {
+          "path": "/api/management/processes/1",
+          "api": true,
+          "durationMs": 27.100000023841858,
+          "bytes": 1071,
+          "bodyBytes": 771
+        }
+      ],
+      "documentBytes": 0,
+      "longTaskMs": 0
+    },
+    {
+      "iteration": 11,
+      "scenario": "map-warm",
+      "durationMs": 90.70000004768372,
+      "resources": [
+        {
+          "path": "/api/management/map",
+          "api": true,
+          "durationMs": 35,
+          "bytes": 32146,
+          "bodyBytes": 31846
+        }
+      ],
+      "documentBytes": 0,
+      "longTaskMs": 0
+    },
+    {
+      "iteration": 11,
+      "scenario": "list-warm",
+      "durationMs": 116.19999998807907,
+      "resources": [
+        {
+          "path": "/api/management/process-types",
+          "api": true,
+          "durationMs": 23.5,
+          "bytes": 488,
+          "bodyBytes": 188
+        },
+        {
+          "path": "/api/management/units",
+          "api": true,
+          "durationMs": 23.100000023841858,
+          "bytes": 403,
+          "bodyBytes": 103
+        },
+        {
+          "path": "/api/management/processes",
+          "api": true,
+          "durationMs": 38.39999997615814,
+          "bytes": 31895,
+          "bodyBytes": 31595
+        }
+      ],
+      "documentBytes": 0,
+      "longTaskMs": 0
+    },
+    {
+      "iteration": 11,
+      "scenario": "search-warm",
+      "durationMs": 81.29999995231628,
+      "resources": [
+        {
+          "path": "/api/management/processes",
+          "api": true,
+          "durationMs": 28.099999964237213,
+          "bytes": 31895,
+          "bodyBytes": 31595
+        }
+      ],
+      "documentBytes": 0,
+      "longTaskMs": 0
+    },
+    {
+      "iteration": 11,
+      "scenario": "detail-warm",
+      "durationMs": 80.39999997615814,
+      "resources": [
+        {
+          "path": "/api/management/processes/1",
+          "api": true,
+          "durationMs": 24.200000047683716,
+          "bytes": 1071,
+          "bodyBytes": 771
+        }
+      ],
+      "documentBytes": 0,
+      "longTaskMs": 0
+    },
+    {
+      "iteration": 11,
+      "scenario": "form-warm",
+      "durationMs": 79.69999998807907,
+      "resources": [
+        {
+          "path": "/api/management/process-types",
+          "api": true,
+          "durationMs": 26.19999998807907,
+          "bytes": 488,
+          "bodyBytes": 188
+        },
+        {
+          "path": "/api/management/units",
+          "api": true,
+          "durationMs": 26,
+          "bytes": 403,
+          "bodyBytes": 103
+        },
+        {
+          "path": "/api/management/processes",
+          "api": true,
+          "durationMs": 26.69999998807907,
+          "bytes": 31895,
+          "bodyBytes": 31595
+        },
+        {
+          "path": "/api/management/processes/1",
+          "api": true,
+          "durationMs": 26.099999964237213,
+          "bytes": 1071,
+          "bodyBytes": 771
+        }
+      ],
+      "documentBytes": 0,
+      "longTaskMs": 0
+    }
+  ]
+}

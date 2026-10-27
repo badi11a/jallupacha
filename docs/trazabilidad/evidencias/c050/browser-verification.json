@@ -1,0 +1,1245 @@
+{
+  "browser": "156.0.8078.48",
+  "checks": [
+    {
+      "name": "list-filters",
+      "controls": [
+        {
+          "tag": "INPUT",
+          "type": "search",
+          "minHeight": "42px",
+          "radius": "7px",
+          "paddingTop": "8.8px",
+          "paddingBottom": "8.8px",
+          "paddingLeft": "10.4px",
+          "border": "rgb(138, 147, 166)",
+          "invalid": false,
+          "foreground": "rgb(41, 40, 63)",
+          "background": "rgb(255, 255, 255)"
+        },
+        {
+          "tag": "SELECT",
+          "type": "select-one",
+          "minHeight": "42px",
+          "radius": "7px",
+          "paddingTop": "8.8px",
+          "paddingBottom": "8.8px",
+          "paddingLeft": "10.4px",
+          "border": "rgb(138, 147, 166)",
+          "invalid": false,
+          "foreground": "rgb(41, 40, 63)",
+          "background": "rgb(255, 255, 255)"
+        },
+        {
+          "tag": "SELECT",
+          "type": "select-one",
+          "minHeight": "42px",
+          "radius": "7px",
+          "paddingTop": "8.8px",
+          "paddingBottom": "8.8px",
+          "paddingLeft": "10.4px",
+          "border": "rgb(138, 147, 166)",
+          "invalid": false,
+          "foreground": "rgb(41, 40, 63)",
+          "background": "rgb(255, 255, 255)"
+        },
+        {
+          "tag": "SELECT",
+          "type": "select-one",
+          "minHeight": "42px",
+          "radius": "7px",
+          "paddingTop": "8.8px",
+          "paddingBottom": "8.8px",
+          "paddingLeft": "10.4px",
+          "border": "rgb(138, 147, 166)",
+          "invalid": false,
+          "foreground": "rgb(41, 40, 63)",
+          "background": "rgb(255, 255, 255)"
+        }
+      ],
+      "contrast": [
+        {
+          "text": 14.289832441992964,
+          "border": 3.0860674041103593
+        },
+        {
+          "text": 14.289832441992964,
+          "border": 3.0860674041103593
+        },
+        {
+          "text": 14.289832441992964,
+          "border": 3.0860674041103593
+        },
+        {
+          "text": 14.289832441992964,
+          "border": 3.0860674041103593
+        }
+      ],
+      "state": "passed"
+    },
+    {
+      "name": "list-320",
+      "available": 320,
+      "scroll": 320,
+      "regions": [
+        {
+          "width": 270,
+          "scrollWidth": 672,
+          "keyboardScroll": 2
+        }
+      ],
+      "state": "passed"
+    },
+    {
+      "name": "process-form",
+      "controls": [
+        {
+          "tag": "SELECT",
+          "type": "select-one",
+          "minHeight": "42px",
+          "radius": "7px",
+          "paddingTop": "8.8px",
+          "paddingBottom": "8.8px",
+          "paddingLeft": "10.4px",
+          "border": "rgb(138, 147, 166)",
+          "invalid": false,
+          "foreground": "rgb(41, 40, 63)",
+          "background": "rgb(255, 255, 255)"
+        },
+        {
+          "tag": "SELECT",
+          "type": "select-one",
+          "minHeight": "42px",
+          "radius": "7px",
+          "paddingTop": "8.8px",
+          "paddingBottom": "8.8px",
+          "paddingLeft": "10.4px",
+          "border": "rgb(138, 147, 166)",
+          "invalid": false,
+          "foreground": "rgb(41, 40, 63)",
+          "background": "rgb(255, 255, 255)"
+        },
+        {
+          "tag": "SELECT",
+          "type": "select-one",
+          "minHeight": "42px",
+          "radius": "7px",
+          "paddingTop": "8.8px",
+          "paddingBottom": "8.8px",
+          "paddingLeft": "10.4px",
+          "border": "rgb(138, 147, 166)",
+          "invalid": false,
+          "foreground": "rgb(41, 40, 63)",
+          "background": "rgb(255, 255, 255)"
+        },
+        {
+          "tag": "INPUT",
+          "type": "text",
+          "minHeight": "42px",
+          "radius": "7px",
+          "paddingTop": "8.8px",
+          "paddingBottom": "8.8px",
+          "paddingLeft": "10.4px",
+          "border": "rgb(138, 147, 166)",
+          "invalid": false,
+          "foreground": "rgb(41, 40, 63)",
+          "background": "rgb(255, 255, 255)"
+        },
+        {
+          "tag": "INPUT",
+          "type": "text",
+          "minHeight": "42px",
+          "radius": "7px",
+          "paddingTop": "8.8px",
+          "paddingBottom": "8.8px",
+          "paddingLeft": "10.4px",
+          "border": "rgb(138, 147, 166)",
+          "invalid": false,
+          "foreground": "rgb(41, 40, 63)",
+          "background": "rgb(255, 255, 255)"
+        },
+        {
+          "tag": "INPUT",
+          "type": "text",
+          "minHeight": "42px",
+          "radius": "7px",
+          "paddingTop": "8.8px",
+          "paddingBottom": "8.8px",
+          "paddingLeft": "10.4px",
+          "border": "rgb(138, 147, 166)",
+          "invalid": false,
+          "foreground": "rgb(41, 40, 63)",
+          "background": "rgb(255, 255, 255)"
+        },
+        {
+          "tag": "INPUT",
+          "type": "text",
+          "minHeight": "42px",
+          "radius": "7px",
+          "paddingTop": "8.8px",
+          "paddingBottom": "8.8px",
+          "paddingLeft": "10.4px",
+          "border": "rgb(138, 147, 166)",
+          "invalid": false,
+          "foreground": "rgb(41, 40, 63)",
+          "background": "rgb(255, 255, 255)"
+        },
+        {
+          "tag": "INPUT",
+          "type": "text",
+          "minHeight": "42px",
+          "radius": "7px",
+          "paddingTop": "8.8px",
+          "paddingBottom": "8.8px",
+          "paddingLeft": "10.4px",
+          "border": "rgb(138, 147, 166)",
+          "invalid": false,
+          "foreground": "rgb(41, 40, 63)",
+          "background": "rgb(255, 255, 255)"
+        },
+        {
+          "tag": "INPUT",
+          "type": "text",
+          "minHeight": "42px",
+          "radius": "7px",
+          "paddingTop": "8.8px",
+          "paddingBottom": "8.8px",
+          "paddingLeft": "10.4px",
+          "border": "rgb(138, 147, 166)",
+          "invalid": false,
+          "foreground": "rgb(41, 40, 63)",
+          "background": "rgb(255, 255, 255)"
+        },
+        {
+          "tag": "INPUT",
+          "type": "text",
+          "minHeight": "42px",
+          "radius": "7px",
+          "paddingTop": "8.8px",
+          "paddingBottom": "8.8px",
+          "paddingLeft": "10.4px",
+          "border": "rgb(138, 147, 166)",
+          "invalid": false,
+          "foreground": "rgb(41, 40, 63)",
+          "background": "rgb(255, 255, 255)"
+        },
+        {
+          "tag": "INPUT",
+          "type": "text",
+          "minHeight": "42px",
+          "radius": "7px",
+          "paddingTop": "8.8px",
+          "paddingBottom": "8.8px",
+          "paddingLeft": "10.4px",
+          "border": "rgb(138, 147, 166)",
+          "invalid": false,
+          "foreground": "rgb(41, 40, 63)",
+          "background": "rgb(255, 255, 255)"
+        },
+        {
+          "tag": "INPUT",
+          "type": "text",
+          "minHeight": "42px",
+          "radius": "7px",
+          "paddingTop": "8.8px",
+          "paddingBottom": "8.8px",
+          "paddingLeft": "10.4px",
+          "border": "rgb(138, 147, 166)",
+          "invalid": false,
+          "foreground": "rgb(41, 40, 63)",
+          "background": "rgb(255, 255, 255)"
+        },
+        {
+          "tag": "SELECT",
+          "type": "select-one",
+          "minHeight": "42px",
+          "radius": "7px",
+          "paddingTop": "8.8px",
+          "paddingBottom": "8.8px",
+          "paddingLeft": "10.4px",
+          "border": "rgb(138, 147, 166)",
+          "invalid": false,
+          "foreground": "rgb(41, 40, 63)",
+          "background": "rgb(255, 255, 255)"
+        },
+        {
+          "tag": "TEXTAREA",
+          "type": "textarea",
+          "minHeight": "42px",
+          "radius": "7px",
+          "paddingTop": "8.8px",
+          "paddingBottom": "8.8px",
+          "paddingLeft": "10.4px",
+          "border": "rgb(138, 147, 166)",
+          "invalid": false,
+          "foreground": "rgb(41, 40, 63)",
+          "background": "rgb(255, 255, 255)"
+        },
+        {
+          "tag": "TEXTAREA",
+          "type": "textarea",
+          "minHeight": "42px",
+          "radius": "7px",
+          "paddingTop": "8.8px",
+          "paddingBottom": "8.8px",
+          "paddingLeft": "10.4px",
+          "border": "rgb(138, 147, 166)",
+          "invalid": false,
+          "foreground": "rgb(41, 40, 63)",
+          "background": "rgb(255, 255, 255)"
+        },
+        {
+          "tag": "TEXTAREA",
+          "type": "textarea",
+          "minHeight": "42px",
+          "radius": "7px",
+          "paddingTop": "8.8px",
+          "paddingBottom": "8.8px",
+          "paddingLeft": "10.4px",
+          "border": "rgb(138, 147, 166)",
+          "invalid": false,
+          "foreground": "rgb(41, 40, 63)",
+          "background": "rgb(255, 255, 255)"
+        },
+        {
+          "tag": "TEXTAREA",
+          "type": "textarea",
+          "minHeight": "42px",
+          "radius": "7px",
+          "paddingTop": "8.8px",
+          "paddingBottom": "8.8px",
+          "paddingLeft": "10.4px",
+          "border": "rgb(138, 147, 166)",
+          "invalid": false,
+          "foreground": "rgb(41, 40, 63)",
+          "background": "rgb(255, 255, 255)"
+        },
+        {
+          "tag": "TEXTAREA",
+          "type": "textarea",
+          "minHeight": "42px",
+          "radius": "7px",
+          "paddingTop": "8.8px",
+          "paddingBottom": "8.8px",
+          "paddingLeft": "10.4px",
+          "border": "rgb(138, 147, 166)",
+          "invalid": false,
+          "foreground": "rgb(41, 40, 63)",
+          "background": "rgb(255, 255, 255)"
+        },
+        {
+          "tag": "TEXTAREA",
+          "type": "textarea",
+          "minHeight": "42px",
+          "radius": "7px",
+          "paddingTop": "8.8px",
+          "paddingBottom": "8.8px",
+          "paddingLeft": "10.4px",
+          "border": "rgb(138, 147, 166)",
+          "invalid": false,
+          "foreground": "rgb(41, 40, 63)",
+          "background": "rgb(255, 255, 255)"
+        },
+        {
+          "tag": "TEXTAREA",
+          "type": "textarea",
+          "minHeight": "42px",
+          "radius": "7px",
+          "paddingTop": "8.8px",
+          "paddingBottom": "8.8px",
+          "paddingLeft": "10.4px",
+          "border": "rgb(138, 147, 166)",
+          "invalid": false,
+          "foreground": "rgb(41, 40, 63)",
+          "background": "rgb(255, 255, 255)"
+        },
+        {
+          "tag": "TEXTAREA",
+          "type": "textarea",
+          "minHeight": "42px",
+          "radius": "7px",
+          "paddingTop": "8.8px",
+          "paddingBottom": "8.8px",
+          "paddingLeft": "10.4px",
+          "border": "rgb(138, 147, 166)",
+          "invalid": false,
+          "foreground": "rgb(41, 40, 63)",
+          "background": "rgb(255, 255, 255)"
+        },
+        {
+          "tag": "TEXTAREA",
+          "type": "textarea",
+          "minHeight": "42px",
+          "radius": "7px",
+          "paddingTop": "8.8px",
+          "paddingBottom": "8.8px",
+          "paddingLeft": "10.4px",
+          "border": "rgb(138, 147, 166)",
+          "invalid": false,
+          "foreground": "rgb(41, 40, 63)",
+          "background": "rgb(255, 255, 255)"
+        },
+        {
+          "tag": "TEXTAREA",
+          "type": "textarea",
+          "minHeight": "42px",
+          "radius": "7px",
+          "paddingTop": "8.8px",
+          "paddingBottom": "8.8px",
+          "paddingLeft": "10.4px",
+          "border": "rgb(138, 147, 166)",
+          "invalid": false,
+          "foreground": "rgb(41, 40, 63)",
+          "background": "rgb(255, 255, 255)"
+        },
+        {
+          "tag": "TEXTAREA",
+          "type": "textarea",
+          "minHeight": "42px",
+          "radius": "7px",
+          "paddingTop": "8.8px",
+          "paddingBottom": "8.8px",
+          "paddingLeft": "10.4px",
+          "border": "rgb(138, 147, 166)",
+          "invalid": false,
+          "foreground": "rgb(41, 40, 63)",
+          "background": "rgb(255, 255, 255)"
+        },
+        {
+          "tag": "TEXTAREA",
+          "type": "textarea",
+          "minHeight": "42px",
+          "radius": "7px",
+          "paddingTop": "8.8px",
+          "paddingBottom": "8.8px",
+          "paddingLeft": "10.4px",
+          "border": "rgb(138, 147, 166)",
+          "invalid": false,
+          "foreground": "rgb(41, 40, 63)",
+          "background": "rgb(255, 255, 255)"
+        },
+        {
+          "tag": "TEXTAREA",
+          "type": "textarea",
+          "minHeight": "42px",
+          "radius": "7px",
+          "paddingTop": "8.8px",
+          "paddingBottom": "8.8px",
+          "paddingLeft": "10.4px",
+          "border": "rgb(138, 147, 166)",
+          "invalid": false,
+          "foreground": "rgb(41, 40, 63)",
+          "background": "rgb(255, 255, 255)"
+        },
+        {
+          "tag": "TEXTAREA",
+          "type": "textarea",
+          "minHeight": "42px",
+          "radius": "7px",
+          "paddingTop": "8.8px",
+          "paddingBottom": "8.8px",
+          "paddingLeft": "10.4px",
+          "border": "rgb(138, 147, 166)",
+          "invalid": false,
+          "foreground": "rgb(41, 40, 63)",
+          "background": "rgb(255, 255, 255)"
+        },
+        {
+          "tag": "TEXTAREA",
+          "type": "textarea",
+          "minHeight": "42px",
+          "radius": "7px",
+          "paddingTop": "8.8px",
+          "paddingBottom": "8.8px",
+          "paddingLeft": "10.4px",
+          "border": "rgb(138, 147, 166)",
+          "invalid": false,
+          "foreground": "rgb(41, 40, 63)",
+          "background": "rgb(255, 255, 255)"
+        },
+        {
+          "tag": "TEXTAREA",
+          "type": "textarea",
+          "minHeight": "42px",
+          "radius": "7px",
+          "paddingTop": "8.8px",
+          "paddingBottom": "8.8px",
+          "paddingLeft": "10.4px",
+          "border": "rgb(138, 147, 166)",
+          "invalid": false,
+          "foreground": "rgb(41, 40, 63)",
+          "background": "rgb(255, 255, 255)"
+        },
+        {
+          "tag": "TEXTAREA",
+          "type": "textarea",
+          "minHeight": "42px",
+          "radius": "7px",
+          "paddingTop": "8.8px",
+          "paddingBottom": "8.8px",
+          "paddingLeft": "10.4px",
+          "border": "rgb(138, 147, 166)",
+          "invalid": false,
+          "foreground": "rgb(41, 40, 63)",
+          "background": "rgb(255, 255, 255)"
+        },
+        {
+          "tag": "TEXTAREA",
+          "type": "textarea",
+          "minHeight": "42px",
+          "radius": "7px",
+          "paddingTop": "8.8px",
+          "paddingBottom": "8.8px",
+          "paddingLeft": "10.4px",
+          "border": "rgb(138, 147, 166)",
+          "invalid": false,
+          "foreground": "rgb(41, 40, 63)",
+          "background": "rgb(255, 255, 255)"
+        },
+        {
+          "tag": "TEXTAREA",
+          "type": "textarea",
+          "minHeight": "42px",
+          "radius": "7px",
+          "paddingTop": "8.8px",
+          "paddingBottom": "8.8px",
+          "paddingLeft": "10.4px",
+          "border": "rgb(138, 147, 166)",
+          "invalid": false,
+          "foreground": "rgb(41, 40, 63)",
+          "background": "rgb(255, 255, 255)"
+        }
+      ],
+      "contrast": [
+        {
+          "text": 14.289832441992964,
+          "border": 3.0860674041103593
+        },
+        {
+          "text": 14.289832441992964,
+          "border": 3.0860674041103593
+        },
+        {
+          "text": 14.289832441992964,
+          "border": 3.0860674041103593
+        },
+        {
+          "text": 14.289832441992964,
+          "border": 3.0860674041103593
+        },
+        {
+          "text": 14.289832441992964,
+          "border": 3.0860674041103593
+        },
+        {
+          "text": 14.289832441992964,
+          "border": 3.0860674041103593
+        },
+        {
+          "text": 14.289832441992964,
+          "border": 3.0860674041103593
+        },
+        {
+          "text": 14.289832441992964,
+          "border": 3.0860674041103593
+        },
+        {
+          "text": 14.289832441992964,
+          "border": 3.0860674041103593
+        },
+        {
+          "text": 14.289832441992964,
+          "border": 3.0860674041103593
+        },
+        {
+          "text": 14.289832441992964,
+          "border": 3.0860674041103593
+        },
+        {
+          "text": 14.289832441992964,
+          "border": 3.0860674041103593
+        },
+        {
+          "text": 14.289832441992964,
+          "border": 3.0860674041103593
+        },
+        {
+          "text": 14.289832441992964,
+          "border": 3.0860674041103593
+        },
+        {
+          "text": 14.289832441992964,
+          "border": 3.0860674041103593
+        },
+        {
+          "text": 14.289832441992964,
+          "border": 3.0860674041103593
+        },
+        {
+          "text": 14.289832441992964,
+          "border": 3.0860674041103593
+        },
+        {
+          "text": 14.289832441992964,
+          "border": 3.0860674041103593
+        },
+        {
+          "text": 14.289832441992964,
+          "border": 3.0860674041103593
+        },
+        {
+          "text": 14.289832441992964,
+          "border": 3.0860674041103593
+        },
+        {
+          "text": 14.289832441992964,
+          "border": 3.0860674041103593
+        },
+        {
+          "text": 14.289832441992964,
+          "border": 3.0860674041103593
+        },
+        {
+          "text": 14.289832441992964,
+          "border": 3.0860674041103593
+        },
+        {
+          "text": 14.289832441992964,
+          "border": 3.0860674041103593
+        },
+        {
+          "text": 14.289832441992964,
+          "border": 3.0860674041103593
+        },
+        {
+          "text": 14.289832441992964,
+          "border": 3.0860674041103593
+        },
+        {
+          "text": 14.289832441992964,
+          "border": 3.0860674041103593
+        },
+        {
+          "text": 14.289832441992964,
+          "border": 3.0860674041103593
+        },
+        {
+          "text": 14.289832441992964,
+          "border": 3.0860674041103593
+        },
+        {
+          "text": 14.289832441992964,
+          "border": 3.0860674041103593
+        },
+        {
+          "text": 14.289832441992964,
+          "border": 3.0860674041103593
+        },
+        {
+          "text": 14.289832441992964,
+          "border": 3.0860674041103593
+        }
+      ],
+      "state": "passed"
+    },
+    {
+      "name": "process-counter-320",
+      "available": 320,
+      "scroll": 320,
+      "regions": [],
+      "state": "passed"
+    },
+    {
+      "name": "process-counter-threshold-utf16-max-association",
+      "state": "passed",
+      "threshold": 3600,
+      "max": 4000,
+      "contrast": {
+        "foreground": "rgb(130, 101, 19)",
+        "background": "rgb(255, 255, 255)",
+        "ratio": 5.4973233456531325
+      }
+    },
+    {
+      "name": "form-320",
+      "available": 320,
+      "scroll": 320,
+      "regions": [],
+      "state": "passed"
+    },
+    {
+      "name": "process-invalid",
+      "controls": [
+        {
+          "tag": "INPUT",
+          "type": "text",
+          "minHeight": "42px",
+          "radius": "7px",
+          "paddingTop": "8.8px",
+          "paddingBottom": "8.8px",
+          "paddingLeft": "10.4px",
+          "border": "rgb(152, 45, 45)",
+          "invalid": true,
+          "foreground": "rgb(41, 40, 63)",
+          "background": "rgb(255, 255, 255)"
+        }
+      ],
+      "contrast": [
+        {
+          "text": 14.289832441992964,
+          "border": 7.641012785103295
+        }
+      ],
+      "state": "passed"
+    },
+    {
+      "name": "process-invalid-pending-failure-discard-return",
+      "writes": 1,
+      "state": "passed"
+    },
+    {
+      "name": "units-editor",
+      "controls": [
+        {
+          "tag": "INPUT",
+          "type": "text",
+          "minHeight": "42px",
+          "radius": "7px",
+          "paddingTop": "8.8px",
+          "paddingBottom": "8.8px",
+          "paddingLeft": "10.4px",
+          "border": "rgb(138, 147, 166)",
+          "invalid": false,
+          "foreground": "rgb(41, 40, 63)",
+          "background": "rgb(255, 255, 255)"
+        },
+        {
+          "tag": "SELECT",
+          "type": "select-one",
+          "minHeight": "42px",
+          "radius": "7px",
+          "paddingTop": "8.8px",
+          "paddingBottom": "8.8px",
+          "paddingLeft": "10.4px",
+          "border": "rgb(138, 147, 166)",
+          "invalid": false,
+          "foreground": "rgb(41, 40, 63)",
+          "background": "rgb(255, 255, 255)"
+        }
+      ],
+      "contrast": [
+        {
+          "text": 14.289832441992964,
+          "border": 3.0860674041103593
+        },
+        {
+          "text": 14.289832441992964,
+          "border": 3.0860674041103593
+        }
+      ],
+      "state": "passed"
+    },
+    {
+      "name": "units-320",
+      "available": 320,
+      "scroll": 320,
+      "regions": [
+        {
+          "width": 270,
+          "scrollWidth": 608,
+          "keyboardScroll": 6
+        }
+      ],
+      "state": "passed"
+    },
+    {
+      "name": "types-editor",
+      "controls": [
+        {
+          "tag": "SELECT",
+          "type": "select-one",
+          "minHeight": "42px",
+          "radius": "7px",
+          "paddingTop": "8.8px",
+          "paddingBottom": "8.8px",
+          "paddingLeft": "10.4px",
+          "border": "rgb(138, 147, 166)",
+          "invalid": false,
+          "foreground": "rgb(41, 40, 63)",
+          "background": "rgb(255, 255, 255)"
+        },
+        {
+          "tag": "INPUT",
+          "type": "text",
+          "minHeight": "42px",
+          "radius": "7px",
+          "paddingTop": "8.8px",
+          "paddingBottom": "8.8px",
+          "paddingLeft": "10.4px",
+          "border": "rgb(138, 147, 166)",
+          "invalid": false,
+          "foreground": "rgb(41, 40, 63)",
+          "background": "rgb(255, 255, 255)"
+        }
+      ],
+      "contrast": [
+        {
+          "text": 14.289832441992964,
+          "border": 3.0860674041103593
+        },
+        {
+          "text": 14.289832441992964,
+          "border": 3.0860674041103593
+        }
+      ],
+      "state": "passed"
+    },
+    {
+      "name": "types-320",
+      "available": 320,
+      "scroll": 320,
+      "regions": [
+        {
+          "width": 270,
+          "scrollWidth": 608,
+          "keyboardScroll": 2
+        }
+      ],
+      "state": "passed"
+    },
+    {
+      "name": "risk-editor",
+      "controls": [
+        {
+          "tag": "TEXTAREA",
+          "type": "textarea",
+          "minHeight": "42px",
+          "radius": "7px",
+          "paddingTop": "8.8px",
+          "paddingBottom": "8.8px",
+          "paddingLeft": "10.4px",
+          "border": "rgb(138, 147, 166)",
+          "invalid": false,
+          "foreground": "rgb(41, 40, 63)",
+          "background": "rgb(255, 255, 255)"
+        },
+        {
+          "tag": "TEXTAREA",
+          "type": "textarea",
+          "minHeight": "42px",
+          "radius": "7px",
+          "paddingTop": "8.8px",
+          "paddingBottom": "8.8px",
+          "paddingLeft": "10.4px",
+          "border": "rgb(138, 147, 166)",
+          "invalid": false,
+          "foreground": "rgb(41, 40, 63)",
+          "background": "rgb(255, 255, 255)"
+        },
+        {
+          "tag": "TEXTAREA",
+          "type": "textarea",
+          "minHeight": "42px",
+          "radius": "7px",
+          "paddingTop": "8.8px",
+          "paddingBottom": "8.8px",
+          "paddingLeft": "10.4px",
+          "border": "rgb(138, 147, 166)",
+          "invalid": false,
+          "foreground": "rgb(41, 40, 63)",
+          "background": "rgb(255, 255, 255)"
+        },
+        {
+          "tag": "INPUT",
+          "type": "text",
+          "minHeight": "42px",
+          "radius": "7px",
+          "paddingTop": "8.8px",
+          "paddingBottom": "8.8px",
+          "paddingLeft": "10.4px",
+          "border": "rgb(138, 147, 166)",
+          "invalid": false,
+          "foreground": "rgb(41, 40, 63)",
+          "background": "rgb(255, 255, 255)"
+        },
+        {
+          "tag": "SELECT",
+          "type": "select-one",
+          "minHeight": "42px",
+          "radius": "7px",
+          "paddingTop": "8.8px",
+          "paddingBottom": "8.8px",
+          "paddingLeft": "10.4px",
+          "border": "rgb(138, 147, 166)",
+          "invalid": false,
+          "foreground": "rgb(41, 40, 63)",
+          "background": "rgb(255, 255, 255)"
+        }
+      ],
+      "contrast": [
+        {
+          "text": 14.289832441992964,
+          "border": 3.0860674041103593
+        },
+        {
+          "text": 14.289832441992964,
+          "border": 3.0860674041103593
+        },
+        {
+          "text": 14.289832441992964,
+          "border": 3.0860674041103593
+        },
+        {
+          "text": 14.289832441992964,
+          "border": 3.0860674041103593
+        },
+        {
+          "text": 14.289832441992964,
+          "border": 3.0860674041103593
+        }
+      ],
+      "state": "passed"
+    },
+    {
+      "name": "risk-counter-320",
+      "available": 320,
+      "scroll": 320,
+      "regions": [],
+      "state": "passed"
+    },
+    {
+      "name": "risk-counter-threshold-utf16-max-association",
+      "state": "passed",
+      "threshold": 3600,
+      "max": 4000,
+      "contrast": {
+        "foreground": "rgb(130, 101, 19)",
+        "background": "rgb(244, 247, 249)",
+        "ratio": 5.109588143467329
+      }
+    },
+    {
+      "name": "risk-320",
+      "available": 320,
+      "scroll": 320,
+      "regions": [],
+      "state": "passed"
+    },
+    {
+      "name": "relation-editor",
+      "controls": [
+        {
+          "tag": "SELECT",
+          "type": "select-one",
+          "minHeight": "42px",
+          "radius": "7px",
+          "paddingTop": "8.8px",
+          "paddingBottom": "8.8px",
+          "paddingLeft": "10.4px",
+          "border": "rgb(138, 147, 166)",
+          "invalid": false,
+          "foreground": "rgb(41, 40, 63)",
+          "background": "rgb(255, 255, 255)"
+        },
+        {
+          "tag": "SELECT",
+          "type": "select-one",
+          "minHeight": "42px",
+          "radius": "7px",
+          "paddingTop": "8.8px",
+          "paddingBottom": "8.8px",
+          "paddingLeft": "10.4px",
+          "border": "rgb(138, 147, 166)",
+          "invalid": false,
+          "foreground": "rgb(41, 40, 63)",
+          "background": "rgb(255, 255, 255)"
+        },
+        {
+          "tag": "TEXTAREA",
+          "type": "textarea",
+          "minHeight": "42px",
+          "radius": "7px",
+          "paddingTop": "8.8px",
+          "paddingBottom": "8.8px",
+          "paddingLeft": "10.4px",
+          "border": "rgb(138, 147, 166)",
+          "invalid": false,
+          "foreground": "rgb(41, 40, 63)",
+          "background": "rgb(255, 255, 255)"
+        }
+      ],
+      "contrast": [
+        {
+          "text": 14.289832441992964,
+          "border": 3.0860674041103593
+        },
+        {
+          "text": 14.289832441992964,
+          "border": 3.0860674041103593
+        },
+        {
+          "text": 14.289832441992964,
+          "border": 3.0860674041103593
+        }
+      ],
+      "state": "passed"
+    },
+    {
+      "name": "relation-counter-320",
+      "available": 320,
+      "scroll": 320,
+      "regions": [],
+      "state": "passed"
+    },
+    {
+      "name": "relation-counter-threshold-utf16-max-association",
+      "state": "passed",
+      "threshold": 3600,
+      "max": 4000,
+      "contrast": {
+        "foreground": "rgb(130, 101, 19)",
+        "background": "rgb(244, 247, 249)",
+        "ratio": 5.109588143467329
+      }
+    },
+    {
+      "name": "relation-320",
+      "available": 320,
+      "scroll": 320,
+      "regions": [],
+      "state": "passed"
+    },
+    {
+      "name": "audit-shared-pagination-boundaries-filters-history",
+      "state": "passed"
+    },
+    {
+      "name": "audit-filters",
+      "controls": [
+        {
+          "tag": "SELECT",
+          "type": "select-one",
+          "minHeight": "42px",
+          "radius": "7px",
+          "paddingTop": "8.8px",
+          "paddingBottom": "8.8px",
+          "paddingLeft": "10.4px",
+          "border": "rgb(138, 147, 166)",
+          "invalid": false,
+          "foreground": "rgb(41, 40, 63)",
+          "background": "rgb(255, 255, 255)"
+        },
+        {
+          "tag": "INPUT",
+          "type": "search",
+          "minHeight": "42px",
+          "radius": "7px",
+          "paddingTop": "8.8px",
+          "paddingBottom": "8.8px",
+          "paddingLeft": "10.4px",
+          "border": "rgb(138, 147, 166)",
+          "invalid": false,
+          "foreground": "rgb(41, 40, 63)",
+          "background": "rgb(255, 255, 255)"
+        }
+      ],
+      "contrast": [
+        {
+          "text": 14.289832441992964,
+          "border": 3.0860674041103593
+        },
+        {
+          "text": 14.289832441992964,
+          "border": 3.0860674041103593
+        }
+      ],
+      "state": "passed"
+    },
+    {
+      "name": "audit-320",
+      "available": 320,
+      "scroll": 320,
+      "regions": [
+        {
+          "width": 270,
+          "scrollWidth": 960,
+          "keyboardScroll": 4
+        }
+      ],
+      "state": "passed"
+    },
+    {
+      "name": "profiles-320",
+      "available": 320,
+      "scroll": 320,
+      "regions": [
+        {
+          "width": 270,
+          "scrollWidth": 704,
+          "keyboardScroll": 1
+        }
+      ],
+      "state": "passed"
+    },
+    {
+      "name": "profiles-checkbox-layout",
+      "state": "passed",
+      "exception": "Native checkboxes retain their own dimensions; not text fields."
+    },
+    {
+      "name": "map-search",
+      "controls": [
+        {
+          "tag": "INPUT",
+          "type": "search",
+          "minHeight": "42px",
+          "radius": "7px",
+          "paddingTop": "8.8px",
+          "paddingBottom": "8.8px",
+          "paddingLeft": "36px",
+          "border": "rgb(138, 147, 166)",
+          "invalid": false,
+          "foreground": "rgb(41, 40, 63)",
+          "background": "rgb(255, 255, 255)"
+        }
+      ],
+      "contrast": [
+        {
+          "text": 14.289832441992964,
+          "border": 3.0860674041103593
+        }
+      ],
+      "state": "passed"
+    },
+    {
+      "name": "map-320",
+      "available": 320,
+      "scroll": 320,
+      "regions": [],
+      "state": "passed"
+    },
+    {
+      "name": "macro-filters",
+      "controls": [
+        {
+          "tag": "INPUT",
+          "type": "search",
+          "minHeight": "42px",
+          "radius": "7px",
+          "paddingTop": "8.8px",
+          "paddingBottom": "8.8px",
+          "paddingLeft": "41.6px",
+          "border": "rgb(138, 147, 166)",
+          "invalid": false,
+          "foreground": "rgb(41, 40, 63)",
+          "background": "rgb(255, 255, 255)"
+        },
+        {
+          "tag": "SELECT",
+          "type": "select-one",
+          "minHeight": "42px",
+          "radius": "7px",
+          "paddingTop": "8.8px",
+          "paddingBottom": "8.8px",
+          "paddingLeft": "10.4px",
+          "border": "rgb(138, 147, 166)",
+          "invalid": false,
+          "foreground": "rgb(41, 40, 63)",
+          "background": "rgb(255, 255, 255)"
+        },
+        {
+          "tag": "SELECT",
+          "type": "select-one",
+          "minHeight": "42px",
+          "radius": "7px",
+          "paddingTop": "8.8px",
+          "paddingBottom": "8.8px",
+          "paddingLeft": "10.4px",
+          "border": "rgb(138, 147, 166)",
+          "invalid": false,
+          "foreground": "rgb(41, 40, 63)",
+          "background": "rgb(255, 255, 255)"
+        }
+      ],
+      "contrast": [
+        {
+          "text": 14.289832441992964,
+          "border": 3.0860674041103593
+        },
+        {
+          "text": 14.289832441992964,
+          "border": 3.0860674041103593
+        },
+        {
+          "text": 14.289832441992964,
+          "border": 3.0860674041103593
+        }
+      ],
+      "state": "passed"
+    },
+    {
+      "name": "macro-320",
+      "available": 320,
+      "scroll": 320,
+      "regions": [],
+      "state": "passed"
+    },
+    {
+      "name": "access",
+      "controls": [
+        {
+          "tag": "INPUT",
+          "type": "email",
+          "minHeight": "42px",
+          "radius": "7px",
+          "paddingTop": "8.8px",
+          "paddingBottom": "8.8px",
+          "paddingLeft": "10.4px",
+          "border": "rgb(138, 147, 166)",
+          "invalid": false,
+          "foreground": "rgb(41, 40, 63)",
+          "background": "rgb(255, 255, 255)"
+        },
+        {
+          "tag": "INPUT",
+          "type": "password",
+          "minHeight": "42px",
+          "radius": "7px",
+          "paddingTop": "8.8px",
+          "paddingBottom": "8.8px",
+          "paddingLeft": "10.4px",
+          "border": "rgb(138, 147, 166)",
+          "invalid": false,
+          "foreground": "rgb(41, 40, 63)",
+          "background": "rgb(255, 255, 255)"
+        }
+      ],
+      "contrast": [
+        {
+          "text": 14.289832441992964,
+          "border": 3.0860674041103593
+        },
+        {
+          "text": 14.289832441992964,
+          "border": 3.0860674041103593
+        }
+      ],
+      "state": "passed"
+    },
+    {
+      "name": "access-keyboard-focus",
+      "width": "3px",
+      "style": "solid",
+      "state": "passed"
+    },
+    {
+      "name": "access-320",
+      "available": 320,
+      "scroll": 320,
+      "regions": [],
+      "state": "passed"
+    }
+  ],
+  "scriptErrors": [],
+  "scope": "Generic fixture. Effective text/border contrast, common controls, route-specific states and 320px reflow; no full WCAG claim."
+}

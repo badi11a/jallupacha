@@ -1,0 +1,8 @@
+name: Frontend security scope
+paths:
+  - frontend/src
+  - frontend/base/template/src
+  - frontend/tools
+  - frontend/scripts
+paths-ignore:
+  - '**/*.spec.ts'

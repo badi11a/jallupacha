@@ -60,7 +60,7 @@ Estos siete colores son los valores de referencia aprobados para el kit. Sus có
 3. Conservar el nombre propio de cada producto en su interfaz, separado de cualquier marca institucional ajena.
 4. Mantener navegación, formularios, mensajes, estados y controles con accesibilidad objetivo **WCAG 2.2 AA**, incluidos teclado, foco visible y contraste.
 5. Separar la presentación compartida de las reglas y flujos de negocio de Jallupacha.
-6. Seguir la arquitectura existente y evitar nuevas dependencias o extraer una librería independiente durante el piloto.
+6. Seguir la arquitectura existente y evitar nuevas dependencias sin necesidad comprobada. C-048 autoriza la base y plantilla local versionadas conforme a [STD-FE-001](base-frontend.md); la extracción/publicación de una biblioteca independiente requiere su decisión y verificación de consumidores, sin presumir adopción institucional.
 
 ### Activación y aislamiento de estilos (C-046)
 

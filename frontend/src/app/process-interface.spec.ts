@@ -5,8 +5,8 @@ import { TestBed } from '@angular/core/testing';
 import { Router, provideRouter } from '@angular/router';
 import { AppComponent } from './app.component';
 import { routes } from './app.routes';
-import { FICHA_FIELDS } from './process-api.service';
-import { AuthService } from './auth.service';
+import { FICHA_FIELDS } from './features/processes/process-api.service';
+import { AuthService } from './core/auth/auth.service';
 
 const MAP = {
   macroprocessTypes: [{
@@ -29,10 +29,12 @@ describe('Interfaz base de esquema — adaptación visual', () => {
       email: 'admin@example.test',
       profiles: ['ADMIN', 'RISK_MANAGER']
     }));
-    return TestBed.configureTestingModule({
+    const identity = JSON.parse(sessionStorage.getItem('jallupacha_user')!);
+    TestBed.configureTestingModule({
       imports: [AppComponent],
       providers: [provideZoneChangeDetection(), provideRouter(routes), provideHttpClient(), provideHttpClientTesting()]
     });
+    TestBed.inject(AuthService).currentUser.set(identity);
   });
 
   afterEach(() => {
@@ -235,6 +237,28 @@ describe('Interfaz base de esquema — adaptación visual', () => {
     fixture.detectChanges();
     expect(root.textContent).toContain('Macroproceso no encontrado');
     expect(root.querySelector('.process-row')).toBeNull();
+    fixture.destroy(); http.verify();
+  });
+
+  it('conserva el origen filtrado en la ficha y su enlace de edición (FE-04)', async () => {
+    const fixture = TestBed.createComponent(AppComponent);
+    const http = TestBed.inject(HttpTestingController);
+    const router = TestBed.inject(Router);
+    fixture.detectChanges();
+    await router.navigateByUrl('/procesos/4?returnTo=%2Fprocesos%3Fq%3Dejemplo'); fixture.detectChanges();
+    http.expectOne('/api/management/processes/4').flush({
+      ...Object.fromEntries(FICHA_FIELDS.map(field => [field.key, null])),
+      id: 4, code: 'PR4', name: 'Proceso de ejemplo', macroprocessId: 2, processTypeId: 3,
+      macroprocess: 'Gestión de la entidad', processType: 'Gestión', status: 'Borrador',
+      completeness: { complete: false, missing: [] }, possibleDuplicates: [], parent: null, subprocesses: [],
+      units: [], risks: [], relations: { outgoing: [], incoming: [] }
+    }); fixture.detectChanges();
+    const root = fixture.nativeElement as HTMLElement;
+    expect(root.querySelector('a[href="/mapa/macroprocesos/2?type=3"]')).not.toBeNull();
+    expect(root.querySelector('a[href="/procesos/4/editar?returnTo=%2Fprocesos%3Fq%3Dejemplo"]')).not.toBeNull();
+    expect([...root.querySelectorAll('button')].some(button => button.textContent?.trim() === 'Volver a resultados')).toBe(true);
+    expect(root.textContent).not.toContain('contacto.unidad@');
+    expect(root.textContent).not.toContain('Anexo institucional:');
     fixture.destroy(); http.verify();
   });
 
