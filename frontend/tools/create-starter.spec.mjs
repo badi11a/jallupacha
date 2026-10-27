@@ -19,6 +19,17 @@ test('generates a neutral consumer with provenance, refuses overwrite and detect
     assert.notEqual(run('--output', output).status, 0);
     const angular = JSON.parse(readFileSync(join(output, 'angular.json'), 'utf8'));
     assert.deepEqual(Object.keys(angular.projects), ['frontend-base']);
+    const pkg = JSON.parse(readFileSync(join(output, 'package.json'), 'utf8'));
+    const lock = JSON.parse(readFileSync(join(output, 'package-lock.json'), 'utf8'));
+    const testConfig = JSON.parse(readFileSync(join(output, 'tsconfig.spec.json'), 'utf8'));
+    for (const type of testConfig.compilerOptions.types) {
+      const dependency = type === 'node' ? '@types/node' : type.split('/')[0];
+      const declared = pkg.devDependencies[dependency] ?? pkg.dependencies[dependency];
+      assert.ok(declared, `Test type library ${type} must have a direct consumer dependency`);
+      assert.equal(lock.packages[''].devDependencies[dependency], declared);
+      assert.ok(lock.packages['node_modules/' + dependency], `Missing locked type dependency ${dependency}`);
+    }
+    assert.equal(pkg.version, lock.version);
     const provenance = JSON.parse(readFileSync(join(output, '.frontend-base.json'), 'utf8'));
     assert.ok(!Object.keys(provenance.files).some(name => name.includes('features/processes') || name.endsWith('.env')));
     const inventory = { ...provenance.sharedSources };

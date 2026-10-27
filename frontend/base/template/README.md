@@ -1,8 +1,10 @@
-# Aplicación base Angular — 0.2.0
+# Aplicación base Angular — 0.2.1
 
 Consumidor neutral del núcleo y kit. Configurar el contrato de sesión en `src/app/session.ts` antes de integrar con una API. No contiene cuentas, credenciales, datos de negocio ni un mecanismo de autenticación simulado. El formulario de ejemplo demuestra interacción sin persistencia.
 
 Instalar con `npm ci`, comprobar con `npm test` y `npm run build`, ejecutar con `npm start`. Para desarrollo con API local, declarar un proxy de mismo origen y comprobar las cookies y CSRF. No incluir secretos en configuración compilada del navegador.
+
+C-052: las pruebas declaran explícitamente `@types/node` como dependencia de desarrollo; la instalación no debe depender de tipos presentes en otro proyecto o directorio ancestro. Migración desde 0.2.0: revisar paquete y lockfile para incorporar esa dependencia, conservar personalizaciones y repetir instalación, pruebas y compilación en un directorio independiente.
 
 Mantener `core/platform` y `shared/ui` como fuentes versionadas; funcionalidades bajo `features`. La procedencia está en `.frontend-base.json`. Desde el repositorio fuente, `node frontend/tools/create-starter.mjs --check <carpeta>` comprueba versión/hashes; no sobrescribe cambios locales. Una actualización necesita revisión de diferencias y migración explícita.
 

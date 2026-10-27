@@ -64,7 +64,7 @@ Las pruebas Oracle requieren un esquema dedicado y configuración explícita; no
 
 ## Estado y documentación
 
-La versión de la especificación no equivale a una certificación de cumplimiento. Permanecen pendientes de cierre la coherencia de autenticación con Argon2id y proveedor local, la auditoría integral, validación Oracle y de instalación, CI de seguridad, carga y aceptación institucional. La base frontend 0.2.0 cuenta con la consolidación y verificaciones técnicas registradas en C-048 a C-050; los límites de evidencia y condiciones de adopción del kit están en su catálogo. No se presume conformidad WCAG integral.
+La versión de la especificación no equivale a una certificación de cumplimiento. Permanecen pendientes de cierre la coherencia de autenticación con Argon2id y proveedor local, la auditoría integral, validación Oracle y de instalación, CI de seguridad, carga y aceptación institucional. La base frontend 0.2.1 conserva la consolidación y verificaciones técnicas registradas en C-048 a C-050 e incorpora la corrección de dependencia de tipos de C-052 para su instalación independiente; los límites de evidencia y condiciones de adopción del kit están en su catálogo. No se presume conformidad WCAG integral.
 
 - [Documentación](docs/README.md)
 - [Reglas de desarrollo](AGENTS.md)

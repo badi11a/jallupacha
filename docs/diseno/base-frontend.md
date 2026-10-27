@@ -1,6 +1,6 @@
 # STD-FE-001 — Base de frontend: seguridad, eficiencia y reutilización
 
-Versión 0.2.0 (ampliación compatible C-050 de paginación; la base inicial 0.1.0 se definió en C-048). Decisión de diseño C-048, autorizada el 2026-10-26 por el responsable al solicitar implementación y adopción en SDD. Aplica al frontend Angular de este repositorio y a la plantilla que genera. La adopción por otros productos requiere comprobar sus contratos y recorridos; no concede conformidad institucional automática.
+Versión 0.2.1 (corrección compatible C-052 de dependencia de tipos para instalación independiente; C-050 amplió paginación en 0.2.0 y C-048 definió la base inicial 0.1.0). Decisión de diseño C-048, autorizada el 2026-10-26 por el responsable al solicitar implementación y adopción en SDD. Aplica al frontend Angular de este repositorio y a la plantilla que genera. La adopción por otros productos requiere comprobar sus contratos y recorridos; no concede conformidad institucional automática.
 
 ## 1. Clasificación, fuentes y revisión previa
 
@@ -42,7 +42,7 @@ Títulos, rutas y disposición de navegación son configuración del producto. L
 
 La fuente mantenida es el núcleo y kit de este repositorio. Un manifiesto versionado y un generador con lista explícita de archivos producen una aplicación Angular neutral, con configuración propia y ejemplo mínimo de formulario. No copiar funcionalidades, datos, credenciales, node_modules ni configuración local. El generador rechaza destinos existentes y enlaces simbólicos en fuentes; no sobrescribe proyectos.
 
-La salida registra versión y hashes de procedencia. La comprobación de procedencia detecta divergencias de inventario y archivos; no determina compatibilidad funcional ni actualiza consumidores silenciosamente. API incompatible exige incremento mayor, migración y consumidores identificados; adiciones compatibles, menor; correcciones compatibles, parche. La versión 0.2.0 sigue siendo base en validación, no paquete institucional estable. C-050 añade un modo de resumen y nombre accesible a la paginación, conservando su resumen predeterminado; la revisión de consumidores y evidencia se registra junto al cambio.
+La salida registra versión y hashes de procedencia. La comprobación de procedencia detecta divergencias de inventario y archivos; no determina compatibilidad funcional ni actualiza consumidores silenciosamente. API incompatible exige incremento mayor, migración y consumidores identificados; adiciones compatibles, menor; correcciones compatibles, parche. La versión 0.2.1 sigue siendo base en validación, no paquete institucional estable. C-050 añade un modo de resumen y nombre accesible a la paginación, conservando su resumen predeterminado; la revisión de consumidores y evidencia se registra junto al cambio. C-052 declara la dependencia de tipos Node que requieren las pruebas y exige verificar al consumidor fuera del árbol del producto para evitar resolver dependencias de un ancestro.
 
 Validar generación, compilación y comportamiento con un consumidor neutral separado antes de distribuir. Ese ejemplo verifica reutilización técnica; no equivale a un segundo producto validado con personas. Publicación en registro, soporte institucional y promoción de paquetes se deciden después de esa evidencia. Se autoriza la plantilla local y contrato versionado; no una publicación externa automática.
 
