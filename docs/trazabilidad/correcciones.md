@@ -456,3 +456,65 @@ Entorno: 2026-10-27, America/Santiago; Node 24.15.0, npm disponible 12.2.0 y Chr
 **Autorización posterior de commit, 2026-10-27:** el responsable solicita guardar el trabajo actual. Se prepara un commit local en la rama existente `features/frontend` con C-048 a C-051: fuentes, pruebas, contratos, herramientas y evidencias registradas de estos cambios. Temporales, dependencias, compilaciones y archivos locales de cuentas quedan excluidos. Se conservan las planillas y migraciones sin modificaciones. La solicitud no incluye push, integración ni despliegue; las verificaciones ya ejecutadas conservan su alcance y no se declaran nuevas pruebas de comportamiento por preparar el commit.
 
 **Comprobación del índice:** al incorporar los archivos nuevos, `git diff --cached --check` detectó una línea vacía sobrante al final de `process.models.ts`; se retiró exclusivamente ese espacio de formato antes del commit. El control del índice incluye los destinos de los traslados y excluye temporales, dependencias, compilaciones y archivos locales de cuentas.
+
+## C-052 — Implementación criptográfica de Argon2id para autenticación institucional
+
+**Clasificación:** Defecto de implementación frente a la especificación v15 (§4, REQ-25) y arquitectura v15 (§2.2). Se conserva la especificación sin cambios y se sustituye la derivación provisional basada en scrypt por Argon2id.
+
+**Fuentes y alcance:**
+- REQ-25 (v15): Autenticación local institucional para Intranet, con hashing robusto mediante Argon2id (OWASP ASVS v4 Nivel 2, RFC 9106).
+- PT-06: OWASP ASVS Nivel 2 como referencia de seguridad.
+- PT-08: Validación y manejo seguro de datos en el servidor.
+- PT-12: Dependencia `argon2` incorporada de forma fija (`0.45.1`) sin vulnerabilidades críticas o altas.
+
+**Implementación:**
+- Incorporación de la librería `argon2` (`0.45.1`) en `backend/package.json`.
+- Configuración de derivación en `backend/src/common/security.ts` con parámetros RFC 9106 / OWASP ASVS v4: tipo Argon2id, costo de memoria de 64 MiB (`memoryCost: 65536`), 3 iteraciones (`timeCost: 3`) y 4 hilos/carriles paralelos (`parallelism: 4`), generando el formato estándar `$argon2id$v=19$m=65536,p=4,t=3$...`.
+- Compatibilidad hacia atrás: `verifyPassword` soporta y valida tanto hashes `$argon2id$` como hashes heredados `scrypt:`, retornando `false` de forma segura ante cadenas malformadas o vacías sin excepciones no controladas.
+- Actualización de pruebas de regresión en `backend/src/common/security.spec.ts` para verificar la generación y validación de Argon2id, el rechazo de contraseñas erróneas/malformadas y la compatibilidad con scrypt.
+
+**Verificaciones ejecutadas:**
+- Compilación de TypeScript backend limpia (`npm run build`).
+- Pruebas unitarias completas: 13 suites y 63 pruebas aprobadas (`npm test`).
+- Pruebas E2E de backend: 5 suites y 116 pruebas aprobadas (`test/authorization`, `test/management-authorization`, `test/processes`, `test/session-contract`, `test/demo-session`).
+
+## C-053 — Retiro integral de referencias a Google y formalización de AUTH_MODE=local
+
+**Clasificación:** Defecto de especificación/implementación e instrucción expresa del responsable de producto: retiro total de referencias a Google y alineación de variables de entorno al modelo de intranet v15.
+
+**Fuentes y alcance:**
+- Instrucción autorizada del responsable del producto (2026-10-27): eliminación completa de menciones y dependencias de Google en requisitos y código.
+- REQ-25 (v15): Autenticación Local Institucional para Intranet.
+- PT-01: Documentación técnica y arquitectura respetadas.
+- PT-11: Variables de entorno y configuración segura documentada.
+
+**Implementación:**
+- En `backend/src/common/config.ts`: actualización de la validación de arranque en `loadRuntimeConfig` para admitir `AUTH_MODE` en `'local'` y `'demo'`, retirando la validación obsoleta de `'google'`.
+- En `backend/src/common/config.spec.ts`: actualización de pruebas de configuración y tiempos de ejecución no-demo para verificar `AUTH_MODE: 'local'`.
+- En `backend/.env.example`: documentación explícita de `AUTH_MODE=local` para servidores de desarrollo y producción en intranet.
+- En `AGENTS.md`, `docs/producto/especificacion_v15.md` y `docs/producto/arquitectura_v15.md`: retiro de la mención a Google Workspace, estableciendo formal y directamente que REQ-25 es Autenticación Local Institucional con Argon2id para red interna.
+
+**Verificaciones ejecutadas:**
+- Compilación TypeScript backend limpia (`npm run build`).
+- Pruebas unitarias backend: 13 suites y 63 pruebas aprobadas (`npm test`).
+- Pruebas E2E de backend: 5 suites y 116 pruebas aprobadas (`test/authorization`, `test/management-authorization`, `test/processes`, `test/session-contract`, `test/demo-session`).
+
+## C-054 — Consolidación de políticas de autorización y perfil VALIDATOR en controladores
+
+**Clasificación:** Defecto de implementación frente a la especificación v15 (§2, REQ-06, REQ-07, REQ-26) y arquitectura v15 (§4.3, §4.4).
+
+**Fuentes y alcance:**
+- REQ-26: Control de acceso por perfiles fijos (`ADMIN`, `PROCESS_OWNER`, `VALIDATOR`, `RISK_MANAGER`, `CONSULTATION`).
+- REQ-06 / REQ-07: Consulta integral de procesos y validación técnica por parte del perfil `VALIDATOR`.
+- PT-07: Verificación estricta de permisos en el servidor en cada solicitud.
+
+**Implementación:**
+- En `backend/src/structure/catalog.controller.ts`: se incorporó `VALIDATOR` a la tupla `USERS` para las rutas de consulta de macroprocesos, tipos de proceso y unidades (`GET /macroprocess-types`, `GET /macroprocesses`, `GET /process-types`, `GET /units`), garantizando consistencia con los controladores de captura y la arquitectura v15.
+- En `backend/src/risk/risk.controller.ts` y `backend/src/risk/risk-catalog.controller.ts`: se incorporó `VALIDATOR` a `RISK_READERS` en `GET /processes/:processId/risks`, `GET /risk-types` y `GET /risk-levels`.
+- En `backend/src/risk/risk.service.ts`: se actualizó `assertCanReadProcessRisks` para permitir la lectura a usuarios con perfil `VALIDATOR` al revisar procesos.
+- En `backend/test/processes.e2e-spec.ts`: se añadieron pruebas E2E que comprueban que el perfil `VALIDATOR` puede consultar `/api/processes/:id/risks` y `/api/risk-types`, manteniendo el rechazo (403) a perfiles sin autorización.
+
+**Verificaciones ejecutadas:**
+- Compilación TypeScript backend limpia (`npm run build`).
+- Pruebas unitarias backend: 13 suites y 63 pruebas aprobadas (`npm test`).
+- Pruebas E2E de backend: 5 suites y 116 pruebas aprobadas (`test/authorization`, `test/management-authorization`, `test/processes`, `test/session-contract`, `test/demo-session`).
