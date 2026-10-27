@@ -1,0 +1,27 @@
+
+    .table-scroll table { min-width: 60rem; }
+    .audit-filters {
+      align-items: end;
+      margin-bottom: var(--ui-space-4);
+    }
+    .diff-box {
+      margin-top: .6rem;
+      padding: .75rem;
+      background: var(--ui-color-background);
+      border: 1px solid var(--ui-color-border);
+      border-radius: var(--ui-radius-md);
+      font-size: .85rem;
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(min(100%, 18rem), 1fr));
+      gap: .75rem;
+    }
+    .diff-col pre {
+      background: var(--ui-color-surface);
+      border: 1px solid var(--ui-color-border);
+      border-radius: 4px;
+      padding: .5rem;
+      overflow-x: auto;
+      max-height: 14rem;
+      font-family: monospace;
+      font-size: .8rem;
+    }

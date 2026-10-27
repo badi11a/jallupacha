@@ -1,0 +1,57 @@
+
+    .table-scroll table { min-width: 44rem; }
+    .profile-editor {
+      border: 1px solid var(--ui-color-border);
+      border-radius: var(--ui-radius-lg);
+      padding: 1.25rem;
+      margin-bottom: 1.5rem;
+      background: var(--ui-color-background);
+    }
+    .profile-editor h2 {
+      margin: 0 0 .5rem 0;
+      font-size: 1.1rem;
+    }
+    .profile-checkboxes {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(min(100%, 18rem), 1fr));
+      gap: .75rem;
+      margin: 1rem 0;
+    }
+    .profile-card {
+      display: flex;
+      align-items: flex-start;
+      gap: .6rem;
+      padding: .6rem .8rem;
+      background: var(--ui-color-surface);
+      border: 1px solid var(--ui-color-border);
+      border-radius: var(--ui-radius-md);
+      cursor: pointer;
+    }
+    .profile-card input[type="checkbox"] {
+      margin-top: .2rem;
+      width: 1.15rem;
+      height: 1.15rem;
+      cursor: pointer;
+    }
+    .profile-info strong {
+      display: block;
+      font-size: .95rem;
+    }
+    .profile-info p {
+      margin: .2rem 0 0 0;
+      font-size: .85rem;
+      color: var(--ui-color-text-muted);
+    }
+    .editor-actions {
+      margin-top: var(--ui-space-4);
+    }
+    .badges-list {
+      display: flex;
+      flex-wrap: wrap;
+      gap: .35rem;
+    }
+    .self-tag {
+      font-size: .8rem;
+      color: var(--ui-color-text-muted);
+      font-style: italic;
+    }

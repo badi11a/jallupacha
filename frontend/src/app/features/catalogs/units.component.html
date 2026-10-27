@@ -1,0 +1,47 @@
+
+    <ui-breadcrumbs [items]="[{ label: 'Unidades internas' }]" />
+    <ui-panel headingId="units-title" eyebrow="CATÁLOGO" heading="Unidades internas">
+      <button panelActions class="primary-button" type="button" [disabled]="saving()" (click)="startCreate()">Nueva unidad</button>
+      @if (error()) { <ui-message kind="error">{{ error() }}</ui-message> }
+      @if (notice()) { <ui-message kind="success">{{ notice() }}</ui-message> }
+      @if (saving()) { <p class="helper" role="status">Guardando cambios…</p> }
+      @if (editing() !== null) {
+        <form novalidate class="ui-form ui-form-grid catalog-editor" (ngSubmit)="save()" [attr.aria-busy]="saving()" [attr.aria-label]="editing() === 0 ? 'Nueva unidad' : 'Editar unidad'">
+          <label class="field">Nombre (obligatorio)<input id="catalog-name" name="name" maxlength="200" [(ngModel)]="name" (ngModelChange)="fieldErrors.set({})" [attr.aria-invalid]="fieldErrors()['name'] ? true : null" [attr.aria-describedby]="fieldErrors()['name'] ? 'catalog-error-name' : null" [disabled]="saving()" required />@if (fieldErrors()['name']) { <span id="catalog-error-name" class="field-error" role="alert">{{ fieldErrors()['name'] }}</span> }</label>
+          <label class="field">Unidad superior
+            <select name="parent" [(ngModel)]="parentUnitId" [disabled]="saving()">
+              <option [ngValue]="null">Sin unidad superior</option>
+              @for (unit of parentOptions(); track unit.id) { <option [ngValue]="unit.id">{{ unit.name }}</option> }
+            </select>
+          </label>
+          <div class="ui-form-actions">
+            <button class="primary-button" type="submit" [disabled]="saving()">{{ saving() ? 'Guardando…' : 'Guardar unidad' }}</button>
+            <button class="quiet-button" type="button" [disabled]="saving()" (click)="cancel()">Cancelar</button>
+          </div>
+        </form>
+      }
+      @if (loading()) { <p class="helper" role="status">Cargando información…</p> }
+      @else if (loadFailed()) { <button type="button" class="quiet-button" (click)="load()">Reintentar carga</button> }
+      @else {
+        <div class="table-scroll" tabindex="0" role="region" aria-label="Unidades internas">
+          <table>
+            <caption class="visually-hidden">Unidades internas</caption>
+            <thead><tr><th scope="col">Unidad</th><th scope="col">Unidad superior</th><th scope="col">Procesos</th><th scope="col">Estado</th><th scope="col">Acciones</th></tr></thead>
+            <tbody>
+              @for (row of rows(); track row.unit.id) {
+                <tr>
+                  <td [style.padding-left.rem]="0.75 + row.depth * 1.5">{{ row.unit.name }}</td>
+                  <td>{{ parentName(row.unit) }}</td>
+                  <td>{{ row.unit.processCount }}</td>
+                  <td><ui-badge [tone]="row.unit.isActive ? 'success' : 'neutral'">{{ row.unit.isActive ? 'Activa' : 'Inactiva' }}</ui-badge></td>
+                  <td class="ui-form-actions">
+                    <button class="quiet-button" type="button" [disabled]="saving()" (click)="startEdit(row.unit)">Editar</button>
+                    @if (row.unit.isActive) { <button class="quiet-button" type="button" [disabled]="saving()" (click)="deactivate(row.unit)">Desactivar</button> }
+                  </td>
+                </tr>
+              } @empty { <tr><td colspan="5">No hay unidades registradas.</td></tr> }
+            </tbody>
+          </table>
+        </div>
+      }
+    </ui-panel>

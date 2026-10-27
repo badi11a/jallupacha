@@ -1,14 +1,14 @@
 import { Component, ElementRef, ViewChild, computed, inject, signal } from '@angular/core';
 import { RouterOutlet } from '@angular/router';
-import { AuthService } from './auth.service';
-import { UiBadgeComponent, UiDialogHostComponent, UiModuleNavComponent, UiModuleNavItem } from './shared/ui';
-import { LeavesWithConfirmation } from './unsaved-changes.guard';
+import { AuthService } from './core/auth/auth.service';
+import { UiBadgeComponent, UiDialogHostComponent, UiModuleNavComponent, UiModuleNavItem, UiMessageComponent } from './shared/ui';
+import { LeavesWithConfirmation } from './core/auth/unsaved-changes.guard';
 
 @Component({
   selector: 'app-root',
   host: { class: 'ui-root' },
   standalone: true,
-  imports: [RouterOutlet, UiModuleNavComponent, UiBadgeComponent, UiDialogHostComponent],
+  imports: [RouterOutlet, UiModuleNavComponent, UiBadgeComponent, UiDialogHostComponent, UiMessageComponent],
   template: `
     <a class="skip-link" href="#main-content" (click)="focusContent($event)">Ir al contenido principal</a>
 
@@ -34,6 +34,7 @@ import { LeavesWithConfirmation } from './unsaved-changes.guard';
     <main id="main-content" tabindex="-1"
       [attr.inert]="auth.logoutInProgress() ? '' : null"
       [attr.aria-busy]="auth.logoutInProgress() ? 'true' : null">
+      @if (auth.sessionError()) { <ui-message kind="error">{{ auth.sessionError() }}</ui-message> }
       <router-outlet #outlet="outlet" />
     </main>
     <ui-dialog-host />

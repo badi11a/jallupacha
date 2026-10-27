@@ -1,0 +1,4 @@
+
+    .wide { grid-column: 1 / -1; }
+    .participant { display: grid; grid-template-columns: minmax(12rem, 1fr) minmax(12rem, 2fr) auto; gap: .6rem; align-items: end; margin-bottom: .6rem; }
+    @media (max-width: 640px) { .participant { grid-template-columns: minmax(0, 1fr); } }

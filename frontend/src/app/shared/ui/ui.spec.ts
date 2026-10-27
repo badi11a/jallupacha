@@ -109,6 +109,37 @@ describe('shared/ui', () => {
     expect(buttonByText(root, 'Siguiente').disabled).toBe(true);
   });
 
+  it('summarizes page counts, labels navigation and disables pending or boundary actions', () => {
+    const fixture = TestBed.createComponent(UiPaginationComponent);
+    for (const [key, value] of Object.entries({ page: 1, pageSize: 25, total: 0, summaryMode: 'pages', label: 'Páginas del registro' })) {
+      fixture.componentRef.setInput(key, value);
+    }
+    fixture.detectChanges();
+    const root = fixture.nativeElement as HTMLElement;
+    expect(root.getAttribute('role')).toBe('navigation');
+    expect(root.getAttribute('aria-label')).toBe('Páginas del registro');
+    expect(root.textContent).toContain('Página 1 de 1');
+    expect(buttonByText(root, 'Anterior').disabled).toBe(true);
+    expect(buttonByText(root, 'Siguiente').disabled).toBe(true);
+    fixture.componentRef.setInput('total', 61);
+    fixture.detectChanges();
+    expect(root.textContent).toContain('Página 1 de 3');
+    expect(buttonByText(root, 'Siguiente').disabled).toBe(false);
+    fixture.componentRef.setInput('disabled', true);
+    fixture.detectChanges();
+    expect(buttonByText(root, 'Siguiente').disabled).toBe(true);
+    fixture.componentRef.setInput('disabled', false);
+    fixture.componentRef.setInput('page', 3);
+    fixture.detectChanges();
+    const emitted: number[] = [];
+    fixture.componentInstance.pageChange.subscribe(page => emitted.push(page));
+    buttonByText(root, 'Siguiente').click();
+    expect(emitted).toEqual([]);
+    buttonByText(root, 'Anterior').click();
+    expect(emitted).toEqual([2]);
+    fixture.destroy();
+  });
+
   it('resolves a confirmation dialog with confirm or cancel', async () => {
     const fixture = TestBed.createComponent(HostComponent);
     fixture.detectChanges();

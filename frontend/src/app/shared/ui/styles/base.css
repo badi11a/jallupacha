@@ -111,7 +111,7 @@
 :where(.ui-root) table { width: 100%; border-collapse: collapse; font-size: var(--ui-font-size-sm); text-align: left; }
 :where(.ui-root) th, :where(.ui-root) td { padding: .65rem var(--ui-space-2); border-top: 1px solid var(--ui-color-table-border); vertical-align: top; }
 :where(.ui-root) th { color: var(--ui-color-heading-subtle); font-weight: var(--ui-font-weight-bold); }
-:where(.ui-root) .pagination { display: flex; align-items: center; justify-content: space-between; gap: var(--ui-space-3); margin-top: var(--ui-space-4); color: var(--ui-color-text-subtle); font-size: var(--ui-font-size-sm); }
+:where(.ui-root) .pagination { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: var(--ui-space-3); margin-top: var(--ui-space-4); color: var(--ui-color-text-subtle); font-size: var(--ui-font-size-sm); }
 
 /* Insignias */
 :where(.ui-root) .badge { display: inline-flex; align-items: center; min-height: 1.5rem; padding: 0 .6rem; border-radius: var(--ui-radius-pill); color: var(--ui-color-text-muted); background: var(--ui-color-neutral-background); font-size: var(--ui-font-size-xs); font-weight: var(--ui-font-weight-bold); white-space: nowrap; }

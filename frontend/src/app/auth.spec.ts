@@ -3,12 +3,12 @@ import { HttpTestingController, provideHttpClientTesting } from '@angular/common
 import { Component } from '@angular/core';
 import { TestBed } from '@angular/core/testing';
 import { provideRouter, Router } from '@angular/router';
-import { adminGuard, authGuard, guestGuard } from './auth.guard';
-import { authInterceptor } from './auth.interceptor';
-import { AuthService, USER_STORAGE_KEY } from './auth.service';
-import { LoginComponent } from './login.component';
-import { ProcessMapComponent } from './process-map.component';
-import { ProcessListComponent } from './process-list.component';
+import { adminGuard, authGuard, guestGuard } from './core/auth/auth.guard';
+import { authInterceptor } from './core/auth/auth.interceptor';
+import { AuthService, USER_STORAGE_KEY } from './core/auth/auth.service';
+import { LoginComponent } from './core/auth/login.component';
+import { ProcessMapComponent } from './features/processes/process-map.component';
+import { ProcessListComponent } from './features/processes/process-list.component';
 
 @Component({ selector: 'app-dummy-protected', standalone: true, template: '<p>Protected content</p>' })
 class DummyProtectedComponent {}
@@ -54,7 +54,7 @@ describe('Autenticación Local Institucional v15 (REQ-25)', () => {
       expect(authService.isAdmin()).toBe(false);
     });
 
-    it('inicia sesión exitosamente y almacena el usuario en sessionStorage', async () => {
+    it('inicia sesión y mantiene identidad solo en memoria', async () => {
       const loginPromise = authService.login('admin@example.test', 'ClaveDemo2026!');
 
       const req = httpMock.expectOne('/api/auth/login');
@@ -77,9 +77,7 @@ describe('Autenticación Local Institucional v15 (REQ-25)', () => {
       expect(authService.isProcessOwner()).toBe(true);
       expect(authService.isRiskManager()).toBe(false);
 
-      const stored = JSON.parse(sessionStorage.getItem(USER_STORAGE_KEY) || '{}');
-      expect(stored.userId).toBe(1);
-      expect(stored.email).toBe('admin@example.test');
+      expect(sessionStorage.getItem(USER_STORAGE_KEY)).toBeNull();
     });
 
     it('cierra la sesión y limpia sessionStorage', async () => {
@@ -209,7 +207,7 @@ describe('Autenticación Local Institucional v15 (REQ-25)', () => {
       await submitPromise;
       fixture.detectChanges();
 
-      expect(component.errorMessage()).toBe('Credenciales no válidas');
+      expect(component.errorMessage()).toContain('Credenciales no válidas');
       expect(component.email).toBe('usuario@example.test'); // R-04: data preserved
       expect(component.password).toBe(''); // sensitive password cleared
 

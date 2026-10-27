@@ -5,10 +5,10 @@ import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { By } from '@angular/platform-browser';
 import { Router, provideRouter } from '@angular/router';
 import { AppComponent } from './app.component';
-import { authGuard, guestGuard } from './auth.guard';
-import { AuthService, ProfileCode } from './auth.service';
+import { authGuard, guestGuard } from './core/auth/auth.guard';
+import { AuthService, ProfileCode } from './core/auth/auth.service';
 import { UiDialogService } from './shared/ui';
-import { LeavesWithConfirmation, unsavedChangesGuard } from './unsaved-changes.guard';
+import { LeavesWithConfirmation, unsavedChangesGuard } from './core/auth/unsaved-changes.guard';
 
 @Component({ template: '<h1>Contenido de revisión</h1>' })
 class CleanViewComponent {}

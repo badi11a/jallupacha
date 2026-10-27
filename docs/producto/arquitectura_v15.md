@@ -142,6 +142,8 @@ Todas las rutas operan bajo el prefijo `/api/`, validan sesión y consultan perf
 
 ## 5. Arquitectura del Frontend y Principios UX
 
+**Base de desarrollo C-048:** se adopta [STD-FE-001](../diseno/base-frontend.md) para núcleo de cliente configurable, organización por funcionalidades, carga diferida, consumo del kit y generación reproducible de una plantilla neutral. Define contratos, dependencias, versiones, criterios FE-01 a FE-10 y verificación SDD. Se conserva Angular Standalone, Signals y CSS nativo. La plantilla y sus consumidores de prueba no equivalen a adopción institucional ni autorizan publicar paquetes externos.
+
 **Consumo del kit (C-046):** `app-root` activa el contenedor `ui-root` para tokens y estilos compartidos; `body.ui-page` consume el restablecimiento opcional de página. Navegación, contenido de rutas y host modal quedan dentro del mismo ámbito, sin cambiar destinos ni controles de autorización. El CSS genérico del kit no define estilos fuera de ese contenedor. Los criterios de longitud de los contratos vigentes se conservan; el kit permite seleccionar UTF-16 o el cálculo de validator según el servidor consumidor.
 
 * **SPA en Angular 19+:** Arquitectura basada en componentes *Standalone* y *Signals*.

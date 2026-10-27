@@ -1,0 +1,122 @@
+
+    <div class="top-nav-bar">
+      <ui-breadcrumbs [items]="[{ label: 'Mapa de procesos', link: '/mapa', queryParams: mapQuery() }, { label: macro()?.name || 'Macroproceso' }]" />
+    </div>
+
+    @if (error()) { <ui-message kind="error">{{ error() }}</ui-message> }
+    @if (error()) { <button type="button" class="quiet-button" (click)="reload()">Reintentar carga</button> }
+    @if (loading()) { <p role="status">Cargando macroproceso…</p> }
+
+    @if (macro(); as m) {
+      <header class="hero-card" aria-labelledby="macro-title">
+        <div class="hero-main">
+          <span class="hero-eyebrow">{{ eyebrowText() }}</span>
+          <h1 id="macro-title" class="hero-title">{{ m.name }}</h1>
+          @if (hasMacroDescription()) {
+            <p class="hero-desc">{{ macroDescription() }}</p>
+          }
+          <div class="stats-row" aria-label="Resumen del macroproceso y unidades en resultados filtrados">
+            <div class="stat-box"><strong>{{ m.processTypes.length }}</strong> <span>Tipos del macroproceso</span></div>
+            <div class="stat-box"><strong>{{ totalProcessCount() }}</strong> <span>Procesos del macroproceso</span></div>
+            <div class="stat-box"><strong>{{ responsibleUnitsCount() }}</strong> <span>Unidades en resultados</span></div>
+          </div>
+        </div>
+
+        <aside class="risk-widget" aria-label="Consulta de riesgos">
+          <div class="risk-widget-header">RIESGOS ASOCIADOS</div>
+          <p>Filtra los procesos que tienen riesgos del nivel seleccionado. Consulta cada evaluación en la ficha del proceso.</p>
+          <p class="helper">Esta vista no presenta una evaluación consolidada de riesgo del macroproceso.</p>
+        </aside>
+      </header>
+
+      <section class="processes-panel" aria-labelledby="processes-section-title">
+        <div class="panel-header-row">
+          <div>
+            <h2 id="processes-section-title" class="panel-heading">Procesos</h2>
+            <p class="panel-subheading">Explora y filtra los procesos asociados a este macroproceso.</p>
+          </div>
+          <div class="panel-count-label" role="status">
+            {{ items().length }} {{ items().length === 1 ? 'resultado visible' : 'resultados visibles' }}{{ items().length >= 300 ? ' (límite de 300; afine los filtros)' : '' }}
+          </div>
+        </div>
+
+        <div class="filters-box" role="search" aria-label="Filtros del macroproceso">
+          <div class="search-box">
+            <svg class="search-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <circle cx="11" cy="11" r="8"></circle>
+              <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+            </svg>
+            <input name="q" type="search" [(ngModel)]="q" (keydown.enter)="applyFilters()" (blur)="applyFilters()" placeholder="Buscar por proceso, tipo o unidad responsable..." aria-label="Buscar por proceso, tipo o unidad responsable" />
+          </div>
+
+          <div class="filter-type-section">
+            <div class="filter-type-header">
+              <span>TIPO DE PROCESO</span>
+            </div>
+            <nav class="type-filters" aria-label="Tipos de proceso del macroproceso">
+              <a [routerLink]="[]" [queryParams]="{ type: null }" queryParamsHandling="merge" class="type-pill" [attr.aria-current]="!processTypeId ? 'true' : null">
+                <span>Todos los procesos</span>
+                <span class="pill-chip">{{ totalProcessCount() }}</span>
+              </a>
+              @for (type of m.processTypes; track type.id) {
+                <a [routerLink]="[]" [queryParams]="{ type: type.id }" queryParamsHandling="merge" class="type-pill" [attr.aria-current]="processTypeId === '' + type.id ? 'true' : null">
+                  <span>{{ type.name }}</span>
+                  <span class="pill-chip">{{ type.processes.length }}</span>
+                </a>
+              }
+            </nav>
+          </div>
+
+          <div class="dropdowns-row">
+            <label class="dropdown-group">
+              <span class="dropdown-label">CON RIESGOS DE NIVEL</span>
+              <select name="risk" [(ngModel)]="riskLevel" (ngModelChange)="applyFilters()" aria-label="Filtrar por nivel de riesgo">
+                <option value="">Todos los riesgos</option>
+                <option value="Bajo">Bajo</option>
+                <option value="Medio">Medio</option>
+                <option value="Alto">Alto</option>
+                <option value="Crítico">Crítico</option>
+              </select>
+            </label>
+            <label class="dropdown-group">
+              <span class="dropdown-label">UNIDAD RESPONSABLE</span>
+              <select name="unit" [(ngModel)]="unitId" (ngModelChange)="applyFilters()" aria-label="Filtrar por unidad responsable">
+                <option value="">Todas las unidades</option>
+                @for (unit of units(); track unit.id) {
+                  <option [value]="unit.id">{{ unit.name }}</option>
+                }
+              </select>
+            </label>
+          </div>
+        </div>
+
+        <ul class="results" role="list">
+          @for (item of items(); track item.id) {
+            <li>
+              <a class="process-row" [routerLink]="['/procesos', item.id]" [queryParams]="{ returnTo: resultsUrl }" [attr.aria-label]="item.name + ', ' + (item.responsibleUnit || 'Sin unidad responsable') + ', tipo ' + item.processType">
+                <div class="col-main">
+                  <strong class="process-name">{{ item.name }}</strong>
+                  <span class="process-unit">{{ item.responsibleUnit || 'Sin unidad responsable' }}</span>
+                </div>
+                <div class="col-type">
+                  <span class="process-type">{{ item.processType }}</span>
+                </div>
+                <div class="col-actions">
+                  <ui-badge tone="neutral">{{ item.status }}</ui-badge>
+                  <svg class="chevron-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                    <polyline points="9 18 15 12 9 6"></polyline>
+                  </svg>
+                </div>
+              </a>
+            </li>
+          } @empty {
+            <li class="empty-state">
+              <p class="helper">Ningún proceso coincide con los filtros aplicados.</p>
+              @if (hasActiveFilters()) {
+                <button type="button" class="quiet-button" (click)="clearFilters()">Restablecer filtros</button>
+              }
+            </li>
+          }
+        </ul>
+      </section>
+    }

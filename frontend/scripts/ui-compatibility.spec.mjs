@@ -70,6 +70,6 @@ test('every selector is scoped, including responsive, reduced-motion and pseudo-
   assert.ok(checked > 100);
   const pageBody = dom.window.document.body;
   pageBody.classList.add('ui-page');
-  assert.equal(dom.window.getComputedStyle(pageBody).minWidth, '320px');
+  assert.equal(dom.window.getComputedStyle(pageBody).minWidth, '0px', 'The host must fit the space remaining beside a vertical scrollbar at 320 CSS px');
   dom.window.close();
 });

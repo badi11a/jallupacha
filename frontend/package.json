@@ -12,6 +12,11 @@
     "build": "ng build",
     "test": "ng test --watch=false",
     "check:contrast": "node scripts/check-contrast.mjs",
+    "check:source": "node tools/check-source.mjs",
+    "measure:frontend": "node tools/measure-frontend.mjs",
+    "check:ui-browser": "node tools/verify-kit-browser.mjs",
+    "test:base": "node --test tools/create-starter.spec.mjs",
+    "base:create": "node tools/create-starter.mjs",
     "check:ui-compatibility": "node --test scripts/ui-compatibility.spec.mjs"
   },
   "dependencies": {
@@ -26,11 +31,11 @@
     "zone.js": "0.15.1"
   },
   "devDependencies": {
-    "@angular/build": "22.2.1",
-    "@angular/cli": "22.2.1",
+    "@angular/build": "22.2.4",
+    "@angular/cli": "22.2.4",
     "@angular/compiler-cli": "22.2.1",
     "jsdom": "30.1.2",
     "typescript": "6.0.2",
-    "vitest": "4.1.11"
+    "vitest": "4.1.12"
   }
 }

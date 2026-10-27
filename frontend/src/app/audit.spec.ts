@@ -1,10 +1,12 @@
 import { TestBed } from '@angular/core/testing';
-import { provideRouter } from '@angular/router';
+import { Router, provideRouter } from '@angular/router';
+import { Location } from '@angular/common';
+import { provideLocationMocks } from '@angular/common/testing';
 import { of, throwError } from 'rxjs';
 import { describe, expect, it, vi, beforeEach } from 'vitest';
-import { AuditComponent } from './audit.component';
-import { AuditApiService, AuditResponse } from './audit.service';
-import { AuthService } from './auth.service';
+import { AuditComponent } from './features/audit/audit.component';
+import { AuditApiService, AuditResponse } from './features/audit/audit.service';
+import { AuthService } from './core/auth/auth.service';
 
 describe('AuditComponent (REQ-27)', () => {
   let mockAuditApi: Partial<AuditApiService>;
@@ -56,6 +58,7 @@ describe('AuditComponent (REQ-27)', () => {
       imports: [AuditComponent],
       providers: [
         provideRouter([{ path: 'auditoria', component: AuditComponent }]),
+        provideLocationMocks(),
         { provide: AuditApiService, useValue: mockAuditApi },
         { provide: AuthService, useValue: mockAuth }
       ]
@@ -128,6 +131,59 @@ describe('AuditComponent (REQ-27)', () => {
     await fixture.whenStable();
     expect(comp.page()).toBe(2);
     expect(mockAuditApi.list).toHaveBeenCalledWith(2, 25, '', '');
+  });
+
+  it('C-050: pagina con el kit conservando filtros, extremos e historial', async () => {
+    mockAuditApi.list = vi.fn(() => of({ ...sampleAuditResponse, total: 60 }));
+    const router = TestBed.inject(Router);
+    router.setUpLocationChangeListener();
+    await router.navigateByUrl('/auditoria?entityType=PROCESS&action=PROCESS_APPROVED');
+    const fixture = TestBed.createComponent(AuditComponent);
+    fixture.detectChanges();
+    const root = fixture.nativeElement as HTMLElement;
+    const pagination = () => root.querySelector('ui-pagination')!;
+    const control = (text: string) => [...pagination().querySelectorAll<HTMLButtonElement>('button')].find(button => button.textContent?.trim() === text)!;
+    expect(pagination().textContent).toContain('Página 1 de 3');
+    expect(control('Anterior').disabled).toBe(true);
+    control('Siguiente').click(); await fixture.whenStable(); fixture.detectChanges();
+    expect(pagination().textContent).toContain('Página 2 de 3');
+    expect(mockAuditApi.list).toHaveBeenLastCalledWith(2, 25, 'PROCESS', 'PROCESS_APPROVED');
+    expect(router.url).toContain('entityType=PROCESS');
+    expect(router.url).toContain('action=PROCESS_APPROVED');
+    expect(router.url).toContain('page=2');
+    control('Siguiente').click(); await fixture.whenStable(); fixture.detectChanges();
+    expect(control('Siguiente').disabled).toBe(true);
+    TestBed.inject(Location).back();
+    await vi.waitFor(() => expect(router.url).toContain('page=2'));
+    await fixture.whenStable(); fixture.detectChanges();
+    expect(pagination().textContent).toContain('Página 2 de 3');
+    fixture.destroy();
+  });
+
+  it('C-050: conserva la consulta al fallar una página y muestra una página vacía tras filtrar', async () => {
+    mockAuditApi.list = vi.fn(() => of({ ...sampleAuditResponse, total: 60 }));
+    const router = TestBed.inject(Router);
+    await router.navigateByUrl('/auditoria?entityType=PROCESS');
+    const fixture = TestBed.createComponent(AuditComponent);
+    fixture.detectChanges();
+    const root = fixture.nativeElement as HTMLElement;
+    const next = root.querySelector('ui-pagination button:last-child') as HTMLButtonElement;
+    vi.mocked(mockAuditApi.list!).mockReturnValueOnce(throwError(() => new Error('Fallo de prueba')));
+    next.click(); await fixture.whenStable(); fixture.detectChanges();
+    expect(root.querySelector('ui-pagination')).toBeNull();
+    expect(router.url).toContain('entityType=PROCESS');
+    expect(router.url).toContain('page=2');
+    [...root.querySelectorAll<HTMLButtonElement>('button')].find(button => button.textContent?.trim() === 'Reintentar consulta')!.click();
+    await fixture.whenStable(); fixture.detectChanges();
+    expect(root.querySelector('ui-pagination')?.textContent).toContain('Página 2 de 3');
+    vi.mocked(mockAuditApi.list!).mockReturnValueOnce(of({ items: [], total: 0, page: 1, limit: 25 }));
+    fixture.componentInstance.action = 'PROCESS_UPDATED';
+    fixture.componentInstance.search(); await fixture.whenStable(); fixture.detectChanges();
+    expect(root.querySelector('ui-pagination')?.textContent).toContain('Página 1 de 1');
+    expect([...root.querySelectorAll<HTMLButtonElement>('ui-pagination button')].every(button => button.disabled)).toBe(true);
+    expect(router.url).not.toContain('page=');
+    expect(mockAuditApi.list).toHaveBeenLastCalledWith(1, 25, 'PROCESS', 'PROCESS_UPDATED');
+    fixture.destroy();
   });
 
   it('handles API errors gracefully', () => {

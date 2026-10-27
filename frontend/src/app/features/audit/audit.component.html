@@ -1,0 +1,106 @@
+
+    <ui-breadcrumbs [items]="[{ label: 'Auditoría' }]" />
+    <ui-panel headingId="audit-title" eyebrow="SEGURIDAD Y CONTROL" heading="Bitácora de auditoría inmutable">
+
+      @if (error()) { <ui-message kind="error">{{ error() }}</ui-message> }
+      @if (error()) { <button type="button" class="quiet-button" (click)="load()">Reintentar consulta</button> }
+
+      <form class="ui-form-grid audit-filters" (ngSubmit)="search()" role="search" aria-label="Filtrar eventos de auditoría">
+        <label class="field">Tipo de entidad
+          <select name="entityType" [(ngModel)]="entityType">
+            <option value="">Todas las entidades</option>
+            <option value="PROCESS">Proceso (PROCESS)</option>
+            <option value="USER">Usuario (USER)</option>
+            <option value="PROCESS_TYPE">Tipo de proceso</option>
+            <option value="ORGANIZATIONAL_UNIT">Unidad interna</option>
+          </select>
+        </label>
+        <label class="field">Acción registrada
+          <input name="action" type="search" placeholder="Ej: PROCESS_APPROVED, USER_PROFILES_UPDATED" [(ngModel)]="action" />
+        </label>
+        <div class="ui-form-actions">
+          <button class="primary-button" type="submit">Filtrar</button>
+          <button class="quiet-button" type="button" (click)="clear()">Limpiar</button>
+        </div>
+      </form>
+
+      @if (loading()) {
+        <p class="helper" role="status">Cargando bitácora de auditoría…</p>
+      } @else if (!error()) {
+        <p class="helper" role="status">{{ total() }} evento(s) coincidente(s) con la consulta ejecutada; {{ items().length }} en esta página.</p>
+        <div class="table-scroll" tabindex="0" role="region" aria-label="Resultados de auditoría">
+          <table>
+            <caption class="visually-hidden">Registro histórico inmutable de eventos de auditoría</caption>
+            <thead>
+              <tr>
+                <th scope="col">ID</th>
+                <th scope="col">Fecha y hora (UTC)</th>
+                <th scope="col">Usuario actor</th>
+                <th scope="col">Acción</th>
+                <th scope="col">Entidad afectada</th>
+                <th scope="col">Valores registrados</th>
+              </tr>
+            </thead>
+            <tbody>
+              @for (entry of items(); track entry.id) {
+                <tr>
+                  <td>{{ entry.id }}</td>
+                  <td>{{ formatDate(entry.createdAt) }}</td>
+                  <td>
+                    @if (entry.actorDisplayName) {
+                      <strong>{{ entry.actorDisplayName }}</strong>
+                      <div class="helper">{{ entry.actorEmail }}</div>
+                    } @else if (entry.actorUserId) {
+                      <span>Usuario ID {{ entry.actorUserId }}</span>
+                    } @else {
+                      <span class="helper">Sistema / Proceso</span>
+                    }
+                  </td>
+                  <td>
+                    <ui-badge [tone]="getActionTone(entry.action)">{{ entry.action }}</ui-badge>
+                  </td>
+                  <td>
+                    <strong>{{ entry.entityType }}</strong> #{{ entry.entityId }}
+                  </td>
+                  <td>
+                    @if (entry.beforeValue || entry.afterValue) {
+                      <button
+                        type="button"
+                        class="text-button"
+                        (click)="toggleDetail(entry.id)"
+                        [attr.aria-expanded]="isExpanded(entry.id)"
+                      >
+                        {{ isExpanded(entry.id) ? 'Ocultar cambios' : 'Ver cambios' }}
+                      </button>
+                      @if (isExpanded(entry.id)) {
+                        <div class="diff-box">
+                          @if (entry.beforeValue) {
+                            <div class="diff-col">
+                              <strong>Valores anteriores:</strong>
+                              <pre>{{ formatJson(entry.beforeValue) }}</pre>
+                            </div>
+                          }
+                          @if (entry.afterValue) {
+                            <div class="diff-col">
+                              <strong>Valores posteriores:</strong>
+                              <pre>{{ formatJson(entry.afterValue) }}</pre>
+                            </div>
+                          }
+                        </div>
+                      }
+                    } @else {
+                      <span class="helper">Sin modificaciones de valor</span>
+                    }
+                  </td>
+                </tr>
+              } @empty {
+                <tr><td colspan="6">No se encontraron registros de auditoría coincidentes.</td></tr>
+              }
+            </tbody>
+          </table>
+        </div>
+
+        <ui-pagination [page]="page()" [pageSize]="limit()" [total]="total()"
+          summaryMode="pages" [disabled]="loading()" (pageChange)="goToPage($event)" />
+      }
+    </ui-panel>

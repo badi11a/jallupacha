@@ -18,6 +18,7 @@ yarn-error.log*
 pnpm-debug.log*
 
 # Temporary files and editor/office locks
+/.tmp/
 *.tmp
 *.temp
 *.swp

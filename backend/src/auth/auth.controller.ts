@@ -198,7 +198,7 @@ export class AuthController {
 
   @Get('me')
   @ApiCookieAuth('jallupacha_session')
-  @RequireProfiles('ADMIN', 'PROCESS_OWNER', 'RISK_MANAGER', 'CONSULTATION')
+  @RequireProfiles('ADMIN', 'PROCESS_OWNER', 'VALIDATOR', 'RISK_MANAGER', 'CONSULTATION')
   async me(@Req() request: AuthenticatedRequest) {
     const identities = await this.dataSource.query(
       `SELECT DISPLAY_NAME AS "displayName", EMAIL AS "email" FROM ${qualifiedTable('USER_IDENTITY')} WHERE USER_ID = :1`,
@@ -216,7 +216,7 @@ export class AuthController {
   @HttpCode(204)
   @ApiCookieAuth('jallupacha_session')
   @ApiHeader({ name: 'X-CSRF-Token', required: true })
-  @RequireProfiles('ADMIN', 'PROCESS_OWNER', 'RISK_MANAGER', 'CONSULTATION')
+  @RequireProfiles('ADMIN', 'PROCESS_OWNER', 'VALIDATOR', 'RISK_MANAGER', 'CONSULTATION')
   async logout(
     @Req() request: AuthenticatedRequest,
     @Res({ passthrough: true }) response: Response
