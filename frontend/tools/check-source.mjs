@@ -17,7 +17,7 @@ if (existsSync(manifestPath)) {
   }
 }
 function walk(dir) { return readdirSync(dir, { withFileTypes: true }).flatMap(entry => entry.isDirectory() ? walk(resolve(dir, entry.name)) : [resolve(dir, entry.name)]); }
-for (const file of walk(root).filter(file => !file.endsWith('.spec.ts') && /\.(ts|html|css)$/.test(file))) {
+for (const file of walk(root).filter(file => !file.endsWith('.spec.ts') && /\.(ts|html|css|scss)$/.test(file))) {
   const name = relative(root, file).replaceAll('\\', '/');
   const source = readFileSync(file, 'utf8');
   const fail = message => failures.push(name + ': ' + message);

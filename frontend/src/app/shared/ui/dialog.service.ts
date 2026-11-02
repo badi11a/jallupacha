@@ -67,8 +67,7 @@ export class UiDialogService {
     else request.resolve(typeof result === 'object' ? result : null);
     const opener = this.opener;
     this.opener = null;
-    // `ui-dialog-host` cierra el <dialog> antes de llamar aquí: fuera del estado
-    // modal el navegador permite devolver el foco a quien abrió el diálogo.
+    // El host llama después de cerrar el overlay; entonces devuelve el foco.
     if (opener?.isConnected) opener.focus();
   }
 

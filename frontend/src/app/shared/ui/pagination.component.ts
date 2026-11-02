@@ -1,7 +1,9 @@
+import { MatButtonModule } from '@angular/material/button';
 import { Component, computed, input, output } from '@angular/core';
 
 /** Paginación anterior/siguiente para listados paginados en el servidor. */
 @Component({
+  imports: [MatButtonModule],
   selector: 'ui-pagination',
   host: { class: 'pagination', role: 'navigation', '[attr.aria-label]': 'label()' },
   template: `
@@ -11,8 +13,8 @@ import { Component, computed, input, output } from '@angular/core';
       <span>Página {{ page() }} · {{ total() }} {{ itemLabel() }}</span>
     }
     <div class="ui-form-actions">
-      <button class="text-button" type="button" [disabled]="disabled() || !hasPrevious()" (click)="pageChange.emit(page() - 1)">Anterior</button>
-      <button class="text-button" type="button" [disabled]="disabled() || !hasNext()" (click)="pageChange.emit(page() + 1)">Siguiente</button>
+      <button matButton="text" class="text-button" type="button" [disabled]="disabled() || !hasPrevious()" (click)="pageChange.emit(page() - 1)">Anterior</button>
+      <button matButton="text" class="text-button" type="button" [disabled]="disabled() || !hasNext()" (click)="pageChange.emit(page() + 1)">Siguiente</button>
     </div>
   `
 })

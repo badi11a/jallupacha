@@ -4,7 +4,7 @@
     </div>
 
     @if (error()) { <ui-message kind="error">{{ error() }}</ui-message> }
-    @if (error()) { <button type="button" class="quiet-button" (click)="reload()">Reintentar carga</button> }
+    @if (error()) { <button matButton="outlined" type="button" class="quiet-button" (click)="reload()">Reintentar carga</button> }
     @if (loading()) { <p role="status">Cargando macroproceso…</p> }
 
     @if (macro(); as m) {
@@ -46,7 +46,7 @@
               <circle cx="11" cy="11" r="8"></circle>
               <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
             </svg>
-            <input name="q" type="search" [(ngModel)]="q" (keydown.enter)="applyFilters()" (blur)="applyFilters()" placeholder="Buscar por proceso, tipo o unidad responsable..." aria-label="Buscar por proceso, tipo o unidad responsable" />
+            <mat-form-field appearance="outline" subscriptSizing="dynamic"><input matInput name="q" type="search" [(ngModel)]="q" (keydown.enter)="applyFilters()" (blur)="applyFilters()" placeholder="Buscar por proceso, tipo o unidad responsable..." aria-label="Buscar por proceso, tipo o unidad responsable" /></mat-form-field>
           </div>
 
           <div class="filter-type-section">
@@ -70,22 +70,22 @@
           <div class="dropdowns-row">
             <label class="dropdown-group">
               <span class="dropdown-label">CON RIESGOS DE NIVEL</span>
-              <select name="risk" [(ngModel)]="riskLevel" (ngModelChange)="applyFilters()" aria-label="Filtrar por nivel de riesgo">
+              <mat-form-field appearance="outline" subscriptSizing="dynamic"><select matNativeControl name="risk" [(ngModel)]="riskLevel" (ngModelChange)="applyFilters()" aria-label="Filtrar por nivel de riesgo">
                 <option value="">Todos los riesgos</option>
                 <option value="Bajo">Bajo</option>
                 <option value="Medio">Medio</option>
                 <option value="Alto">Alto</option>
                 <option value="Crítico">Crítico</option>
-              </select>
+              </select></mat-form-field>
             </label>
             <label class="dropdown-group">
               <span class="dropdown-label">UNIDAD RESPONSABLE</span>
-              <select name="unit" [(ngModel)]="unitId" (ngModelChange)="applyFilters()" aria-label="Filtrar por unidad responsable">
+              <mat-form-field appearance="outline" subscriptSizing="dynamic"><select matNativeControl name="unit" [(ngModel)]="unitId" (ngModelChange)="applyFilters()" aria-label="Filtrar por unidad responsable">
                 <option value="">Todas las unidades</option>
                 @for (unit of units(); track unit.id) {
                   <option [value]="unit.id">{{ unit.name }}</option>
                 }
-              </select>
+              </select></mat-form-field>
             </label>
           </div>
         </div>
@@ -113,7 +113,7 @@
             <li class="empty-state">
               <p class="helper">Ningún proceso coincide con los filtros aplicados.</p>
               @if (hasActiveFilters()) {
-                <button type="button" class="quiet-button" (click)="clearFilters()">Restablecer filtros</button>
+                <button matButton="outlined" type="button" class="quiet-button" (click)="clearFilters()">Restablecer filtros</button>
               }
             </li>
           }

@@ -13,25 +13,20 @@
           <fieldset class="profile-checkboxes" tabindex="-1" [disabled]="saving()" [attr.aria-busy]="saving()" [attr.aria-invalid]="profileError() ? true : null" [attr.aria-describedby]="profileError() ? 'profile-error' : null">
             <legend class="visually-hidden">Perfiles institucionales</legend>
             @for (prof of availableProfiles; track prof.code) {
-              <label class="profile-card">
-                <input
-                  type="checkbox"
-                  [checked]="isSelected(prof.code)"
-                  (change)="toggleProfile(prof.code)"
-                />
+              <mat-checkbox class="profile-card" [disabled]="saving()" [checked]="isSelected(prof.code)" (change)="toggleProfile(prof.code)">
                 <div class="profile-info">
                   <strong>{{ prof.name }}</strong>
                   <p>{{ prof.description }}</p>
                 </div>
-              </label>
+              </mat-checkbox>
             }
           </fieldset>
           @if (profileError()) { <p id="profile-error" class="field-error" role="alert">{{ profileError() }}</p> }
           <div class="ui-form-actions editor-actions">
-            <button class="primary-button" type="button" [disabled]="saving()" (click)="saveProfiles()">
+            <button matButton="filled" class="primary-button" type="button" [disabled]="saving()" (click)="saveProfiles()">
               {{ saving() ? 'Guardando…' : 'Guardar perfiles' }}
             </button>
-            <button class="quiet-button" type="button" [disabled]="saving()" (click)="cancelEdit()">
+            <button matButton="outlined" class="quiet-button" type="button" [disabled]="saving()" (click)="cancelEdit()">
               Cancelar
             </button>
           </div>
@@ -40,7 +35,7 @@
 
       @if (loading()) {
         <p class="helper" role="status">Cargando usuarios…</p>
-      } @else if (loadFailed()) { <button type="button" class="quiet-button" (click)="loadUsers()">Reintentar carga de usuarios</button> }
+      } @else if (loadFailed()) { <button matButton="outlined" type="button" class="quiet-button" (click)="loadUsers()">Reintentar carga de usuarios</button> }
       @else {
         <div class="table-scroll" tabindex="0" role="region" aria-label="Usuarios y perfiles">
           <table>
@@ -73,7 +68,7 @@
                     @if (isSelf(user.id)) {
                       <span class="self-tag">(Usuario actual)</span>
                     } @else {
-                      <button
+                      <button matButton="text"
                         type="button"
                         class="text-button"
                         [disabled]="saving() || editingUser()?.id === user.id"

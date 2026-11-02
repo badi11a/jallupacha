@@ -22,6 +22,14 @@ test('generates a neutral consumer with provenance, refuses overwrite and detect
     const pkg = JSON.parse(readFileSync(join(output, 'package.json'), 'utf8'));
     const lock = JSON.parse(readFileSync(join(output, 'package-lock.json'), 'utf8'));
     const testConfig = JSON.parse(readFileSync(join(output, 'tsconfig.spec.json'), 'utf8'));
+    for (const dependency of ['@angular/material', '@angular/cdk']) {
+      assert.equal(pkg.dependencies[dependency], '22.2.1');
+      assert.equal(lock.packages[''].dependencies[dependency], pkg.dependencies[dependency]);
+      assert.equal(lock.packages['node_modules/' + dependency].version, pkg.dependencies[dependency]);
+    }
+    const theme = 'src/app/shared/ui/styles/material.scss';
+    assert.ok(angular.projects['frontend-base'].architect.build.options.styles.includes(theme));
+    assert.match(readFileSync(join(output, theme), 'utf8'), /@use '@angular\/material'/);
     for (const type of testConfig.compilerOptions.types) {
       const dependency = type === 'node' ? '@types/node' : type.split('/')[0];
       const declared = pkg.devDependencies[dependency] ?? pkg.dependencies[dependency];

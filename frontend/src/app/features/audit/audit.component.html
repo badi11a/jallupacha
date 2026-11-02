@@ -3,24 +3,24 @@
     <ui-panel headingId="audit-title" eyebrow="SEGURIDAD Y CONTROL" heading="Bitácora de auditoría inmutable">
 
       @if (error()) { <ui-message kind="error">{{ error() }}</ui-message> }
-      @if (error()) { <button type="button" class="quiet-button" (click)="load()">Reintentar consulta</button> }
+      @if (error()) { <button matButton="outlined" type="button" class="quiet-button" (click)="load()">Reintentar consulta</button> }
 
       <form class="ui-form-grid audit-filters" (ngSubmit)="search()" role="search" aria-label="Filtrar eventos de auditoría">
         <label class="field">Tipo de entidad
-          <select name="entityType" [(ngModel)]="entityType">
+          <mat-form-field appearance="outline" subscriptSizing="dynamic"><select matNativeControl name="entityType" [(ngModel)]="entityType">
             <option value="">Todas las entidades</option>
             <option value="PROCESS">Proceso (PROCESS)</option>
             <option value="USER">Usuario (USER)</option>
             <option value="PROCESS_TYPE">Tipo de proceso</option>
             <option value="ORGANIZATIONAL_UNIT">Unidad interna</option>
-          </select>
+          </select></mat-form-field>
         </label>
         <label class="field">Acción registrada
-          <input name="action" type="search" placeholder="Ej: PROCESS_APPROVED, USER_PROFILES_UPDATED" [(ngModel)]="action" />
+          <mat-form-field appearance="outline" subscriptSizing="dynamic"><input matInput name="action" type="search" placeholder="Ej: PROCESS_APPROVED, USER_PROFILES_UPDATED" [(ngModel)]="action" /></mat-form-field>
         </label>
         <div class="ui-form-actions">
-          <button class="primary-button" type="submit">Filtrar</button>
-          <button class="quiet-button" type="button" (click)="clear()">Limpiar</button>
+          <button matButton="filled" class="primary-button" type="submit">Filtrar</button>
+          <button matButton="outlined" class="quiet-button" type="button" (click)="clear()">Limpiar</button>
         </div>
       </form>
 
@@ -64,7 +64,7 @@
                   </td>
                   <td>
                     @if (entry.beforeValue || entry.afterValue) {
-                      <button
+                      <button matButton="text"
                         type="button"
                         class="text-button"
                         (click)="toggleDetail(entry.id)"

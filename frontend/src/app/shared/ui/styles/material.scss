@@ -1,0 +1,55 @@
+@use '@angular/material' as mat;
+
+/* Material is scoped to the consumer and its explicitly owned overlay container. */
+.ui-root, .ui-overlay-root {
+  @include mat.theme((
+    color: (primary: mat.$azure-palette, theme-type: light),
+    typography: (plain-family: var(--ui-font-family), brand-family: var(--ui-font-family)),
+    density: 0,
+  ));
+  @include mat.theme-overrides((
+    primary: var(--ui-color-primary), on-primary: var(--ui-color-on-primary),
+    surface: var(--ui-color-surface), on-surface: var(--ui-color-text),
+    on-surface-variant: var(--ui-color-text-muted), outline: var(--ui-color-border-strong),
+    error: var(--ui-color-error-text), on-error: var(--ui-color-on-primary),
+    surface-container: var(--ui-color-surface), surface-container-high: var(--ui-color-surface),
+    body-large-size: var(--ui-font-size-base), body-large-tracking: 0,
+    label-large-weight: var(--ui-font-weight-medium), label-large-tracking: 0,
+  ));
+  @include mat.button-overrides((
+    filled-container-shape: var(--ui-radius-md), text-container-shape: var(--ui-radius-md),
+    outlined-container-shape: var(--ui-radius-md),
+    filled-container-height: var(--ui-control-height), text-container-height: var(--ui-control-height),
+    outlined-container-height: var(--ui-control-height),
+  ));
+  @include mat.form-field-overrides((
+    outlined-container-shape: var(--ui-radius-md), container-height: var(--ui-control-height),
+    container-vertical-padding: 10px, outlined-outline-color: var(--ui-color-border-strong),
+    outlined-hover-outline-color: var(--ui-color-primary),
+    outlined-focus-outline-color: var(--ui-color-primary),
+    outlined-error-outline-color: var(--ui-color-error-text),
+    outlined-error-focus-outline-color: var(--ui-color-error-text),
+    outlined-error-hover-outline-color: var(--ui-color-error-text),
+  ));
+}
+
+:where(.ui-root) .danger-button {
+  @include mat.button-overrides((
+    filled-container-color: var(--ui-color-danger), filled-label-text-color: var(--ui-color-on-primary),
+    text-label-text-color: var(--ui-color-danger),
+  ));
+}
+:where(.ui-root) mat-form-field {
+  width: 100%; min-width: 0;
+  background: var(--ui-color-surface); border-radius: var(--ui-radius-md);
+}
+:where(.ui-root) input[matInput], :where(.ui-root) textarea[matInput], :where(.ui-root) select[matNativeControl] {
+  min-width: 0;
+  max-width: 100%;
+}
+:where(.ui-root) input[matInput]:focus-visible,
+:where(.ui-root) textarea[matInput]:focus-visible,
+:where(.ui-root) select[matNativeControl]:focus-visible { outline: none; }
+:where(.ui-root) button[matButton], :where(.ui-root) a[matButton] {
+  white-space: normal; height: auto; min-height: var(--ui-control-height); max-width: 100%;
+}

@@ -20,10 +20,12 @@
     "check:ui-compatibility": "node --test scripts/ui-compatibility.spec.mjs"
   },
   "dependencies": {
+    "@angular/cdk": "22.2.1",
     "@angular/common": "22.2.1",
     "@angular/compiler": "22.2.1",
     "@angular/core": "22.2.1",
     "@angular/forms": "22.2.1",
+    "@angular/material": "22.2.1",
     "@angular/platform-browser": "22.2.1",
     "@angular/router": "22.2.1",
     "rxjs": "7.8.2",
