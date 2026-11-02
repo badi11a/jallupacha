@@ -22,7 +22,7 @@ import { AuthenticatedUser } from '../common/auth.types';
 import { CreateRiskListValueDto } from './risk.dto';
 import { RiskService } from './risk.service';
 
-const RISK_READERS = ['ADMIN', 'PROCESS_OWNER', 'RISK_MANAGER'] as const;
+const RISK_READERS = ['ADMIN', 'PROCESS_OWNER', 'VALIDATOR', 'RISK_MANAGER'] as const;
 
 @Controller()
 @ApiTags('risk-catalogs')

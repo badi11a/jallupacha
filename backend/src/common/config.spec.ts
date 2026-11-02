@@ -9,7 +9,7 @@ describe('local demo runtime controls', () => {
   });
 
   it('leaves non-demo authentication modes unaffected', () => {
-    expect(() => validateDemoRuntime('0.0.0.0', 'google', 'production')).not.toThrow();
+    expect(() => validateDemoRuntime('0.0.0.0', 'local', 'production')).not.toThrow();
   });
 
   it('uses configured positive integer limits', () => {
@@ -88,7 +88,7 @@ describe('loadRuntimeConfig', () => {
   });
 
   it('accepts a server configuration without demo mode', () => {
-    apply({ ...base, APP_ENV: 'production', NODE_ENV: 'production', HOST: '0.0.0.0', AUTH_MODE: 'google' });
+    apply({ ...base, APP_ENV: 'production', NODE_ENV: 'production', HOST: '0.0.0.0', AUTH_MODE: 'local' });
     expect(loadRuntimeConfig().appEnv).toBe('production');
   });
 
@@ -99,7 +99,7 @@ describe('loadRuntimeConfig', () => {
     expect(() => loadRuntimeConfig()).toThrow('NODE_ENV');
     apply({ ...base, APP_ENV: 'development', NODE_ENV: 'production' });
     expect(() => loadRuntimeConfig()).toThrow('demo');
-    apply({ ...base, APP_ENV: 'production', NODE_ENV: 'production', AUTH_MODE: 'google', DEMO_DATA_ENABLED: 'true' });
+    apply({ ...base, APP_ENV: 'production', NODE_ENV: 'production', AUTH_MODE: 'local', DEMO_DATA_ENABLED: 'true' });
     expect(() => loadRuntimeConfig()).toThrow('demo');
     apply({ ...base, DATABASE_PASSWORD: '' });
     expect(() => loadRuntimeConfig()).toThrow('DATABASE_PASSWORD');
