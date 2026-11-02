@@ -16,7 +16,7 @@ Aplicar los patrones dentro de `ui-root`. Contador y validación usan el criteri
 
 ## 2. Anatomía del campo
 
-C-053: los controles migrados utilizan la presentación de Angular Material, etiquetas externas o `mat-label` inequívocamente asociadas y errores del contrato actual. Los formularios existentes conservan ngModel o FormGroup; no se cambian límites ni estados por uniformidad. El bloqueo de guardado se comprueba sobre cada control, especialmente los personalizados. El kit conserva la confirmación accesible de descarte y los errores persistentes; un aviso temporal no los sustituye. La adaptación de Material debe respetar `aria-describedby` de ayudas/contadores y errores externos y el foco del primer control inválido.
+C-056: los controles migrados utilizan la presentación de Angular Material, etiquetas externas o `mat-label` inequívocamente asociadas y errores del contrato actual. Los formularios existentes conservan ngModel o FormGroup; no se cambian límites ni estados por uniformidad. El bloqueo de guardado se comprueba sobre cada control, especialmente los personalizados. El kit conserva la confirmación accesible de descarte y los errores persistentes; un aviso temporal no los sustituye. La adaptación de Material debe respetar `aria-describedby` de ayudas/contadores y errores externos y el foco del primer control inválido.
 
 Cada campo tiene etiqueta visible y asociación `for`/`id`, ayuda cuando aporta información y error junto al control. Usar IDs únicos, incluyendo instancia/registro si hay varios formularios. No usar placeholder como etiqueta ni color/asterisco como única indicación de obligatoriedad.
 

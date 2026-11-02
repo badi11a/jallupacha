@@ -1,6 +1,6 @@
 # Catálogo de componentes — Sistema de diseño digital
 
-**Revisión:** C-053, 2026-10-27. **Estado:** contratos del kit y base 0.3.0 en validación técnica; adopción institucional fuera del alcance de esta revisión.
+**Revisión:** C-056, 2026-10-27. **Estado:** contratos del kit y base 0.3.0 en validación técnica; adopción institucional fuera del alcance de esta revisión.
 
 La API se coteja con [el punto de entrada público](../../frontend/src/app/shared/ui/index.ts). Disponible no significa validado con usuarios. [STD-UX-001](marco_estandar_ux_institucional.md) establece reglas y evaluación; [fundamentos](design-system.md), identidad y tokens. Rutas, permisos, contenido y reglas de negocio pertenecen a cada producto.
 
@@ -12,7 +12,7 @@ La API se coteja con [el punto de entrada público](../../frontend/src/app/share
 4. Componer mediante contenido proyectado, opciones públicas y clases compartidas antes de extender. El producto decide qué se muestra y qué acción ejecuta.
 5. Extensiones aditivas: necesidad concreta, contrato, estados y verificación. Renombrar/retirar API: identificar consumidores, adaptación y registro en el mismo cambio de Git.
 6. Una variante se justifica por tarea y contexto, documentando diferencias y accesibilidad; un selector más específico o copia del componente no es una variante mantenible.
-7. No extraer paquetes, instalar dependencias ni crear envoltorios sin necesidad demostrada. C-048 autoriza exportar núcleo y kit mediante la plantilla local versionada de [STD-FE-001](base-frontend.md), con hashes, comprobación de consumidores y sin publicación externa automática. C-053 adopta controles Material con imports explícitos y mantiene tablas semánticas y patrones compartidos. No se crean envoltorios para cada control.
+7. No extraer paquetes, instalar dependencias ni crear envoltorios sin necesidad demostrada. C-048 autoriza exportar núcleo y kit mediante la plantilla local versionada de [STD-FE-001](base-frontend.md), con hashes, comprobación de consumidores y sin publicación externa automática. C-056 adopta controles Material con imports explícitos y mantiene tablas semánticas y patrones compartidos. No se crean envoltorios para cada control.
 
 Ejemplo desde un consumidor situado en `app/`:
 
@@ -124,4 +124,4 @@ Antes de adaptar otro producto: comprobar controles externos antes/después de c
 
 C-048: el destino predeterminado de identidad del módulo pasó a la raíz neutral. Jallupacha sigue proporcionando /mapa explícitamente; consumidores que dependían del valor implícito anterior deben declarar su destino. En ese cambio se introdujo la base 0.1.0. La versión 0.2.1 del generador y del contrato: C-050 amplió paginación en 0.2.0 y C-052 corrige la dependencia de tipos para instalar/probar el consumidor de forma independiente, sin cambiar APIs visuales.
 
-**Migración C-053 a 0.3.0:** incorporar Material/CDK 22.2.1 y lockfile, tema Sass y controles con sus módulos públicos. UiMaterialInputDirective asocia uiInvalid al estado visual de matInput: undefined conserva el ErrorStateMatcher de Angular; true/false explícitos respetan la validación manual del consumidor. Mantener aria-describedby, etiquetas y mensajes existentes. UiDialogService y UiPagination conservan APIs; la paginación usa botones Material y no necesita MatPaginator. Revisar fuentes de diálogos y carga diferida, verificar el consumidor y registrar personalizaciones sin sobrescritura. Estado en validación; evidencias y límites en C-053.
+**Migración C-056 a 0.3.0:** incorporar Material/CDK 22.2.1 y lockfile, tema Sass y controles con sus módulos públicos. UiMaterialInputDirective asocia uiInvalid al estado visual de matInput: undefined conserva el ErrorStateMatcher de Angular; true/false explícitos respetan la validación manual del consumidor. Mantener aria-describedby, etiquetas y mensajes existentes. UiDialogService y UiPagination conservan APIs; la paginación usa botones Material y no necesita MatPaginator. Revisar fuentes de diálogos y carga diferida, verificar el consumidor y registrar personalizaciones sin sobrescritura. Estado en validación; evidencias y límites en C-056.

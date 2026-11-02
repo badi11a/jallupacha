@@ -7,7 +7,7 @@ Este documento formaliza la arquitectura técnica de la versión 15 (v15), reemp
 * **Entorno de ejecución:** Despliegue *on-premise* en la red interna (intranet) institucional.
 * **Plataforma backend:** Node.js, NestJS, TypeScript, TypeORM.
 * **Base de datos oficial:** **Oracle Database 19c** (instalación directa, sin Docker, `synchronize: false`).
-* **Plataforma frontend:** Angular (Single Page Application, Standalone Components, Vitest), Angular Material/CDK 22.2.1 como base de controles; tema Sass institucional y CSS de composición con tokens de diseño (C-053).
+* **Plataforma frontend:** Angular (Single Page Application, Standalone Components, Vitest), Angular Material/CDK 22.2.1 como base de controles; tema Sass institucional y CSS de composición con tokens de diseño (C-056).
 * **Seguridad de referencia:** OWASP ASVS v4 Nivel 2 (PT-06).
 
 ---
@@ -142,7 +142,7 @@ Todas las rutas operan bajo el prefijo `/api/`, validan sesión y consultan perf
 
 ## 5. Arquitectura del Frontend y Principios UX
 
-**Base de desarrollo C-048/C-053:** se adopta [STD-FE-001](../diseno/base-frontend.md) para núcleo configurable, organización por funcionalidades, carga diferida y generación reproducible de plantilla neutral. C-053 autoriza la migración a Angular Material/CDK como base de controles, conservando Angular Standalone, Signals, contratos de negocio/sesión, navegación y siete tokens de marca. El tema compartido usa Sass; la composición propia conserva CSS. La plantilla y sus consumidores de prueba no equivalen a adopción institucional ni autorizan publicar paquetes externos.
+**Base de desarrollo C-048/C-056:** se adopta [STD-FE-001](../diseno/base-frontend.md) para núcleo configurable, organización por funcionalidades, carga diferida y generación reproducible de plantilla neutral. C-056 autoriza la migración a Angular Material/CDK como base de controles, conservando Angular Standalone, Signals, contratos de negocio/sesión, navegación y siete tokens de marca. El tema compartido usa Sass; la composición propia conserva CSS. La plantilla y sus consumidores de prueba no equivalen a adopción institucional ni autorizan publicar paquetes externos.
 
 **Consumo del kit (C-046):** `app-root` activa el contenedor `ui-root` para tokens y estilos compartidos; `body.ui-page` consume el restablecimiento opcional de página. Navegación, contenido de rutas y host modal quedan dentro del mismo ámbito, sin cambiar destinos ni controles de autorización. El CSS genérico del kit no define estilos fuera de ese contenedor. Los criterios de longitud de los contratos vigentes se conservan; el kit permite seleccionar UTF-16 o el cálculo de validator según el servidor consumidor.
 

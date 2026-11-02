@@ -55,7 +55,7 @@ Estos siete colores son los valores de referencia aprobados para el kit. Sus có
 
 ## 4. Aplicación al kit Angular
 
-C-053: Angular Material/CDK constituye la base de controles por solicitud del responsable. Conservar exactamente los siete `--brand-*`, la cadena tipográfica de sistema y los roles semánticos; mapearlos mediante APIs públicas de tema/overrides sin redefinir selectores internos de Material. El tema Sass y los estilos de composición se mantienen dentro del kit. El contenedor CDK de overlays recibe su ámbito explícito porque se crea fuera de `app-root`; no se coloca `ui-root` indiscriminadamente en `body`. No se agregan fuentes/iconos de servicios externos. Contraste, foco, errores, densidad y reajuste se verifican nuevamente; las evidencias del CSS anterior no acreditan los controles migrados.
+C-056: Angular Material/CDK constituye la base de controles por solicitud del responsable. Conservar exactamente los siete `--brand-*`, la cadena tipográfica de sistema y los roles semánticos; mapearlos mediante APIs públicas de tema/overrides sin redefinir selectores internos de Material. El tema Sass y los estilos de composición se mantienen dentro del kit. El contenedor CDK de overlays recibe su ámbito explícito porque se crea fuera de `app-root`; no se coloca `ui-root` indiscriminadamente en `body`. No se agregan fuentes/iconos de servicios externos. Contraste, foco, errores, densidad y reajuste se verifican nuevamente; las evidencias del CSS anterior no acreditan los controles migrados.
 
 1. Mantener tokens y componentes reutilizables en `frontend/src/app/shared/ui/`.
 2. Aplicar la paleta mediante variables semánticas, evitando códigos HEX repetidos en componentes.
