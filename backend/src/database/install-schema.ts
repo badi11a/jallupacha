@@ -2,6 +2,7 @@ import 'dotenv/config';
 import { DataSource } from 'typeorm';
 import { assertSchemaInstallAllowed, databaseOptions } from '../common/config';
 import { MvpV14Initial1770000000000 } from './migrations/1770000000000-InitialMvpV14';
+import { CreateLocalCredential1770000000001 } from './migrations/1770000000001-CreateLocalCredential';
 import { applyRuntimeGrants } from './grants';
 import { seedProcesses } from './seed-processes';
 import { SCHEMA_SEQUENCES, SCHEMA_TABLES, requiredOracleIdentifier } from './schema';
@@ -20,6 +21,7 @@ async function installSchema(): Promise<void> {
     try {
       await ddlRunner.connect();
       await new MvpV14Initial1770000000000().up(ddlRunner);
+      await new CreateLocalCredential1770000000001().up(ddlRunner);
     } finally {
       await ddlRunner.release();
     }

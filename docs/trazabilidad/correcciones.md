@@ -987,3 +987,28 @@ Entorno: 2026-10-27, America/Santiago; Node 24.15.0, npm disponible 12.2.0 y Chr
 - Compilación TypeScript backend limpia (`npm run build`).
 - Pruebas unitarias backend: 13 suites y 63 pruebas aprobadas (`npm test`).
 - Pruebas E2E de backend: 5 suites y 116 pruebas aprobadas (`test/authorization`, `test/management-authorization`, `test/processes`, `test/session-contract`, `test/demo-session`).
+
+## C-056 — Consolidación de la cadena de migraciones para instalación reproducible desde cero
+
+**Clasificación:** Defecto de implementación frente a PT-04/PT-05 (ambientes reproducibles desde cero). Al intentar `db:reset:local` sobre un esquema realmente vacío, la migración `MvpV14Initial1770000000000` fallaba con `ORA-00955` porque `InitialIncrementOne1740000000000` (y sus parches `1740000000001` a `1740000000005`) creaban de antemano las mismas tablas base (`APP_USER`, `AUDIT`, `MACROPROCESS`, `PROCESS`, `PROCESS_VERSION`, etc.) con un diseño ya superado. Ningún ambiente real corría esta cadena completa: se bootstrapeaban vía `install-schema.ts` + `reconcile-migrations.ts` (que registraba manualmente estas migraciones como aplicadas sin ejecutarlas), ocultando el defecto. El responsable confirma que la generación "Incremento 1" es histórica, sin ambientes dependientes, y autoriza consolidar `InitialMvpV14` como única fuente de verdad para instalaciones nuevas.
+
+**Fuentes y alcance:**
+- PT-04/PT-05: instalación reproducible desde cero en el ambiente de pruebas.
+- PT-14: mínimos privilegios (el usuario runtime no tiene `DELETE` sobre tablas de proceso).
+- `src/database/mvp-v14-schema.ts` ya declaraba `RISK_TYPE`, `RISK_LEVEL` y `LOCAL_CREDENTIAL` como tablas del modelo v14, pero la migración nunca las creaba.
+
+**Implementación:**
+- `src/database/migrations/1770000000000-InitialMvpV14.ts`: se agregó `RISK_TYPE`, `RISK_LEVEL` y la secuencia `MACROPROCESS_CODE_SEQ` (usada por `catalog.service.ts` y nunca recreada tras eliminar la migración de origen); se quitó `SECURITY_EVENT.IP_ADDRESS` (la IP vive únicamente en `SECURITY_EVENT_IP` para anonimización independiente, tal como ya reflejaban `security-event.entity.ts` y `reconcile-migrations.ts`).
+- Se eliminaron las 6 migraciones históricas superadas (`InitialIncrementOne`, `MoveSecurityEventIp`, `NormalizeSeedIdentityPresentation`, `CreateMissingAuditTable`, `CreateProcessDrafts`, `CreateProcessRisks`) y el script `reconcile-migrations.ts`, ya innecesario.
+- `src/database/reset-local.ts`: su lista de borrado (`TABLE_DROP_ORDER`/`SEQUENCES`), mantenida a mano y ya desincronizada (le faltaban `MACROPROCESS_TYPE`, `ORGANIZATIONAL_UNIT`, `PROCESS_UNIT`, `PROCESS_RELATION`), ahora importa `SCHEMA_TABLES`/`SCHEMA_SEQUENCES` de `schema.ts`.
+- `src/database/schema.ts`: eliminada su copia duplicada de las listas; ahora reexporta desde `mvp-v14-schema.ts` (fuente única, la misma que usa la migración).
+- `src/database/install-schema.ts`: ahora también ejecuta `CreateLocalCredential1770000000001`, que antes quedaba fuera de ese atajo.
+- `backend/test/process-drafts.oracle.e2e-spec.ts`: el cleanup de datos de prueba agregado hoy mismo usaba la conexión runtime restringida; falla con `ORA-41900` porque esa cuenta no tiene `DELETE` (PT-14). Se movió a una conexión separada con el usuario propietario, solo para la limpieza.
+- `backend/test/release01-map-risks.oracle.e2e-spec.ts`: su caso negativo `other-owner-session` usaba perfil `VALIDATOR`, que C-055 incorporó a `RISK_READERS`; se actualizó la expectativa de 403 a 200.
+- `src/database/grants.spec.ts`: se retiró la excepción `LEGACY_GRANT_MIGRATIONS`, ya sin migraciones que la necesiten.
+
+**Verificaciones ejecutadas:**
+- Compilación TypeScript backend limpia (`npx tsc --noEmit`).
+- Pruebas unitarias backend: 13 suites y 63 pruebas aprobadas (`npm test`).
+- `db:reset:local` ejecutado de punta a punta contra Oracle local real (drop total, 2 migraciones limpias, grants, siembra): 23 tablas, cadena de migraciones sin colisión, catálogos de riesgo y usuarios demo poblados correctamente.
+- Suite E2E Oracle completa contra esa base recién instalada: 124 pruebas aprobadas, 7 omitidas (suite `schema-install` con opt-in explícito, no ejecutada para no repetir el drop destructivo).

@@ -20,6 +20,8 @@ describe('process drafts (Oracle)', () => {
   let admin: AuthenticatedUser;
   let macroprocessId: number;
   let processTypeId: number;
+  let processId!: number;
+  let childId!: number;
   const originalSchema = process.env.ORACLE_SCHEMA;
   const originalDatabaseUser = process.env.DATABASE_USER;
 
@@ -60,6 +62,26 @@ describe('process drafts (Oracle)', () => {
   });
 
   afterAll(async () => {
+    if (Number.isSafeInteger(processId) && Number.isSafeInteger(childId)) {
+      // El usuario runtime (DATABASE_USER) no tiene DELETE por diseño (PT-14); la limpieza
+      // de datos de prueba se hace con el usuario propietario, nunca con el de la app.
+      const schema = process.env.ORACLE_SCHEMA!.toUpperCase();
+      const ownerSource = new DataSource(databaseOptions(true));
+      await ownerSource.initialize();
+      try {
+        await ownerSource.query(
+          `UPDATE "${schema}"."PROCESS" SET CURRENT_VERSION_ID = NULL WHERE ID IN (:1, :2)`,
+          [processId, childId]
+        );
+        await ownerSource.query(
+          `DELETE FROM "${schema}"."PROCESS_VERSION" WHERE PROCESS_ID IN (:1, :2)`,
+          [processId, childId]
+        );
+        await ownerSource.query(`DELETE FROM "${schema}"."PROCESS" WHERE ID IN (:1, :2)`, [processId, childId]);
+      } finally {
+        await ownerSource.destroy();
+      }
+    }
     await dataSource?.destroy();
     restoreEnvironment('ORACLE_SCHEMA', originalSchema);
     restoreEnvironment('DATABASE_USER', originalDatabaseUser);
@@ -88,7 +110,7 @@ describe('process drafts (Oracle)', () => {
       processTypeId,
       name: marker
     });
-    const processId = Number(created.id);
+    processId = Number(created.id);
     expect(Number.isSafeInteger(processId)).toBe(true);
     expect(created).toMatchObject({
       code: expect.stringMatching(/^PR\d+$/),
@@ -111,7 +133,7 @@ describe('process drafts (Oracle)', () => {
       name: `${marker} hijo`,
       parentProcessId: processId
     });
-    const childId = Number(child.id);
+    childId = Number(child.id);
     expect(Number.isSafeInteger(childId)).toBe(true);
     await expect(processes.update(processId, owner, {
       revision: 1,

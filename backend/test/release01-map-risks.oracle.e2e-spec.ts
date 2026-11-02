@@ -188,10 +188,11 @@ describe('Release 01 internal process map and risk flow (Oracle)', () => {
       })]
     });
 
+    // C-055: VALIDATOR fue incorporado a RISK_READERS (REQ-06/REQ-07); ya no es un caso negativo.
     await request(app.getHttpServer())
       .get(`/api/processes/${processNode.id}/risks`)
       .set('Cookie', 'jallupacha_session=other-owner-session')
-      .expect(403);
+      .expect(200);
     await request(app.getHttpServer())
       .get(`/api/processes/${processNode.id}/risks`)
       .set('Cookie', 'jallupacha_session=consultation-session')

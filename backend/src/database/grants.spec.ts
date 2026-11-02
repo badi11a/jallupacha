@@ -6,12 +6,6 @@ import { SCHEMA_ID_GENERATORS } from './schema';
 const srcDir = join(__dirname, '..');
 const migrationsDir = join(__dirname, 'migrations');
 const databaseDir = join(__dirname, '..', '..', 'database');
-// Migrations applied before grants were centralized; they may still contain GRANT statements.
-const LEGACY_GRANT_MIGRATIONS = new Set([
-  '1740000000003-CreateMissingAuditTable.ts',
-  '1740000000004-CreateProcessDrafts.ts',
-  '1740000000005-CreateProcessRisks.ts'
-]);
 
 function sourceFiles(dir: string): string[] {
   return readdirSync(dir, { withFileTypes: true }).flatMap((entry) => {
@@ -82,19 +76,9 @@ describe('runtime grants', () => {
     for (const object of declaredObjects) expect(created).toContain(object);
   });
 
-  it('keeps grants out of new migrations and consistent with legacy ones', () => {
+  it('keeps grants out of migrations entirely', () => {
     for (const name of migrations) {
-      const text = read(join(migrationsDir, name));
-      if (!LEGACY_GRANT_MIGRATIONS.has(name)) {
-        expect(text).not.toMatch(/\bGRANT\b/);
-        continue;
-      }
-      const legacy = [...text.matchAll(/GRANT ([A-Z, ]+) ON (?:\$\{table\('([A-Z_]+)'\)\}|\$\{table\})/g)];
-      expect(legacy.length).toBeGreaterThan(0);
-      for (const [, privileges, object] of legacy) {
-        const expected = declared.find((grant) => grant.object === (object ?? 'AUDIT'));
-        expect(expected?.privileges.join(', ')).toBe(privileges.trim());
-      }
+      expect(read(join(migrationsDir, name))).not.toMatch(/\bGRANT\b/);
     }
   });
 
