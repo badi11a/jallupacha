@@ -1,14 +1,15 @@
+import { MatButtonModule } from '@angular/material/button';
 import { Component, ViewChild, inject } from '@angular/core';
 import { RouterOutlet } from '@angular/router';
 import { AppSession } from './session';
 import { LeavesWithConfirmation } from './core/platform';
 import { UiDialogHostComponent, UiMessageComponent, UiModuleNavComponent } from './shared/ui';
 @Component({ selector: 'app-root', host: { class: 'ui-root' },
-  imports: [RouterOutlet, UiDialogHostComponent, UiMessageComponent, UiModuleNavComponent],
+  imports: [MatButtonModule, RouterOutlet, UiDialogHostComponent, UiMessageComponent, UiModuleNavComponent],
   template: `
     <a class="skip-link" href="#main-content">Ir al contenido principal</a>
     <ui-module-nav appName="Aplicación base" appLink="/inicio" [items]="[{ label: 'Inicio', link: '/inicio' }, { label: 'Ejemplo', link: '/ejemplo' }]">
-      @if (session.isAuthenticated()) { <button sessionControls type="button" class="quiet-button" [disabled]="session.logoutInProgress()" (click)="logout()">Cerrar sesión</button> }
+      @if (session.isAuthenticated()) { <button matButton="outlined" sessionControls type="button" class="quiet-button" [disabled]="session.logoutInProgress()" (click)="logout()">Cerrar sesión</button> }
     </ui-module-nav>
     @if (session.logoutInProgress()) { <p role="status">Cerrando sesión…</p> }
     <main id="main-content" tabindex="-1" [attr.inert]="session.logoutInProgress() ? '' : null">

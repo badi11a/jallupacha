@@ -1,6 +1,6 @@
 # Registro de cambios SDD
 
-## Línea base 0.2.1
+## Línea base 0.3.0
 
 Aplicación generada a partir de la base frontend. El manifiesto registra procedencia; no se presume que las pruebas del proyecto consumidor hayan sido ejecutadas.
 

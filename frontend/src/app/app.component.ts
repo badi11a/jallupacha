@@ -1,3 +1,4 @@
+import { MatButtonModule } from '@angular/material/button';
 import { Component, ElementRef, ViewChild, computed, inject, signal } from '@angular/core';
 import { RouterOutlet } from '@angular/router';
 import { AuthService } from './core/auth/auth.service';
@@ -8,7 +9,7 @@ import { LeavesWithConfirmation } from './core/auth/unsaved-changes.guard';
   selector: 'app-root',
   host: { class: 'ui-root' },
   standalone: true,
-  imports: [RouterOutlet, UiModuleNavComponent, UiBadgeComponent, UiDialogHostComponent, UiMessageComponent],
+  imports: [MatButtonModule, RouterOutlet, UiModuleNavComponent, UiBadgeComponent, UiDialogHostComponent, UiMessageComponent],
   template: `
     <a class="skip-link" href="#main-content" (click)="focusContent($event)">Ir al contenido principal</a>
 
@@ -23,7 +24,7 @@ import { LeavesWithConfirmation } from './core/auth/unsaved-changes.guard';
           @if (primaryProfileBadge()) {
             <ui-badge tone="neutral">{{ primaryProfileBadge() }}</ui-badge>
           }
-          <button type="button" class="quiet-button logout-btn" [disabled]="logoutBusy()" (click)="logout()" aria-label="Cerrar sesión">Cerrar sesión</button>
+          <button matButton="outlined" type="button" class="quiet-button logout-btn" [disabled]="logoutBusy()" (click)="logout()" aria-label="Cerrar sesión">Cerrar sesión</button>
         </div>
       </ui-module-nav>
     }
@@ -56,22 +57,8 @@ import { LeavesWithConfirmation } from './core/auth/unsaved-changes.guard';
       color: var(--ui-color-text);
       font-weight: var(--ui-font-weight-medium);
     }
-    .logout-btn {
-      padding: 0.25rem 0.6rem;
-      border: 1px solid var(--ui-color-border-strong);
-      border-radius: var(--ui-radius-md);
-      background: transparent;
-      color: var(--ui-color-text);
-      font-size: var(--ui-font-size-xs);
-      font-weight: var(--ui-font-weight-medium);
-      cursor: pointer;
-      transition: all 0.15s ease;
-    }
-    .logout-btn:hover {
-      color: var(--ui-color-error-text);
-      border-color: var(--ui-color-error-text);
-      background: var(--ui-color-error-background);
-    }
+    .logout-btn { font-size: var(--ui-font-size-xs); }
+
   `]
 })
 export class AppComponent {

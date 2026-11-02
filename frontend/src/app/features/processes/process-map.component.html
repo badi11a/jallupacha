@@ -15,19 +15,19 @@
 </section>
 
 <section class="panel map-panel" aria-label="Explorar el mapa de procesos">
-  @if (error()) { <ui-message kind="error">{{ error() }}</ui-message><button type="button" class="quiet-button" (click)="load()">Reintentar carga</button> }
+  @if (error()) { <ui-message kind="error">{{ error() }}</ui-message><button matButton="outlined" type="button" class="quiet-button" (click)="load()">Reintentar carga</button> }
   @if (loading()) { <p class="helper" role="status">Cargando información…</p> }
   @else if (!error()) {
     <div class="map-toolbar">
       <div class="map-search">
         <span aria-hidden="true" class="search-icon">⌕</span>
         <label class="visually-hidden" for="map-filter">Buscar macroproceso</label>
-        <input id="map-filter" type="search" placeholder="Buscar macroproceso…" [value]="filter()" (input)="updateFilter($any($event.target).value)" />
+        <mat-form-field appearance="outline" subscriptSizing="dynamic"><input matInput id="map-filter" type="search" placeholder="Buscar macroproceso…" [value]="filter()" (input)="updateFilter($any($event.target).value)" /></mat-form-field>
       </div>
       <div class="family-filters" role="group" aria-label="Filtrar por clasificación">
-        <button type="button" [attr.aria-pressed]="selectedFamily() === null" (click)="updateFamily(null)">Todos</button>
+        <button matButton="text" type="button" [attr.aria-pressed]="selectedFamily() === null" (click)="updateFamily(null)">Todos</button>
         @for (family of map(); track family.id) {
-          <button type="button" [attr.aria-pressed]="selectedFamily() === family.id" (click)="updateFamily(family.id)">{{ family.name }}</button>
+          <button matButton="text" type="button" [attr.aria-pressed]="selectedFamily() === family.id" (click)="updateFamily(family.id)">{{ family.name }}</button>
         }
       </div>
     </div>

@@ -34,30 +34,36 @@ try {
   }
   async function styles(name, selector) {
     await page.waitForFunction(selector => [...document.querySelectorAll(selector)].every(element => {
-      const expected = element.getAttribute('aria-invalid') === 'true' ? 'rgb(152, 45, 45)' : 'rgb(138, 147, 166)';
-      return getComputedStyle(element).borderTopColor === expected;
-    }), selector, { polling: 'raf', timeout: 3000 });
-    const items = await page.locator(selector).evaluateAll(elements => elements.map(element => {
-      const style = getComputedStyle(element);
-      return { tag: element.tagName, type: element.type, minHeight: style.minHeight, radius: style.borderRadius, paddingTop: style.paddingTop,
-        paddingBottom: style.paddingBottom, paddingLeft: style.paddingLeft, border: style.borderTopColor,
-        invalid: element.getAttribute('aria-invalid') === 'true', foreground: style.color, background: style.backgroundColor };
-    }));
-    assert.ok(items.length, name + ' must contain controls');
-    for (const item of items) {
-      assert.equal(item.minHeight, '42px', name);
-      assert.equal(item.radius, '7px', name);
-      assert.equal(item.paddingTop, '8.8px', name);
-      assert.equal(item.paddingBottom, '8.8px', name);
-      assert.equal(item.border, item.invalid ? 'rgb(152, 45, 45)' : 'rgb(138, 147, 166)', name);
-    }
-    const contrast = await page.locator(selector).evaluateAll(elements => {
+      const outline = element.closest('mat-form-field')?.querySelector('.mdc-notched-outline__leading');
+      return outline && getComputedStyle(outline).borderTopColor ===
+        (element.getAttribute('aria-invalid') === 'true' ? 'rgb(152, 45, 45)' : 'rgb(138, 147, 166)');
+    }), selector, { timeout: 3000 });
+    const items = await page.locator(selector).evaluateAll(elements => {
       const rgb = text => (text.match(/[\d.]+/g) ?? []).slice(0, 3).map(Number);
       const lum = color => rgb(color).map(value => { const s = value / 255; return s <= .04045 ? s / 12.92 : ((s + .055) / 1.055) ** 2.4; }).reduce((sum, value, index) => sum + value * [.2126, .7152, .0722][index], 0);
-      const ratio = (a, b) => (Math.max(lum(a), lum(b)) + .05) / (Math.min(lum(a), lum(b)) + .05);
-      return elements.map(element => { const style = getComputedStyle(element); return { text: ratio(style.color, style.backgroundColor), border: ratio(style.borderTopColor, style.backgroundColor) }; });
+      const ratio = (a,b) => (Math.max(lum(a),lum(b))+.05)/(Math.min(lum(a),lum(b))+.05);
+      return elements.map(element => {
+        const field = element.closest('mat-form-field');
+        // Test-only observation of Material's painted outline, never a production style dependency.
+        const outline = field?.querySelector('.mdc-notched-outline__leading');
+        const style = getComputedStyle(element), edge = outline && getComputedStyle(outline);
+        let background = 'rgb(255, 255, 255)';
+        for(let p=element;p;p=p.parentElement){ const c=getComputedStyle(p).backgroundColor; if(c!=='rgba(0, 0, 0, 0)'&&c!=='transparent'){background=c;break;} }
+        return { tag:element.tagName, material:!!field, height:field?.getBoundingClientRect().height,
+          radius:edge?.borderTopLeftRadius, border:edge?.borderTopColor, invalid:element.getAttribute('aria-invalid')==='true',
+          foreground:style.color,background,textContrast:ratio(style.color,background),borderContrast:edge&&ratio(edge.borderTopColor,background) };
+      });
     });
-    for (const pair of contrast) { assert.ok(pair.text >= 4.5, name + ' text contrast'); assert.ok(pair.border >= 3, name + ' border contrast'); }
+    assert.ok(items.length,name+' must contain controls');
+    for(const item of items){
+      assert.equal(item.material,true,name);
+      assert.ok(item.height >= 42,name+' control height');
+      assert.equal(item.radius,'7px',name);
+      assert.equal(item.border,item.invalid?'rgb(152, 45, 45)':'rgb(138, 147, 166)',name);
+      assert.ok(item.textContrast>=4.5,name+' text contrast');
+      assert.ok(item.borderContrast>=3,name+' border contrast');
+    }
+    const contrast=items.map(({textContrast,borderContrast})=>({text:textContrast,border:borderContrast}));
     checks.push({ name, controls: items, contrast, state: 'passed' });
   }
   async function reflow(name) {
@@ -87,7 +93,7 @@ try {
   }
   async function resolveDiscard() {
     await page.getByRole('button', { name: 'Descartar cambios', exact: true }).click();
-    await page.locator('dialog').waitFor({ state: 'detached' });
+    await page.getByRole('dialog').waitFor({ state: 'detached' });
   }
   async function counterCheck(fieldSelector, counterSelector, name) {
     const field = page.locator(fieldSelector), counter = page.locator(counterSelector);
@@ -155,6 +161,36 @@ try {
   assert.equal(await page.locator('#field-name').inputValue(), 'Proceso modificado');
   assert.equal(await page.locator('#field-name').isDisabled(), false);
   await page.unroute('**/api/management/processes/1');
+  const externalBefore = await page.evaluate(() => {
+    const region=document.createElement('section');region.id='outside-kit';region.innerHTML='<label>External<input value="External"></label><button type="button">External action</button>';
+    document.body.append(region);
+    document.querySelector('app-root').style.setProperty('--ui-color-primary','#4f235c');
+    return [...region.querySelectorAll('input,button')].map(e=>{const s=getComputedStyle(e);return [s.color,s.backgroundColor,s.fontSize,s.borderRadius,e.getBoundingClientRect().width];});
+  });
+  await page.getByRole('button', { name: 'Cancelar', exact: true }).click();
+  const dialog=page.getByRole('dialog'); await dialog.waitFor();
+  assert.equal(await dialog.getAttribute('aria-labelledby'),'ui-dialog-title');
+  const discard=dialog.getByRole('button',{name:'Descartar cambios',exact:true});
+  await page.waitForFunction(() => getComputedStyle(document.querySelector('.ui-dialog-panel')).getPropertyValue('--ui-color-primary').trim()==='#4f235c');
+  assert.equal(await dialog.getByRole('button',{name:'Continuar editando',exact:true}).evaluate(e=>getComputedStyle(e).color),'rgb(79, 35, 92)');
+  assert.equal(await discard.evaluate(e=>getComputedStyle(e).backgroundColor),'rgb(168, 50, 50)','danger tone stays semantic');
+  assert.deepEqual(await page.locator('#outside-kit input, #outside-kit button').evaluateAll(es=>es.map(e=>{const s=getComputedStyle(e);return [s.color,s.backgroundColor,s.fontSize,s.borderRadius,e.getBoundingClientRect().width];})),externalBefore);
+  await dialog.getByRole('button',{name:'Continuar editando',exact:true}).focus();
+  await page.keyboard.press('Shift+Tab');
+  assert.equal(await discard.evaluate(e=>e===document.activeElement),true,'focus wraps inside the modal');
+  await page.keyboard.press('Tab');
+  assert.equal(await dialog.getByRole('button',{name:'Continuar editando',exact:true}).evaluate(e=>e===document.activeElement),true);
+  await page.screenshot({path:join(output,'dialog-desktop.png')});
+  await page.setViewportSize({width:320,height:900});
+  const dialogGeometry=await dialog.evaluate(e=>({left:e.getBoundingClientRect().left,right:e.getBoundingClientRect().right,width:document.documentElement.clientWidth}));
+  assert.ok(dialogGeometry.left>=0&&dialogGeometry.right<=dialogGeometry.width,'dialog fits 320px');
+  await page.screenshot({path:join(output,'dialog-320.png')});
+  await page.setViewportSize({width:1440,height:1000});
+  await page.keyboard.press('Escape'); await dialog.waitFor({state:'detached'});
+  assert.equal(await page.getByRole('button',{name:'Cancelar',exact:true}).evaluate(e=>e===document.activeElement),true,'Escape restores opener focus');
+  assert.equal(await page.locator('#field-name').inputValue(),'Proceso modificado');
+  await page.evaluate(()=>{document.querySelector('app-root').style.removeProperty('--ui-color-primary');document.querySelector('#outside-kit').remove();});
+  checks.push({name:'material-dialog-theme-isolation-tab-trap-escape-restoration-320',state:'passed'});
   await page.getByRole('button', { name: 'Cancelar', exact: true }).click();
   await page.getByRole('button', { name: 'Continuar editando', exact: true }).click();
   assert.equal(await page.locator('#field-name').inputValue(), 'Proceso modificado');
@@ -181,14 +217,14 @@ try {
   await counterCheck('#risk-description', '#counter-risk-description', 'risk');
   await reflow('risk');
   await page.getByRole('button', { name: 'Cancelar', exact: true }).click();
-  assert.equal(await page.locator('dialog').count(), 0, 'clean risk exits immediately');
+  assert.equal(await page.getByRole('dialog').count(), 0, 'clean risk exits immediately');
   await page.getByRole('button', { name: 'Agregar relación', exact: true }).click();
   await page.locator('select[name="destination"] option').nth(1).waitFor({ state: 'attached' });
   await styles('relation-editor', '.process-inline-editor input, .process-inline-editor select, .process-inline-editor textarea');
   await counterCheck('#relation-description', '#counter-relation-description', 'relation');
   await reflow('relation');
   await page.getByRole('button', { name: 'Cancelar', exact: true }).click();
-  assert.equal(await page.locator('dialog').count(), 0, 'clean relation exits immediately');
+  assert.equal(await page.getByRole('dialog').count(), 0, 'clean relation exits immediately');
   await page.route('**/api/audit?*', async route => {
     const pageNumber = Number(new URL(route.request().url()).searchParams.get('page') || 1);
     await route.fulfill({ json: { items: [{ id: pageNumber, createdAt: '2026-10-27T12:00:00Z', actorUserId: null, actorDisplayName: null,
@@ -220,7 +256,7 @@ try {
   await page.getByRole('button', { name: 'Modificar perfiles', exact: true }).click();
   await page.locator('.profile-card').first().waitFor();
   await reflow('profiles');
-  checks.push({ name: 'profiles-checkbox-layout', state: 'passed', exception: 'Native checkboxes retain their own dimensions; not text fields.' });
+  checks.push({ name: 'profiles-checkbox-layout', state: 'passed', implementation: 'Material checkboxes retain checked and pending states.' });
   await page.getByRole('button', { name: 'Cancelar', exact: true }).click();
   await visit('/mapa', '#map-filter');
   await styles('map-search', '#map-filter');
@@ -234,8 +270,9 @@ try {
   await page.locator('#login-email').focus();
   await page.keyboard.press('Tab');
   assert.equal(await page.locator('#login-password').evaluate(element => element === document.activeElement), true);
-  const focus = await page.locator('#login-password').evaluate(element => ({ width: getComputedStyle(element).outlineWidth, style: getComputedStyle(element).outlineStyle }));
-  assert.equal(focus.style, 'solid'); assert.equal(focus.width, '3px');
+  await page.waitForFunction(() => getComputedStyle(document.querySelector('#login-password').closest('mat-form-field').querySelector('.mdc-notched-outline__leading')).borderTopWidth === '2px');
+  const focus = await page.locator('#login-password').evaluate(element => { const edge = getComputedStyle(element.closest('mat-form-field').querySelector('.mdc-notched-outline__leading')); return { width:edge.borderTopWidth,style:edge.borderTopStyle,color:edge.borderTopColor }; });
+  assert.equal(focus.style,'solid'); assert.equal(focus.width,'2px'); assert.equal(focus.color,'rgb(48, 56, 128)');
   checks.push({ name: 'access-keyboard-focus', ...focus, state: 'passed' });
   await reflow('access');
   assert.deepEqual(scriptErrors, []);

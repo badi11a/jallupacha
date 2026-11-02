@@ -1,3 +1,7 @@
+import { MatButtonModule } from '@angular/material/button';
+import { MatFormFieldModule } from '@angular/material/form-field';
+import { MatInputModule } from '@angular/material/input';
+import { UiMaterialInputDirective } from '../../shared/ui';
 import { Component, inject, signal } from '@angular/core';
 import { FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
@@ -5,21 +9,21 @@ import { AppSession } from '../../session';
 import { LeavesWithConfirmation } from '../../core/platform';
 import { UiDialogService, UiMessageComponent } from '../../shared/ui';
 
-@Component({ imports: [ReactiveFormsModule, UiMessageComponent], template: `
+@Component({ imports: [MatButtonModule, MatFormFieldModule, MatInputModule, UiMaterialInputDirective, ReactiveFormsModule, UiMessageComponent], template: `
   <h1>Acceso</h1>
   @if (error()) { <ui-message kind="error">{{ error() }}</ui-message> }
   @if (busy()) { <p role="status">Verificando acceso…</p> }
   <form class="ui-form" [formGroup]="form" (ngSubmit)="login()" [attr.aria-busy]="busy()" novalidate>
     <div class="field"><label for="access-email">Correo (obligatorio)</label>
-      <input id="access-email" type="email" formControlName="email" required autocomplete="username"
-        [attr.aria-invalid]="invalid('email') ? true : null" [attr.aria-describedby]="invalid('email') ? 'email-error' : null" />
+      <mat-form-field appearance="outline" subscriptSizing="dynamic"><input matInput [uiInvalid]="invalid('email') ? true : null" id="access-email" type="email" formControlName="email" required autocomplete="username"
+        [attr.aria-invalid]="invalid('email') ? true : null" [aria-describedby]="invalid('email') ? 'email-error' : ''" /></mat-form-field>
       @if (invalid('email')) { <p id="email-error" class="field-error">Ingrese un correo válido.</p> }
     </div>
     <div class="field"><label for="access-password">Contraseña (obligatorio)</label>
-      <input id="access-password" type="password" formControlName="password" required autocomplete="current-password"
-        [attr.aria-invalid]="invalid('password') ? true : null" [attr.aria-describedby]="invalid('password') ? 'password-error' : null" />
+      <mat-form-field appearance="outline" subscriptSizing="dynamic"><input matInput [uiInvalid]="invalid('password') ? true : null" id="access-password" type="password" formControlName="password" required autocomplete="current-password"
+        [attr.aria-invalid]="invalid('password') ? true : null" [aria-describedby]="invalid('password') ? 'password-error' : ''" /></mat-form-field>
       @if (invalid('password')) { <p id="password-error" class="field-error">Ingrese su contraseña.</p> }
-    </div><button class="primary-button" type="submit" [disabled]="busy()">Ingresar</button>
+    </div><button matButton="filled" class="primary-button" type="submit" [disabled]="busy()">Ingresar</button>
   </form>` })
 export class AccessComponent implements LeavesWithConfirmation {
   private readonly session = inject(AppSession);

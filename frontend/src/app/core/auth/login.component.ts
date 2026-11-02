@@ -1,3 +1,7 @@
+import { MatButtonModule } from '@angular/material/button';
+import { MatFormFieldModule } from '@angular/material/form-field';
+import { MatInputModule } from '@angular/material/input';
+import { UiMaterialInputDirective } from '../../shared/ui';
 import { Component, ElementRef, inject, signal } from '@angular/core';
 import { FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
@@ -8,7 +12,7 @@ import { LeavesWithConfirmation } from './unsaved-changes.guard';
 
 @Component({
   selector: 'app-login',
-  imports: [ReactiveFormsModule, UiMessageComponent],
+  imports: [MatButtonModule, MatFormFieldModule, MatInputModule, UiMaterialInputDirective, ReactiveFormsModule, UiMessageComponent],
   templateUrl: './login.component.html'
 })
 export class LoginComponent implements LeavesWithConfirmation {

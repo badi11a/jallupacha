@@ -58,7 +58,7 @@ test('every selector is scoped, including responsive, reduced-motion and pseudo-
           if (char === ')') depth--;
           if (i === rule.selectorText.length || (char === ',' && depth === 0)) {
             const selector = rule.selectorText.slice(start, i).trim();
-            assert.match(selector, /^(?:\.ui-root\b|:where\(\.ui-root\)|body\.ui-page\b)/, selector);
+            assert.match(selector, /^(?:\.ui-root\b|\.ui-overlay-root\b|:where\(\.ui-root\)|body\.ui-page\b)/, selector);
             checked++; start = i + 1;
           }
         }

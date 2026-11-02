@@ -1,3 +1,7 @@
+import { MatButtonModule } from '@angular/material/button';
+import { MatFormFieldModule } from '@angular/material/form-field';
+import { MatInputModule } from '@angular/material/input';
+import { UiMaterialInputDirective } from '../../shared/ui';
 import { Component, DestroyRef, ElementRef, OnInit, inject, signal } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { forkJoin, of } from 'rxjs';
@@ -15,7 +19,7 @@ interface ParticipantRow { unitId: number | null; function: string; }
 
 @Component({
   selector: 'app-process-form',
-  imports: [FormsModule, UiBreadcrumbsComponent, UiCharCounterComponent, UiMessageComponent, UiPanelComponent, UiSectionComponent],
+  imports: [MatButtonModule, MatFormFieldModule, MatInputModule, UiMaterialInputDirective, FormsModule, UiBreadcrumbsComponent, UiCharCounterComponent, UiMessageComponent, UiPanelComponent, UiSectionComponent],
   styleUrl: './process-form.component.css',
   templateUrl: './process-form.component.html'
 })

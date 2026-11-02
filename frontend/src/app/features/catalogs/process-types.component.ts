@@ -1,3 +1,7 @@
+import { MatButtonModule } from '@angular/material/button';
+import { MatFormFieldModule } from '@angular/material/form-field';
+import { MatInputModule } from '@angular/material/input';
+import { UiMaterialInputDirective } from '../../shared/ui';
 import { Component, ElementRef, OnInit, inject, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { ProcessApi, ProcessTypeItem, errorMessage } from '../processes/process-api.service';
@@ -7,7 +11,7 @@ import { LeavesWithConfirmation } from '../../core/auth/unsaved-changes.guard';
 
 @Component({
   selector: 'app-process-types',
-  imports: [FormsModule, UiBadgeComponent, UiBreadcrumbsComponent, UiMessageComponent, UiPanelComponent],
+  imports: [MatButtonModule, MatFormFieldModule, MatInputModule, UiMaterialInputDirective, FormsModule, UiBadgeComponent, UiBreadcrumbsComponent, UiMessageComponent, UiPanelComponent],
   styleUrl: './process-types.component.css',
   templateUrl: './process-types.component.html'
 })

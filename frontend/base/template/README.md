@@ -1,4 +1,4 @@
-# Aplicación base Angular — 0.2.1
+# Aplicación base Angular — 0.3.0
 
 Consumidor neutral del núcleo y kit. Configurar el contrato de sesión en `src/app/session.ts` antes de integrar con una API. No contiene cuentas, credenciales, datos de negocio ni un mecanismo de autenticación simulado. El formulario de ejemplo demuestra interacción sin persistencia.
 
@@ -13,3 +13,5 @@ La API de identidad devuelve `userId` entero positivo, `displayName`, `email`, `
 Aplicar SDD: documentar requisito, clasificación del hallazgo, diseño y criterios antes de cambiar comportamiento; registrar pruebas y revisión en el mismo cambio. Comprobar sesión inválida, errores y respuestas tardías, formulario limpio/modificado, fallos de guardado, teclado/foco, contraste, 200 % y 320 px. Mantener análisis estático, dependencias, secretos, pruebas y presupuesto en CI. No declarar conformidad con comprobaciones no ejecutadas.
 
 Estado: base en validación técnica. La generación/compilación no acredita aceptación con personas, accesibilidad integral ni condiciones de producción.
+
+C-056 / 0.3.0: controles Angular Material/CDK 22.2.1 y tema Sass local, sin recursos tipográficos remotos. Importar MatButtonModule, MatFormFieldModule y MatInputModule en cada consumidor según uso. UiMaterialInputDirective vincula los errores manuales al estado visual de matInput. Mantener etiquetas asociadas, mensajes y aria-describedby; conservar guardas y bloqueo de escrituras. La actualización desde 0.2.x requiere revisar controles, tema, dependencias y diálogos, seguida de pruebas del consumidor.

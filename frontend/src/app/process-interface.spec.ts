@@ -1,3 +1,4 @@
+import { ComponentFixture as DialogFixture, DeferBlockState } from '@angular/core/testing';
 import { provideHttpClient } from '@angular/common/http';
 import { HttpTestingController, provideHttpClientTesting } from '@angular/common/http/testing';
 import { provideZoneChangeDetection } from '@angular/core';
@@ -202,7 +203,8 @@ describe('Interfaz base de esquema — adaptación visual', () => {
     expect(root.querySelector('.macro-desc')?.textContent).toBe(MAP.macroprocessTypes[0].macroprocesses[0].description);
     expect(root.querySelector('.macro-title')?.nextElementSibling?.className).toBe('macro-desc');
     (root.querySelector('.macro-link') as HTMLAnchorElement).click();
-    await fixture.whenStable(); fixture.detectChanges();
+    await fixture.whenStable();
+    await loadDialogs(fixture); fixture.detectChanges();
     expect(router.url).toBe('/mapa/macroprocesos/2');
     http.expectOne('/api/management/map').flush(MAP);
     http.expectOne('/api/management/units').flush([{ id: 7, name: 'Dirección', isActive: true }]);
@@ -224,6 +226,7 @@ describe('Interfaz base de esquema — adaptación visual', () => {
       && r.params.get('processTypeId') === '3' && r.params.get('q') === 'plan' && r.params.get('unitId') === '7').flush([]);
     fixture.detectChanges();
     await fixture.whenStable();
+    await loadDialogs(fixture);
     fixture.detectChanges();
     expect(root.querySelector('.hero-desc')).toBeNull();
     expect((root.querySelector('input[name="q"]') as HTMLInputElement).value).toBe('plan');
@@ -315,14 +318,16 @@ describe('Interfaz base de esquema — adaptación visual', () => {
     const removeRiskBtn = [...root.querySelectorAll('button')].find(button => button.textContent?.trim() === 'Eliminar')!;
     removeRiskBtn.click();
     await fixture.whenStable();
+    await loadDialogs(fixture);
     fixture.detectChanges();
-    const dialog = root.querySelector('dialog') as HTMLDialogElement;
+    const dialog = document.querySelector('[role="dialog"]') as HTMLDialogElement;
     expect(dialog).not.toBeNull();
     expect(dialog.textContent).toContain('¿Confirmas la eliminación definitiva de este riesgo?');
     const confirmDelete = [...dialog.querySelectorAll('button')].find(b => b.textContent?.trim() === 'Eliminar')!;
     expect(confirmDelete.classList.contains('danger-button')).toBe(true);
     confirmDelete.click();
     await fixture.whenStable();
+    await loadDialogs(fixture);
     fixture.detectChanges();
     const delReq = http.expectOne({ method: 'DELETE', url: '/api/management/processes/4/risks/9' });
     delReq.flush({});
@@ -347,6 +352,7 @@ describe('Interfaz base de esquema — adaptación visual', () => {
     http.expectOne('/api/management/processes').flush([]);
     fixture.detectChanges();
     await fixture.whenStable();
+    await loadDialogs(fixture);
 
     const root = fixture.nativeElement as HTMLElement;
     // Señalización de obligatoriedad (R-05.4)
@@ -368,14 +374,16 @@ describe('Interfaz base de esquema — adaptación visual', () => {
     nameInput.dispatchEvent(new Event('input'));
     fixture.detectChanges();
     await fixture.whenStable();
+    await loadDialogs(fixture);
 
     // Intentar cancelar o navegar fuera debe pedir confirmación modal
     const cancelBtn = [...root.querySelectorAll('button')].find(b => b.textContent?.trim() === 'Cancelar')!;
     cancelBtn.click();
     await fixture.whenStable();
+    await loadDialogs(fixture);
     fixture.detectChanges();
 
-    const dialog = root.querySelector('dialog') as HTMLDialogElement;
+    const dialog = document.querySelector('[role="dialog"]') as HTMLDialogElement;
     expect(dialog).not.toBeNull();
     expect(dialog.textContent).toContain('Hay modificaciones pendientes en el formulario');
 
@@ -383,17 +391,20 @@ describe('Interfaz base de esquema — adaptación visual', () => {
     const stayBtn = [...dialog.querySelectorAll('button')].find(b => b.textContent?.trim() === 'Continuar editando')!;
     stayBtn.click();
     await fixture.whenStable();
+    await loadDialogs(fixture);
     fixture.detectChanges();
     expect(router.url).toBe('/procesos/nuevo');
 
     // Si confirma descartar, permite salir
     cancelBtn.click();
     await fixture.whenStable();
+    await loadDialogs(fixture);
     fixture.detectChanges();
-    const discardDialog = root.querySelector('dialog') as HTMLDialogElement;
+    const discardDialog = document.querySelector('[role="dialog"]') as HTMLDialogElement;
     const leaveBtn = [...discardDialog.querySelectorAll('button')].find(b => b.textContent?.trim() === 'Descartar cambios')!;
     leaveBtn.click();
     await fixture.whenStable();
+    await loadDialogs(fixture);
     fixture.detectChanges();
 
     expect(router.url).toBe('/procesos');
@@ -414,6 +425,7 @@ describe('Interfaz base de esquema — adaptación visual', () => {
     http.expectOne('/api/management/units').flush([{ id: 1, name: 'Unidad A', parentUnitId: null, processCount: 0, isActive: true }]);
     fixture.detectChanges();
     await fixture.whenStable();
+    await loadDialogs(fixture);
 
     const root = fixture.nativeElement as HTMLElement;
     const deactBtn = [...root.querySelectorAll('button')].find(b => b.textContent?.trim() === 'Desactivar')!;
@@ -423,13 +435,15 @@ describe('Interfaz base de esquema — adaptación visual', () => {
     // Confirmación modal accesible (R-07.1)
     deactBtn.click();
     await fixture.whenStable();
+    await loadDialogs(fixture);
     fixture.detectChanges();
-    const dialog = root.querySelector('dialog') as HTMLDialogElement;
+    const dialog = document.querySelector('[role="dialog"]') as HTMLDialogElement;
     expect(dialog).not.toBeNull();
     expect(dialog.textContent).toContain('¿Desactivar la unidad "Unidad A"?');
     const confirmBtn = [...dialog.querySelectorAll('button')].find(b => b.textContent?.trim() === 'Desactivar')!;
     confirmBtn.click();
     await fixture.whenStable();
+    await loadDialogs(fixture);
     fixture.detectChanges();
 
     const deactReq = http.expectOne({ method: 'PATCH', url: '/api/management/units/1/deactivate' });
@@ -455,18 +469,20 @@ describe('Interfaz base de esquema — adaptación visual', () => {
     http.expectOne('/api/management/processes').flush([]);
     fixture.detectChanges();
     await fixture.whenStable();
+    await loadDialogs(fixture);
 
     const root = fixture.nativeElement as HTMLElement;
-    expect(root.querySelector('dialog')).toBeNull();
+    expect(document.querySelector('[role="dialog"]')).toBeNull();
 
     // 1. Salir usando el botón "Cancelar" sin haber modificado ningún campo
     const cancelBtn = [...root.querySelectorAll('button')].find(b => b.textContent?.trim() === 'Cancelar')!;
     cancelBtn.click();
     await fixture.whenStable();
+    await loadDialogs(fixture);
     fixture.detectChanges();
 
     // Debe navegar a /procesos directamente sin levantar modal de confirmación
-    expect(root.querySelector('dialog')).toBeNull();
+    expect(document.querySelector('[role="dialog"]')).toBeNull();
     expect(router.url).toBe('/procesos');
     http.expectOne('/api/management/process-types').flush([]);
     http.expectOne('/api/management/units').flush([]);
@@ -480,13 +496,15 @@ describe('Interfaz base de esquema — adaptación visual', () => {
     http.expectOne('/api/management/processes').flush([]);
     fixture.detectChanges();
     await fixture.whenStable();
+    await loadDialogs(fixture);
 
     // Navegar a otra ruta (ej. /mapa): el guard evalúa isDirty() === false y permite la navegación inmediata
     await router.navigateByUrl('/mapa');
     await fixture.whenStable();
+    await loadDialogs(fixture);
     fixture.detectChanges();
 
-    expect(root.querySelector('dialog')).toBeNull();
+    expect(document.querySelector('[role="dialog"]')).toBeNull();
     expect(router.url).toBe('/mapa');
     http.expectOne('/api/management/map').flush(MAP);
 
@@ -510,6 +528,7 @@ describe('Interfaz base de esquema — adaptación visual', () => {
     http.expectOne('/api/management/processes/4').flush(detail);
     fixture.detectChanges();
     await fixture.whenStable();
+    await loadDialogs(fixture);
 
     const root = fixture.nativeElement as HTMLElement;
 
@@ -522,8 +541,9 @@ describe('Interfaz base de esquema — adaptación visual', () => {
     const cancelClean = [...root.querySelectorAll<HTMLButtonElement>('form[aria-label="Nuevo riesgo"] button')].find(b => b.textContent?.trim() === 'Cancelar')!;
     cancelClean.click();
     await fixture.whenStable();
+    await loadDialogs(fixture);
     fixture.detectChanges();
-    expect(root.querySelector('dialog')).toBeNull();
+    expect(document.querySelector('[role="dialog"]')).toBeNull();
     expect(root.querySelector('form[aria-label="Nuevo riesgo"]')).toBeNull();
 
     // 2. Abrir subformulario de riesgo, escribir texto y pulsar Cancelar: requiere confirmación modal
@@ -535,13 +555,15 @@ describe('Interfaz base de esquema — adaptación visual', () => {
     descInput.dispatchEvent(new Event('input'));
     fixture.detectChanges();
     await fixture.whenStable();
+    await loadDialogs(fixture);
 
     const cancelDirty = [...root.querySelectorAll<HTMLButtonElement>('form[aria-label="Nuevo riesgo"] button')].find(b => b.textContent?.trim() === 'Cancelar')!;
     cancelDirty.click();
     await fixture.whenStable();
+    await loadDialogs(fixture);
     fixture.detectChanges();
 
-    const dialog = root.querySelector('dialog') as HTMLDialogElement;
+    const dialog = document.querySelector('[role="dialog"]') as HTMLDialogElement;
     expect(dialog).not.toBeNull();
     expect(dialog.textContent).toContain('Hay cambios sin guardar en el riesgo');
 
@@ -549,6 +571,7 @@ describe('Interfaz base de esquema — adaptación visual', () => {
     const discardBtn = [...dialog.querySelectorAll('button')].find(b => b.textContent?.trim() === 'Descartar cambios')!;
     discardBtn.click();
     await fixture.whenStable();
+    await loadDialogs(fixture);
     fixture.detectChanges();
     expect(root.querySelector('form[aria-label="Nuevo riesgo"]')).toBeNull();
 
@@ -561,13 +584,14 @@ describe('Interfaz base de esquema — adaptación visual', () => {
     descInput2.dispatchEvent(new Event('input'));
     fixture.detectChanges();
     await fixture.whenStable();
+    await loadDialogs(fixture);
 
     // Iniciar navegación a /mapa: el guard se ejecuta asíncronamente
     const navPromise = router.navigateByUrl('/mapa');
     await new Promise(resolve => setTimeout(resolve, 0));
     fixture.detectChanges();
 
-    const leaveDialog = root.querySelector('dialog') as HTMLDialogElement;
+    const leaveDialog = document.querySelector('[role="dialog"]') as HTMLDialogElement;
     expect(leaveDialog).not.toBeNull();
     expect(leaveDialog.textContent).toContain('Hay modificaciones pendientes en el formulario de la ficha');
 
@@ -577,6 +601,7 @@ describe('Interfaz base de esquema — adaptación visual', () => {
     const navResult = await navPromise;
     expect(navResult).toBe(false);
     await fixture.whenStable();
+    await loadDialogs(fixture);
     fixture.detectChanges();
     expect(router.url).toBe('/procesos/4');
 
@@ -585,12 +610,13 @@ describe('Interfaz base de esquema — adaptación visual', () => {
     await new Promise(resolve => setTimeout(resolve, 0));
     fixture.detectChanges();
 
-    const leaveDialog2 = root.querySelector('dialog') as HTMLDialogElement;
+    const leaveDialog2 = document.querySelector('[role="dialog"]') as HTMLDialogElement;
     const leaveBtn = [...leaveDialog2.querySelectorAll('button')].find(b => b.textContent?.trim() === 'Descartar cambios')!;
     leaveBtn.click();
     const navResult2 = await navPromise2;
     expect(navResult2).toBe(true);
     await fixture.whenStable();
+    await loadDialogs(fixture);
     fixture.detectChanges();
     expect(router.url).toBe('/mapa');
     http.expectOne('/api/management/map').flush(MAP);
@@ -599,3 +625,9 @@ describe('Interfaz base de esquema — adaptación visual', () => {
     http.verify();
   });
 });
+
+/** Unit tests load the real deferred outlet deterministically; browser checks cover lazy loading. */
+async function loadDialogs(fixture: DialogFixture<unknown>): Promise<void> {
+  for (const block of await fixture.getDeferBlocks()) await block.render(DeferBlockState.Complete);
+  fixture.detectChanges();
+}

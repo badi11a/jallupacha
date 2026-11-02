@@ -13,9 +13,9 @@
 }
 
 :where(.ui-root), :where(.ui-root) * { box-sizing: border-box; }
-:where(.ui-root) button, :where(.ui-root) input, :where(.ui-root) select, :where(.ui-root) textarea { font: inherit; }
+:where(.ui-root) button, :where(.ui-root) input, :where(.ui-root) select:not([matNativeControl]), :where(.ui-root) textarea:not([matInput]) { font: inherit; }
 :where(.ui-root) button { cursor: pointer; }
-:where(.ui-root) button:disabled { cursor: not-allowed; opacity: .58; }
+:where(.ui-root) button:disabled:not([matButton]) { cursor: not-allowed; opacity: .58; }
 :where(.ui-root) :focus-visible { outline: 3px solid var(--ui-color-focus); outline-offset: 3px; }
 :where(.ui-root) h1, :where(.ui-root) h2, :where(.ui-root) h3, :where(.ui-root) p { margin-top: 0; }
 :where(.ui-root) h1, :where(.ui-root) h2, :where(.ui-root) h3 { color: var(--ui-color-heading); line-height: 1.2; }
@@ -31,7 +31,7 @@
 
 /* Formularios */
 :where(.ui-root) label { font-size: var(--ui-font-size-sm); font-weight: var(--ui-font-weight-medium); }
-:where(.ui-root) input:not([type=checkbox]):not([type=radio]), :where(.ui-root) select, :where(.ui-root) textarea {
+:where(.ui-root) input:not([type=checkbox]):not([type=radio]):not([matInput]):not([matNativeControl]), :where(.ui-root) select:not([matNativeControl]), :where(.ui-root) textarea:not([matInput]) {
   min-width: 0;
   min-height: var(--ui-control-height);
   padding: .55rem .65rem;
@@ -41,7 +41,7 @@
   background: var(--ui-color-surface);
 }
 :where(.ui-root) textarea { resize: vertical; }
-.ui-root input[aria-invalid=true], .ui-root select[aria-invalid=true], .ui-root textarea[aria-invalid=true] { border-color: var(--ui-color-error-text); }
+.ui-root input[aria-invalid=true]:not([matInput]), .ui-root select[aria-invalid=true]:not([matNativeControl]), .ui-root textarea[aria-invalid=true]:not([matInput]) { border-color: var(--ui-color-error-text); }
 :where(.ui-root) fieldset { display: flex; flex-wrap: wrap; gap: .45rem var(--ui-space-4); margin: 0; padding: 0; border: 0; }
 :where(.ui-root) .check-label { display: inline-flex; align-items: center; gap: .35rem; font-size: var(--ui-font-size-sm); font-weight: 500; }
 :where(.ui-root) .check-label input { accent-color: var(--ui-color-primary); }
@@ -53,7 +53,7 @@
 :where(.ui-root) .ui-form-actions { display: flex; flex-wrap: wrap; align-items: center; gap: var(--ui-space-2); }
 
 /* Botones */
-:where(.ui-root) .primary-button, :where(.ui-root) .danger-button {
+:where(.ui-root) .primary-button:not([matButton]), :where(.ui-root) .danger-button:not([matButton]) {
   min-height: var(--ui-control-height);
   padding: .55rem .85rem;
   border: 0;
@@ -62,11 +62,11 @@
   background: var(--ui-color-primary);
   font-weight: var(--ui-font-weight-bold);
 }
-:where(.ui-root) .primary-button:hover:not(:disabled) { background: var(--ui-color-primary-hover); }
-:where(.ui-root) a.primary-button, :where(.ui-root) a.danger-button, :where(.ui-root) a.quiet-button, :where(.ui-root) a.text-button { display: inline-flex; align-items: center; text-decoration: none; }
-:where(.ui-root) .danger-button { background: var(--ui-color-danger); }
-:where(.ui-root) .danger-button:hover:not(:disabled) { background: var(--ui-color-danger-hover); }
-:where(.ui-root) .quiet-button, :where(.ui-root) .text-button {
+:where(.ui-root) .primary-button:not([matButton]):hover:not(:disabled) { background: var(--ui-color-primary-hover); }
+:where(.ui-root) a.primary-button:not([matButton]), :where(.ui-root) a.danger-button:not([matButton]), :where(.ui-root) a.quiet-button:not([matButton]), :where(.ui-root) a.text-button:not([matButton]) { display: inline-flex; align-items: center; text-decoration: none; }
+:where(.ui-root) .danger-button:not([matButton]) { background: var(--ui-color-danger); }
+:where(.ui-root) .danger-button:not([matButton]):hover:not(:disabled) { background: var(--ui-color-danger-hover); }
+:where(.ui-root) .quiet-button:not([matButton]), :where(.ui-root) .text-button:not([matButton]) {
   padding: .4rem .55rem;
   border: 1px solid transparent;
   border-radius: var(--ui-radius-sm);
@@ -74,7 +74,7 @@
   background: transparent;
   font-weight: var(--ui-font-weight-medium);
 }
-:where(.ui-root) .quiet-button:hover:not(:disabled), :where(.ui-root) .text-button:hover:not(:disabled) { border-color: var(--ui-color-quiet-hover-border); background: var(--ui-color-quiet-hover-background); }
+:where(.ui-root) .quiet-button:not([matButton]):hover:not(:disabled), :where(.ui-root) .text-button:not([matButton]):hover:not(:disabled) { border-color: var(--ui-color-quiet-hover-border); background: var(--ui-color-quiet-hover-background); }
 
 /* Estructura común */
 :where(.ui-root) .skip-link { position: absolute; left: var(--ui-space-4); top: -100px; z-index: 10; padding: var(--ui-space-2) var(--ui-space-3); border-radius: var(--ui-radius-md); color: var(--ui-color-on-primary); background: var(--ui-color-primary); }
@@ -157,14 +157,7 @@
   :where(.ui-root) .table-cards td.table-cards-full { display: block; }
 }
 
-/* Diálogo */
-:where(.ui-root) .ui-dialog { width: min(480px, calc(100vw - var(--ui-space-6))); padding: 0; border: 1px solid var(--ui-color-border); border-radius: var(--ui-radius-xl); color: var(--ui-color-text); background: var(--ui-color-surface); box-shadow: var(--ui-shadow-dialog); }
-:where(.ui-root) .ui-dialog::backdrop { background: var(--ui-color-backdrop); }
-:where(.ui-root) .ui-dialog form { display: grid; gap: var(--ui-space-4); padding: var(--ui-space-5); }
-:where(.ui-root) .ui-dialog h2 { font-size: 1.15rem; }
-:where(.ui-root) .ui-dialog p { margin: 0; color: var(--ui-color-text-muted); line-height: var(--ui-line-height); }
-:where(.ui-root) .ui-dialog-actions { display: flex; flex-wrap: wrap; justify-content: flex-end; gap: var(--ui-space-2); margin-top: var(--ui-space-1); }
-
+/* El diálogo se presenta con MatDialog; la aplicación conserva sus acciones. */
 @media (max-width: 520px) {
   :where(.ui-root) main { width: min(100% - var(--ui-space-4), var(--ui-content-width)); padding-top: 1.2rem; }
   :where(.ui-root) .panel { padding: var(--ui-space-4); }

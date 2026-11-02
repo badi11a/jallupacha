@@ -1,3 +1,5 @@
+import { MatCheckboxModule } from '@angular/material/checkbox';
+import { MatButtonModule } from '@angular/material/button';
 import { Component, ElementRef, OnInit, inject, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 
@@ -18,7 +20,7 @@ import { SYSTEM_PROFILES, UserItem, UsersService } from './users.service';
 @Component({
   selector: 'app-users',
   standalone: true,
-  imports: [
+  imports: [MatCheckboxModule, MatButtonModule,
     FormsModule,
 
     UiBadgeComponent,

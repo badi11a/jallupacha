@@ -12,13 +12,13 @@
       </div>
 
       @if (returnUrl; as origin) {
-        <button type="button" class="text-button" (click)="navigation.returnTo(origin)">Volver a resultados</button>
+        <button matButton="text" type="button" class="text-button" (click)="navigation.returnTo(origin)">Volver a resultados</button>
       }
 
       <div class="workflow-actions-bar" aria-label="Acciones de la ficha">
         @if (d.status === 'Borrador' && auth.hasAnyProfile('ADMIN', 'PROCESS_OWNER')) {
-          <a class="quiet-button" [routerLink]="['/procesos', d.id, 'editar']" [queryParams]="{ returnTo: returnUrl }">Editar</a>
-          <button
+          <a matButton="outlined" class="quiet-button" [routerLink]="['/procesos', d.id, 'editar']" [queryParams]="{ returnTo: returnUrl }">Editar</a>
+          <button matButton="filled"
             type="button"
             class="primary-button"
             [disabled]="submitting() || !d.completeness.complete"
@@ -29,7 +29,7 @@
           </button>
         }
         @if (d.status === 'En revisión' && auth.hasAnyProfile('ADMIN', 'VALIDATOR')) {
-          <button
+          <button matButton="filled"
             type="button"
             class="primary-button"
             [disabled]="submitting()"
@@ -37,7 +37,7 @@
           >
             Aprobar proceso
           </button>
-          <button
+          <button matButton="outlined"
             type="button"
             class="quiet-button"
             [disabled]="submitting()"
@@ -48,7 +48,7 @@
         }
         @if (d.status === 'Vigente') {
           @if (auth.hasAnyProfile('ADMIN', 'PROCESS_OWNER')) {
-            <button
+            <button matButton="outlined"
               type="button"
               class="quiet-button"
               [disabled]="submitting()"
@@ -58,7 +58,7 @@
             </button>
           }
           @if (auth.isAdmin()) {
-            <button
+            <button matButton="outlined"
               type="button"
               class="quiet-button"
               [disabled]="submitting()"
@@ -74,16 +74,16 @@
         <section class="ui-form process-inline-editor" aria-labelledby="reject-title">
           <h2 id="reject-title" style="margin: 0; font-size: 1rem;">Observaciones de rechazo técnico (obligatorio)</h2>
           <label class="field">Motivo u observaciones técnicas
-            <textarea
+            <mat-form-field appearance="outline" subscriptSizing="dynamic"><textarea matInput
               name="rejectionReason"
               rows="3"
               placeholder="Indique las observaciones técnicas para devolver el proceso a borrador..."
               [(ngModel)]="rejectionReason"
               required
-            ></textarea>
+            ></textarea></mat-form-field>
           </label>
           <div class="ui-form-actions">
-            <button
+            <button matButton="filled"
               type="button"
               class="primary-button"
               [disabled]="submitting() || !rejectionReason.trim()"
@@ -91,7 +91,7 @@
             >
               Confirmar rechazo
             </button>
-            <button type="button" class="quiet-button" (click)="cancelReject()">Cancelar</button>
+            <button matButton="outlined" type="button" class="quiet-button" (click)="cancelReject()">Cancelar</button>
           </div>
         </section>
       }
@@ -220,8 +220,8 @@
           @if (editingRisk() === risk.id) {
             <form class="ui-form process-inline-editor" (ngSubmit)="saveRisk(d.id)" [attr.inert]="saving() ? '' : null" [attr.aria-label]="'Editar riesgo'">
               <ng-container *ngTemplateOutlet="riskFields" />
-              <div class="ui-form-actions"><button class="primary-button" type="submit" [disabled]="saving()">Guardar riesgo</button>
-                <button class="quiet-button" type="button" [disabled]="saving()" (click)="cancelRisk()">Cancelar</button></div>
+              <div class="ui-form-actions"><button matButton="filled" class="primary-button" type="submit" [disabled]="saving()">Guardar riesgo</button>
+                <button matButton="outlined" class="quiet-button" type="button" [disabled]="saving()" (click)="cancelRisk()">Cancelar</button></div>
             </form>
           } @else {
             <article class="item">
@@ -230,8 +230,8 @@
               <p class="helper"><strong>Causa:</strong> {{ risk.cause }} · <strong>Consecuencia:</strong> {{ risk.consequence }}</p>
               @if (auth.hasAnyProfile('RISK_MANAGER')) {
                 <div class="ui-form-actions item-actions">
-                  <button class="quiet-button" type="button" (click)="editRisk(risk)">Editar</button>
-                  <button class="danger-button" type="button" (click)="removeRisk(d.id, risk.id)">Eliminar</button>
+                  <button matButton="outlined" class="quiet-button" type="button" (click)="editRisk(risk)">Editar</button>
+                  <button matButton="filled" class="danger-button" type="button" (click)="removeRisk(d.id, risk.id)">Eliminar</button>
                 </div>
               }
             </article>
@@ -240,11 +240,11 @@
         @if (editingRisk() === 0) {
           <form class="ui-form process-inline-editor" (ngSubmit)="saveRisk(d.id)" [attr.inert]="saving() ? '' : null" aria-label="Nuevo riesgo">
             <ng-container *ngTemplateOutlet="riskFields" />
-            <div class="ui-form-actions"><button class="primary-button" type="submit" [disabled]="saving()">Agregar riesgo</button>
-              <button class="quiet-button" type="button" [disabled]="saving()" (click)="cancelRisk()">Cancelar</button></div>
+            <div class="ui-form-actions"><button matButton="filled" class="primary-button" type="submit" [disabled]="saving()">Agregar riesgo</button>
+              <button matButton="outlined" class="quiet-button" type="button" [disabled]="saving()" (click)="cancelRisk()">Cancelar</button></div>
           </form>
         } @else if (editingRisk() === null && auth.hasAnyProfile('RISK_MANAGER')) {
-          <button class="quiet-button" type="button" (click)="newRisk()">Agregar riesgo</button>
+          <button matButton="outlined" class="quiet-button" type="button" (click)="newRisk()">Agregar riesgo</button>
         }
       </ui-section>
 
@@ -255,8 +255,8 @@
             <form class="ui-form process-inline-editor" (ngSubmit)="saveRelation(d.id)" [attr.inert]="saving() ? '' : null" aria-label="Editar relación">
               <p><strong>{{ rel.code }} · {{ rel.name }}</strong></p>
               <ng-container *ngTemplateOutlet="relationFields; context: { $implicit: false }" />
-              <div class="ui-form-actions"><button class="primary-button" type="submit" [disabled]="saving()">Guardar relación</button>
-                <button class="quiet-button" type="button" [disabled]="saving()" (click)="cancelRelation()">Cancelar</button></div>
+              <div class="ui-form-actions"><button matButton="filled" class="primary-button" type="submit" [disabled]="saving()">Guardar relación</button>
+                <button matButton="outlined" class="quiet-button" type="button" [disabled]="saving()" (click)="cancelRelation()">Cancelar</button></div>
             </form>
           } @else {
             <article class="item">
@@ -265,8 +265,8 @@
               <p>{{ rel.description }}</p>
               @if (auth.hasAnyProfile('ADMIN', 'PROCESS_OWNER')) {
                 <div class="ui-form-actions item-actions">
-                  <button class="quiet-button" type="button" (click)="editRelation(rel.id, rel.type, rel.description)">Editar</button>
-                  <button class="danger-button" type="button" (click)="removeRelation(d.id, rel.id)">Eliminar</button>
+                  <button matButton="outlined" class="quiet-button" type="button" (click)="editRelation(rel.id, rel.type, rel.description)">Editar</button>
+                  <button matButton="filled" class="danger-button" type="button" (click)="removeRelation(d.id, rel.id)">Eliminar</button>
                 </div>
               }
             </article>
@@ -275,11 +275,11 @@
         @if (editingRelation() === 0) {
           <form class="ui-form process-inline-editor" (ngSubmit)="saveRelation(d.id)" [attr.inert]="saving() ? '' : null" aria-label="Nueva relación">
             <ng-container *ngTemplateOutlet="relationFields; context: { $implicit: true }" />
-            <div class="ui-form-actions"><button class="primary-button" type="submit" [disabled]="saving()">Agregar relación</button>
-              <button class="quiet-button" type="button" [disabled]="saving()" (click)="cancelRelation()">Cancelar</button></div>
+            <div class="ui-form-actions"><button matButton="filled" class="primary-button" type="submit" [disabled]="saving()">Agregar relación</button>
+              <button matButton="outlined" class="quiet-button" type="button" [disabled]="saving()" (click)="cancelRelation()">Cancelar</button></div>
           </form>
         } @else if (editingRelation() === null && auth.hasAnyProfile('ADMIN', 'PROCESS_OWNER')) {
-          <button class="quiet-button" type="button" (click)="newRelation(d.id)">Agregar relación</button>
+          <button matButton="outlined" class="quiet-button" type="button" (click)="newRelation(d.id)">Agregar relación</button>
         }
         <h3>Entrantes</h3>
         @for (rel of d.relations.incoming; track rel.id) {
@@ -299,45 +299,45 @@
     <ng-template #riskFields>
       <div class="field">
         <label for="risk-description">Descripción del riesgo</label>
-        <textarea id="risk-description" name="description" rows="2" maxlength="4000" aria-describedby="counter-risk-description" [(ngModel)]="risk.description"></textarea>
+        <mat-form-field appearance="outline" subscriptSizing="dynamic"><textarea matInput id="risk-description" name="description" rows="2" maxlength="4000" aria-describedby="counter-risk-description" [(ngModel)]="risk.description"></textarea></mat-form-field>
         <ui-char-counter id="counter-risk-description" [value]="risk.description" [max]="4000" lengthMode="utf16" />
       </div>
       <div class="field">
         <label for="risk-cause">Causa</label>
-        <textarea id="risk-cause" name="cause" rows="2" maxlength="4000" aria-describedby="counter-risk-cause" [(ngModel)]="risk.cause"></textarea>
+        <mat-form-field appearance="outline" subscriptSizing="dynamic"><textarea matInput id="risk-cause" name="cause" rows="2" maxlength="4000" aria-describedby="counter-risk-cause" [(ngModel)]="risk.cause"></textarea></mat-form-field>
         <ui-char-counter id="counter-risk-cause" [value]="risk.cause" [max]="4000" lengthMode="utf16" />
       </div>
       <div class="field">
         <label for="risk-consequence">Consecuencia</label>
-        <textarea id="risk-consequence" name="consequence" rows="2" maxlength="4000" aria-describedby="counter-risk-consequence" [(ngModel)]="risk.consequence"></textarea>
+        <mat-form-field appearance="outline" subscriptSizing="dynamic"><textarea matInput id="risk-consequence" name="consequence" rows="2" maxlength="4000" aria-describedby="counter-risk-consequence" [(ngModel)]="risk.consequence"></textarea></mat-form-field>
         <ui-char-counter id="counter-risk-consequence" [value]="risk.consequence" [max]="4000" lengthMode="utf16" />
       </div>
-      <label class="field">Tipo de riesgo<input name="type" maxlength="120" [(ngModel)]="risk.type" /></label>
+      <label class="field">Tipo de riesgo<mat-form-field appearance="outline" subscriptSizing="dynamic"><input matInput name="type" maxlength="120" [(ngModel)]="risk.type" /></mat-form-field></label>
       <label class="field">Nivel de riesgo
-        <select name="level" [(ngModel)]="risk.level">
+        <mat-form-field appearance="outline" subscriptSizing="dynamic"><select matNativeControl name="level" [(ngModel)]="risk.level">
           <option value="">Seleccione…</option>
           @for (level of levels; track level) { <option [value]="level">{{ level }}</option> }
-        </select>
+        </select></mat-form-field>
       </label>
     </ng-template>
 
     <ng-template #relationFields let-isNew>
       @if (isNew) {
         <label class="field">Proceso de destino
-          <select name="destination" [(ngModel)]="relation.destinationProcessId">
+          <mat-form-field appearance="outline" subscriptSizing="dynamic"><select matNativeControl name="destination" [(ngModel)]="relation.destinationProcessId">
             <option [ngValue]="null">Seleccione…</option>
             @for (option of destinations(); track option.id) { <option [ngValue]="option.id">{{ option.code }} · {{ option.name }}</option> }
-          </select>
+          </select></mat-form-field>
         </label>
       }
       <label class="field">Tipo de relación
-        <select name="relationType" [(ngModel)]="relation.type">
+        <mat-form-field appearance="outline" subscriptSizing="dynamic"><select matNativeControl name="relationType" [(ngModel)]="relation.type">
           @for (type of relationTypes; track type.value) { <option [value]="type.value">{{ type.label }}</option> }
-        </select>
+        </select></mat-form-field>
       </label>
       <div class="field">
         <label for="relation-description">Descripción</label>
-        <textarea id="relation-description" name="relationDescription" rows="2" maxlength="4000" aria-describedby="counter-relation-description" [(ngModel)]="relation.description"></textarea>
+        <mat-form-field appearance="outline" subscriptSizing="dynamic"><textarea matInput id="relation-description" name="relationDescription" rows="2" maxlength="4000" aria-describedby="counter-relation-description" [(ngModel)]="relation.description"></textarea></mat-form-field>
         <ui-char-counter id="counter-relation-description" [value]="relation.description" [max]="4000" lengthMode="utf16" />
       </div>
     </ng-template>

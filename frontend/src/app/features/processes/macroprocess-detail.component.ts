@@ -1,3 +1,7 @@
+import { MatButtonModule } from '@angular/material/button';
+import { MatFormFieldModule } from '@angular/material/form-field';
+import { MatInputModule } from '@angular/material/input';
+import { UiMaterialInputDirective } from '../../shared/ui';
 import { Component, DestroyRef, computed, inject, OnInit, signal } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { FormsModule } from '@angular/forms';
@@ -8,7 +12,7 @@ import { UiBadgeComponent, UiBadgeTone, UiBreadcrumbsComponent, UiMessageCompone
 
 @Component({
   selector: 'app-macroprocess-detail',
-  imports: [FormsModule, RouterLink, UiBadgeComponent, UiBreadcrumbsComponent, UiMessageComponent],
+  imports: [MatButtonModule, MatFormFieldModule, MatInputModule, UiMaterialInputDirective, FormsModule, RouterLink, UiBadgeComponent, UiBreadcrumbsComponent, UiMessageComponent],
   styleUrl: './macroprocess-detail.component.css',
   templateUrl: './macroprocess-detail.component.html'
 })

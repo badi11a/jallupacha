@@ -1,3 +1,7 @@
+import { MatButtonModule } from '@angular/material/button';
+import { MatFormFieldModule } from '@angular/material/form-field';
+import { MatInputModule } from '@angular/material/input';
+import { UiMaterialInputDirective } from '../../shared/ui';
 import { NgTemplateOutlet } from '@angular/common';
 import { Component, DestroyRef, OnInit, inject, signal } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
@@ -21,7 +25,7 @@ const emptyRelation = (): { destinationProcessId: number | null; type: string; d
 
 @Component({
   selector: 'app-process-detail',
-  imports: [FormsModule, NgTemplateOutlet, RouterLink, UiBadgeComponent, UiBreadcrumbsComponent, UiCharCounterComponent, UiMessageComponent, UiSectionComponent, ProcessGovernanceComponent],
+  imports: [MatButtonModule, MatFormFieldModule, MatInputModule, UiMaterialInputDirective, FormsModule, NgTemplateOutlet, RouterLink, UiBadgeComponent, UiBreadcrumbsComponent, UiCharCounterComponent, UiMessageComponent, UiSectionComponent, ProcessGovernanceComponent],
   styleUrl: './process-detail.component.css',
   templateUrl: './process-detail.component.html'
 })

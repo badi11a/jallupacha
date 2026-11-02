@@ -1,6 +1,6 @@
 # Arquitectura de la aplicación consumidora
 
-Base Angular 0.2.1, en validación técnica. Decisiones iniciales: SPA, componentes independientes, TypeScript estricto, formularios reactivos tipados, Signals y RxJS, CSS nativo y kit con ámbito `ui-root`.
+Base Angular 0.3.0, en validación técnica. Decisiones iniciales: SPA, componentes independientes, TypeScript estricto, formularios reactivos tipados, Signals y RxJS, Angular Material/CDK 22.2.1 para controles, tema Sass público, CSS para composición y kit con ámbito `ui-root`.
 
 La raíz compone configuración y proveedores. `core/platform` ofrece sesión por cookies, HTTP acotado y cambios pendientes; `session.ts` adapta el contrato inicial del consumidor. `features` contiene las funcionalidades; `shared/ui` contiene presentación genérica. Core/UI no dependen de funcionalidades. Los destinos se definen en rutas, con carga diferida cuando corresponde.
 
@@ -11,3 +11,5 @@ Contrato inicial de sesión: GET `/api/auth/me`, POST `/api/auth/login` con corr
 Cada producto documenta despliegue HTTPS, cabeceras, CSP y compatibilidad antes de liberar; la generación no comprueba infraestructura. No incluir secretos en configuración pública del navegador.
 
 Verificar con la CI entregada, pruebas de consumidores, revisión visual/accesibilidad y aceptación del producto. Las versiones y hashes de procedencia están en `.frontend-base.json`; un cambio incompatible necesita migración explícita.
+
+El tema se carga desde shared/ui/styles/material.scss; no requiere fuentes remotas. UiDialogHost carga el contenedor Material al abrir el primer diálogo y conserva el contrato de UiDialogService. El tema del overlay copia las variables del consumidor. Tablas semánticas y paginación simple conservan su estructura; no se incorpora MatTable/MatPaginator sin necesidad concreta.
