@@ -3,30 +3,13 @@ import { DataSource } from 'typeorm';
 import { databaseOptions } from '../common/config';
 import { applyRuntimeGrants } from './grants';
 import { seed } from './seed';
+import { SCHEMA_SEQUENCES, SCHEMA_TABLES } from './schema';
 
-const TABLE_DROP_ORDER = [
-  'PROCESS_RISK',
-  'PROCESS',
-  'PROCESS_VERSION',
-  'SECURITY_EVENT_IP',
-  'SECURITY_EVENT',
-  'APP_SESSION',
-  'AUDIT',
-  'USER_PROFILE',
-  'LOCAL_CREDENTIAL',
-  'DEMO_IDENTITY',
-  'USER_IDENTITY',
-  'APP_PROFILE',
-  'APP_USER',
-  'PROCESS_TYPE',
-  'RISK_TYPE',
-  'RISK_LEVEL',
-  'MACROPROCESS',
-  'ADMIN_CONTROL',
-  'migrations'
-];
-
-const SEQUENCES = ['PROCESS_CODE_SEQ', 'MACROPROCESS_CODE_SEQ'];
+// SCHEMA_TABLES/SCHEMA_SEQUENCES is the single source of truth for every object this
+// product creates; a separately hand-maintained drop list drifts and leaves orphaned
+// tables behind (see C-056 in docs/trazabilidad/correcciones.md).
+const TABLE_DROP_ORDER = SCHEMA_TABLES;
+const SEQUENCES = SCHEMA_SEQUENCES;
 
 function assertLocalResetAllowed(): string {
   const schema = process.env.ORACLE_SCHEMA?.trim().toUpperCase();
