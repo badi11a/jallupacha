@@ -163,7 +163,12 @@ export class RiskService {
       [processId]
     );
     if (!rows.length) throw new NotFoundException('Process not found');
-    if (actor.profiles.includes('ADMIN') || actor.profiles.includes('PROCESS_OWNER') || actor.profiles.includes('RISK_MANAGER')) return;
+    if (
+      actor.profiles.includes('ADMIN') ||
+      actor.profiles.includes('PROCESS_OWNER') ||
+      actor.profiles.includes('VALIDATOR') ||
+      actor.profiles.includes('RISK_MANAGER')
+    ) return;
     throw new ForbiddenException();
   }
 

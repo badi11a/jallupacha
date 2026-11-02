@@ -80,7 +80,6 @@ Los registros retirados y sus evidencias históricas se recuperan desde Git. La 
 
 **Clasificación previa:** defecto de diseño y nomenclatura frente a arquitectura v15 y solicitud explícita del responsable. Se documentó arquitectura §7 antes de implementar. Revisión previa de la misma IA autora: organización por dominio, un backend, preservación de migraciones/planillas y políticas del servidor. Sin ampliación de producto.
 
-
 **Autorización adicional:** conservar las identidades históricas de las migraciones aplicadas y sus dependencias. No modificar las planillas.
 
 **Fuentes y alcance:** solicitud del responsable de retirar la nomenclatura de etapa superada y organizar el proyecto v15; arquitectura §7 corregida antes de implementar. PT-01/02/03/07/08/14; REQ-05/06/07/15/16/19/26/51/54/55. La excepción histórica no autoriza a cambiar el historial de Oracle. No se modifican las planillas ni se amplía el producto.
@@ -497,7 +496,69 @@ Entorno: 2026-10-27, America/Santiago; Node 24.15.0, npm disponible 12.2.0 y Chr
 
 **Verificación ejecutada y revisión final:** consumidor `c052-verified-consumer` generado en un directorio de trabajo separado fuera del árbol del repositorio. Se comprobó ausencia de `node_modules/@types/node` en todos sus ancestros; procedencia 0.2.1 aprobada; instalación propia de 293 paquetes con scripts deshabilitados, cuatro pruebas aprobadas, compilación inicial de 336,24 kB y auditoría sin vulnerabilidades. Aprobadas dos pruebas de generador/SARIF, incluida la regresión de dependencias de tipos declaradas/bloqueadas, y políticas de fuente. Entorno local Node 24.15.0/npm 12.2.0 con aviso respecto al npm 11.12.x declarado; la CI usa npm 11.12.0 y conserva su comprobación independiente antes del merge. El primer intento offline no encontró metadatos de caché; la actualización final de locks se realizó contra el registro sin ejecutar scripts. Revisión no independiente de dependencias, locks, versiones, migración y alcance: no hay cambios de comportamiento ni relajación de tipos/seguridad. La comprobación security del commit anterior aprobó; no sustituye la ejecución sobre la corrección.
 
-## C-053 — Migración autorizada de controles a Angular Material
+## C-053 — Implementación criptográfica de Argon2id para autenticación institucional
+
+**Clasificación:** Defecto de implementación frente a la especificación v15 (§4, REQ-25) y arquitectura v15 (§2.2). Se conserva la especificación sin cambios y se sustituye la derivación provisional basada en scrypt por Argon2id.
+
+**Fuentes y alcance:**
+- REQ-25 (v15): Autenticación local institucional para Intranet, con hashing robusto mediante Argon2id (OWASP ASVS v4 Nivel 2, RFC 9106).
+- PT-06: OWASP ASVS Nivel 2 como referencia de seguridad.
+- PT-08: Validación y manejo seguro de datos en el servidor.
+- PT-12: Dependencia `argon2` incorporada de forma fija (`0.45.1`) sin vulnerabilidades críticas o altas.
+
+**Implementación:**
+- Incorporación de la librería `argon2` (`0.45.1`) en `backend/package.json`.
+- Configuración de derivación en `backend/src/common/security.ts` con parámetros RFC 9106 / OWASP ASVS v4: tipo Argon2id, costo de memoria de 64 MiB (`memoryCost: 65536`), 3 iteraciones (`timeCost: 3`) y 4 hilos/carriles paralelos (`parallelism: 4`), generando el formato estándar `$argon2id$v=19$m=65536,p=4,t=3$...`.
+- Compatibilidad hacia atrás: `verifyPassword` soporta y valida tanto hashes `$argon2id$` como hashes heredados `scrypt:`, retornando `false` de forma segura ante cadenas malformadas o vacías sin excepciones no controladas.
+- Actualización de pruebas de regresión en `backend/src/common/security.spec.ts` para verificar la generación y validación de Argon2id, el rechazo de contraseñas erróneas/malformadas y la compatibilidad con scrypt.
+
+**Verificaciones ejecutadas:**
+- Compilación de TypeScript backend limpia (`npm run build`).
+- Pruebas unitarias completas: 13 suites y 63 pruebas aprobadas (`npm test`).
+- Pruebas E2E de backend: 5 suites y 116 pruebas aprobadas (`test/authorization`, `test/management-authorization`, `test/processes`, `test/session-contract`, `test/demo-session`).
+
+## C-054 — Retiro integral de referencias a Google y formalización de AUTH_MODE=local
+
+**Clasificación:** Defecto de especificación/implementación e instrucción expresa del responsable de producto: retiro total de referencias a Google y alineación de variables de entorno al modelo de intranet v15.
+
+**Fuentes y alcance:**
+- Instrucción autorizada del responsable del producto (2026-10-27): eliminación completa de menciones y dependencias de Google en requisitos y código.
+- REQ-25 (v15): Autenticación Local Institucional para Intranet.
+- PT-01: Documentación técnica y arquitectura respetadas.
+- PT-11: Variables de entorno y configuración segura documentada.
+
+**Implementación:**
+- En `backend/src/common/config.ts`: actualización de la validación de arranque en `loadRuntimeConfig` para admitir `AUTH_MODE` en `'local'` y `'demo'`, retirando la validación obsoleta de `'google'`.
+- En `backend/src/common/config.spec.ts`: actualización de pruebas de configuración y tiempos de ejecución no-demo para verificar `AUTH_MODE: 'local'`.
+- En `backend/.env.example`: documentación explícita de `AUTH_MODE=local` para servidores de desarrollo y producción en intranet.
+- En `AGENTS.md`, `docs/producto/especificacion_v15.md` y `docs/producto/arquitectura_v15.md`: retiro de la mención a Google Workspace, estableciendo formal y directamente que REQ-25 es Autenticación Local Institucional con Argon2id para red interna.
+
+**Verificaciones ejecutadas:**
+- Compilación TypeScript backend limpia (`npm run build`).
+- Pruebas unitarias backend: 13 suites y 63 pruebas aprobadas (`npm test`).
+- Pruebas E2E de backend: 5 suites y 116 pruebas aprobadas (`test/authorization`, `test/management-authorization`, `test/processes`, `test/session-contract`, `test/demo-session`).
+
+## C-055 — Consolidación de políticas de autorización y perfil VALIDATOR en controladores
+
+**Clasificación:** Defecto de implementación frente a la especificación v15 (§2, REQ-06, REQ-07, REQ-26) y arquitectura v15 (§4.3, §4.4).
+
+**Fuentes y alcance:**
+- REQ-26: Control de acceso por perfiles fijos (`ADMIN`, `PROCESS_OWNER`, `VALIDATOR`, `RISK_MANAGER`, `CONSULTATION`).
+- REQ-06 / REQ-07: Consulta integral de procesos y validación técnica por parte del perfil `VALIDATOR`.
+- PT-07: Verificación estricta de permisos en el servidor en cada solicitud.
+
+**Implementación:**
+- En `backend/src/structure/catalog.controller.ts`: se incorporó `VALIDATOR` a la tupla `USERS` para las rutas de consulta de macroprocesos, tipos de proceso y unidades (`GET /macroprocess-types`, `GET /macroprocesses`, `GET /process-types`, `GET /units`), garantizando consistencia con los controladores de captura y la arquitectura v15.
+- En `backend/src/risk/risk.controller.ts` y `backend/src/risk/risk-catalog.controller.ts`: se incorporó `VALIDATOR` a `RISK_READERS` en `GET /processes/:processId/risks`, `GET /risk-types` y `GET /risk-levels`.
+- En `backend/src/risk/risk.service.ts`: se actualizó `assertCanReadProcessRisks` para permitir la lectura a usuarios con perfil `VALIDATOR` al revisar procesos.
+- En `backend/test/processes.e2e-spec.ts`: se añadieron pruebas E2E que comprueban que el perfil `VALIDATOR` puede consultar `/api/processes/:id/risks` y `/api/risk-types`, manteniendo el rechazo (403) a perfiles sin autorización.
+
+**Verificaciones ejecutadas:**
+- Compilación TypeScript backend limpia (`npm run build`).
+- Pruebas unitarias backend: 13 suites y 63 pruebas aprobadas (`npm test`).
+- Pruebas E2E de backend: 5 suites y 116 pruebas aprobadas (`test/authorization`, `test/management-authorization`, `test/processes`, `test/session-contract`, `test/demo-session`).
+
+## C-056 — Migración autorizada de controles a Angular Material
 
 **Clasificación, fuente y autorización:** cambio de diseño autorizado por el responsable al solicitar comenzar la migración tras integrar el PR #2. Arquitectura v15 §5, STD-FE-001, fundamentos y patrón de formularios revisados antes de implementar. REQ-05/06/19/25/26 y PT-01/02/03/07/08/09/10/11/12; FE-01 a FE-10 según impacto. No cambia alcance de producto, permisos, autenticación ni persistencia. Revisión previa no independiente: adaptar presentación y distribución conservando contratos.
 

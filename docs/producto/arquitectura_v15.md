@@ -14,7 +14,7 @@ Este documento formaliza la arquitectura técnica de la versión 15 (v15), reemp
 
 ## 2. Modelo de autenticación y sesiones para Intranet (REQ-25 v15, PT-09)
 
-Al operar en una red interna privada sin salida a Internet, la autenticación externa por Google Workspace queda descartada y se reemplaza por **Autenticación Local Institucional con Argon2id**, preparada para su futura interconexión con directorios corporativos.
+Al operar en una red interna privada sin salida a Internet, la autenticación se realiza mediante **Autenticación Local Institucional con Argon2id**, preparada para su futura interconexión con directorios corporativos.
 
 ```mermaid
 flowchart TD

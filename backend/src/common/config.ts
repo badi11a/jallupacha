@@ -72,8 +72,8 @@ export function loadRuntimeConfig(): RuntimeConfig {
     throw new Error('PORT must be a valid TCP port');
   }
   const authMode = required('AUTH_MODE');
-  if (authMode !== 'demo' && authMode !== 'google') {
-    throw new Error('AUTH_MODE must be demo or google');
+  if (authMode !== 'demo' && authMode !== 'local') {
+    throw new Error('AUTH_MODE must be demo or local');
   }
   if (appEnv !== 'local' && (authMode === 'demo' || process.env.DEMO_DATA_ENABLED === 'true')) {
     throw new Error('Demo authentication and demo data are allowed only when APP_ENV=local');

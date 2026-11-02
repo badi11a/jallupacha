@@ -21,7 +21,7 @@ import {
 } from './catalog.dto';
 import { CatalogService } from './catalog.service';
 
-const USERS = ['ADMIN', 'PROCESS_OWNER', 'RISK_MANAGER', 'CONSULTATION'] as const;
+const USERS = ['ADMIN', 'PROCESS_OWNER', 'VALIDATOR', 'RISK_MANAGER', 'CONSULTATION'] as const;
 
 @Controller()
 @ApiTags('catalogs')

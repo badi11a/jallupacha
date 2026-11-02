@@ -129,6 +129,18 @@ describe('process endpoint authorization', () => {
       .expect(403);
     expect(risks.listForProcess).not.toHaveBeenCalled();
 
+    activeUser = { id: 14, profiles: ['VALIDATOR'] };
+    await api.get('/api/processes/3/risks')
+      .set('Cookie', 'jallupacha_session=valid-session')
+      .expect(200);
+    expect(risks.listForProcess).toHaveBeenCalled();
+
+    await api.get('/api/risk-types')
+      .set('Cookie', 'jallupacha_session=valid-session')
+      .expect(200);
+    expect(risks.listTypes).toHaveBeenCalled();
+
+    activeUser = { id: 10, profiles: ['CONSULTATION'] };
     await api.post('/api/processes/3/risks')
       .set(headers)
       .send({
