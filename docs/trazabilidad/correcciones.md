@@ -693,3 +693,13 @@ Entorno: 2026-10-27, America/Santiago; Node 24.15.0, npm disponible 12.2.0 y Chr
 | Teclado, zoom 200 % y tecnologías de asistencia | No probado para este cambio. |
 
 **Revisión registrada:** revisión por la IA autora, no independiente; decisiones de diseño tomadas por el responsable. Se confirma que no cambia el alcance funcional ni se debilitan controles técnicos.
+
+## C-061 — Retiro de identificadores institucionales en documentos de diseño
+
+**Clasificación SDD:** defecto de documentación frente a AGENTS.md (datos y textos organizacionalmente neutros); sin cambio de producto, código, estilos ni paleta.
+
+**Hallazgo y comportamiento esperado:** la nota de procedencia de la paleta en `design-system.md` §6 nombraba la institución y el documento de origen, y `analisis-comparativo-frontend.md` citaba una ruta local que incluía ese nombre. La documentación vigente no debe nombrar instituciones específicas.
+
+**Corrección:** la procedencia se describe como un manual de normas gráficas externo, conservando la aclaración de no afiliación; la identificación exacta queda recuperable en el historial de Git. La ruta local se reemplaza por el nombre del proyecto comparado. Los siete `--brand-*` y sus HEX no cambian.
+
+**Verificación:** búsqueda en el repositorio (sin `node_modules`) de los términos institucionales: solo quedan la regla de AGENTS.md que los prohíbe y una aserción negativa de `process-interface.spec.ts` que verifica su ausencia en la interfaz. El generador de la base no copia documentos, por lo que no se propagaba a consumidores. Sin pruebas de código: no hay cambio de comportamiento. **Revisión:** IA autora, no independiente.

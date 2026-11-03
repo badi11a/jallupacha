@@ -105,7 +105,7 @@ Se utiliza `aria-current="page"` únicamente si el destino coincide con la pági
 - [DEC-FE-001](decision-biblioteca-controles.md): decisión sobre la biblioteca de controles (C-060).
 - [Tokens](../../frontend/src/app/shared/ui/styles/tokens.css) y [estilos compartidos](../../frontend/src/app/shared/ui/styles/base.css).
 
-**Procedencia de la paleta (registro interno, no identidad del producto):** valores cromáticos tomados como referencia del *Manual de Normas Gráficas de la Universidad de Tarapacá (2017)*, páginas 14 y 15. Esta referencia documental no implica afiliación ni autorización para usar marcas o símbolos de esa institución.
+**Procedencia de la paleta (registro interno, no identidad del producto):** valores cromáticos tomados como referencia de un manual de normas gráficas externo. La identificación del documento fuente se conserva en el historial de Git, no en la documentación vigente (C-061). Esta referencia no implica afiliación ni autorización para usar marcas o símbolos ajenos.
 
 ## 7. Registro de cambio
 

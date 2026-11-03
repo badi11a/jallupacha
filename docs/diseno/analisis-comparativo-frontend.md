@@ -16,7 +16,7 @@ La comparación tiene una asimetría importante: Jallupacha es un producto con r
 
 Fuentes rectoras: [arquitectura v15, sección 5](../producto/arquitectura_v15.md), [STD-FE-001](base-frontend.md), [STD-UX-001, especialmente secciones 5 y 6](marco_estandar_ux_institucional.md), [fundamentos visuales](design-system.md), [catálogo](catalogo-componentes.md) y [formularios](patrones-formularios.md).
 
-Fuentes de implementación: `frontend/src/app`, `frontend/base`, generador, verificaciones y configuración del frontend de Jallupacha; `src/app`, estilos, configuraciones, README, paquete y lockfile de `C:/Users/altir/Documents/UniversidadDeTarapaca/Proyecto-Base-Frontend-main`.
+Fuentes de implementación: `frontend/src/app`, `frontend/base`, generador, verificaciones y configuración del frontend de Jallupacha; `src/app`, estilos, configuraciones, README, paquete y lockfile del proyecto local `Proyecto-Base-Frontend-main`.
 
 Este análisis actualiza el contraste previo a C-048 conservado en [correcciones](../trazabilidad/correcciones.md). Aquel describía un frontend más plano, con carga inmediata y retornos pendientes. Esos hallazgos no deben repetirse como descripción actual: hoy existen `core/platform`, `core/auth`, `features`, carga diferida y protección de retorno.
 
