@@ -1,6 +1,6 @@
 # Formularios — patrón compartido del design-system
 
-**Revisión:** C-039, 2026-10-22. **Estado:** piloto en evaluación. Aplica R-03, R-05, R-06, R-07 y R-08 de [STD-UX-001](marco_estandar_ux_institucional.md).
+**Revisión:** C-039, 2026-10-22. **Estado:** piloto en evaluación. Aplica R-03, R-05, R-06 y R-07 de [STD-UX-001](marco_estandar_ux_institucional.md).
 
 ## 1. Elegir la composición
 
@@ -85,7 +85,7 @@ Este ejemplo muestra **guardado pendiente**, no un formulario listo para copiar 
 - Acción principal: `.primary-button` (`matButton="filled"`); alternativa: `.quiet-button` (`outlined`) o `.text-button` (`text`); destrucción: `.danger-button` (`filled`) según la consecuencia. Las clases marcan el rol y siempre acompañan a `matButton` (DEC-FE-001, C-060). No hay un máximo universal de botones por pantalla: justificar prioridad y tarea.
 - Acciones se envuelven en espacio reducido. Columnas de campos con mínimo elástico; no forzar desplazamiento horizontal de la página.
 - Foco visible independiente de hover, error y selección; controles deshabilitados no reciben el tratamiento hover de una acción disponible.
-- Una redefinición semántica de tokens requiere volver a comprobar contraste. No cambiar los siete colores de marca para corregir una combinación.
+- No cambiar los siete colores de marca para corregir una combinación.
 
 Los ejemplos de este documento describen estados inicial, inválido, deshabilitado y guardando con el CSS compartido. No afirman que todos los formularios actuales de Jallupacha estén migrados a estas clases. La referencia HTML temporal se retiró mediante C-040.
 
@@ -94,7 +94,7 @@ Los ejemplos de este documento describen estados inicial, inválido, deshabilita
 1. Entrada limpia → Cancelar; modificación → cancelar descarte → conservar valores.
 2. Envío inválido → foco y errores por campo; corregir uno → conservar errores de los restantes.
 3. Petición pendiente → un envío, mensaje y bloqueo coherentes; fallo → valores conservados y reintento.
-4. Recorrido de teclado y textos visibles; contraste efectivo de campo, error, foco y acción.
-5. Ampliación al 200 % y reajuste a 320 píxeles CSS, registrándolos como comprobaciones distintas; comprobar que las acciones y el foco siguen disponibles.
+4. Recorrido de teclado y textos visibles.
+5. Reajuste a 320 píxeles CSS; comprobar que las acciones y el foco siguen disponibles.
 
-Reutilizar regresiones existentes; añadir solo las que falten para el comportamiento afectado. Registrar exactamente qué se ejecutó en el mismo cambio de Git. Pruebas DOM no acreditan por sí solas colores efectivos, modalidad del navegador, lectura asistiva ni utilidad con personas. La promoción del patrón sigue la [evaluación del catálogo](catalogo-componentes.md#6-evaluación-de-patrones).
+Reutilizar regresiones existentes; añadir solo las que falten para el comportamiento afectado. Registrar exactamente qué se ejecutó en el mismo cambio de Git. Pruebas DOM no acreditan por sí solas colores efectivos, modalidad del navegador ni utilidad con personas. La promoción del patrón sigue la [evaluación del catálogo](catalogo-componentes.md#6-evaluación-de-patrones).

@@ -1,7 +1,7 @@
 # Estándar Institucional de Experiencia de Usuario (UX) y Diseño de Interfaces
 
 **Código Documental:** STD-UX-001  
-**Versión:** 1.6 — Guía de principios, reglas, patrones y verificación UX mediante SDD
+**Versión:** 1.7 — Guía de principios, reglas, patrones y verificación UX mediante SDD
 
 **Fecha:** 2026-10-22
 
@@ -17,7 +17,7 @@
 ## 1. Alcance y Ámbito Institucional
 
 ### 1.1. Propósito
-Este estándar define las directrices y patrones de interfaz de usuario (UI) y experiencia de usuario (UX) para el ecosistema de aplicaciones web de la institución. Su propósito es asegurar coherencia funcional, facilidad de uso, accesibilidad y predictibilidad operativa en los sistemas institucionales, optimizando la interacción y la curva de aprendizaje de los miembros de la comunidad institucional según los perfiles y objetivos de cada sistema.
+Este estándar define las directrices y patrones de interfaz de usuario (UI) y experiencia de usuario (UX) para el ecosistema de aplicaciones web de la institución. Su propósito es asegurar coherencia funcional, facilidad de uso y predictibilidad operativa en los sistemas institucionales, optimizando la interacción y la curva de aprendizaje de los miembros de la comunidad institucional según los perfiles y objetivos de cada sistema.
 
 ### 1.2. Ámbito Técnico y Operativo
 1. **Infraestructura de Alojamiento:** Aplicaciones alojadas en infraestructura institucional local (*on-premise*).
@@ -41,7 +41,7 @@ La guía separa cuatro niveles para evitar que una decisión particular se convi
 - **Debería:** recomendación; una alternativa debe explicar la necesidad que la justifica.
 - **Puede / Ejemplo:** opción o ilustración. No obliga a incorporar una función ni a copiar una pantalla.
 - Un comportamiento descrito aquí es un criterio esperado. Su existencia en un documento o en un componente no demuestra que la aplicación lo cumpla.
-- Los identificadores R-01 a R-08 se conservan para mantener la trazabilidad histórica. Las precisiones y reglas nuevas se revisan como cambios de diseño, sin modificar código en esta revisión documental.
+- Los identificadores R-01 a R-07 y R-09 a R-12 se conservan para mantener la trazabilidad histórica. Las precisiones y reglas nuevas se revisan como cambios de diseño, sin modificar código en esta revisión documental.
 
 ### 1.4. Autoridad y fuentes del proyecto
 
@@ -60,7 +60,6 @@ La guía separa cuatro niveles para evitar que una decisión particular se convi
 | **PUX-03** | **Reconocimiento y simplicidad.** Las opciones relevantes son reconocibles y no exigen recordar rutas ni comparar controles redundantes. | Alternativas justificadas por tareas; evitar duplicación sin beneficio. R-01, R-10. |
 | **PUX-04** | **Control y continuidad de la tarea.** La persona puede volver, cancelar y recuperarse sin perder trabajo involuntariamente. | Datos conservados, descarte informado y retorno con contexto. R-04, R-05, R-07, R-11. |
 | **PUX-05** | **Fidelidad de la información.** La interfaz diferencia información registrada, ausencia, error y ejemplo; explicita el alcance de sus indicadores. | No presentar contactos ficticios, resultados parciales o valores desconocidos como hechos del registro. R-05, R-06, R-12. |
-| **PUX-06** | **Accesibilidad e inclusión.** Las tareas pueden comprenderse y operarse mediante las formas de interacción previstas, incluidas tecnologías de asistencia. | Teclado, foco, estructura semántica, mensajes, contraste, ampliación y reajuste. R-01 a R-12 según el control afectado, especialmente R-08. |
 | **PUX-07** | **Adecuación a la tarea y al dominio.** La organización de la interfaz responde a las necesidades de las personas y a la complejidad del trabajo. | Elegir patrones por su propósito; documentar decisiones locales sin imponer una cantidad de menús, pasos o columnas universal. Secciones 3 y 4. |
 | **PUX-08** | **Evidencia y reutilización responsable.** Un diseño se comparte con sus condiciones de uso, resultados y límites comprobados. | Evaluar recorridos completos; distinguir existencia, validación y adopción de un patrón. Secciones 5 y 6; PT-01 y PT-03. |
 
@@ -119,34 +118,13 @@ Toda aplicación debe gestionar explícitamente los siguientes estados operativo
 2. **Fallos Bloqueantes o del Sistema:** Mensajes persistentes (`role="alert"`), redactados en lenguaje institucional sin exponer detalles técnicos internos (trazas de error, consultas SQL o códigos de infraestructura), ofreciendo siempre una vía explícita de continuidad o reintento.
 3. **Advertencias de Negocio:** Mensajes de aviso disponibles en el contexto de trabajo hasta que la condición se subsane, sin bloquear innecesariamente el trabajo en borrador cuando la regla de negocio lo permita.
 4. **Confirmaciones de Éxito:** Mensajes de confirmación visibles y proporcionados al contexto. No se impone una duración arbitraria fija; si la confirmación es temporal, debe ser legible antes de disiparse.
-5. **No forzar desplazamientos automáticos bruscos:** Se debe evitar el desplazamiento automático forzado (*auto-scroll*) que desoriente a usuarios con tecnologías asistivas o ampliadores de pantalla. Se debe priorizar el anuncio accesible mediante regiones en vivo (`aria-live`).
+5. **No forzar desplazamientos automáticos bruscos:** Se debe evitar el desplazamiento automático forzado (*auto-scroll*) que desoriente a las personas. Se debe priorizar el anuncio mediante regiones en vivo (`aria-live`).
 
 ### R-07: Acciones Destructivas y Cambios Pendientes
 1. **Confirmación de Acciones Destructivas:** Toda operación irreversible (eliminación definitiva o desvinculación crítica) debe requerir confirmación explícita mediante un diálogo modal accesible antes de su ejecución.
 2. **Protección de Cambios No Guardados:** Cuando un formulario —sea una pantalla completa de captura o un subformulario embebido/inline dentro de un panel (como riesgos, relaciones o catálogos inline)— contenga modificaciones pendientes respecto a su estado inicial (`isDirty`), el sistema debe advertir al usuario mediante un diálogo modal accesible antes de abandonar la pantalla, descartar o cerrar la vista, previniendo la pérdida involuntaria de información. Si no existen modificaciones pendientes (`!isDirty`), la navegación o cancelación debe proceder de forma inmediata sin mostrar ningún diálogo.
 3. **Cambios dentro de la Misma Pantalla:** La protección incluye seleccionar otro registro para editar, pulsar «Nuevo» sobre un editor abierto, cancelar observaciones o guardar otro subformulario cuando estas acciones reemplazan o cierran una edición pendiente. Una guarda de ruta por sí sola no acredita esta regla. Confirmar el descarte de un editor no autoriza descartar otros formularios.
 4. **Respuesta Pendiente y Salida:** Mientras se guarda, se debe impedir la salida que pierda trabajo o conservar de forma segura la edición y definir qué ocurrirá al finalizar la solicitud. Si se permite seguir editando, el éxito de una petición anterior no debe marcar como guardadas modificaciones posteriores. La protección al cerrar o recargar el navegador debe evaluarse según las capacidades de la plataforma y documentarse; no se promete recuperación automática ni almacenamiento persistente de borradores por esta regla.
-
-### R-08: Accesibilidad y Adaptabilidad Visual en Escritorio
-1. **Objetivo Propuesto:** Se establece como objetivo técnico la conformidad con las Pautas de Accesibilidad para el Contenido Web (**WCAG 2.2 Nivel AA**).
-   > [!NOTE]
-   > La conformidad con WCAG 2.2 AA constituye un objetivo propuesto para el ecosistema institucional, pendiente de adopción formal por las instancias de gobernanza correspondientes.
-2. **Comprobación Integral y Evaluación Humana:** La verificación de accesibilidad no puede declararse cumplida basándose únicamente en herramientas automatizadas. Requiere comprobaciones automáticas (como validación de contraste y análisis estático) combinadas con **evaluación humana** sobre los criterios aplicables:
-   - Navegación exclusiva por teclado y visibilidad y orden lógico del foco.
-   - Coherencia en la secuencia de lectura e interpretación con tecnologías de asistencia.
-   - Disponibilidad y pertinencia de alternativas textuales en contenido no textual.
-   - Comprensión de avisos, estados y mensajes de error.
-   *No debe declararse una conformidad que no haya sido efectivamente verificada.*
-3. **Ampliación de Texto (*Resize Text* - WCAG 2.2 Criterio 1.4.4):**  
-   Excepto para subtítulos e imágenes de texto, el texto de la interfaz debe poder ampliarse hasta un **200%** mediante las funciones estándar del navegador sin requerir tecnologías de asistencia y sin que se pierda contenido ni funcionalidad.
-4. **Reajuste de Contenido (*Reflow* - WCAG 2.2 Criterio 1.4.10):**  
-   El contenido debe presentarse sin pérdida de información ni funcionalidad, y sin requerir desplazamiento en dos dimensiones (horizontal y vertical de forma simultánea), para:
-   - Contenido con desplazamiento vertical a un ancho equivalente a **320 píxeles CSS** (típicamente evaluado en escritorio redimensionando la ventana a 1280 píxeles con un zoom del 400%).
-   - Contenido con desplazamiento horizontal a una altura equivalente a **256 píxeles CSS**.
-   - **Excepciones Aplicables:** La excepción corresponde a aquellas partes del contenido o de la interfaz cuya disposición bidimensional sea esencial para su uso o significado. En estos casos se admite desplazamiento bidimensional o barras de desplazamiento horizontal (`overflow-x: auto`), como ocurre por ejemplo en:
-     - Tablas de datos complejas o multidimensionales donde la relación celda-encabezado requiere preservar la alineación en cuadrícula.
-     - Mapas de procesos, esquemas de flujo y diagramas visuales donde la disposición espacial relativa entre elementos perdería su significado al reordenarse en una sola columna.
-     - Interfaces gráficas interactivas, lienzos de dibujo o control con barras de herramientas continuas.
 
 ### R-09: Destinos predecibles e identificación consistente
 
@@ -161,7 +139,7 @@ Toda aplicación debe gestionar explícitamente los siguientes estados operativo
 2. Se pueden ofrecer vías alternativas cuando sirven a tareas o estrategias de búsqueda diferentes, por ejemplo, explorar una estructura y buscar por texto. Deben conducir a la misma ficha o explicar claramente la diferencia de vista, permisos o alcance.
 3. La repetición de un enlace o acción dentro de una pantalla debe aportar un beneficio contextual concreto, como evitar un desplazamiento extenso en un formulario. Debe documentarse su finalidad, mantener comportamiento equivalente y revisarse para que no compita innecesariamente con otros controles. La mera posibilidad de que el usuario no vea un enlace no basta como justificación.
 4. No se deben reproducir menús generales en paneles o pies como atajos arbitrarios. R-01.5 regula el pie; un enlace contextual relacionado con la tarea no es, por sí mismo, un menú paralelo. Un enlace convencional de identidad a inicio y un destino de inicio se evalúan por su función reconocible; compartir destino no los convierte automáticamente en defecto.
-5. La revisión debe inventariar los accesos equivalentes y comprobar su propósito, identificación y resultado. No se eliminan buscadores, enlaces de relación o rutas útiles solo para imponer un camino único. Las alternativas de localización se evalúan según WCAG 2.2, incluidas sus excepciones para pasos de un proceso.
+5. La revisión debe inventariar los accesos equivalentes y comprobar su propósito, identificación y resultado. No se eliminan buscadores, enlaces de relación o rutas útiles solo para imponer un camino único.
 
 ### R-11: Retorno y conservación del contexto
 
@@ -177,7 +155,7 @@ Toda aplicación debe gestionar explícitamente los siguientes estados operativo
 2. La ausencia de información, un valor cero, un dato no aplicable y un fallo de consulta son estados distintos. No se sustituyen entre sí para completar visualmente una tarjeta o un indicador.
 3. Todo resumen o indicador debe explicar qué representa, sobre qué conjunto se calcula y si está afectado por filtros, límites de resultados o datos incompletos. Un subtotal no se presenta como total general. El significado y cálculo de un indicador de negocio deben proceder de la especificación del producto; esta guía no inventa agregaciones.
 4. Conceptos distintos deben conservar nombres y representaciones distinguibles. En el piloto, «criticidad del proceso», «nivel de riesgo» y «distribución de riesgos» no son sinónimos; su relación no se deduce de la forma gráfica de un medidor.
-5. Las claves técnicas se traducen a términos comprensibles cuando se presentan como contenido de uso habitual. Los estados y niveles mantienen texto o alternativas accesibles; el color no es su único identificador. Los medidores y gráficos deben utilizar semántica accesible compatible con el dato que representan.
+5. Las claves técnicas se traducen a términos comprensibles cuando se presentan como contenido de uso habitual. Los estados y niveles mantienen texto; el color no es su único identificador.
 
 ---
 
@@ -265,7 +243,7 @@ Esta sección identifica decisiones del producto y puntos de evaluación del pil
 3. **Neutralidad de Datos (`AGENTS.md`):**  
    Los datos de prueba del sistema emplean terminología institucional neutra («la institución», «la entidad», «la organización»), sin incorporar nombres, marcas, escudos o denominaciones de entidades específicas.
 4. **Visualizaciones Piloto y Transición a Estándar Institucional:**  
-   El medidor de nivel de riesgo de la ficha y la distribución de riesgo del macroproceso son soluciones exploratorias. Su presencia en el frontend no valida el cálculo ni los convierte en patrones institucionales aprobados. Se deben revisar significado, agregación, conjunto de datos y accesibilidad conforme a R-12 antes de promoverlos; esta revisión documental no autoriza una fórmula ni modifica contratos del producto.
+   El medidor de nivel de riesgo de la ficha y la distribución de riesgo del macroproceso son soluciones exploratorias. Su presencia en el frontend no valida el cálculo ni los convierte en patrones institucionales aprobados. Se deben revisar significado, agregación y conjunto de datos conforme a R-12 antes de promoverlos; esta revisión documental no autoriza una fórmula ni modifica contratos del producto.
 
 ### 4.2. Ejemplos de Implementación de los Arquetipos en Jallupacha
 
@@ -300,12 +278,13 @@ Cualquier modificación a este estándar debe quedar registrada con su versión,
 | Versión | Fecha | Motivación | Resumen de Cambios |
 |---|---|---|---|
 | **1.0** | 2026-10-21 | Formalización inicial del estándar | Desacoplamiento de las normas generales respecto a particularidades de Jallupacha. Establecimiento de 8 reglas obligatorias y 4 arquetipos de referencia. |
-| **1.1** | 2026-10-21 | Revisión colegiada de alcance y accesibilidad | Ampliación del alcance a toda la comunidad institucional; flexibilización del rol del pie (acciones contextuales); distinción semántica entre Desactivar y Eliminar; incorporación explícita de WCAG 2.2 1.4.4 (Ampliación) y 1.4.10 (Reajuste). |
-| **1.2** | 2026-10-21 | Consolidación normativa y desacoplamiento técnico | Sustitución de nombres de componentes (`ui-breadcrumbs`) y clases CSS por conceptos normativos y niveles visuales recomendados (R-02, R-03). Flexibilización de excepciones de reajuste en R-08.4 mediante criterio esencial no taxativo. |
+| **1.1** | 2026-10-21 | Revisión colegiada de alcance | Ampliación del alcance a toda la comunidad institucional; flexibilización del rol del pie (acciones contextuales); distinción semántica entre Desactivar y Eliminar. |
+| **1.2** | 2026-10-21 | Consolidación normativa y desacoplamiento técnico | Sustitución de nombres de componentes (`ui-breadcrumbs`) y clases CSS por conceptos normativos y niveles visuales recomendados (R-02, R-03). |
 | **1.3** | 2026-10-21 | Armonización documental y correcciones UX | Incorporación explícita del rol de las visualizaciones piloto (4.1.4); alineación de confirmaciones modales accesibles (R-07.1), protección de cambios no guardados (R-07.2), niveles visuales de desactivación y edición (R-03) y validación de campo in-situ (R-06.1). |
 | **1.4** | 2026-10-22 | Navegación local institucional y superación de shell v14 | Estandarización de navegación primaria estable (R-01.1): barra plana no fija, separación entre navegación y acciones, etiquetas completas, correspondencia activa en subrutas y reajuste elástico sin desborde. |
 | **1.5** | 2026-10-22 | Corrección del indicador activo (C-030) | Distinción semántica de página y sección padre; referencia al subrayado recto compartido del sistema de diseño. |
 | **1.6** | 2026-10-22 | Consolidación de la guía UX mediante SDD (C-031) | Principios explícitos; separación de niveles y autoridad; reglas R-09 a R-12; precisión de cancelación, datos sensibles y ediciones pendientes; criterios de aceptación, evidencia, gobierno y adopción. Cambio exclusivamente documental. |
+| **1.7** | 2026-11-03 | Decisión del responsable (C-062) | Simplificación de principios y reglas; se conservan los identificadores vigentes. |
 
 ### 5.2. Tratamiento de Excepciones
 
@@ -315,7 +294,7 @@ Revisión documental C-040 (2026-10-22) de la versión 1.6: limpieza de referenc
 2. El registro de excepción debe señalar:
    - La regla estándar afectada.
    - La justificación operativa o de dominio que la motiva.
-   - Las medidas implementadas para resguardar la consistencia de uso y los principios de accesibilidad.
+   - Las medidas implementadas para resguardar la consistencia de uso.
    - La aplicación, versión y tarea a las que se limita; las alternativas evaluadas; la evidencia, responsable de aceptación y condición o fecha de revisión.
 3. La excepción se registra en la documentación del producto y en el mismo cambio de Git. No cambia la regla para otros sistemas ni autoriza excepciones a requisitos, permisos, seguridad o protección de datos.
 4. Los comportamientos que aún incumplen una regla se registran como fallidos o no probados según la evidencia. Su existencia previa no equivale a una excepción aprobada.
@@ -328,18 +307,18 @@ Las siguientes son funciones de gobierno que la organización debe asignar; esta
 |---|---|
 | Responsable del producto | Define tareas y alcance; resuelve decisiones de producto y acepta excepciones dentro de su autoridad. |
 | Mantenimiento de la guía y del sistema de diseño | Mantiene versiones, contratos y relaciones entre reglas, patrones y componentes; documenta compatibilidad y migración. |
-| Revisión de diseño y verificación | Examina recorridos y evidencia, incluidas accesibilidad y alternativas de acceso; distingue observación de hipótesis. Una revisión IA no sustituye evaluación humana o conformidad requerida. |
+| Revisión de diseño y verificación | Examina recorridos y evidencia, incluidas alternativas de acceso; distingue observación de hipótesis. Una revisión IA no sustituye evaluación humana. |
 | Instancia de adopción institucional | Decide la adopción organizacional, las responsabilidades y el calendario para otros sistemas. Permanece por definir hasta una decisión formal. |
 
 Un patrón se registra con uno de estos estados, indicando siempre contexto y evidencia:
 
 - **Propuesto:** existe una idea o especificación; no hay validación suficiente.
 - **Piloto en evaluación:** existe una implementación con pruebas delimitadas y pendientes explícitos.
-- **Validado en un contexto:** hay evidencia de uso con personas representativas, incluidas necesidades de accesibilidad, y comprobaciones técnicas pertinentes. No se extrapola automáticamente a otras tareas o aplicaciones.
+- **Validado en un contexto:** hay evidencia de uso con personas representativas y comprobaciones técnicas pertinentes. No se extrapola automáticamente a otras tareas o aplicaciones.
 - **Adoptado institucionalmente:** la instancia competente acepta alcance, soporte y condiciones de uso; se registra versión y decisión.
 - **En retirada:** se identifica reemplazo, compatibilidad, motivo y transición para consumidores existentes.
 
-Antes de promover una solución del piloto se debe comprobar que atiende una necesidad compartida, reutiliza lo existente o justifica reemplazarlo, funciona con contenido y estados representativos, y documenta límites, accesibilidad y soporte. La existencia de capturas, código o pruebas unitarias no basta para promoverla. La documentación debe explicar cuándo usarla, cuándo evitarla, sus estados, contrato y verificaciones conocidas.
+Antes de promover una solución del piloto se debe comprobar que atiende una necesidad compartida, reutiliza lo existente o justifica reemplazarlo, funciona con contenido y estados representativos, y documenta límites y soporte. La existencia de capturas, código o pruebas unitarias no basta para promoverla. La documentación debe explicar cuándo usarla, cuándo evitarla, sus estados, contrato y verificaciones conocidas.
 
 Los cambios compartidos deben identificar consumidores afectados y ofrecer instrucciones de migración o compatibilidad. Una nueva versión de la guía no demuestra una migración automática del frontend ni obliga a modificar otros sistemas sin una decisión de adopción.
 
@@ -364,7 +343,7 @@ Los cambios compartidos deben identificar consumidores afectados y ofrecer instr
 
 ### 6.2. Criterios mínimos de aceptación por regla
 
-La tabla es un índice de comprobación. Cada fila agrupa las subreglas aplicables y no las sustituye. Para un cambio pequeño se seleccionan las reglas afectadas; una revisión integral de navegación debe incluir al menos R-01, R-02 y R-09 a R-11, además de R-07 cuando haya edición y R-08.
+La tabla es un índice de comprobación. Cada fila agrupa las subreglas aplicables y no las sustituye. Para un cambio pequeño se seleccionan las reglas afectadas; una revisión integral de navegación debe incluir al menos R-01, R-02 y R-09 a R-11, además de R-07 cuando haya edición.
 
 | Regla | Comprobación observable | Evidencia pertinente |
 |---|---|---|
@@ -373,13 +352,12 @@ La tabla es un índice de comprobación. Cada fila agrupa las subreglas aplicabl
 | **R-03** | El nombre de cada acción corresponde a su efecto; Cancelar afecta solo al ámbito de edición definido y respeta R-07. | Textos visibles y recorrido de formulario completo, inline o diálogo afectado. |
 | **R-04** | Un fallo de validación o servidor conserva los datos de negocio; una carga fallida no habilita guardar una ficha vacía; campos sensibles siguen su política. | Fallo controlado y comparación de los valores antes/después. |
 | **R-05** | Carga, vacío, ausencia de coincidencias, error y operación pendiente son distinguibles; no hay doble envío ni sustitución por respuestas antiguas. | Respuesta pendiente, respuestas en distinto orden y resultados vacíos en el recorrido afectado. |
-| **R-06** | Errores de campo tienen asociación accesible; fallos bloqueantes ofrecen continuidad; mensajes y gestión de foco no desorientan. | Inspección semántica, teclado, lectura de mensajes y evaluación asistiva cuando corresponda. |
+| **R-06** | Errores de campo tienen asociación accesible; fallos bloqueantes ofrecen continuidad; mensajes y gestión de foco no desorientan. | Inspección semántica, teclado y lectura de mensajes. |
 | **R-07** | Sin cambios se sale inmediatamente; con cambios se confirma una sola vez; cancelar el descarte conserva datos; cambiar de editor o guardar otro no pierde trabajo. | Recorrido de edición dentro de ruta y entre rutas, con guardado pendiente y fallo. |
-| **R-08** | El contenido y las tareas afectadas mantienen acceso por teclado, foco visible, semántica, contraste, ampliación y reajuste aplicables. | Colores efectivos, revisión visual, ampliación real al 200 %, reajuste y evaluación con tecnologías de asistencia. Registrar alcance y excepciones esenciales. |
 | **R-09** | Antes de activar un control se puede anticipar su resultado; después se obtiene lo anunciado; controles equivalentes son reconocibles. | Comparación entre etiqueta/contexto y destino/efecto, incluidas entradas directas. |
 | **R-10** | Cada acceso alternativo tiene una tarea o beneficio identificable; las repeticiones no sugieren falsas diferencias ni crean menús paralelos. | Inventario de accesos, justificación y revisión de recorridos equivalentes. |
 | **R-11** | Volver desde un registro restaura el contexto válido del origen; entrada directa tiene salida válida; no se arrastra contexto entre sesiones. | Recorrido de ida/vuelta y entrada directa, con filtros y datos cambiados cuando aplique. |
-| **R-12** | Se distingue información registrada, ausente y de ayuda; indicadores identifican conjunto, cálculo aprobado y filtros; no hay ejemplos presentados como hechos. | Contraste con contrato y datos de prueba neutrales, verificación de totales/subtotales y alternativas accesibles. |
+| **R-12** | Se distingue información registrada, ausente y de ayuda; indicadores identifican conjunto, cálculo aprobado y filtros; no hay ejemplos presentados como hechos. | Contraste con contrato y datos de prueba neutrales, verificación de totales/subtotales y alternativas textuales. |
 
 ### 6.3. Estados de verificación y condición de cierre
 
@@ -390,9 +368,9 @@ La tabla es un índice de comprobación. Cada fila agrupa las subreglas aplicabl
 | **No probado** | No se ejecutó la comprobación o falta evidencia suficiente. Una lectura de código, captura o prueba de otro recorrido no acredita el caso. |
 | **No aplica** | Explicar por qué la regla o subregla no corresponde a la tarea. La falta de tiempo o de herramienta no es motivo de no aplicabilidad. |
 
-Una comprobación automática no reemplaza una comprobación humana distinta. Un ancho de 320 píxeles CSS no acredita por sí solo ampliación real al 200 %, y una revisión visual no acredita uso con lector de pantalla. El funcionamiento y el texto real se revisan junto con el contraste de los colores efectivos; mantener tokens aprobados no demuestra todas sus combinaciones.
+Una comprobación automática no reemplaza una comprobación humana distinta. El funcionamiento y el texto real se revisan en la interfaz.
 
-Un cambio no se declara conforme si tiene verificaciones necesarias fallidas o no probadas. Se registran los pendientes y la decisión competente que corresponda; una excepción válida no convierte una comprobación no ejecutada en aprobada. La conformidad y pruebas requeridas antes de producción permanecen bajo PT-03, PT-04 y las demás reglas de seguridad del proyecto.
+Un cambio no se declara conforme si tiene verificaciones necesarias fallidas o no probadas. Se registran los pendientes y la decisión competente que corresponda; una excepción válida no convierte una comprobación no ejecutada en aprobada. Las pruebas requeridas permanecen bajo PT-03.
 
 La aprobación de una propuesta documental y el cumplimiento de la interfaz son resultados diferentes. Este documento puede revisarse y versionarse conservando como no probada la futura implementación de sus criterios.
 
@@ -434,5 +412,4 @@ Las referencias sustentan la guía; sus ejemplos, marcas y componentes no se inc
 - [Heurísticas de usabilidad de Nielsen Norman Group](https://www.nngroup.com/articles/ten-usability-heuristics/): orientación, reconocimiento, control y consistencia.
 - [Enlaces duplicados en una misma página](https://www.nngroup.com/articles/duplicate-links/) y [vías alternativas de navegación](https://www.nngroup.com/articles/reduce-redundancydecrease-duplicated-design-decisions/): evaluar la utilidad contextual de la redundancia, sin imponer un camino único.
 - [Information scent](https://www.nngroup.com/articles/information-scent/): correspondencia entre las señales del enlace y el contenido esperado. Un defecto que desorienta no acredita por sí mismo manipulación deliberada.
-- [WCAG 2.2](https://www.w3.org/TR/WCAG22/): referencia de accesibilidad, incluidos navegación consistente, propósito de enlaces, múltiples vías, identificación consistente, foco, contraste, texto y reajuste. Cada criterio conserva su nivel y sus excepciones; esta guía puede establecer reglas propias adicionales, como la orientación contextual, sin atribuirlas erróneamente a un criterio AA.
 - [Criterios de contribución de GOV.UK Design System](https://design-system.service.gov.uk/community/contribution-criteria/): referencia para utilidad, ausencia de duplicación innecesaria, evidencia de uso y versatilidad antes de promover patrones compartidos. No se adoptan su marca ni sus decisiones particulares de navegación.

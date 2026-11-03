@@ -12,7 +12,7 @@ Definición de requisitos institucionales, reglas funcionales, ciclo de vida de 
 - [`base-frontend.md`](diseno/base-frontend.md): STD-FE-001, núcleo configurable, arquitectura por funcionalidades, plantilla versionada y criterios de seguridad/eficiencia integrados en SDD.
 Fundamentos visuales, kit compartido de interfaz, patrones de experiencia de usuario y contratos de componentes:
 - [`marco_estandar_ux_institucional.md`](diseno/marco_estandar_ux_institucional.md): Guía STD-UX-001 de principios, reglas de experiencia, arquetipos de pantalla y criterios de verificación.
-- [`design-system.md`](diseno/design-system.md): Identidad visual propia, tokens, paleta aprobada, tipografía y criterios de accesibilidad WCAG 2.2 AA; no acredita conformidad integral del frontend.
+- [`design-system.md`](diseno/design-system.md): Identidad visual propia, tokens, paleta aprobada y tipografía.
 - [`catalogo-componentes.md`](diseno/catalogo-componentes.md): Contratos de la API pública y consumo de componentes del kit compartido (`shared/ui/`).
 - [`patrones-formularios.md`](diseno/patrones-formularios.md): Patrón transversal para anatomía, validación in-situ, control de foco y preservación de cambios no guardados.
 

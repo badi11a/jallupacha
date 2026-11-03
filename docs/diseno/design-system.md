@@ -4,7 +4,7 @@
 
 **Propósito:** definir una identidad visual propia, consistente y reutilizable para aplicaciones web. Jallupacha es el primer producto consumidor; el sistema de diseño no pertenece a una aplicación concreta.
 
-**Alcance:** paleta, tipografía, identidad de producto, tokens, accesibilidad y reglas de aplicación. No modifica requisitos funcionales, arquitectura de backend ni permisos.
+**Alcance:** paleta, tipografía, identidad de producto, tokens y reglas de aplicación. No modifica requisitos funcionales, arquitectura de backend ni permisos.
 
 **Relación con la guía UX:** [STD-UX-001](marco_estandar_ux_institucional.md) define principios, reglas y verificaciones de experiencia. Este documento concreta los fundamentos visuales; [el catálogo](catalogo-componentes.md) describe componentes existentes y [la arquitectura v15](../producto/arquitectura_v15.md) las decisiones particulares de Jallupacha. La aprobación visual del piloto no implica adopción institucional de todos sus patrones ni conformidad comprobada de la aplicación.
 
@@ -43,7 +43,7 @@ Estos siete colores son los valores de referencia aprobados para el kit. Sus có
 
 - Los tokens funcionales existentes `--ui-*` deben apuntar a los valores adecuados de la paleta cuando corresponda.
 - Se admiten neutros y colores funcionales adicionales para fondos, texto, bordes, errores, éxito y advertencias. **No se presentan como integrantes de la paleta de marca.**
-- No se alteran los valores HEX de referencia para resolver problemas de contraste; se selecciona otra combinación o rol semántico.
+- No se alteran los valores HEX de referencia; si una combinación no funciona, se selecciona otra o un rol semántico.
 - Los nombres `--uta-*` del código anterior deben migrar a estos nombres neutros y sus referencias deben actualizarse.
 
 ## 3. Tipografía
@@ -62,9 +62,8 @@ C-060 ratifica esta base en [DEC-FE-001](decision-biblioteca-controles.md) y map
 1. Mantener tokens y componentes reutilizables en `frontend/src/app/shared/ui/`.
 2. Aplicar la paleta mediante variables semánticas, evitando códigos HEX repetidos en componentes.
 3. Conservar el nombre propio de cada producto en su interfaz, separado de cualquier marca institucional ajena.
-4. Mantener navegación, formularios, mensajes, estados y controles con accesibilidad objetivo **WCAG 2.2 AA**, incluidos teclado, foco visible y contraste.
-5. Separar la presentación compartida de las reglas y flujos de negocio de Jallupacha.
-6. Seguir la arquitectura existente y evitar nuevas dependencias sin necesidad comprobada. C-048 autoriza la base y plantilla local versionadas conforme a [STD-FE-001](base-frontend.md); la extracción/publicación de una biblioteca independiente requiere su decisión y verificación de consumidores, sin presumir adopción institucional.
+4. Separar la presentación compartida de las reglas y flujos de negocio de Jallupacha.
+5. Seguir la arquitectura existente y evitar nuevas dependencias sin necesidad comprobada. C-048 autoriza la base y plantilla local versionadas conforme a [STD-FE-001](base-frontend.md); la extracción/publicación de una biblioteca independiente requiere su decisión y verificación de consumidores, sin presumir adopción institucional.
 
 ### Activación y aislamiento de estilos (C-046)
 
@@ -85,14 +84,13 @@ Se utiliza `aria-current="page"` únicamente si el destino coincide con la pági
 ## 5. Criterios de aceptación SDD
 
 - [ ] Los siete tokens `--brand-*` contienen exactamente los HEX indicados.
-- [ ] No quedan tokens `--uta-*` ni referencias a una identidad institucional ajena en componentes, estilos o textos visibles.
+- [ ] No quedan tokens con nombre de otra institución ni referencias a una identidad institucional ajena en componentes, estilos o textos visibles.
 - [ ] El kit no requiere ni solicita activos gráficos de esa institución.
 - [ ] Cada aplicación utiliza únicamente sus propias denominaciones y marcas autorizadas.
 - [ ] Los componentes reutilizables conservan su funcionamiento y separación de responsabilidades.
-- [ ] Se mantienen los requisitos de accesibilidad, sin afirmar verificaciones no realizadas.
 - [ ] No se alteran API, base de datos, autenticación ni requisitos funcionales.
 
-**Verificación:** los resultados se registran por versión y cambio en [correcciones](../trazabilidad/correcciones.md), con alcance y pendientes. La revisión documental de la guía no acredita compilación, contraste efectivo, recorrido, revisión visual ni conformidad WCAG del frontend. Aplicar los estados y criterios de evidencia de la sección 6 de STD-UX-001; no declarar resultados que no se hayan obtenido.
+**Verificación:** los resultados se registran por versión y cambio en [correcciones](../trazabilidad/correcciones.md), con alcance y pendientes. La revisión documental de la guía no acredita compilación, recorrido ni revisión visual del frontend. Aplicar los estados y criterios de evidencia de la sección 6 de STD-UX-001; no declarar resultados que no se hayan obtenido.
 
 ## 6. Referencias internas y trazabilidad
 

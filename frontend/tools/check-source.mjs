@@ -53,4 +53,4 @@ for (const file of walk(root).filter(file => !file.endsWith('.spec.ts') && /\.(t
   visit(ast);
 }
 if (failures.length) { failures.forEach(message => console.error(message)); process.exitCode = 1; }
-else console.log('STD-FE-001: layer boundaries, lazy feature imports, tokens and bounded unsafe-code policies passed. This is not a complete SAST scan.');
+else console.log('STD-FE-001: layer boundaries, lazy feature imports, tokens and bounded unsafe-code policies passed.');

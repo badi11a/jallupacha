@@ -52,9 +52,9 @@ stateDiagram-v2
 
 ### REQ-25 (v15) — Autenticación Local Institucional para Intranet
 Los usuarios del sistema ingresan mediante sus credenciales institucionales (correo corporativo y contraseña).
-* La contraseña se verifica contra la base de datos institucional usando hashing robusto mediante **Argon2id** (OWASP ASVS v4 Nivel 2).
+* La contraseña se verifica contra la base de datos institucional usando hashing robusto mediante **Argon2id**.
 * El sistema bloquea temporalmente la cuenta tras 5 intentos fallidos consecutivos durante un lapso de 15 minutos para mitigar ataques de fuerza bruta.
-* La sesión se gestiona de forma segura en el servidor, cerrándose automáticamente tras 30 minutos de inactividad (PT-09).
+* La sesión se gestiona de forma segura en el servidor, cerrándose automáticamente tras 30 minutos de inactividad.
 * La comunicación utiliza cookies protegidas (`HttpOnly`, `SameSite=Strict`) y protección CSRF mediante cabecera `X-CSRF-Token` vinculada a la sesión.
 * La arquitectura mantiene el campo `PROVIDER` en la identidad (`'LOCAL'`) para permitir la integración transparente con LDAP o Active Directory corporativo cuando la red institucional lo disponga.
 

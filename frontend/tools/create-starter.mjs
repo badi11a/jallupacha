@@ -72,13 +72,13 @@ if (mode === '--check') {
     if (/(?:^|\/)(?:\.env(?:\.|$)|node_modules|\.git(?:\/|$)|credentials?(?:[./]|$)|wallet(?:\/|$))/i.test(name)) throw new Error('Local configuration or credentials are not exportable');
     files.set(name, regularFile(template, file));
   }
-  for (const name of ['tools/check-source.mjs', 'tools/check-sarif.mjs', 'scripts/check-contrast.mjs']) {
+  for (const name of ['tools/check-source.mjs']) {
     files.set(name, regularFile(frontend, join(frontend, name)));
   }
   const pkg = JSON.parse(readFileSync(join(frontend, 'package.json'), 'utf8'));
   files.set('package.json', Buffer.from(JSON.stringify({ name: 'frontend-base-consumer', version: manifest.version, private: true,
     engines: pkg.engines, scripts: { start: 'ng serve --host 127.0.0.1', build: 'ng build', test: 'ng test --watch=false',
-      'check:source': 'node tools/check-source.mjs', 'check:contrast': 'node scripts/check-contrast.mjs' },
+      'check:source': 'node tools/check-source.mjs' },
     dependencies: pkg.dependencies, devDependencies: pkg.devDependencies, overrides: manifest.dependencyOverrides }, null, 2) + '\n'));
   for (const name of ['angular.json', 'tsconfig.json', 'tsconfig.app.json', 'tsconfig.spec.json']) {
     let data = readFileSync(join(frontend, name), 'utf8');

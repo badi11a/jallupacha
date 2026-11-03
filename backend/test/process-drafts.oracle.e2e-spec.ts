@@ -63,7 +63,7 @@ describe('process drafts (Oracle)', () => {
 
   afterAll(async () => {
     if (Number.isSafeInteger(processId) && Number.isSafeInteger(childId)) {
-      // El usuario runtime (DATABASE_USER) no tiene DELETE por diseño (PT-14); la limpieza
+      // El usuario runtime (DATABASE_USER) no tiene DELETE por diseño; la limpieza
       // de datos de prueba se hace con el usuario propietario, nunca con el de la app.
       const schema = process.env.ORACLE_SCHEMA!.toUpperCase();
       const ownerSource = new DataSource(databaseOptions(true));

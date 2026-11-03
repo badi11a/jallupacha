@@ -55,16 +55,15 @@ npm run test:e2e --workspace backend -- --runTestsByPath test/authorization.e2e-
 npm test --workspace frontend
 npm run check:source --workspace frontend
 npm run test:base --workspace frontend
-npm run check:contrast --workspace frontend
 npm run build
 npm run docs:openapi --workspace backend
 ```
 
-Las pruebas Oracle requieren un esquema dedicado y configuración explícita; no se ejecutan sobre datos institucionales. Las pruebas automáticas no sustituyen la revisión humana ni la conformidad de producción.
+Las pruebas Oracle requieren un esquema dedicado y configuración explícita; no se ejecutan sobre datos institucionales.
 
 ## Estado y documentación
 
-La versión de la especificación no equivale a una certificación de cumplimiento. Permanecen pendientes de cierre la coherencia de autenticación con Argon2id y proveedor local, la auditoría integral, validación Oracle y de instalación, CI de seguridad, carga y aceptación institucional. La base frontend 0.2.1 conserva la consolidación y verificaciones técnicas registradas en C-048 a C-050 e incorpora la corrección de dependencia de tipos de C-052 para su instalación independiente; los límites de evidencia y condiciones de adopción del kit están en su catálogo. No se presume conformidad WCAG integral.
+La versión de la especificación no equivale a una certificación de cumplimiento. Permanecen pendientes de cierre la coherencia de autenticación con Argon2id y proveedor local y la carga. La base frontend 0.2.1 conserva la consolidación y verificaciones técnicas registradas en C-048 a C-050 e incorpora la corrección de dependencia de tipos de C-052 para su instalación independiente; los límites de evidencia y condiciones de adopción del kit están en su catálogo.
 
 - [Documentación](docs/README.md)
 - [Reglas de desarrollo](AGENTS.md)

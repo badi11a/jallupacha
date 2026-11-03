@@ -11,7 +11,7 @@ La API se coteja con [el punto de entrada público](../../frontend/src/app/share
 3. Usar tokens semánticos `--ui-*` y conservar los siete HEX `--brand-*`. No copiar CSS de componentes ni redefinir sus selectores internos desde el consumidor.
 4. Componer mediante contenido proyectado, opciones públicas y clases compartidas antes de extender. El producto decide qué se muestra y qué acción ejecuta.
 5. Extensiones aditivas: necesidad concreta, contrato, estados y verificación. Renombrar/retirar API: identificar consumidores, adaptación y registro en el mismo cambio de Git.
-6. Una variante se justifica por tarea y contexto, documentando diferencias y accesibilidad; un selector más específico o copia del componente no es una variante mantenible.
+6. Una variante se justifica por tarea y contexto, documentando diferencias; un selector más específico o copia del componente no es una variante mantenible.
 7. No extraer paquetes, instalar dependencias ni crear envoltorios sin necesidad demostrada. C-048 autoriza exportar núcleo y kit mediante la plantilla local versionada de [STD-FE-001](base-frontend.md), con hashes, comprobación de consumidores y sin publicación externa automática. C-056 adopta controles Material con imports explícitos y mantiene tablas semánticas y patrones compartidos. No se crean envoltorios para cada control.
 
 Ejemplo desde un consumidor situado en `app/`:
@@ -91,12 +91,12 @@ Estado común: **piloto en evaluación**, conforme a STD-UX-001 `5.3. Ninguno qu
 
 | Patrón y contexto | Evidencia identificada | Límites y promoción |
 | --- | --- | --- |
-| Fundamentos y acciones CSS | Combinaciones de tokens en `check:contrast`; inspección C-039, con referencia temporal retirada en C-040. | Revisar colores efectivos en cada consumidor y uso con personas representativas antes de promover. |
-| Formulario modal corto | `shared/ui/ui.spec.ts`: cancelación, foco, validación y valores; C-039 añade persistencia de errores no corregidos. | No cubre escrituras remotas ni evaluación asistiva o de uso. Estas evaluaciones corresponden al contexto de adopción. Evitar captura extensa dentro del modal. |
+| Fundamentos y acciones CSS | Inspección C-039, con referencia temporal retirada en C-040. | Revisar colores efectivos en cada consumidor y uso con personas representativas antes de promover. |
+| Formulario modal corto | `shared/ui/ui.spec.ts`: cancelación, foco, validación y valores; C-039 añade persistencia de errores no corregidos. | No cubre escrituras remotas ni evaluación de uso. Estas evaluaciones corresponden al contexto de adopción. Evitar captura extensa dentro del modal. |
 | Formularios completos/inline | [Contrato de formularios](patrones-formularios.md), ejemplos y pruebas del auxiliar. | Cada consumidor demuestra carga, validación, petición, fallo y descarte; el kit no acredita esos recorridos por existir. |
 | Mensajes e insignias | Regresiones de roles y contenido del kit. | Semántica de tono/texto y frecuencia de anuncios se revisan en la tarea real. |
 | Navegación y migas | Regresiones de títulos/historial y consultas de las migas. | Distribución horizontal del piloto no se universaliza. Retorno explícito requiere comprobación del consumidor. |
-| Tablas y paginación | Regresiones de extremos/eventos y estructura CSS documentada. | La evidencia no incluye lectura asistiva, tablas complejas ni totales de otros consumidores; cada integración verifica su contexto. |
+| Tablas y paginación | Regresiones de extremos/eventos y estructura CSS documentada. | La evidencia no incluye tablas complejas ni totales de otros consumidores; cada integración verifica su contexto. |
 
 Los resultados ejecutados y su alcance exacto de C-039 se recuperan desde el historial de Git. Los antecedentes conservan sus límites; no se trasladan como aprobación de nuevos estados.
 
@@ -106,21 +106,21 @@ Registrar en el mismo cambio de Git, antes de agregar una variante o componente:
 
 1. Tarea, usuarios, regla UX y motivo por el que no basta la composición existente.
 2. Consumidores, contrato, estados, contenido largo/ausente y teclado.
-3. Tokens y efectos sobre contraste, foco y reajuste; evitar valores visuales aislados.
+3. Tokens y efectos sobre foco y reajuste; evitar valores visuales aislados.
 4. Comprobación significativa más pequeña, evidencia y límites: cotejo de API/enlaces para documentos; regresión apropiada para comportamiento.
 5. Revisión y estado del patrón, responsable de mantenimiento y adaptación de consumidores si cambia el contrato.
 
-Una variante útil en una pantalla sigue siendo local hasta demostrar necesidad compartida. «Validado en un contexto» requiere uso con personas representativas y comprobaciones de accesibilidad además de pruebas técnicas. «Adoptado institucionalmente» requiere decisión de la instancia competente, alcance y soporte; una revisión IA no la concede.
+Una variante útil en una pantalla sigue siendo local hasta demostrar necesidad compartida. «Validado en un contexto» requiere uso con personas representativas además de pruebas técnicas. «Adoptado institucionalmente» requiere decisión de la instancia competente, alcance y soporte; una revisión IA no la concede.
 
-**Alcance de la evidencia y condiciones de adopción:** la evaluación asistiva y el uso con un segundo producto real no forman parte de la evidencia disponible. El soporte y la compatibilidad institucionales requieren una decisión de adopción. C-046 añade un consumidor de prueba y regresiones de aislamiento, sin acreditar un segundo producto. Por decisión del responsable del 2026-10-27 (C-049), estos puntos no constituyen pendientes activos de esta revisión. Las condiciones aplicables se comprueban al adoptar o promover el kit, manteniendo los estados reales de verificación y los controles de liberación. Decisiones y excepciones permanecen en el registro del cambio.
+**Alcance de la evidencia y condiciones de adopción:** el uso con un segundo producto real no forma parte de la evidencia disponible. El soporte y la compatibilidad institucionales requieren una decisión de adopción. C-046 añade un consumidor de prueba y regresiones de aislamiento, sin acreditar un segundo producto. Por decisión del responsable del 2026-10-27 (C-049), estos puntos no constituyen pendientes activos de esta revisión. Las condiciones aplicables se comprueban al adoptar o promover el kit, manteniendo los estados reales de verificación y los controles de liberación. Decisiones y excepciones permanecen en el registro del cambio.
 
-**Resultado de esta revisión (C-049):** consumo uniforme de controles equivalentes implementado y eficiencia técnica medida mediante escenarios reproducibles de navegador y compilación. Campos, filtros y acciones consumen los patrones existentes; se conservan excepciones de distribución justificadas. La matriz de consumidores, evidencias y resultados están en [C-049](../trazabilidad/correcciones.md#c-049--alcance-de-la-revisión-del-kit-y-plan-de-consolidación). El plan y sus criterios están en [STD-FE-001, sección 8](base-frontend.md#8-consolidación-del-consumo-y-medición-c-049). La comprobación técnica se completó sin sesiones con personas y no equivale a conformidad integral WCAG.
+**Resultado de esta revisión (C-049):** consumo uniforme de controles equivalentes implementado y eficiencia técnica medida mediante escenarios reproducibles de navegador y compilación. Campos, filtros y acciones consumen los patrones existentes; se conservan excepciones de distribución justificadas. La matriz de consumidores, evidencias y resultados están en [C-049](../trazabilidad/correcciones.md#c-049--alcance-de-la-revisión-del-kit-y-plan-de-consolidación). El plan y sus criterios están en [STD-FE-001, sección 8](base-frontend.md#8-consolidación-del-consumo-y-medición-c-049). La comprobación técnica se completó sin sesiones con personas.
 
 ### Comprobación de compatibilidad C-046
 
 La muestra `frontend/test/fixtures/ui-compatibility.html` convive con controles del anfitrión fuera de `ui-root`, una interfaz genérica dentro y otra instancia con roles visuales propios. Usa los estilos reales, sin API, sesión ni rutas del producto. `npm run check:ui-compatibility --workspace frontend` comprueba aislamiento y activación sobre esa muestra. Es un consumidor de prueba, no una segunda aplicación validada con personas.
 
-Antes de adaptar otro producto: comprobar controles externos antes/después de cargar el kit, variables locales, foco y teclado, textos largos, errores, tablas, ancho de 320 píxeles y ampliación real al 200 %. Los resultados de DOM automatizado no acreditan esas comprobaciones de navegador. Identificar consumidores y adaptar `ui-root`, restablecimiento y criterio de longitud en el mismo cambio cuando cambie este contrato. Se mantiene el estado de piloto; el soporte institucional y la evaluación con tecnologías de asistencia se tratan en la adopción correspondiente, fuera del trabajo activo delimitado en C-049.
+Antes de adaptar otro producto: comprobar controles externos antes/después de cargar el kit, variables locales, foco y teclado, textos largos, errores, tablas y ancho de 320 píxeles. Los resultados de DOM automatizado no acreditan esas comprobaciones de navegador. Identificar consumidores y adaptar `ui-root`, restablecimiento y criterio de longitud en el mismo cambio cuando cambie este contrato. Se mantiene el estado de piloto; el soporte institucional se trata en la adopción correspondiente, fuera del trabajo activo delimitado en C-049.
 
 C-048: el destino predeterminado de identidad del módulo pasó a la raíz neutral. Jallupacha sigue proporcionando /mapa explícitamente; consumidores que dependían del valor implícito anterior deben declarar su destino. En ese cambio se introdujo la base 0.1.0. La versión 0.2.1 del generador y del contrato: C-050 amplió paginación en 0.2.0 y C-052 corrige la dependencia de tipos para instalar/probar el consumidor de forma independiente, sin cambiar APIs visuales.
 

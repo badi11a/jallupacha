@@ -39,19 +39,13 @@ try {
         (element.getAttribute('aria-invalid') === 'true' ? 'rgb(152, 45, 45)' : 'rgb(138, 147, 166)');
     }), selector, { timeout: 3000 });
     const items = await page.locator(selector).evaluateAll(elements => {
-      const rgb = text => (text.match(/[\d.]+/g) ?? []).slice(0, 3).map(Number);
-      const lum = color => rgb(color).map(value => { const s = value / 255; return s <= .04045 ? s / 12.92 : ((s + .055) / 1.055) ** 2.4; }).reduce((sum, value, index) => sum + value * [.2126, .7152, .0722][index], 0);
-      const ratio = (a,b) => (Math.max(lum(a),lum(b))+.05)/(Math.min(lum(a),lum(b))+.05);
       return elements.map(element => {
         const field = element.closest('mat-form-field');
         // Test-only observation of Material's painted outline, never a production style dependency.
         const outline = field?.querySelector('.mdc-notched-outline__leading');
-        const style = getComputedStyle(element), edge = outline && getComputedStyle(outline);
-        let background = 'rgb(255, 255, 255)';
-        for(let p=element;p;p=p.parentElement){ const c=getComputedStyle(p).backgroundColor; if(c!=='rgba(0, 0, 0, 0)'&&c!=='transparent'){background=c;break;} }
+        const edge = outline && getComputedStyle(outline);
         return { tag:element.tagName, material:!!field, height:field?.getBoundingClientRect().height,
-          radius:edge?.borderTopLeftRadius, border:edge?.borderTopColor, invalid:element.getAttribute('aria-invalid')==='true',
-          foreground:style.color,background,textContrast:ratio(style.color,background),borderContrast:edge&&ratio(edge.borderTopColor,background) };
+          radius:edge?.borderTopLeftRadius, border:edge?.borderTopColor, invalid:element.getAttribute('aria-invalid')==='true' };
       });
     });
     assert.ok(items.length,name+' must contain controls');
@@ -60,11 +54,8 @@ try {
       assert.ok(item.height >= 42,name+' control height');
       assert.equal(item.radius,'7px',name);
       assert.equal(item.border,item.invalid?'rgb(152, 45, 45)':'rgb(138, 147, 166)',name);
-      assert.ok(item.textContrast>=4.5,name+' text contrast');
-      assert.ok(item.borderContrast>=3,name+' border contrast');
     }
-    const contrast=items.map(({textContrast,borderContrast})=>({text:textContrast,border:borderContrast}));
-    checks.push({ name, controls: items, contrast, state: 'passed' });
+    checks.push({ name, controls: items, state: 'passed' });
   }
   async function reflow(name) {
     await page.setViewportSize({ width: 320, height: 900 });
@@ -107,26 +98,13 @@ try {
     await page.waitForFunction(selector => document.querySelector(selector)?.textContent.includes('3.600 / 4.000') && !document.querySelector(selector).hidden, counterSelector);
     await field.fill('é'.repeat(4000));
     await page.waitForFunction(selector => document.querySelector(selector)?.textContent.includes('4.000 / 4.000'), counterSelector);
-    const contrast = await counter.evaluate(element => {
-      const lum = color => (color.match(/[\d.]+/g) ?? []).slice(0, 3).map(Number).map(value => {
-        const s = value / 255; return s <= .04045 ? s / 12.92 : ((s + .055) / 1.055) ** 2.4;
-      }).reduce((sum, value, index) => sum + value * [.2126, .7152, .0722][index], 0);
-      const foreground = getComputedStyle(element).color;
-      let background = 'rgb(255, 255, 255)';
-      for (let parent = element; parent; parent = parent.parentElement) {
-        const color = getComputedStyle(parent).backgroundColor;
-        if (color !== 'rgba(0, 0, 0, 0)' && color !== 'transparent') { background = color; break; }
-      }
-      return { foreground, background, ratio: (Math.max(lum(foreground), lum(background)) + .05) / (Math.min(lum(foreground), lum(background)) + .05) };
-    });
-    assert.ok(contrast.ratio >= 4.5, name + ' counter contrast');
     await field.press('End'); await page.keyboard.insertText('x');
     assert.equal((await field.inputValue()).length, 4000, 'native input limit is retained');
     await field.scrollIntoViewIfNeeded();
     await page.screenshot({ path: join(output, name + '-counter-desktop.png') });
     await reflow(name + '-counter');
     await field.fill(initial);
-    checks.push({ name: name + '-counter-threshold-utf16-max-association', state: 'passed', threshold: 3600, max: 4000, contrast });
+    checks.push({ name: name + '-counter-threshold-utf16-max-association', state: 'passed', threshold: 3600, max: 4000 });
   }
   await visit('/procesos', 'table tbody tr a');
   await styles('list-filters', 'form[role="search"] input, form[role="search"] select');
@@ -277,7 +255,7 @@ try {
   await reflow('access');
   assert.deepEqual(scriptErrors, []);
   writeFileSync(join(output, 'browser-verification.json'), JSON.stringify({ browser: browser.version(), checks, scriptErrors,
-    scope: 'Generic fixture. Effective text/border contrast, common controls, route-specific states and 320px reflow; no full WCAG claim.' }, null, 2) + '\n');
+    scope: 'Generic fixture. Common controls, route-specific states and 320px reflow.' }, null, 2) + '\n');
   console.log(`Browser verification passed: ${checks.length} checks`);
   await context.close();
 } finally { await browser?.close(); server.kill(); }

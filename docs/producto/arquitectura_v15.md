@@ -8,11 +8,10 @@ Este documento formaliza la arquitectura técnica de la versión 15 (v15), reemp
 * **Plataforma backend:** Node.js, NestJS, TypeScript, TypeORM.
 * **Base de datos oficial:** **Oracle Database 19c** (instalación directa, sin Docker, `synchronize: false`).
 * **Plataforma frontend:** Angular (Single Page Application, Standalone Components, Vitest), Angular Material/CDK 22.2.1 como base de controles; tema Sass institucional y CSS de composición con tokens de diseño (C-056).
-* **Seguridad de referencia:** OWASP ASVS v4 Nivel 2 (PT-06).
 
 ---
 
-## 2. Modelo de autenticación y sesiones para Intranet (REQ-25 v15, PT-09)
+## 2. Modelo de autenticación y sesiones para Intranet (REQ-25 v15)
 
 Al operar en una red interna privada sin salida a Internet, la autenticación se realiza mediante **Autenticación Local Institucional con Argon2id**, preparada para su futura interconexión con directorios corporativos.
 
@@ -43,13 +42,13 @@ CREATE TABLE "LOCAL_CREDENTIAL" (
 );
 ```
 
-### 2.2. Parámetros criptográficos y mitigación de ataques (PT-06, PT-08)
+### 2.2. Parámetros criptográficos y mitigación de ataques (PT-08)
 * **Algoritmo de derivación:** **Argon2id** (RFC 9106), computado en el servidor de aplicaciones Node.js.
 * **Protección contra fuerza bruta:** Contador `FAILED_ATTEMPTS`. Al acumular 5 intentos fallidos consecutivos, la cuenta se bloquea automáticamente por 15 minutos (`LOCKED_UNTIL = SYSTIMESTAMP + INTERVAL '15' MINUTE`).
 * **Protección contra enumeración:** Todo error de autenticación responde el mensaje neutral: *"Credenciales no válidas"*.
 * **Trazabilidad:** Cada intento (exitoso o rechazado) se registra en `SECURITY_EVENT` y `SECURITY_EVENT_IP`.
 
-### 2.3. Gestión de sesión y CSRF (PT-09)
+### 2.3. Gestión de sesión y CSRF
 * **Identificador de sesión:** Token pseudoaleatorio criptográfico de 64 caracteres hexadecimales (256 bits de entropía).
 * **Almacenamiento en BD:** Se persiste su resumen SHA-256 en la tabla `APP_SESSION`.
 * **Expiración por inactividad:** 30 minutos desde la última petición (`LAST_ACTIVITY`).
@@ -170,7 +169,7 @@ Decisión de diseño revisada antes de implementar, autorizada por el responsabl
 
 El origen se transmite como dirección interna de listado validada por la aplicación; no admite destinos externos, acceso, administración ni recursión de orígenes. Las migas representan jerarquía y el control de retorno representa el recorrido: cumplen funciones diferentes. El desplazamiento se recuerda en memoria, sin persistir búsquedas en almacenamiento permanente; tras recargar la aplicación se conservan los filtros de la dirección, pero no se promete la posición anterior.
 
-### 5.2. Información fiel, accesibilidad y patrones (C-033)
+### 5.2. Información fiel y patrones (C-033)
 
 - Las tarjetas del mapa y el detalle muestran la descripción registrada inmediatamente debajo del nombre del macroproceso y antes de los contadores (C-042). La semilla proporciona una descripción específica y coherente para cada macroproceso; el cargador la valida, la inserción la persiste y `/api/management/map` la devuelve como `description: string | null`. Si falta en registros existentes, se omite sin texto sustitutivo. Las tarjetas no muestran el código del macroproceso (C-041); se conserva la búsqueda por código o nombre prevista en REQ-19. Estas decisiones de presentación son específicas de Jallupacha.
 - La cabecera del detalle no incorpora el párrafo genérico retirado en C-042. El alcance de cada contador se expresa en su etiqueta y el límite se informa junto a los resultados cuando se alcanza, sin sustituir la descripción por explicaciones de funcionamiento.
@@ -178,8 +177,8 @@ El origen se transmite como dirección interna de listado validada por la aplica
 - Distinguir petición pendiente, fallo y respuesta vacía. Un fallo ofrece reintento y no muestra un total cero ni habilita una ficha vacía como si hubiese cargado correctamente.
 - Los totales del mapa identifican que pertenecen al mapa completo; los contadores de resultados indican filtros y límite del contrato. No usar el primer riesgo de una consulta como evaluación consolidada del proceso o distribución institucional. La ficha puede describir explícitamente el mayor nivel entre sus riesgos registrados, sin presentarlo como evaluación independiente del proceso.
 - Errores junto al campo, asociados con `aria-describedby` y `aria-invalid`; foco en el primer campo inválido. Se mantienen validaciones del servidor. Indicadores categóricos usan texto y estructura de grupo, no medidores numéricos ficticios.
-- Contraste de bordes efectivos en cada componente, objetivos de control de al menos 24 píxeles CSS y reajuste sin desbordamiento de la página. Tablas pueden desplazarse dentro de un contenedor identificable y operable con teclado.
-- La evaluación de patrones reutilizables y sus límites se registra en el catálogo del kit. Su incorporación no equivale a adopción institucional ni a conformidad completa con WCAG.
+- Reajuste sin desbordamiento de la página. Tablas pueden desplazarse dentro de un contenedor identificable y operable con teclado.
+- La evaluación de patrones reutilizables y sus límites se registra en el catálogo del kit. Su incorporación no equivale a adopción institucional.
 
 ## 6. Operación e infraestructura
 
@@ -187,12 +186,11 @@ Consolidación documental C-040 de las instrucciones operativas aún aplicables 
 
 - Oracle Database 19c es la plataforma oficial, con instalación directa y sin Docker. Verificar versión, edición y compatibilidad institucional antes de desplegar.
 - Separar cuenta propietaria del esquema y cuenta de ejecución. Mantener `synchronize: false`. La instalación parte de un esquema vacío y ejecuta el instalador versionado vigente; no usa una cadena incremental de migraciones de TypeORM ni una tabla de historial de migraciones. Git conserva los instaladores históricos retirados.
-- Los permisos de objetos pertenecen exclusivamente a `backend/database/grant-runtime.sql`; los de sistema, a `backend/database/grant-system.sql`. El instalador no concede permisos. Revisar mínimos privilegios y aplicar grants por el procedimiento autorizado del ambiente.
+- Los permisos de objetos pertenecen exclusivamente a `backend/database/grant-runtime.sql`; los de sistema, a `backend/database/grant-system.sql`. El instalador no concede permisos. Aplicar grants por el procedimiento autorizado del ambiente.
 - `db:install:schema` exige autorización explícita, cuenta propietaria y un esquema vacío; se rehúsa si encuentra tablas o secuencias existentes. `db:reset:local` es la única operación que elimina y recrea objetos, y queda limitada al entorno local de demostración con sus salvaguardas explícitas. Ningún comando de instalación o reinicio autoriza borrar o transformar datos institucionales. Si un ambiente con datos institucionales debe conservarlos, se define, aprueba y verifica una migración de datos separada antes de intervenirlo.
 - Para completar las descripciones de una semilla local existente sin reinstalar, `npm run db:seed:macroprocesses --workspace backend` (C-042) verifica primero los 11 códigos, nombres reconocidos y clasificaciones, completa solo descripciones ausentes y aplica los dos nombres autorizados. Conserva descripciones ya registradas, IDs, procesos y relaciones. Exige ambiente local con datos genéricos y Oracle en bucle local; utiliza una transacción y falla sin escrituras si no reconoce la semilla. No es una operación de producción ni sustituye la instalación del esquema.
-- Las pruebas de persistencia, SQL, permisos y transacciones se realizan contra un esquema Oracle de pruebas dedicado, sin datos de producción. Registrar comando, versión, destino, resultado y límites; no afirmar pruebas Oracle de CI sin instancia disponible.
-- El despliegue institucional termina TLS en un proxy equivalente al aprobado, redirige HTTP a HTTPS y verifica cabeceras de seguridad en el ambiente de pruebas antes de publicar.
-- El procedimiento de respaldo/restauración identifica responsable, frecuencia, retención, acceso/cifrado y ubicación separada. Comprobar restauración antes de producción; no sustituirla por una función de interfaz.
+- Las pruebas de persistencia, SQL, permisos y transacciones se realizan contra un esquema Oracle de pruebas dedicado, sin datos de producción. Registrar comando, versión, destino, resultado y límites.
+- El despliegue institucional termina TLS en un proxy equivalente al aprobado y redirige HTTP a HTTPS.
 - Credenciales y configuración del ambiente permanecen fuera del repositorio; `.env.example` documenta variables sin secretos. La purga de archivos no elimina configuración local, cuentas ni información persistida.
 
 ## 7. Organización por responsabilidades v15 (C-047)
@@ -205,6 +203,6 @@ Las operaciones de captura utilizadas por Angular se organizan por dominio: tipo
 
 Todo controlador de captura exige sesión, CSRF en escrituras y políticas explícitas: lectura para los cinco perfiles; estructura para `ADMIN`; creación y edición de procesos y relaciones para `ADMIN` o `PROCESS_OWNER`; envío a revisión para esos mismos perfiles; aprobación y rechazo para `ADMIN` o `VALIDATOR`; riesgos para `RISK_MANAGER`. La nueva versión se restringe a `ADMIN` o `PROCESS_OWNER` y el retiro a `ADMIN`, coherente con las acciones de la ficha. Los controles de edición de riesgos de Angular se muestran únicamente al perfil que autoriza el servidor; una cuenta con varios perfiles conserva las capacidades de cada uno. Se elimina la excepción de acceso público del controlador de captura. Los controles existentes de los contratos institucionales no se debilitan.
 
-El frontend conserva el kit en `shared/ui` y utiliza nombres funcionales `ProcessMapComponent` y `ProcessApi`. Las herramientas de base de datos y datos genéricos se nombran por instalación, esquema y semilla. Los instaladores conservan confirmación explícita y no se ejecutan en esta reorganización. El instalador vigente crea el esquema actual desde cero y requiere verificación Oracle dedicada antes de usarse en un ambiente de pruebas.
+El frontend conserva el kit en `shared/ui` y utiliza nombres funcionales `ProcessMapComponent` y `ProcessApi`. Las herramientas de base de datos y datos genéricos se nombran por instalación, esquema y semilla. Los instaladores conservan confirmación explícita y no se ejecutan en esta reorganización. El instalador vigente crea el esquema actual en una cuenta vacía.
 
-Verificaciones de la reorganización: compilación de ambos proyectos, regresiones existentes, pruebas directas de autorización en los controladores de captura, ausencia de nomenclatura retirada fuera de antecedentes recuperables desde Git, conservación de planillas y revisión de diferencias. Comparar las consultas y transacciones trasladadas con sus originales; cualquier cambio de persistencia requiere pruebas Oracle dedicadas. La reorganización no acredita corrección de los pendientes criptográficos, auditoría integral, producción o accesibilidad.
+Verificaciones de la reorganización: compilación de ambos proyectos, regresiones existentes, pruebas directas de autorización en los controladores de captura, ausencia de nomenclatura retirada fuera de antecedentes recuperables desde Git, conservación de planillas y revisión de diferencias. Comparar las consultas y transacciones trasladadas con sus originales; cualquier cambio de persistencia requiere pruebas Oracle dedicadas. La reorganización no acredita corrección de los pendientes criptográficos.

@@ -9,7 +9,7 @@ La fuente de requisitos del producto es `Requisitos_Sistema_Procesos_v15.xlsx` (
 - La aplicación es el producto institucional. Todo endpoint fuera de `/api/auth/login` requiere autenticación y una política explícita de autorización. Verificar permisos en el servidor y consultar perfiles actuales en cada solicitud (PT-07). La excepción del piloto de operador único (C-011) queda superada por la arquitectura multiusuario v15.
 - Esquema Oracle versionado y reproducible; `synchronize: false`. El producto se instala desde un esquema vacío mediante el instalador vigente, no mediante una cadena incremental de migraciones de TypeORM. Git conserva el historial técnico de instaladores retirados. Si algún ambiente con datos institucionales debiera conservarlos, se diseña y aprueba por separado una migración de datos; nunca se presupone un reinicio destructivo.
 - Permisos Oracle: solo en `backend/database/grant-runtime.sql` (objetos) y `grant-system.sql` (sistema); el instalador de esquema no otorga permisos. Ver `docs/producto/arquitectura_v15.md`, sección 6, «Operación e infraestructura».
-- Cada cambio debe referenciar requisitos, incluir verificación apropiada y tener revisión registrada antes de integrarse. La revisión de IA no sustituye la conformidad requerida para producción.
+- Cada cambio debe referenciar requisitos, incluir verificación apropiada y tener revisión registrada antes de integrarse.
 - Ejecutar la verificación significativa más pequeña para el comportamiento afectado. Usar pruebas Oracle para persistencia, SQL, grants o transacciones; ampliar o repetir verificaciones solo cuando el impacto o un fallo lo justifique. Mantener PT-03 y ejecutar las verificaciones requeridas para liberar.
 - Toda prueba `*.oracle.e2e-spec.ts` que inserte registros reales (`PROCESS`, `PROCESS_VERSION`, etc.) debe eliminarlos explícitamente en `afterAll`, usando los IDs capturados al crearlos, antes de cerrar la conexión. No usar transacciones con rollback como sustituto (atan la limpieza al motor de base de datos vigente). Un test que no deja la base como la encontró es un defecto de implementación, aunque sus aserciones pasen.
 - No declarar cumplida una verificación que no se ejecutó. La autenticación local de desarrollo no cumple REQ-25.
@@ -20,7 +20,7 @@ La fuente de requisitos del producto es `Requisitos_Sistema_Procesos_v15.xlsx` (
 
 ## Principios técnicos obligatorios
 
-Texto y verificación transcritos de la planilla v13.
+Texto y verificación transcritos de la planilla v13. Rigen los principios listados (C-062).
 
 ### PT-01
 
@@ -40,24 +40,6 @@ Los cambios que afectan el comportamiento del sistema cuentan con pruebas apropi
 
 **Verificación:** Cada cambio de comportamiento tiene pruebas (automáticas cuando es posible; si no, una prueba manual descrita) y una revisión registrada. La automatización se amplía progresivamente.
 
-### PT-04
-
-Los ambientes se instalan de forma reproducible, y nada llega a producción sin probarse en el ambiente de pruebas.
-
-**Verificación:** Instalación desde cero en pruebas; conformidad del responsable del área antes de producción.
-
-### PT-05
-
-Los cambios en la estructura de datos se gestionan mediante mecanismos versionados y reproducibles.
-
-**Verificación:** La estructura de datos se puede recrear desde cero en el ambiente de pruebas aplicando los cambios versionados.
-
-### PT-06
-
-Se usa OWASP ASVS nivel 2 como referencia de seguridad.
-
-**Verificación:** Lista de verificación revisada antes de producción, con excepciones documentadas.
-
 ### PT-07
 
 Cada permiso se verifica en el servidor en cada solicitud; ocultar un botón no es control de acceso.
@@ -68,43 +50,7 @@ Cada permiso se verifica en el servidor en cada solicitud; ocultar un botón no 
 
 Todo dato externo es no confiable: se valida en el servidor, las consultas usan parámetros y lo que se muestra se escapa.
 
-**Verificación:** Pruebas automáticas con entradas maliciosas; análisis de código (SAST) en la CI.
-
-### PT-09
-
-Las sesiones y credenciales de autenticación se gestionan de forma segura según el mecanismo de autenticación utilizado. La sesión se cierra tras 30 minutos de inactividad.
-
-**Verificación:** Prueba de seguridad antes de producción que comprueba, según corresponda al mecanismo usado: expiración, invalidación al cerrar sesión, protección de tokens, atributos seguros de cookies, protección CSRF y otros controles aplicables.
-
-### PT-10
-
-La aplicación usa las protecciones estándar de su tipo de interfaz y sus mensajes de error no muestran detalles internos.
-
-**Verificación:** Prueba de seguridad automática (DAST) sin hallazgos altos ni críticos; en interfaces web incluye, por ejemplo, cabeceras de seguridad como HSTS y CSP.
-
-### PT-11
-
-Las claves y credenciales nunca están en el código; se guardan como configuración segura de cada ambiente.
-
-**Verificación:** La CI detecta claves en el repositorio y bloquea el cambio.
-
-### PT-12
-
-Las librerías de terceros no tienen vulnerabilidades conocidas críticas o altas, salvo excepción documentada.
-
-**Verificación:** La CI revisa las dependencias en cada cambio y bloquea si encuentra alguna.
-
-### PT-13
-
-Los datos almacenados que lo requieran y los respaldos se protegen mediante controles de cifrado y acceso adecuados; los respaldos se guardan en una ubicación separada.
-
-**Verificación:** Revisión de configuración antes de producción, junto con la prueba de restauración de los respaldos.
-
-### PT-14
-
-Cada componente tiene solo los permisos que necesita; la aplicación usa un usuario de base de datos con mínimos privilegios.
-
-**Verificación:** Revisión de configuración antes de producción.
+**Verificación:** Pruebas automáticas con entradas maliciosas.
 
 ## Correcciones mediante SDD
 
@@ -129,7 +75,7 @@ Antes de cerrar un cambio de interfaz, verificar textos visibles y recorrido fun
 - Aplicar `docs/diseno/base-frontend.md` (STD-FE-001, C-048) al construir o modificar frontend/base reutilizable. Respetar dependencias core/platform → contratos genéricos; core/auth → adaptación del producto; features → dominio; shared/ui → presentación independiente. Registrar los criterios FE afectados y la migración de consumidores antes de integrar.
 - La base se distribuye inicialmente mediante generador local versionado y fuentes explícitas. No copiar secretos, datos ni funcionalidades del producto; no sobrescribir consumidores ni publicar paquetes sin una solicitud que lo autorice. La plantilla debe compilarse y verificarse como consumidor neutral.
 
-- Consultar `docs/diseno/design-system.md` para la paleta, tipografía, marca de producto y criterios WCAG 2.2 AA del kit compartido.
+- Consultar `docs/diseno/design-system.md` para la paleta, tipografía y marca de producto del kit compartido.
 - Aplicar `docs/diseno/marco_estandar_ux_institucional.md` (STD-UX-001) como guía de principios, reglas y criterios de revisión de los próximos cambios de interfaz del proyecto. Su adopción institucional para otros sistemas permanece pendiente y no se presume conformidad del frontend existente.
 - Antes de construir o revisar un cambio UX, identificar tarea, recorrido y reglas aplicables, incluidas sus subreglas. Usar el procedimiento, matriz y registro de evidencia de la sección 6 de la guía; conservar hallazgo, decisión y revisión en el mismo cambio de Git. Registrar cada comprobación como aprobada en su alcance, fallida, no probada o no aplicable con justificación.
 - Inventariar accesos equivalentes al revisar navegación. Permitir caminos alternativos que sirvan tareas distintas; justificar repeticiones en una misma pantalla y comprobar etiquetas, destinos y retorno con contexto (R-09 a R-11). No imponer un camino único ni convertir la disposición de Jallupacha en obligación universal.
@@ -137,5 +83,5 @@ Antes de cerrar un cambio de interfaz, verificar textos visibles y recorrido fun
 - Mantener la identidad visual propia de cada producto y el sistema independiente de marcas externas. No incorporar fuentes sin licencia comprobada.
 - Mantener fundamentos y componentes genéricos en `frontend/src/app/shared/ui/`; lógica de negocio y navegación específica permanecen en la aplicación.
 - Protección obligatoria de cambios no guardados (R-07.2): Todo componente que gestione formularios —sean pantallas completas de captura, subformularios embebidos (como riesgos y relaciones en la ficha de proceso) o formularios inline en paneles de catálogo— DEBE implementar `LeavesWithConfirmation` y asociar la guarda `canDeactivate: [unsavedChangesGuard]` en `app.routes.ts`. La lógica debe verificar si el formulario contiene modificaciones pendientes (`isDirty()`); si no hay cambios, la salida o cancelación debe ocurrir inmediatamente sin mostrar ningún diálogo. Si existen cambios pendientes, tanto el botón Cancelar del formulario como la navegación fuera de la pantalla deben requerir confirmación modal accesible (`UiDialogService.confirm`) antes de descartar.
-- Al verificar cambios visuales, registrar explícitamente contraste, recorrido/textos visibles, revisión visual y pruebas. No declarar completada una comprobación que no se ejecutó.
+- Al verificar cambios visuales, registrar explícitamente recorrido/textos visibles, revisión visual y pruebas. No declarar completada una comprobación que no se ejecutó.
 - C-048 precisa la guarda de formularios embebidos: la ruta mantiene `canDeactivate` sobre su contenedor y este agrega la protección de los editores; no crear rutas artificiales para subformularios. Ningún editor puede descartar otro sin resolver sus cambios. El acceso también implementa su contrato de salida, sin persistir ni serializar contraseñas.

@@ -10,8 +10,8 @@ Mantener `core/platform` y `shared/ui` como fuentes versionadas; funcionalidades
 
 La API de identidad devuelve `userId` entero positivo, `displayName`, `email`, `profiles` no vacío de códigos en mayúscula. Sesión por cookies HttpOnly, token CSRF legible con nombre configurado y cabecera correspondiente en escrituras. El núcleo limita credenciales y CSRF a la API configurada del mismo origen. El producto define perfiles, políticas y autorización en el servidor.
 
-Aplicar SDD: documentar requisito, clasificación del hallazgo, diseño y criterios antes de cambiar comportamiento; registrar pruebas y revisión en el mismo cambio. Comprobar sesión inválida, errores y respuestas tardías, formulario limpio/modificado, fallos de guardado, teclado/foco, contraste, 200 % y 320 px. Mantener análisis estático, dependencias, secretos, pruebas y presupuesto en CI. No declarar conformidad con comprobaciones no ejecutadas.
+Aplicar SDD: documentar requisito, clasificación del hallazgo, diseño y criterios antes de cambiar comportamiento; registrar pruebas y revisión en el mismo cambio. Comprobar sesión inválida, errores y respuestas tardías, formulario limpio/modificado, fallos de guardado, teclado/foco y 320 px. No declarar conformidad con comprobaciones no ejecutadas.
 
-Estado: base en validación técnica. La generación/compilación no acredita aceptación con personas, accesibilidad integral ni condiciones de producción.
+Estado: base en validación técnica. La generación/compilación no acredita aceptación con personas.
 
 C-056 / 0.3.0: controles Angular Material/CDK 22.2.1 y tema Sass local, sin recursos tipográficos remotos. Importar MatButtonModule, MatFormFieldModule y MatInputModule en cada consumidor según uso. UiMaterialInputDirective vincula los errores manuales al estado visual de matInput. Mantener etiquetas asociadas, mensajes y aria-describedby; conservar guardas y bloqueo de escrituras. La actualización desde 0.2.x requiere revisar controles, tema, dependencias y diálogos, seguida de pruebas del consumidor.

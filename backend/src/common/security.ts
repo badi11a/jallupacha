@@ -15,7 +15,7 @@ export function safeHashEqual(token: string, expectedHash: string): boolean {
   return actual.length === expected.length && timingSafeEqual(actual, expected);
 }
 
-// OWASP ASVS v4 Nivel 2 y RFC 9106 para derivación de contraseñas con Argon2id
+// RFC 9106 para derivación de contraseñas con Argon2id
 const ARGON2ID_OPTIONS: argon2.HashOptions & { raw?: false } = {
   type: argon2.argon2id,
   memoryCost: 65536, // 64 MiB (RFC 9106)

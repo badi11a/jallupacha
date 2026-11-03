@@ -23,6 +23,6 @@ Aplicar la arquitectura y requisitos del producto consumidor. Esta base aporta m
 
 ## Cierre del cambio
 
-Ejecutar `npm run check:source`, pruebas pertinentes y compilación. Cambios visuales: contraste efectivo, textos/recorrido, teclado, revisión visual, 200 % y 320 px se registran por separado. Añadir comprobaciones de sesión, CSRF, respuestas tardías y descarte cuando se afecten. La CI incluye análisis de seguridad, secretos, dependencias y presupuesto; comprobar su resultado antes de integrar.
+Ejecutar `npm run check:source`, pruebas pertinentes y compilación. Cambios visuales: textos/recorrido, teclado, revisión visual y 320 px se registran por separado. Añadir comprobaciones de sesión, CSRF, respuestas tardías y descarte cuando se afecten.
 
 Registrar versión, método, resultado y revisión en `docs/cambios.md`: aprobado en su alcance, fallido, no probado o no aplicable con justificación. Un consumidor de prueba no acredita adopción institucional ni producción. Actualizar componentes compartidos con revisión de procedencia/migración; nunca sobrescribir personalizaciones automáticamente.

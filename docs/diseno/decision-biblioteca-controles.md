@@ -6,7 +6,7 @@ Evidencia: **[M]** medido en el repositorio, **[D]** documentado en una fuente p
 
 ## 1. Pregunta
 
-¿Qué familia de controles debe usar la base de frontend para los sistemas web de la organización, de modo que la decisión sea defendible ante criterios de seguridad, accesibilidad, mantenimiento, identidad y costo?
+¿Qué familia de controles debe usar la base de frontend para los sistemas web de la organización, de modo que la decisión sea defendible ante criterios de seguridad, mantenimiento, identidad y costo?
 
 ## 2. Contexto
 
@@ -24,7 +24,7 @@ Evidencia: **[M]** medido en el repositorio, **[D]** documentado en una fuente p
 | ID | Criterio | Prioridad |
 | --- | --- | --- |
 | C1 | Cobertura de las capacidades habituales sin código propio | Alta |
-| C2 | Accesibilidad de los controles difíciles (fechas, autocompletado, diálogos) | Alta |
+| C2 | Teclado y semántica de los controles difíciles (fechas, autocompletado, diálogos) | Alta |
 | C3 | Código propio que la organización debe mantener | Alta |
 | C4 | Coherencia entre equipos distintos | Alta |
 | C5 | Longevidad y soporte | Media |
@@ -44,7 +44,7 @@ Evidencia: **[M]** medido en el repositorio, **[D]** documentado en una fuente p
 | Criterio | A. Material + CDK | B. CDK solo + kit |
 | --- | --- | --- |
 | C1 | **Favorable:** fechas con rango, autocompletado, tabla con orden y paginación, pasos, pestañas y menús **[D]**. No cubre archivos ni gráficos. | **Desfavorable:** esos controles habría que construirlos. |
-| C2 | **Favorable con verificación:** el proveedor aporta teclado y semántica **[D]**; cada consumidor debe comprobarlos (FE-07). | **Desfavorable:** fechas y autocompletado accesibles son difíciles de construir y sostener **[S]**. |
+| C2 | **Favorable:** el proveedor aporta teclado y semántica **[D]**. | **Desfavorable:** fechas y autocompletado con teclado y semántica correctos son difíciles de construir y sostener **[S]**. |
 | C3 | **Favorable:** solo los vacíos (archivos y gráficos). | **Desfavorable:** todos los controles complejos. |
 | C4 | **Favorable con controles:** biblioteca ampliamente conocida por personas y asistentes de IA **[S]**; exige reglas que impidan salirse de los tokens. | **Neutral:** contrato propio que hay que documentar control por control. |
 | C5 | **Favorable:** mismo ciclo que el framework **[D]**. | **Favorable** en el CDK; el resto depende de la organización. |
@@ -56,28 +56,27 @@ Evidencia: **[M]** medido en el repositorio, **[D]** documentado en una fuente p
 
 ## 5. Decisión
 
-> Se ratifica Angular Material/CDK como familia de controles de la base: mantiene un único proveedor de interfaz, el del framework; cubre los controles complejos habituales; evita construir y mantener en la organización controles cuya accesibilidad es difícil de asegurar, y tiene un costo de dependencias marginal. Las capacidades no cubiertas se resuelven con componentes propios del kit, salvo una excepción aprobada.
+> Se ratifica Angular Material/CDK como familia de controles de la base: mantiene un único proveedor de interfaz, el del framework; cubre los controles complejos habituales; evita construir y mantener en la organización controles complejos difíciles de sostener, y tiene un costo de dependencias marginal. Las capacidades no cubiertas se resuelven con componentes propios del kit, salvo una excepción aprobada.
 
 **Riesgos y mitigación:**
 
 - Divergencia entre equipos: tema único exportado por la base, ejemplos en el catálogo y reglas en `check:source`.
 - Crecimiento del paquete: carga diferida por funcionalidad y medición en cada versión de la base.
 - Proveedores añadidos sin control: proceso de la sección 6.
-- Accesibilidad no comprobada en un recorrido real: verificación por consumidor antes de producción.
 
 ## 6. Consecuencias
 
-- **Gráficos:** SVG propios simples en el kit, cada uno con una tabla equivalente accesible que presenta los mismos datos. Un gráfico que no pueda resolverse así requiere una excepción a E1 aprobada y registrada.
+- **Gráficos:** SVG propios simples en el kit, cada uno con una tabla equivalente que presenta los mismos datos. Un gráfico que no pueda resolverse así requiere una excepción a E1 aprobada y registrada.
 - **Componentes propios:** subida de archivos (input nativo, teclado, arrastrar y soltar como alternativa, lista, errores asociados, progreso y protección de cambios no guardados) y línea de tiempo semántica. Cada uno con su contrato y verificación según el catálogo §7.
-- **Gobierno de dependencias:** ninguna dependencia nueva sin una entrada aprobada en el registro, con bloqueo en la CI; `npm ci`, versiones exactas y lockfile; evaluar `ignore-scripts`, `npm audit signatures` y un espejo interno del registro de paquetes. Este control cubre también los paquetes inexistentes o suplantados que pueda sugerir un asistente de IA. Toda excepción a E1 registra la necesidad, el proveedor, la licencia y su seguimiento.
+- **Gobierno de dependencias:** ninguna dependencia nueva sin una entrada aprobada en el registro, `npm ci`, versiones exactas y lockfile. Este control cubre también los paquetes inexistentes o suplantados que pueda sugerir un asistente de IA. Toda excepción a E1 registra la necesidad, el proveedor, la licencia y su seguimiento.
 - **Ajustes del kit (C-060):** los roles del tema que heredaban la paleta azure se mapean a roles `--ui-color-*`; se retira el CSS de botones sin `matButton`, y las clases de rol se conservan como marcadores sobre `matButton`, exigidos por `check:source`.
 - **Fuera de esta decisión:** almacenamiento, validación y descarga segura de archivos, autenticación de personas externas y obligaciones normativas. Se especifican con cada sistema.
 
 ## 7. Resolución (2026-11-03)
 
 1. Prioridades de la sección 3: aprobadas sin cambios.
-2. Gráficos: SVG propios simples con tabla equivalente accesible; sin excepción a E1.
+2. Gráficos: SVG propios simples con tabla equivalente; sin excepción a E1.
 3. CSS anterior de botones: retirado; las clases de rol se conservan sobre `matButton`.
 4. Registrada en C-060 y enlazada desde STD-FE-001 §2 y design-system §4.
 
-**Límites:** no se prototipó ni se midió la alternativa B; los controles de Material aún no utilizados no se probaron con zoom real ni con lector de pantalla. **Revisión:** redactado por IA, sin revisión técnica independiente; decisiones de la sección 7 tomadas por el responsable.
+**Límites:** no se prototipó ni se midió la alternativa B. **Revisión:** redactado por IA, sin revisión técnica independiente; decisiones de la sección 7 tomadas por el responsable.

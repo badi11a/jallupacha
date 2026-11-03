@@ -11,7 +11,7 @@ describe('session token primitives', () => {
     expect(safeHashEqual(second, tokenHash(first))).toBe(false);
   });
 
-  it('hashes passwords with Argon2id (REQ-25 v15, PT-06) and verifies them', async () => {
+  it('hashes passwords with Argon2id (REQ-25 v15) and verifies them', async () => {
     const password = 'ClaveInstitucionalSegura!2026';
     const hash = await hashPassword(password);
     expect(hash).toMatch(/^\$argon2id\$v=19\$m=65536,p=4,t=3\$/);

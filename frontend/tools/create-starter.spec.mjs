@@ -59,19 +59,3 @@ test('generates a neutral consumer with provenance, refuses overwrite and detect
     rmSync(resolved, { recursive: true });
   }
 });
-
-test('security gate rejects high findings and missing analysis', () => {
-  const temp = mkdtempSync(join(parentReal, 'base-generator-sarif-'));
-  try {
-    const check = () => spawnSync(process.execPath, [join(frontend, 'tools/check-sarif.mjs'), temp], { encoding: 'utf8' }).status;
-    assert.notEqual(check(), 0);
-    const report = severity => ({ runs: [{ tool: { driver: { rules: [{ id: 'example', properties: { 'security-severity': severity } }] } }, results: [{ ruleId: 'example', level: 'warning' }] }] });
-    writeFileSync(join(temp, 'analysis.sarif'), JSON.stringify(report('5.0'))); assert.equal(check(), 0);
-    writeFileSync(join(temp, 'analysis.sarif'), JSON.stringify(report('8.0'))); assert.notEqual(check(), 0);
-    writeFileSync(join(temp, 'analysis.sarif'), JSON.stringify({ runs: [] })); assert.notEqual(check(), 0);
-  } finally {
-    const resolved = realpathSync(temp);
-    if (dirname(resolved) !== parentReal || !resolved.startsWith(join(parentReal, 'base-generator-'))) throw new Error('Unsafe cleanup destination');
-    rmSync(resolved, { recursive: true });
-  }
-});

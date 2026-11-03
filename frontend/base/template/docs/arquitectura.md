@@ -10,6 +10,6 @@ Contrato inicial de sesión: GET `/api/auth/me`, POST `/api/auth/login` con corr
 
 Cada producto documenta despliegue HTTPS, cabeceras, CSP y compatibilidad antes de liberar; la generación no comprueba infraestructura. No incluir secretos en configuración pública del navegador.
 
-Verificar con la CI entregada, pruebas de consumidores, revisión visual/accesibilidad y aceptación del producto. Las versiones y hashes de procedencia están en `.frontend-base.json`; un cambio incompatible necesita migración explícita.
+Verificar con pruebas de consumidores, revisión visual y aceptación del producto. Las versiones y hashes de procedencia están en `.frontend-base.json`; un cambio incompatible necesita migración explícita.
 
 El tema se carga desde shared/ui/styles/material.scss; no requiere fuentes remotas. UiDialogHost carga el contenedor Material al abrir el primer diálogo y conserva el contrato de UiDialogService. El tema del overlay copia las variables del consumidor. Tablas semánticas y paginación simple conservan su estructura; no se incorpora MatTable/MatPaginator sin necesidad concreta.
