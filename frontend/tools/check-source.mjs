@@ -22,6 +22,9 @@ for (const file of walk(root).filter(file => !file.endsWith('.spec.ts') && /\.(t
   const source = readFileSync(file, 'utf8');
   const fail = message => failures.push(name + ': ' + message);
   if (name.startsWith('features/') && /#[0-9a-f]{3,8}\b/i.test(source)) fail('Use semantic color tokens');
+  for (const [tag] of source.matchAll(/<(?:button|a)\b[^>]*>/g)) {
+    if (/\b(?:primary|quiet|text|danger)-button\b/.test(tag) && !/\bmatButton\b/.test(tag)) fail('Button role classes require matButton (DEC-FE-001)');
+  }
   if (!file.endsWith('.ts')) continue;
   const ast = ts.createSourceFile(file, source, ts.ScriptTarget.Latest, true);
   function visit(node) {

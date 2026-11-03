@@ -53,6 +53,8 @@ const PAIRS = [
   ['on-primary', 'danger', TEXT, 'botón de peligro'],
   ['on-primary', 'danger-hover', TEXT, 'botón de peligro en hover'],
   ['on-brand', 'brand', TEXT, 'barra superior'],
+  ['brand-accent', 'brand', TEXT, 'acción sobre superficie inversa de Material'],
+  ['text', 'neutral-background', TEXT, 'texto sobre surface-container-highest de Material'],
   ['info-text', 'info-background', TEXT, 'mensaje informativo'],
   ['success-text', 'success-background', TEXT, 'mensaje de éxito'],
   ['error-text', 'error-background', TEXT, 'mensaje de error'],

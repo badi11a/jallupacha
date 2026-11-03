@@ -76,7 +76,7 @@ Cambio de ruta: foco al título y posición superior. Atrás/Adelante: posición
 
 | Patrón | Composición y límites |
 | --- | --- |
-| Acciones | `.primary-button` principal contextual; `.quiet-button` / `.text-button` alternativas; `.danger-button` consecuencias destructivas. `button` para acciones, `a` para destinos. Deshabilitar con `disabled` nativo; una clase sobre un enlace no bloquea navegación. |
+| Acciones | `matButton` con clase de rol: `.primary-button` (`filled`) principal contextual; `.quiet-button` (`outlined`) / `.text-button` (`text`) alternativas; `.danger-button` (`filled`) consecuencias destructivas. Las clases no tienen estilo propio sin `matButton` y `check:source` rechaza ese uso (C-060). `button` para acciones, `a` para destinos. Deshabilitar con `disabled` nativo; una clase sobre un enlace no bloquea navegación. |
 | Campos | `.field`, `.field-error`, `.check-label` y controles nativos. Bordes de control: `--ui-color-border-strong`; inválido: `--ui-color-error-text`; separadores decorativos: `--ui-color-border`. Ver [formularios](patrones-formularios.md). |
 | Formularios | `.ui-form`, `.ui-form-fields`, `.ui-form-grid`, `.ui-form-actions`: espaciado por tokens, columnas elásticas y acciones que se envuelven. Sin estado, HTTP ni reglas de negocio. |
 | Tablas | `.table-scroll` y tabla nativa con `caption`/`scope`. Contenedor desplazable con nombre, `role=region` y `tabindex=0`. `.table-cards` requiere `data-label` y revisar lectura lineal; no aplicar automáticamente a todas las tablas. |

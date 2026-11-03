@@ -52,29 +52,7 @@
 :where(.ui-root) .ui-form-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 18rem), 1fr)); gap: var(--ui-space-4); }
 :where(.ui-root) .ui-form-actions { display: flex; flex-wrap: wrap; align-items: center; gap: var(--ui-space-2); }
 
-/* Botones */
-:where(.ui-root) .primary-button:not([matButton]), :where(.ui-root) .danger-button:not([matButton]) {
-  min-height: var(--ui-control-height);
-  padding: .55rem .85rem;
-  border: 0;
-  border-radius: var(--ui-radius-md);
-  color: var(--ui-color-on-primary);
-  background: var(--ui-color-primary);
-  font-weight: var(--ui-font-weight-bold);
-}
-:where(.ui-root) .primary-button:not([matButton]):hover:not(:disabled) { background: var(--ui-color-primary-hover); }
-:where(.ui-root) a.primary-button:not([matButton]), :where(.ui-root) a.danger-button:not([matButton]), :where(.ui-root) a.quiet-button:not([matButton]), :where(.ui-root) a.text-button:not([matButton]) { display: inline-flex; align-items: center; text-decoration: none; }
-:where(.ui-root) .danger-button:not([matButton]) { background: var(--ui-color-danger); }
-:where(.ui-root) .danger-button:not([matButton]):hover:not(:disabled) { background: var(--ui-color-danger-hover); }
-:where(.ui-root) .quiet-button:not([matButton]), :where(.ui-root) .text-button:not([matButton]) {
-  padding: .4rem .55rem;
-  border: 1px solid transparent;
-  border-radius: var(--ui-radius-sm);
-  color: var(--ui-color-primary);
-  background: transparent;
-  font-weight: var(--ui-font-weight-medium);
-}
-:where(.ui-root) .quiet-button:not([matButton]):hover:not(:disabled), :where(.ui-root) .text-button:not([matButton]):hover:not(:disabled) { border-color: var(--ui-color-quiet-hover-border); background: var(--ui-color-quiet-hover-background); }
+/* Botones: .primary-button, .quiet-button, .text-button y .danger-button marcan el rol sobre matButton (C-060). */
 
 /* Estructura común */
 :where(.ui-root) .skip-link { position: absolute; left: var(--ui-space-4); top: -100px; z-index: 10; padding: var(--ui-space-2) var(--ui-space-3); border-radius: var(--ui-radius-md); color: var(--ui-color-on-primary); background: var(--ui-color-primary); }

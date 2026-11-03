@@ -658,3 +658,38 @@ Entorno: 2026-10-27, America/Santiago; Node 24.15.0, npm disponible 12.2.0 y Chr
 | R-08: teclado, foco, zoom 200 % y tecnologías de asistencia | No probado para este cambio: la comprobación automática de atributos no sustituye una revisión asistiva ni de ampliación real. |
 
 **Revisión registrada:** revisión por la IA autora, no independiente. Se cotejaron los tokens, consumidores directos, plantilla, regresión y los valores calculados por el script; no se amplió el alcance ni se modificaron controles Material. La segunda revisión, hecha por otra IA, ejecutó la revisión visual; teclado, zoom real y tecnologías de asistencia permanecen no probados.
+
+## C-060 — Ratificación de la biblioteca de controles (DEC-FE-001) y ajustes derivados del kit
+
+**Clasificación SDD:** decisión de diseño de la base de frontend (STD-FE-001 §2), sin cambio de producto, requisitos, textos visibles, navegación, permisos, datos ni backend. Fundamenta C-056.
+
+**Decisión del responsable (2026-11-03):** se aprueba [DEC-FE-001](../diseno/decision-biblioteca-controles.md): Angular Material/CDK se ratifica como única familia de controles. Prioridades de criterios aprobadas sin cambios; gráficos mediante SVG propios simples con tabla equivalente accesible, sin excepción al criterio E1; retiro del CSS de botones anterior a Material.
+
+**Hallazgos y comportamiento esperado:**
+
+- El tema declaraba `mat.$azure-palette` y solo sobrescribía parte de los roles de sistema; contenedores primario/secundario/terciario, superficies `lowest/low/highest/variant/bright/dim`, `outline-variant`, `error-container` y superficie inversa heredaban azure. Todo rol de sistema que consumen los controles Material debe resolverse a un rol `--ui-color-*` del kit.
+- `base.css` mantenía reglas `.primary-button`, `.quiet-button`, `.text-button` y `.danger-button` con `:not([matButton])`. La búsqueda en `src` confirmó que todos los usos llevan `matButton`, por lo que esas reglas no se aplicaban. Las clases deben quedar solo como marcadores de rol sobre `matButton`, y su uso sin `matButton` debe rechazarse.
+
+**Implementación:**
+
+- `material.scss`: `theme-overrides` mapea los roles heredados a `background`, `surface`, `neutral-background`, `border`, `surface-accent`, `text`, `primary`, `on-primary`, `error-background`, `error-text`, `brand`, `on-brand` y `brand-accent`. Los siete `--brand-*` no cambian.
+- `base.css`: se retiran las reglas de botones sin `matButton`; `.danger-button` conserva su override en `material.scss`.
+- `check-source.mjs`: rechaza etiquetas `button`/`a` con clase de rol de botón sin `matButton`.
+- `check-contrast.mjs`: añade `brand-accent/brand` (acción sobre superficie inversa) y `text/neutral-background` (`surface-container-highest`).
+- Documentos: DEC-FE-001 pasa a aprobada; enlaces desde STD-FE-001 §2 y design-system §4 y §6; catálogo y patrón de formularios exigen `matButton` en sus ejemplos de acciones.
+
+**Matriz de verificación (2026-11-03, entorno local):**
+
+| Comprobación | Estado y evidencia |
+| --- | --- |
+| Encabezados del registro | Aprobado: no existía `## C-060` antes de esta entrada. |
+| Contraste WCAG 2.2 AA | Aprobado: `npm run check:contrast --workspace frontend`, 58 pares; `brand-accent/brand` 4,68:1 y `text/neutral-background` 12,61:1. |
+| Políticas de fuente | Aprobado: `npm run check:source --workspace frontend`. Comprobación negativa: una plantilla temporal con `<button class="quiet-button">` sin `matButton` fue rechazada y se eliminó. |
+| Regresión Angular | Aprobado: `npm test --workspace frontend`, 12 archivos y 126/126 pruebas. |
+| Generador de la base | Aprobado: `npm run test:base --workspace frontend`, 2/2 pruebas. |
+| Compilación | Aprobado con la advertencia preexistente: `npm run build --workspace frontend`, 565,64 kB iniciales frente al aviso de 450 kB, bajo el error de 600 kB. |
+| Resolución de roles y revisión visual | Aprobado en su alcance: servidor de fixtures genérico (`preview-server.mjs`) y navegador integrado; en `/usuarios`, los `--mat-sys-*` mapeados resuelven a valores del kit (p. ej. `secondary-container` #edf3fb, `inverse-surface` #22213F, `tertiary` #303880). El editor de perfiles con casillas y botones `filled`/`outlined` se ve con el índigo del kit. Revisión por la IA, sin personas. |
+| Controles Material aún no usados (fechas, autocompletado, menús, pestañas) | No probado: no existen consumidores; se verificarán con el primer uso según FE-07. |
+| Teclado, zoom 200 % y tecnologías de asistencia | No probado para este cambio. |
+
+**Revisión registrada:** revisión por la IA autora, no independiente; decisiones de diseño tomadas por el responsable. Se confirma que no cambia el alcance funcional ni se debilitan controles técnicos.

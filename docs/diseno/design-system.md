@@ -57,6 +57,8 @@ Estos siete colores son los valores de referencia aprobados para el kit. Sus có
 
 C-056: Angular Material/CDK constituye la base de controles por solicitud del responsable. Conservar exactamente los siete `--brand-*`, la cadena tipográfica de sistema y los roles semánticos; mapearlos mediante APIs públicas de tema/overrides sin redefinir selectores internos de Material. El tema Sass y los estilos de composición se mantienen dentro del kit. El contenedor CDK de overlays recibe su ámbito explícito porque se crea fuera de `app-root`; no se coloca `ui-root` indiscriminadamente en `body`. No se agregan fuentes/iconos de servicios externos. Contraste, foco, errores, densidad y reajuste se verifican nuevamente; las evidencias del CSS anterior no acreditan los controles migrados.
 
+C-060 ratifica esta base en [DEC-FE-001](decision-biblioteca-controles.md) y mapea en `material.scss` los roles de sistema que heredaban la paleta azure (contenedores primario, secundario y terciario, superficies, variantes de contorno, error y superficie inversa) a roles `--ui-color-*`; se retiró el CSS de botones sin `matButton`.
+
 1. Mantener tokens y componentes reutilizables en `frontend/src/app/shared/ui/`.
 2. Aplicar la paleta mediante variables semánticas, evitando códigos HEX repetidos en componentes.
 3. Conservar el nombre propio de cada producto en su interfaz, separado de cualquier marca institucional ajena.
@@ -100,6 +102,7 @@ Se utiliza `aria-current="page"` únicamente si el destino coincide con la pági
 - [Arquitectura v15](../producto/arquitectura_v15.md): decisiones técnicas y de navegación de la aplicación.
 - [Catálogo de componentes](catalogo-componentes.md): contratos del kit existente.
 - [Patrón de formularios](patrones-formularios.md): anatomía, estados, errores, foco y verificación por consumidor.
+- [DEC-FE-001](decision-biblioteca-controles.md): decisión sobre la biblioteca de controles (C-060).
 - [Tokens](../../frontend/src/app/shared/ui/styles/tokens.css) y [estilos compartidos](../../frontend/src/app/shared/ui/styles/base.css).
 
 **Procedencia de la paleta (registro interno, no identidad del producto):** valores cromáticos tomados como referencia del *Manual de Normas Gráficas de la Universidad de Tarapacá (2017)*, páginas 14 y 15. Esta referencia documental no implica afiliación ni autorización para usar marcas o símbolos de esa institución.

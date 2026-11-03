@@ -69,8 +69,8 @@ Las guardas y la coordinación entre formularios son responsabilidad del consumi
       </div>
     </div>
     <div class="ui-form-actions">
-      <button type="submit" class="primary-button">Guardando…</button>
-      <button type="button" class="quiet-button">Cancelar</button>
+      <button matButton="filled" type="submit" class="primary-button">Guardando…</button>
+      <button matButton="outlined" type="button" class="quiet-button">Cancelar</button>
     </div>
   </fieldset>
 </form>
@@ -82,7 +82,7 @@ Este ejemplo muestra **guardado pendiente**, no un formulario listo para copiar 
 
 - Fuente, pesos, tamaños y separación: tokens del kit. No simular títulos aumentando el peso de una etiqueta.
 - Campos: altura mínima `--ui-control-height`, borde `--ui-color-border-strong`, radio `--ui-radius-md`; errores con `--ui-color-error-text`. Un borde decorativo tenue no sustituye el borde de un control.
-- Acción principal: `.primary-button`; alternativa: `.quiet-button` o `.text-button`; destrucción: `.danger-button` según la consecuencia. No hay un máximo universal de botones por pantalla: justificar prioridad y tarea.
+- Acción principal: `.primary-button` (`matButton="filled"`); alternativa: `.quiet-button` (`outlined`) o `.text-button` (`text`); destrucción: `.danger-button` (`filled`) según la consecuencia. Las clases marcan el rol y siempre acompañan a `matButton` (DEC-FE-001, C-060). No hay un máximo universal de botones por pantalla: justificar prioridad y tarea.
 - Acciones se envuelven en espacio reducido. Columnas de campos con mínimo elástico; no forzar desplazamiento horizontal de la página.
 - Foco visible independiente de hover, error y selección; controles deshabilitados no reciben el tratamiento hover de una acción disponible.
 - Una redefinición semántica de tokens requiere volver a comprobar contraste. No cambiar los siete colores de marca para corregir una combinación.
