@@ -15,11 +15,11 @@
     .risk-widget-header { font-size: var(--ui-font-size-xs); font-weight: var(--ui-font-weight-bold); color: var(--ui-color-text-subtle); letter-spacing: .06em; text-transform: uppercase; margin-bottom: .85rem; }
     .risk-bar { display: flex; height: 9px; border-radius: var(--ui-radius-pill); overflow: hidden; background: var(--ui-color-border); margin-bottom: .85rem; }
     .risk-seg { height: 100%; transition: width .3s ease; }
-    .risk-seg-bajo { background: var(--ui-color-success-text); }
-    .risk-seg-medio { background: var(--brand-yellow); }
-    .risk-seg-alto { background: var(--brand-orange); }
-    .risk-seg-critico { background: var(--ui-color-danger); }
-    .risk-seg-none { background: var(--ui-color-border-strong); }
+    .risk-seg-bajo { background: var(--ui-color-risk-low); }
+    .risk-seg-medio { background: var(--ui-color-risk-medium); }
+    .risk-seg-alto { background: var(--ui-color-risk-high); }
+    .risk-seg-critico { background: var(--ui-color-risk-critical); }
+    .risk-seg-none { background: var(--ui-color-risk-none); }
     .risk-legend { display: flex; flex-wrap: wrap; justify-content: space-between; gap: var(--ui-space-2); font-size: var(--ui-font-size-xs); }
     .risk-legend-item { display: inline-flex; align-items: center; gap: .35rem; color: var(--ui-color-text-subtle); }
     .risk-legend-item strong { color: var(--ui-color-heading); font-weight: var(--ui-font-weight-bold); }

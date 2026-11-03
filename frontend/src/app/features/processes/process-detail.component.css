@@ -10,7 +10,6 @@
     .hero-title { margin: 0 0 .5rem; font-size: var(--ui-font-size-display); font-weight: var(--ui-font-weight-heavy); color: var(--ui-color-heading); line-height: 1.25; }
     .accent-bar { width: 44px; height: 3px; background: var(--ui-color-map-support); border-radius: 2px; margin-bottom: .75rem; }
     .hero-status { display: flex; align-items: center; gap: .45rem; font-size: var(--ui-font-size-sm); color: var(--ui-color-text-subtle); margin-bottom: var(--ui-space-4); }
-    .status-dot { width: 7px; height: 7px; border-radius: 50%; background: var(--brand-yellow); flex-shrink: 0; }
     .hero-desc { color: var(--ui-color-text-muted); font-size: var(--ui-font-size-md); line-height: 1.55; margin: 0 0 1.5rem; }
 
     .trio-box { background: var(--ui-color-background); border: 1px solid var(--ui-color-border); border-radius: var(--ui-radius-lg); padding: var(--ui-space-4) 1.25rem; display: grid; grid-template-columns: repeat(3, 1fr); gap: 1.25rem; }
@@ -27,11 +26,11 @@
     .risk-label-row { display: inline-flex; align-items: center; gap: .35rem; font-size: var(--ui-font-size-sm); font-weight: var(--ui-font-weight-bold); color: var(--ui-color-heading); }
     .risk-subtitle { font-size: var(--ui-font-size-xs); color: var(--ui-color-text-subtle); }
     .risk-gauge { display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px; margin: .85rem 0 .5rem; }
-    .risk-gauge-seg { height: 8px; border-radius: var(--ui-radius-pill); background: var(--ui-color-border); transition: background .2s ease; }
-    .risk-gauge-seg.active[data-level="Bajo"] { background: var(--ui-color-success-text); }
-    .risk-gauge-seg.active[data-level="Medio"] { background: var(--brand-yellow); }
-    .risk-gauge-seg.active[data-level="Alto"] { background: var(--brand-orange); }
-    .risk-gauge-seg.active[data-level="Crítico"] { background: var(--ui-color-danger); }
+    .risk-gauge-seg { height: 8px; border-radius: var(--ui-radius-pill); background: var(--ui-color-risk-none); transition: background .2s ease; }
+    .risk-gauge-seg.active[data-level="Bajo"] { background: var(--ui-color-risk-low); }
+    .risk-gauge-seg.active[data-level="Medio"] { background: var(--ui-color-risk-medium); }
+    .risk-gauge-seg.active[data-level="Alto"] { background: var(--ui-color-risk-high); }
+    .risk-gauge-seg.active[data-level="Crítico"] { background: var(--ui-color-risk-critical); }
     .risk-gauge-labels { display: grid; grid-template-columns: repeat(4, 1fr); text-align: center; gap: 6px; font-size: var(--ui-font-size-xs); }
     .risk-gauge-label { color: var(--ui-color-text-subtle); }
     .risk-gauge-label.active { color: var(--ui-color-heading); font-weight: var(--ui-font-weight-heavy); }

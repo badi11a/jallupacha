@@ -63,6 +63,12 @@
   --ui-color-warning-background: #fff3cd;
   --ui-color-warning-border: var(--brand-yellow);
   --ui-color-status: #826513;
+  /* Roles semánticos para indicadores no textuales de nivel de riesgo. */
+  --ui-color-risk-low: var(--ui-color-success-text);
+  --ui-color-risk-medium: #A67C00;
+  --ui-color-risk-high: var(--brand-orange);
+  --ui-color-risk-critical: var(--ui-color-danger);
+  --ui-color-risk-none: var(--ui-color-text-subtle);
   --ui-color-map-strategic: var(--brand-ink);
   --ui-color-map-mission: var(--brand-steel-blue);
   --ui-color-map-support: var(--brand-yellow);

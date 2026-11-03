@@ -259,6 +259,8 @@ describe('Interfaz base de esquema — adaptación visual', () => {
     const root = fixture.nativeElement as HTMLElement;
     expect(root.querySelector('a[href="/mapa/macroprocesos/2?type=3"]')).not.toBeNull();
     expect(root.querySelector('a[href="/procesos/4/editar?returnTo=%2Fprocesos%3Fq%3Dejemplo"]')).not.toBeNull();
+    expect(root.querySelector('.risk-gauge')?.getAttribute('aria-hidden')).toBe('true');
+    expect(root.querySelector('.risk-widget ui-badge')?.textContent?.trim()).toBe('Sin clasificar');
     expect([...root.querySelectorAll('button')].some(button => button.textContent?.trim() === 'Volver a resultados')).toBe(true);
     expect(root.textContent).not.toContain('contacto.unidad@');
     expect(root.textContent).not.toContain('Anexo institucional:');
@@ -290,6 +292,9 @@ describe('Interfaz base de esquema — adaptación visual', () => {
     expect(root.textContent).toContain('Faltan campos mínimos: Entradas');
     expect(root.textContent).toContain('Posibles duplicados');
     expect(root.textContent).toContain('Crítico');
+    expect(root.querySelector('.risk-gauge')?.getAttribute('role')).toBeNull();
+    expect(root.querySelector('.risk-gauge')?.getAttribute('aria-hidden')).toBe('true');
+    expect(root.querySelector('.risk-widget ui-badge')?.textContent?.trim()).toBe('Crítico');
     expect(root.textContent).not.toMatch(/Diagrama disponible|Medio-Alto|direccion.planificacion@/);
     expect(root.querySelector('.trio-box')?.textContent).toContain('ÁREA DE NEGOCIO');
     expect(root.querySelector('.trio-box')?.textContent).not.toContain('UNIDAD RESPONSABLE');

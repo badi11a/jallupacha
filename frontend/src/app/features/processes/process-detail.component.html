@@ -155,7 +155,7 @@
             <ui-badge [tone]="currentRiskTone()">{{ currentRiskLevel() }}</ui-badge>
           </div>
 
-          <div class="risk-gauge" role="meter" [attr.aria-valuenow]="currentRiskLevel()" aria-label="Nivel de riesgo del proceso">
+          <div class="risk-gauge" aria-hidden="true">
             @for (level of levels; track level) {
               <div
                 class="risk-gauge-seg"

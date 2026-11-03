@@ -613,3 +613,35 @@ Entorno: 2026-10-27, America/Santiago; Node 24.15.0, npm disponible 12.2.0 y Chr
 **Pendiente deliberado:** `.catalog-editor` (unidades y tipos de proceso) y la estructura *hero* de las dos fichas de detalle están duplicadas; hacerlas patrones compartidos amplía la API del kit y requiere decisión y registro propios (catálogo §7). Sin ejecutar: revisión visual en navegador, 320 px/200 % y contraste efectivo de controles Material.
 
 **Verificación:** `ng test` 126/126 aprobadas; `check:source` aprobado; `build` compila con el aviso de presupuesto existente (565,44 kB frente a 450 kB). Revisión por la misma IA autora, no independiente; al ser sustituciones de igual valor computado no se espera cambio visual, pero no se comprobó en navegador.
+
+## C-059 — Roles semánticos y contraste de indicadores de riesgo
+
+**Clasificación SDD:** defecto de implementación frente a `docs/diseno/design-system.md` §4.2 (paleta aplicada mediante variables semánticas, sin tokens de paleta en componentes) y STD-UX-001 R-08 / WCAG 2.2 AA 1.4.11. No cambia especificación, textos visibles, cálculo de nivel, navegación, permisos, datos ni backend.
+
+**Tarea, perfil y recorrido:** cualquier persona autenticada que consulta la ficha de un proceso y quien explora el detalle de un macroproceso recibe indicadores de nivel de riesgo distinguibles sin depender exclusivamente de color. La ficha anuncia el resumen textual y su insignia; la barra lineal solo lo representa visualmente. No se modifican accesos equivalentes, destinos ni retorno (R-01/02/09/10/11 no aplican al alcance cromático y semántico de este cambio).
+
+**Hallazgos y comportamiento esperado:** los segmentos de riesgo usaban directamente `--brand-yellow` y `--brand-orange`; el amarillo de paleta no alcanza 3:1 sobre `--ui-color-surface` ni `--ui-color-background`. El medidor declaraba `role="meter"` pero exponía un texto en `aria-valuenow` y no declaraba límites. Todos los indicadores no textuales de los cinco estados (`Bajo`, `Medio`, `Alto`, `Crítico` y sin nivel) deben usar roles `--ui-color-risk-*` que alcancen 3:1 contra ambas superficies; el nivel se conserva textual y no se duplica a tecnología asistiva.
+
+**Decisión e implementación:**
+
+- Se añadieron los roles semánticos `--ui-color-risk-low`, `--ui-color-risk-medium`, `--ui-color-risk-high`, `--ui-color-risk-critical` y `--ui-color-risk-none` en el kit. El ámbar funcional `#A67C00` se reserva para riesgo medio; los siete `--brand-*` conservan exactamente sus HEX aprobados.
+- Los segmentos de riesgo de ficha y macroproceso consumen exclusivamente esos roles. La regla `.status-dot`, que usaba `--brand-yellow`, se retiró: no existe ninguna plantilla que use esa clase.
+- El indicador de ficha deja de ser un `meter`: se marca `aria-hidden="true"` porque la insignia textual contigua anuncia una vez el nivel actual. Sin riesgos, la insignia anuncia `Sin clasificar` y el resumen indica cero riesgos; no queda un estado ambiguo.
+- `--ui-color-map-support` permanece sin cambio. Las flechas y barras donde aparece son decoración (las flechas ya usan `aria-hidden`); la familia de apoyo se nombra explícitamente y su texto `heading/map-support` mantiene contraste verificado. No comunica por sí solo nivel de riesgo ni otro estado.
+- `check-contrast.mjs` incorpora los diez pares no textuales de los cinco roles contra `surface` y `background`.
+
+**Archivos cambiados:** `frontend/src/app/shared/ui/styles/tokens.css`, `frontend/scripts/check-contrast.mjs`, estilos de detalle de proceso y macroproceso, plantilla y regresión de interfaz de proceso, y este registro.
+
+**Matriz de verificación (2026-11-03, entorno local):**
+
+| Comprobación | Estado y evidencia |
+| --- | --- |
+| Encabezados del registro | Aprobado: búsqueda completa de `## C-0xx` antes de editar; C-042, C-045 a C-058 aparecen una sola vez y no hay bloque duplicado. |
+| Contraste WCAG 2.2 AA 1.4.11 | Aprobado: `npm run check:contrast --workspace frontend`; 54 pares. Bajo 5,73/5,33; medio 3,82/3,55; alto 3,97/3,69; crítico 6,63/6,16; sin nivel 5,82/5,41 sobre `surface/background`, respectivamente. Durante la primera ejecución, `risk-none` con `border-strong` falló 2,87:1 sobre `background`; se corrigió antes de la ejecución final. |
+| Políticas de fuente | Aprobado: `npm run check:source --workspace frontend`; límites de capas, imports y tokens aprobados. |
+| Regresión Angular y contrato ARIA | Aprobado: `npm test --workspace frontend`; precomprobación de compatibilidad 3/3 y Angular 12 archivos/126 pruebas. La regresión comprueba que la barra no tiene rol de medidor, es decorativa y que las insignias anuncian `Crítico` y `Sin clasificar`. |
+| Compilación | Aprobado con advertencia preexistente de presupuesto: `npm run build --workspace frontend` termina correctamente con 565,66 kB iniciales; mantiene el aviso de 450 kB y no supera el límite de error de 600 kB. |
+| Revisión visual de ficha y macroproceso con cuatro niveles y sin riesgos | No probado: no se dispuso de una sesión de navegador conectada a datos locales representativos durante este cambio. Se requiere comprobar los cinco estados, textos visibles y recorrido antes de declarar conformidad visual integral. |
+| R-08: teclado, foco, zoom 200 % y tecnologías de asistencia | No probado para este cambio: la comprobación automática de atributos no sustituye una revisión asistiva ni de ampliación real. |
+
+**Revisión registrada:** revisión por la IA autora, no independiente. Se cotejaron los tokens, consumidores directos, plantilla, regresión y los valores calculados por el script; no se amplió el alcance ni se modificaron controles Material. La revisión visual y asistiva indicada permanece explícitamente no probada.
