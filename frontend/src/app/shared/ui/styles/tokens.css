@@ -69,6 +69,7 @@
   --ui-color-risk-high: var(--brand-orange);
   --ui-color-risk-critical: var(--ui-color-danger);
   --ui-color-risk-none: var(--ui-color-text-subtle);
+  --ui-color-risk-track: var(--ui-color-surface);
   --ui-color-map-strategic: var(--brand-ink);
   --ui-color-map-mission: var(--brand-steel-blue);
   --ui-color-map-support: var(--brand-yellow);

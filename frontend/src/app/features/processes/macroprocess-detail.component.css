@@ -13,7 +13,7 @@
 
     .risk-widget { padding: 1.25rem 1.4rem; border-radius: var(--ui-radius-lg); background: var(--ui-color-background); border: 1px solid var(--ui-color-border); }
     .risk-widget-header { font-size: var(--ui-font-size-xs); font-weight: var(--ui-font-weight-bold); color: var(--ui-color-text-subtle); letter-spacing: .06em; text-transform: uppercase; margin-bottom: .85rem; }
-    .risk-bar { display: flex; height: 9px; border-radius: var(--ui-radius-pill); overflow: hidden; background: var(--ui-color-border); margin-bottom: .85rem; }
+    .risk-bar { display: flex; height: 9px; border-radius: var(--ui-radius-pill); overflow: hidden; background: var(--ui-color-risk-track); margin-bottom: .85rem; }
     .risk-seg { height: 100%; transition: width .3s ease; }
     .risk-seg-bajo { background: var(--ui-color-risk-low); }
     .risk-seg-medio { background: var(--ui-color-risk-medium); }

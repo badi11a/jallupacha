@@ -622,6 +622,8 @@ Entorno: 2026-10-27, America/Santiago; Node 24.15.0, npm disponible 12.2.0 y Chr
 
 **Hallazgos y comportamiento esperado:** los segmentos de riesgo usaban directamente `--brand-yellow` y `--brand-orange`; el amarillo de paleta no alcanza 3:1 sobre `--ui-color-surface` ni `--ui-color-background`. El medidor declaraba `role="meter"` pero exponía un texto en `aria-valuenow` y no declaraba límites. Todos los indicadores no textuales de los cinco estados (`Bajo`, `Medio`, `Alto`, `Crítico` y sin nivel) deben usar roles `--ui-color-risk-*` que alcancen 3:1 contra ambas superficies; el nivel se conserva textual y no se duplica a tecnología asistiva.
 
+**Hallazgo de revisión posterior de C-059:** la primera versión reutilizó `--ui-color-risk-none` como fondo de los segmentos inactivos de la ficha. Al oscurecer ese rol para el estado de datos «sin nivel», el nivel activo dejó de distinguirse del riel (Bajo 1,02:1; Medio 1,53:1; Alto 1,47:1; Crítico 1,14:1). «Sin nivel de riesgo» y «segmento inactivo» son roles diferentes. El comportamiento esperado se amplía, sin cambiar alcance: cada nivel activo debe alcanzar 3:1 contra un rol de riel propio, además de las dos superficies.
+
 **Decisión e implementación:**
 
 - Se añadieron los roles semánticos `--ui-color-risk-low`, `--ui-color-risk-medium`, `--ui-color-risk-high`, `--ui-color-risk-critical` y `--ui-color-risk-none` en el kit. El ámbar funcional `#A67C00` se reserva para riesgo medio; los siete `--brand-*` conservan exactamente sus HEX aprobados.
@@ -629,6 +631,9 @@ Entorno: 2026-10-27, America/Santiago; Node 24.15.0, npm disponible 12.2.0 y Chr
 - El indicador de ficha deja de ser un `meter`: se marca `aria-hidden="true"` porque la insignia textual contigua anuncia una vez el nivel actual. Sin riesgos, la insignia anuncia `Sin clasificar` y el resumen indica cero riesgos; no queda un estado ambiguo.
 - `--ui-color-map-support` permanece sin cambio. Las flechas y barras donde aparece son decoración (las flechas ya usan `aria-hidden`); la familia de apoyo se nombra explícitamente y su texto `heading/map-support` mantiene contraste verificado. No comunica por sí solo nivel de riesgo ni otro estado.
 - `check-contrast.mjs` incorpora los diez pares no textuales de los cinco roles contra `surface` y `background`.
+- La revisión añade `--ui-color-risk-track: var(--ui-color-surface)` para el riel decorativo. `--ui-color-risk-none` queda exclusivamente en `.risk-seg-none` para el estado «sin nivel». Se conserva el ámbar funcional `#A67C00`: frente al riel claro, Bajo/Medio/Alto/Crítico alcanzan 5,73/3,82/3,97/6,63:1. No se modifican los siete `--brand-*`.
+- `.risk-gauge-seg` y el fondo de `.risk-bar` consumen `risk-track`. La búsqueda de plantilla confirma que el detalle de macroproceso actualmente no renderiza `.risk-bar` ni `.risk-seg`; por tanto, allí no hay segmentos que puedan sumar menos de 100 % ni riel visible junto a uno. El estilo se mantiene preparado para ese patrón y queda cubierto por el contraste de riel.
+- `check-contrast.mjs` añade cuatro pares no textuales de cada nivel activo contra `risk-track`, la regresión que faltaba en la primera versión.
 
 **Archivos cambiados:** `frontend/src/app/shared/ui/styles/tokens.css`, `frontend/scripts/check-contrast.mjs`, estilos de detalle de proceso y macroproceso, plantilla y regresión de interfaz de proceso, y este registro.
 
@@ -637,10 +642,11 @@ Entorno: 2026-10-27, America/Santiago; Node 24.15.0, npm disponible 12.2.0 y Chr
 | Comprobación | Estado y evidencia |
 | --- | --- |
 | Encabezados del registro | Aprobado: búsqueda completa de `## C-0xx` antes de editar; C-042, C-045 a C-058 aparecen una sola vez y no hay bloque duplicado. |
-| Contraste WCAG 2.2 AA 1.4.11 | Aprobado: `npm run check:contrast --workspace frontend`; 54 pares. Bajo 5,73/5,33; medio 3,82/3,55; alto 3,97/3,69; crítico 6,63/6,16; sin nivel 5,82/5,41 sobre `surface/background`, respectivamente. Durante la primera ejecución, `risk-none` con `border-strong` falló 2,87:1 sobre `background`; se corrigió antes de la ejecución final. |
-| Políticas de fuente | Aprobado: `npm run check:source --workspace frontend`; límites de capas, imports y tokens aprobados. |
-| Regresión Angular y contrato ARIA | Aprobado: `npm test --workspace frontend`; precomprobación de compatibilidad 3/3 y Angular 12 archivos/126 pruebas. La regresión comprueba que la barra no tiene rol de medidor, es decorativa y que las insignias anuncian `Crítico` y `Sin clasificar`. |
-| Compilación | Aprobado con advertencia preexistente de presupuesto: `npm run build --workspace frontend` termina correctamente con 565,66 kB iniciales; mantiene el aviso de 450 kB y no supera el límite de error de 600 kB. |
+| Contraste WCAG 2.2 AA 1.4.11 | Aprobado en la primera versión: `npm run check:contrast --workspace frontend`; 54 pares. Bajo 5,73/5,33; medio 3,82/3,55; alto 3,97/3,69; crítico 6,63/6,16; sin nivel 5,82/5,41 sobre `surface/background`, respectivamente. Durante la primera ejecución, `risk-none` con `border-strong` falló 2,87:1 sobre `background`; se corrigió antes de la ejecución final. |
+| Revisión de contraste activo/riesgo C-059 | Aprobado: ejecución posterior de `npm run check:contrast --workspace frontend`; 58 pares. Los cuatro niveles activos frente a `risk-track` alcanzan Bajo 5,73; Medio 3,82; Alto 3,97; Crítico 6,63:1, todos >= 3:1. |
+| Políticas de fuente | Aprobado: ejecución posterior de `npm run check:source --workspace frontend`; límites de capas, imports y tokens aprobados. |
+| Regresión Angular y contrato ARIA | Aprobado: ejecución posterior de `npm test --workspace frontend`; precomprobación de compatibilidad 3/3 y Angular 12 archivos/126 pruebas. La regresión comprueba que la barra no tiene rol de medidor, es decorativa y que las insignias anuncian `Crítico` y `Sin clasificar`. |
+| Compilación | Aprobado con advertencia preexistente de presupuesto: ejecución posterior de `npm run build --workspace frontend` termina correctamente con 565,71 kB iniciales; mantiene el aviso de 450 kB y no supera el límite de error de 600 kB. |
 | Revisión visual de ficha y macroproceso con cuatro niveles y sin riesgos | No probado: no se dispuso de una sesión de navegador conectada a datos locales representativos durante este cambio. Se requiere comprobar los cinco estados, textos visibles y recorrido antes de declarar conformidad visual integral. |
 | R-08: teclado, foco, zoom 200 % y tecnologías de asistencia | No probado para este cambio: la comprobación automática de atributos no sustituye una revisión asistiva ni de ampliación real. |
 

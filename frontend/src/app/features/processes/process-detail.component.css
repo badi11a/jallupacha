@@ -26,7 +26,7 @@
     .risk-label-row { display: inline-flex; align-items: center; gap: .35rem; font-size: var(--ui-font-size-sm); font-weight: var(--ui-font-weight-bold); color: var(--ui-color-heading); }
     .risk-subtitle { font-size: var(--ui-font-size-xs); color: var(--ui-color-text-subtle); }
     .risk-gauge { display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px; margin: .85rem 0 .5rem; }
-    .risk-gauge-seg { height: 8px; border-radius: var(--ui-radius-pill); background: var(--ui-color-risk-none); transition: background .2s ease; }
+    .risk-gauge-seg { height: 8px; border-radius: var(--ui-radius-pill); background: var(--ui-color-risk-track); transition: background .2s ease; }
     .risk-gauge-seg.active[data-level="Bajo"] { background: var(--ui-color-risk-low); }
     .risk-gauge-seg.active[data-level="Medio"] { background: var(--ui-color-risk-medium); }
     .risk-gauge-seg.active[data-level="Alto"] { background: var(--ui-color-risk-high); }
