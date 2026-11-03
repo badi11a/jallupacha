@@ -7,7 +7,7 @@ Sistema institucional de gestión de procesos, macroprocesos, estructura organiz
 ```text
 backend/src/
   app.module.ts       Composición de una sola aplicación NestJS
-  database/           Conexión compartida, migraciones, instalación y semillas
+  database/           Conexión compartida, instalación del esquema y semillas
   auth/               Acceso y sesiones
   audit/              Bitácora y eventos de seguridad
   identity/           Usuarios y perfiles
@@ -43,9 +43,9 @@ Las rutas visibles permanecen `/mapa`, `/procesos`, `/unidades`, `/tipos-de-proc
 - Dependencias reproducibles mediante `npm ci`.
 - Inicio con `npm run start:dev` desde la raíz.
 
-Las migraciones y los permisos se administran mediante `db:migrate` y `db:grant` del backend, usando las cuentas y el procedimiento autorizado. Nunca se ejecutan reinstalaciones o reinicios destructivos como parte del arranque. `db:install:schema` es una herramienta explícita para la base histórica de esquema y datos genéricos: su existencia no acredita una instalación v15 completa. Exige confirmación del destino y no debe usarse como actualización de un ambiente existente.
+El esquema y los permisos se administran mediante `db:install:schema` y `db:grant` del backend, usando las cuentas y el procedimiento autorizado. Nunca se ejecutan reinstalaciones o reinicios destructivos como parte del arranque. `db:install:schema` solo crea el esquema vigente en una cuenta Oracle vacía y exige confirmación explícita; no actualiza ni borra un ambiente existente. `db:reset:local` es la operación destructiva separada, limitada a la demostración local.
 
-Se conservan las identidades de migraciones aplicadas y sus dependencias por decisión del responsable. Los demás nombres describen funciones del producto. La documentación y los registros superados permanecen recuperables desde Git.
+El historial de instaladores y decisiones técnicas permanece recuperable desde Git. Los nombres activos describen funciones del producto y del esquema vigente.
 
 ## Verificación
 

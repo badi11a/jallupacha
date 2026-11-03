@@ -1,39 +1,26 @@
 import 'dotenv/config';
 import { DataSource } from 'typeorm';
 import { databaseOptions } from '../common/config';
+import { createSchema } from './create-schema';
 import { applyRuntimeGrants } from './grants';
 import { seed } from './seed';
+import { SCHEMA_SEQUENCES, SCHEMA_TABLES } from './schema';
 
-const TABLE_DROP_ORDER = [
-  'PROCESS_RISK',
-  'PROCESS',
-  'PROCESS_VERSION',
-  'SECURITY_EVENT_IP',
-  'SECURITY_EVENT',
-  'APP_SESSION',
-  'AUDIT',
-  'USER_PROFILE',
-  'LOCAL_CREDENTIAL',
-  'DEMO_IDENTITY',
-  'USER_IDENTITY',
-  'APP_PROFILE',
-  'APP_USER',
-  'PROCESS_TYPE',
-  'RISK_TYPE',
-  'RISK_LEVEL',
-  'MACROPROCESS',
-  'ADMIN_CONTROL',
-  'migrations'
-];
-
-const SEQUENCES = ['PROCESS_CODE_SEQ', 'MACROPROCESS_CODE_SEQ'];
+// SCHEMA_TABLES/SCHEMA_SEQUENCES is the single source of truth for every object this
+// product creates; a separately hand-maintained drop list drifts and leaves orphaned
+// tables behind (see C-057 in docs/trazabilidad/correcciones.md).
+const TABLE_DROP_ORDER = SCHEMA_TABLES;
+const SEQUENCES = SCHEMA_SEQUENCES;
+// Legacy TypeORM metadata is not part of the current schema but must be removed when
+// rebuilding a local schema that was created by the retired migration mechanism.
+const LEGACY_TABLES = ['migrations'];
 
 function assertLocalResetAllowed(): string {
   const schema = process.env.ORACLE_SCHEMA?.trim().toUpperCase();
   const service = process.env.ORACLE_SERVICE?.trim();
   const expectedConfirmation = schema && service ? `RESET ${schema}@${service}` : '';
   const loopback = ['127.0.0.1', '::1', 'localhost'];
-  const migrationUser = process.env.MIGRATION_USER?.trim().toUpperCase();
+  const schemaOwnerUser = process.env.SCHEMA_OWNER_USER?.trim().toUpperCase();
 
   if (process.env.NODE_ENV !== 'development' ||
     process.env.AUTH_MODE !== 'demo' ||
@@ -43,11 +30,11 @@ function assertLocalResetAllowed(): string {
     !schema ||
     !/^[A-Z][A-Z0-9_$#]{0,29}$/.test(schema) ||
     !service ||
-    migrationUser !== schema ||
+    schemaOwnerUser !== schema ||
     process.env.LOCAL_RESET_SCHEMA?.trim().toUpperCase() !== schema ||
     process.env.LOCAL_RESET_CONFIRM !== expectedConfirmation) {
     throw new Error(
-      'Local reset refused. Require development/demo mode, loopback hosts, owner migration user, ' +
+      'Local reset refused. Require development/demo mode, loopback hosts, schema owner account, ' +
       'LOCAL_RESET_SCHEMA matching ORACLE_SCHEMA, and LOCAL_RESET_CONFIRM="RESET <schema>@<service>".'
     );
   }
@@ -66,7 +53,7 @@ async function resetLocalSchema(): Promise<void> {
       'SELECT TABLE_NAME AS "tableName" FROM USER_TABLES'
     );
     const tableNames = new Set(tables.map(({ tableName }) => tableName));
-    for (const name of TABLE_DROP_ORDER) {
+    for (const name of [...TABLE_DROP_ORDER, ...LEGACY_TABLES]) {
       if (!tableNames.has(name)) continue;
       await source.query(`DROP TABLE "${schema}"."${name}" CASCADE CONSTRAINTS PURGE`);
     }
@@ -79,7 +66,13 @@ async function resetLocalSchema(): Promise<void> {
       if (sequenceNames.has(name)) await source.query(`DROP SEQUENCE "${schema}"."${name}"`);
     }
 
-    await source.runMigrations({ transaction: 'all' });
+    const ddlRunner = source.createQueryRunner();
+    try {
+      await ddlRunner.connect();
+      await createSchema(ddlRunner);
+    } finally {
+      await ddlRunner.release();
+    }
     await applyRuntimeGrants(source);
   } finally {
     if (source.isInitialized) await source.destroy();
@@ -88,7 +81,7 @@ async function resetLocalSchema(): Promise<void> {
 }
 
 resetLocalSchema().then(
-  () => console.info('Local schema was recreated from migrations and generic content.'),
+  () => console.info('Local schema was recreated from the current installer and generic content.'),
   (error: unknown) => {
     console.error('Local schema reset failed; verify the explicit local-only safeguards and Oracle access.');
     console.error(error instanceof Error ? error.message : 'Unexpected reset error');

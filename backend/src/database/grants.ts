@@ -61,7 +61,7 @@ export async function applyRuntimeGrants(source: DataSource): Promise<number> {
   if (!/^[A-Z][A-Z0-9_$#]{0,29}$/.test(schema) || !/^[A-Z][A-Z0-9_$#]{0,29}$/.test(runtimeUser)) {
     throw new Error('Invalid Oracle schema or runtime user configuration');
   }
-  if (runtimeUser === schema || process.env.MIGRATION_USER?.trim().toUpperCase() !== schema) {
+  if (runtimeUser === schema || process.env.SCHEMA_OWNER_USER?.trim().toUpperCase() !== schema) {
     throw new Error('Runtime grants require the schema owner connection and a separate DATABASE_USER');
   }
   const statements = runtimeGrantStatements(runtimeUser, schema);

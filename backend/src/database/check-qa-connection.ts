@@ -9,7 +9,7 @@ type ConnectionIdentity = {
 };
 
 async function verifyConnection(label: string, migration: boolean): Promise<void> {
-  const source = new DataSource({ ...databaseOptions(migration), entities: [], migrations: [] } as never);
+  const source = new DataSource({ ...databaseOptions(migration), entities: [] } as never);
   try {
     await source.initialize();
     const [identity] = await source.query<ConnectionIdentity[]>(

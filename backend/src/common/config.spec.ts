@@ -27,9 +27,9 @@ describe('local demo runtime controls', () => {
   });
 });
 
-describe('explicit historical schema installation controls', () => {
+describe('explicit clean schema installation controls', () => {
   const values = {
-    ORACLE_SCHEMA: 'TEST_OWNER', ORACLE_SERVICE: 'TEST_SERVICE', MIGRATION_USER: 'TEST_OWNER', DATABASE_USER: 'TEST_RUNTIME',
+    ORACLE_SCHEMA: 'TEST_OWNER', ORACLE_SERVICE: 'TEST_SERVICE', SCHEMA_OWNER_USER: 'TEST_OWNER', DATABASE_USER: 'TEST_RUNTIME',
     SCHEMA_INSTALL_ALLOWED: 'true', SCHEMA_INSTALL_CONFIRM: 'INSTALL SCHEMA TEST_OWNER@TEST_SERVICE',
     SCHEMA_ALLOW_OWNER_RUNTIME_FOR_QA: 'false'
   };
@@ -53,8 +53,8 @@ describe('explicit historical schema installation controls', () => {
     delete process.env.SCHEMA_INSTALL_ALLOWED;
     expect(() => assertSchemaInstallAllowed()).toThrow('installation refused');
   });
-  it('requires the migration account to own the target schema', () => {
-    process.env.MIGRATION_USER = 'OTHER_OWNER';
+  it('requires the schema owner account to own the target schema', () => {
+    process.env.SCHEMA_OWNER_USER = 'OTHER_OWNER';
     expect(() => assertSchemaInstallAllowed()).toThrow('installation refused');
   });
   it('preserves separate runtime accounts unless the explicit QA exception is set', () => {

@@ -5,7 +5,7 @@ import { resolve } from 'path';
 import request from 'supertest';
 import { DataSource } from 'typeorm';
 
-// Requires the local Oracle database with all migrations applied and backend/.env configured.
+// Requires the local Oracle database created by the current schema installer and backend/.env configured.
 // The runtime account cannot delete audit rows, so the test only appends and counts.
 describe('security event audit (Oracle)', () => {
   let app: INestApplication;

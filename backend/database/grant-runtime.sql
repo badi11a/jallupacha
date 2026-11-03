@@ -1,10 +1,8 @@
 -- ÚNICA fuente de permisos sobre objetos de la aplicación para la cuenta de ejecución.
 -- Se aplica con `npm run db:grant` (cuenta propietaria; verifica faltantes y excesos) y
--- `db:reset:local`. Las migraciones NO otorgan permisos: toda tabla o secuencia nueva
+-- `db:reset:local`. El instalador del esquema NO otorga permisos: toda tabla o secuencia nueva
 -- debe añadirse aquí en el mismo cambio. Solo líneas GRANT <privilegios> ON <OBJETO> TO &&app_user;
 -- (una por objeto). Privilegios de sistema: ver grant-system.sql.
--- Las migraciones 1740000000003, 04 y 05 ya aplicadas otorgaron AUDIT, PROCESS*, RISK_* con los
--- mismos privilegios declarados abajo; no se modifican.
 DEFINE app_user = JALLUPACHA_APP
 
 -- Identidad, perfiles y sesión

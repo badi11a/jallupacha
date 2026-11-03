@@ -4,7 +4,7 @@
       border: 1px solid var(--ui-color-border);
       border-radius: var(--ui-radius-lg);
       padding: 1.25rem;
-      margin-bottom: 1.5rem;
+      margin-bottom: var(--ui-space-5);
       background: var(--ui-color-background);
     }
     .profile-editor h2 {

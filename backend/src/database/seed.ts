@@ -131,7 +131,7 @@ export async function seed(): Promise<void> {
 
 if (require.main === module) {
   seed().catch((error: unknown) => {
-    console.error('Database seed failed. Check the Oracle connection and migration account.');
+    console.error('Database seed failed. Check the Oracle connection and schema owner account.');
     console.error(error instanceof Error ? error.message : 'Unexpected seed error');
     process.exitCode = 1;
   });

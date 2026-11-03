@@ -1,35 +1,10 @@
 import { DataSource, EntityManager } from 'typeorm';
 import { databaseOptions } from '../src/common/config';
+import { SCHEMA_TABLES } from '../src/database/schema';
 
 const oracleOptIn = process.env.SCHEMA_ORACLE_TEST === 'true';
 const oracleDescribe = oracleOptIn ? describe : describe.skip;
 let dataSourceForOracle: DataSource | undefined;
-
-const APPLICATION_TABLES = [
-  'MACROPROCESS_TYPE',
-  'MACROPROCESS',
-  'PROCESS_TYPE',
-  'ORGANIZATIONAL_UNIT',
-  'PROCESS',
-  'PROCESS_VERSION',
-  'PROCESS_UNIT',
-  'PROCESS_RISK',
-  'PROCESS_RELATION'
-];
-
-const LEGACY_TABLES = [
-  'APP_USER',
-  'APP_PROFILE',
-  'USER_PROFILE',
-  'USER_IDENTITY',
-  'DEMO_IDENTITY',
-  'APP_SESSION',
-  'AUDIT',
-  'SECURITY_EVENT',
-  'SECURITY_EVENT_IP',
-  'RISK_TYPE',
-  'RISK_LEVEL'
-];
 
 interface IdRow {
   id: number | string;
@@ -51,8 +26,8 @@ oracleDescribe('initial schema Oracle installation', () => {
       'ORACLE_PORT',
       'ORACLE_SERVICE',
       'ORACLE_SCHEMA',
-      'MIGRATION_USER',
-      'MIGRATION_PASSWORD',
+      'SCHEMA_OWNER_USER',
+      'SCHEMA_OWNER_PASSWORD',
       'SCHEMA_ORACLE_SCHEMA'
     ];
     const missing = requiredVariables.filter((name) => !process.env[name]?.trim());
@@ -66,7 +41,7 @@ oracleDescribe('initial schema Oracle installation', () => {
     if (process.env.SCHEMA_ORACLE_SCHEMA!.trim().toUpperCase() !== schema) {
       throw new Error('SCHEMA_ORACLE_SCHEMA must explicitly match ORACLE_SCHEMA.');
     }
-    if (process.env.MIGRATION_USER!.trim().toUpperCase() !== schema) {
+    if (process.env.SCHEMA_OWNER_USER!.trim().toUpperCase() !== schema) {
       throw new Error('initial schema Oracle install tests must connect as the ORACLE_SCHEMA owner.');
     }
 
@@ -78,18 +53,13 @@ oracleDescribe('initial schema Oracle installation', () => {
     if (dataSourceForOracle?.isInitialized) await dataSourceForOracle.destroy();
   });
 
-  it('has exactly the v14 tables and no user, session, audit, or configurable risk tables', async () => {
+  it('has exactly the current application tables and no TypeORM migration history table', async () => {
     const rows: Array<{ tableName: string }> = await oracle().query(
       'SELECT TABLE_NAME AS "tableName" FROM USER_TABLES ORDER BY TABLE_NAME'
     );
     const actual = rows.map((row) => row.tableName);
-    const migrationTables = actual.filter((name) => name.toUpperCase() === 'MIGRATIONS');
-
-    expect(migrationTables).toHaveLength(1);
-    expect([...actual].sort()).toEqual([...APPLICATION_TABLES, migrationTables[0]].sort());
-    expect(actual.map((name) => name.toUpperCase())).not.toEqual(
-      expect.arrayContaining(LEGACY_TABLES)
-    );
+    expect([...actual].sort()).toEqual([...SCHEMA_TABLES].sort());
+    expect(actual.map((name) => name.toUpperCase())).not.toContain('MIGRATIONS');
   });
 
   it('contains the fixed v14 demonstration seed counts', async () => {

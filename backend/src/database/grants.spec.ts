@@ -4,14 +4,8 @@ import { compareGrants, parseRuntimeGrants, readRuntimeGrants, runtimeGrantState
 import { SCHEMA_ID_GENERATORS } from './schema';
 
 const srcDir = join(__dirname, '..');
-const migrationsDir = join(__dirname, 'migrations');
 const databaseDir = join(__dirname, '..', '..', 'database');
-// Migrations applied before grants were centralized; they may still contain GRANT statements.
-const LEGACY_GRANT_MIGRATIONS = new Set([
-  '1740000000003-CreateMissingAuditTable.ts',
-  '1740000000004-CreateProcessDrafts.ts',
-  '1740000000005-CreateProcessRisks.ts'
-]);
+const schemaInstaller = join(__dirname, 'create-schema.ts');
 
 function sourceFiles(dir: string): string[] {
   return readdirSync(dir, { withFileTypes: true }).flatMap((entry) => {
@@ -21,7 +15,6 @@ function sourceFiles(dir: string): string[] {
   });
 }
 
-const migrations = readdirSync(migrationsDir).filter((name) => name.endsWith('.ts')).sort();
 const read = (path: string): string => readFileSync(path, 'utf8');
 const declared = readRuntimeGrants();
 const declaredObjects = new Set(declared.map((grant) => grant.object));
@@ -43,10 +36,9 @@ describe('runtime grants', () => {
     }
   });
 
-  it('grants only table privileges to the runtime user and never system or migration objects', () => {
+  it('grants only table privileges to the runtime user and never system objects', () => {
     for (const item of statements) {
       expect(item).toMatch(/^GRANT (SELECT|INSERT|UPDATE|DELETE)(, (SELECT|INSERT|UPDATE|DELETE))* ON "OWNER_SCHEMA"\."[A-Z_]+" TO "APP_RUNTIME"$/);
-      expect(item).not.toContain('migrations');
     }
   });
 
@@ -57,9 +49,9 @@ describe('runtime grants', () => {
     expect(declared.find((item) => item.object === 'AUDIT')?.privileges).toEqual(['SELECT', 'INSERT']);
   });
 
-  it('grants every table and sequence created by migrations and used by the code', () => {
+  it('grants every table and sequence created by the schema installer and used by the code', () => {
     const created = [
-      ...migrations.flatMap((name) => allMatches(read(join(migrationsDir, name)), CREATED)),
+      ...allMatches(read(schemaInstaller), CREATED),
       ...SCHEMA_ID_GENERATORS.map((generator) => generator.sequence)
     ];
     expect(created.length).toBeGreaterThan(10);
@@ -73,29 +65,17 @@ describe('runtime grants', () => {
     for (const object of used) expect(declaredObjects).toContain(object);
   });
 
-  it('declares no grant for an object that no migration creates', () => {
+  it('declares no grant for an object that the schema installer does not create', () => {
     const created = new Set([
-      ...migrations.flatMap((name) => allMatches(read(join(migrationsDir, name)), CREATED)),
+      ...allMatches(read(schemaInstaller), CREATED),
       ...SCHEMA_ID_GENERATORS.map((generator) => generator.sequence)
     ]);
     created.add('AUDIT');
     for (const object of declaredObjects) expect(created).toContain(object);
   });
 
-  it('keeps grants out of new migrations and consistent with legacy ones', () => {
-    for (const name of migrations) {
-      const text = read(join(migrationsDir, name));
-      if (!LEGACY_GRANT_MIGRATIONS.has(name)) {
-        expect(text).not.toMatch(/\bGRANT\b/);
-        continue;
-      }
-      const legacy = [...text.matchAll(/GRANT ([A-Z, ]+) ON (?:\$\{table\('([A-Z_]+)'\)\}|\$\{table\})/g)];
-      expect(legacy.length).toBeGreaterThan(0);
-      for (const [, privileges, object] of legacy) {
-        const expected = declared.find((grant) => grant.object === (object ?? 'AUDIT'));
-        expect(expected?.privileges.join(', ')).toBe(privileges.trim());
-      }
-    }
+  it('keeps grants out of the schema installer', () => {
+    expect(read(schemaInstaller)).not.toMatch(/\bGRANT\b/);
   });
 
   it('keeps system privileges in grant-system.sql only', () => {

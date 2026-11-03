@@ -1,28 +1,11 @@
+// One declaration for every application object created by create-schema.ts. It is also
+// used by the explicitly protected local reset so the two operations cannot drift.
 export const SCHEMA_TABLES = [
-  'PROCESS_RELATION',
-  'PROCESS_UNIT',
-  'PROCESS_RISK',
-  'PROCESS_VERSION',
-  'PROCESS',
-  'ORGANIZATIONAL_UNIT',
-  'PROCESS_TYPE',
-  'MACROPROCESS',
-  'MACROPROCESS_TYPE',
-  // Tablas del modelo institucional de identidad, acceso y auditoria
-  'LOCAL_CREDENTIAL',
-  'SECURITY_EVENT_IP',
-  'SECURITY_EVENT',
-  'APP_SESSION',
-  'AUDIT',
-  'USER_PROFILE',
-  'DEMO_IDENTITY',
-  'USER_IDENTITY',
-  'APP_PROFILE',
-  'APP_USER',
-  'ADMIN_CONTROL',
-  'RISK_TYPE',
-  'RISK_LEVEL',
-  'migrations'
+  'PROCESS_RELATION', 'PROCESS_UNIT', 'PROCESS_RISK', 'PROCESS_VERSION', 'PROCESS',
+  'ORGANIZATIONAL_UNIT', 'PROCESS_TYPE', 'MACROPROCESS', 'MACROPROCESS_TYPE',
+  'LOCAL_CREDENTIAL', 'SECURITY_EVENT_IP', 'SECURITY_EVENT', 'APP_SESSION', 'AUDIT',
+  'USER_PROFILE', 'DEMO_IDENTITY', 'USER_IDENTITY', 'APP_PROFILE', 'APP_USER',
+  'ADMIN_CONTROL', 'RISK_TYPE', 'RISK_LEVEL'
 ] as const;
 
 export const SCHEMA_ID_GENERATORS = [
@@ -37,12 +20,10 @@ export const SCHEMA_ID_GENERATORS = [
 ] as const;
 
 export const SCHEMA_SEQUENCES = [
-  'PROCESS_CODE_SEQ',
-  'MACROPROCESS_CODE_SEQ',
-  ...SCHEMA_ID_GENERATORS.map(({ sequence }) => sequence)
+  'PROCESS_CODE_SEQ', 'MACROPROCESS_CODE_SEQ', ...SCHEMA_ID_GENERATORS.map(({ sequence }) => sequence)
 ] as const;
 
-export function requiredOracleIdentifier(name: 'ORACLE_SCHEMA' | 'DATABASE_USER' | 'MIGRATION_USER'): string {
+export function requiredOracleIdentifier(name: 'ORACLE_SCHEMA' | 'DATABASE_USER' | 'SCHEMA_OWNER_USER'): string {
   const value = process.env[name]?.trim().toUpperCase();
   if (!value || !/^[A-Z][A-Z0-9_$#]{0,29}$/.test(value)) {
     throw new Error(`${name} must be a valid Oracle identifier`);

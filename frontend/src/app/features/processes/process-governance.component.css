@@ -5,20 +5,20 @@
       border: 1px solid var(--ui-color-border);
       border-radius: var(--ui-radius-xl);
       box-shadow: var(--ui-shadow-panel);
-      margin-bottom: 1.5rem;
+      margin-bottom: var(--ui-space-5);
     }
     @media (max-width: 768px) { .governance { padding: 1.25rem; } }
     .governance-heading { margin: 0 0 .35rem; font-size: 1.25rem; font-weight: var(--ui-font-weight-heavy); color: var(--brand-steel-blue); }
     .governance-subheading { margin: 0 0 1.5rem; font-size: var(--ui-font-size-sm); color: var(--ui-color-text-muted); }
 
     .gov-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1.25rem; align-items: stretch; }
-    @media (max-width: 960px) { .gov-grid { grid-template-columns: 1fr; gap: 1rem; } }
+    @media (max-width: 960px) { .gov-grid { grid-template-columns: 1fr; gap: var(--ui-space-4); } }
 
     .gov-card {
       display: flex;
       flex-direction: column;
       justify-content: space-between;
-      gap: 1rem;
+      gap: var(--ui-space-4);
       padding: 1.35rem 1.4rem;
       background: var(--ui-color-surface);
       border: 1px solid var(--ui-color-border);
@@ -27,12 +27,12 @@
     .gov-card-header { min-width: 0; }
     .gov-eyebrow {
       display: inline-block;
-      font-size: .75rem;
+      font-size: var(--ui-font-size-xs);
       font-weight: var(--ui-font-weight-bold);
       color: var(--brand-steel-blue);
       letter-spacing: .06em;
       text-transform: uppercase;
-      margin-bottom: .5rem;
+      margin-bottom: var(--ui-space-2);
     }
     .gov-title {
       font-size: 1.05rem;
@@ -48,7 +48,7 @@
       line-height: 1.5;
       margin: 0;
     }
-    .gov-badge-row { margin-bottom: .5rem; }
+    .gov-badge-row { margin-bottom: var(--ui-space-2); }
 
     .gov-card-footer {
       padding-top: .75rem;
@@ -73,11 +73,11 @@
       flex-shrink: 0;
     }
 
-    .gov-pills-wrap { display: flex; flex-wrap: wrap; gap: .5rem; margin-top: .5rem; }
+    .gov-pills-wrap { display: flex; flex-wrap: wrap; gap: var(--ui-space-2); margin-top: var(--ui-space-2); }
     .gov-participant-chip {
       display: inline-flex;
       flex-direction: column;
-      gap: .25rem;
+      gap: var(--ui-space-1);
       max-width: 100%;
     }
     .participant-pill {

@@ -11,7 +11,7 @@ const required = (name: string): string => {
   return value;
 };
 
-export function databaseOptions(migration = false): OracleConnectionOptions {
+export function databaseOptions(schemaOwner = false): OracleConnectionOptions {
   initializeOracleClient();
   const schema = required('ORACLE_SCHEMA').toUpperCase();
   if (!/^[A-Z][A-Z0-9_$#]{0,29}$/.test(schema)) {
@@ -28,12 +28,10 @@ export function databaseOptions(migration = false): OracleConnectionOptions {
     host: required('ORACLE_HOST'),
     port,
     serviceName: required('ORACLE_SERVICE'),
-    username: required(migration ? 'MIGRATION_USER' : 'DATABASE_USER'),
-    password: required(migration ? 'MIGRATION_PASSWORD' : 'DATABASE_PASSWORD'),
+    username: required(schemaOwner ? 'SCHEMA_OWNER_USER' : 'DATABASE_USER'),
+    password: required(schemaOwner ? 'SCHEMA_OWNER_PASSWORD' : 'DATABASE_PASSWORD'),
     schema,
     synchronize: false,
-    migrationsRun: false,
-    migrations: [__dirname + '/../database/migrations/*{.js,.ts}'],
     entities: [__dirname + '/../**/*.entity{.js,.ts}'],
     logging: false
   };
@@ -97,14 +95,14 @@ export function configuredRateLimit(): { ttl: number; limit: number } {
 export function assertSchemaInstallAllowed(): string {
   const schema = requiredOracleIdentifier('ORACLE_SCHEMA');
   const service = process.env.ORACLE_SERVICE?.trim();
-  const migrationUser = requiredOracleIdentifier('MIGRATION_USER');
+  const ownerUser = requiredOracleIdentifier('SCHEMA_OWNER_USER');
   const expectedConfirmation = service ? `INSTALL SCHEMA ${schema}@${service}` : '';
 
-  if (!service || migrationUser !== schema ||
+  if (!service || ownerUser !== schema ||
     process.env.SCHEMA_INSTALL_ALLOWED !== 'true' ||
     process.env.SCHEMA_INSTALL_CONFIRM !== expectedConfirmation) {
     throw new Error(
-      'Schema installation refused. Require the owner migration user, SCHEMA_INSTALL_ALLOWED=true, and ' +
+      'Schema installation refused. Require the schema owner account, SCHEMA_INSTALL_ALLOWED=true, and ' +
       `SCHEMA_INSTALL_CONFIRM="${expectedConfirmation}".`
     );
   }
