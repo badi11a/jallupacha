@@ -8,12 +8,12 @@
     @if (loading()) { <p role="status">Cargando macroproceso…</p> }
 
     @if (macro(); as m) {
-      <header class="hero-card" aria-labelledby="macro-title">
-        <div class="hero-main">
-          <span class="hero-eyebrow">{{ eyebrowText() }}</span>
-          <h1 id="macro-title" class="hero-title">{{ m.name }}</h1>
+      <header class="ui-hero" aria-labelledby="macro-title">
+        <div class="ui-hero-main">
+          <span class="ui-hero-eyebrow">{{ eyebrowText() }}</span>
+          <h1 id="macro-title" class="ui-hero-title">{{ m.name }}</h1>
           @if (hasMacroDescription()) {
-            <p class="hero-desc">{{ macroDescription() }}</p>
+            <p class="ui-hero-desc">{{ macroDescription() }}</p>
           }
           <div class="stats-row" aria-label="Resumen del macroproceso y unidades en resultados filtrados">
             <div class="stat-box"><strong>{{ m.processTypes.length }}</strong> <span>Tipos del macroproceso</span></div>

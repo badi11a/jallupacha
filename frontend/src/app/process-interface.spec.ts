@@ -211,8 +211,8 @@ describe('Interfaz base de esquema — adaptación visual', () => {
     http.expectOne(r => r.url.endsWith('/processes') && r.params.get('macroprocessId') === '2').flush([ITEM]);
     fixture.detectChanges();
     expect(root.querySelector('#macro-title')?.textContent).toBe('Estrategia');
-    expect(root.querySelector('.hero-desc')?.textContent).toBe(MAP.macroprocessTypes[0].macroprocesses[0].description);
-    expect(root.querySelector('#macro-title')?.nextElementSibling?.className).toBe('hero-desc');
+    expect(root.querySelector('.ui-hero-desc')?.textContent).toBe(MAP.macroprocessTypes[0].macroprocesses[0].description);
+    expect(root.querySelector('#macro-title')?.nextElementSibling?.className).toBe('ui-hero-desc');
     expect(root.textContent).not.toContain('Tipos y procesos del mapa completo de este macroproceso. Las unidades se cuentan en los resultados filtrados, hasta 300.');
     expect(root.querySelector('#map-filter')).toBeNull();
     expect(root.querySelector('.topbar, .app-nav, .sidebar, .app-footer')).toBeNull();
@@ -228,7 +228,7 @@ describe('Interfaz base de esquema — adaptación visual', () => {
     await fixture.whenStable();
     await loadDialogs(fixture);
     fixture.detectChanges();
-    expect(root.querySelector('.hero-desc')).toBeNull();
+    expect(root.querySelector('.ui-hero-desc')).toBeNull();
     expect((root.querySelector('input[name="q"]') as HTMLInputElement).value).toBe('plan');
     expect(root.querySelector('.type-filters [aria-current="true"]')?.textContent).toContain('Planificación');
     expect(root.textContent).toContain('Ningún proceso coincide');

@@ -7,7 +7,7 @@
       @if (notice()) { <ui-message kind="success">{{ notice() }}</ui-message> }
       @if (saving()) { <p class="helper" role="status">Guardando cambios…</p> }
       @if (editing() !== null) {
-        <form novalidate class="ui-form ui-form-grid catalog-editor" (ngSubmit)="save()" [attr.aria-busy]="saving()" [attr.aria-label]="editing() === 0 ? 'Nuevo tipo de proceso' : 'Editar tipo de proceso'">
+        <form novalidate class="ui-form ui-form-grid ui-inline-editor" (ngSubmit)="save()" [attr.aria-busy]="saving()" [attr.aria-label]="editing() === 0 ? 'Nuevo tipo de proceso' : 'Editar tipo de proceso'">
           <label class="field">Macroproceso (obligatorio)
             <mat-form-field appearance="outline" subscriptSizing="dynamic"><select matNativeControl [uiInvalid]="fieldErrors()['macro'] ? true : null" id="catalog-macro" name="macro" [(ngModel)]="macroprocessId" (ngModelChange)="fieldErrors.set({})" [attr.aria-invalid]="fieldErrors()['macro'] ? true : null" [aria-describedby]="(fieldErrors()['macro'] ? 'catalog-error-macro' : null) ?? ''" [disabled]="saving() || editing() !== 0">
               <option [ngValue]="null">Seleccione…</option>

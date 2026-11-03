@@ -6,7 +6,7 @@
       @if (notice()) { <ui-message kind="success">{{ notice() }}</ui-message> }
       @if (saving()) { <p class="helper" role="status">Guardando cambios…</p> }
       @if (editing() !== null) {
-        <form novalidate class="ui-form ui-form-grid catalog-editor" (ngSubmit)="save()" [attr.aria-busy]="saving()" [attr.aria-label]="editing() === 0 ? 'Nueva unidad' : 'Editar unidad'">
+        <form novalidate class="ui-form ui-form-grid ui-inline-editor" (ngSubmit)="save()" [attr.aria-busy]="saving()" [attr.aria-label]="editing() === 0 ? 'Nueva unidad' : 'Editar unidad'">
           <label class="field">Nombre (obligatorio)<mat-form-field appearance="outline" subscriptSizing="dynamic"><input matInput [uiInvalid]="fieldErrors()['name'] ? true : null" id="catalog-name" name="name" maxlength="200" [(ngModel)]="name" (ngModelChange)="fieldErrors.set({})" [attr.aria-invalid]="fieldErrors()['name'] ? true : null" [aria-describedby]="(fieldErrors()['name'] ? 'catalog-error-name' : null) ?? ''" [disabled]="saving()" required /></mat-form-field>@if (fieldErrors()['name']) { <span id="catalog-error-name" class="field-error" role="alert">{{ fieldErrors()['name'] }}</span> }</label>
           <label class="field">Unidad superior
             <mat-form-field appearance="outline" subscriptSizing="dynamic"><select matNativeControl name="parent" [(ngModel)]="parentUnitId" [disabled]="saving()">

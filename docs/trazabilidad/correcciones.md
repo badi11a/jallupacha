@@ -702,3 +702,27 @@ Entorno: 2026-10-27, America/Santiago; Node 24.15.0, npm disponible 12.2.0 y Chr
 | Pruebas backend | Aprobado: `npm test --workspace backend`, 13 suites y 63/63 pruebas. |
 | Compilación | Aprobado: `npm run build`, 565,64 kB iniciales con el aviso de presupuesto existente. |
 | Script de navegador | Aprobado: `node --check frontend/tools/verify-kit-browser.mjs`; no se ejecutó el recorrido completo. |
+
+## C-063 — Cabecera de ficha y editor en línea como patrones del kit
+
+**Clasificación SDD:** cambio de diseño del kit (STD-FE-001 §8.1, catálogo §7), solicitado por el responsable. Sin cambio de producto, textos, rutas, permisos, datos ni backend.
+
+**Hallazgo:** la cabecera de ficha estaba duplicada en el detalle de proceso y de macroproceso (`.hero-card`, `.hero-main`, `.hero-eyebrow`, `.hero-title`, `.hero-desc`), con diferencias menores no justificadas por la tarea: margen del título (.5rem/.75rem), margen del rótulo (.6rem/.5rem) y ancho máximo de la descripción solo en macroproceso. El marco del editor en línea (`.catalog-editor`) era idéntico en unidades y tipos de proceso.
+
+**Registro del catálogo §7:**
+
+1. Tarea: identificar el registro consultado (proceso o macroproceso) y crear o editar un registro de catálogo sin salir de su lista. La composición existente (`.panel`, `.ui-form-grid`) no cubre la cuadrícula con columna lateral ni el marco del editor.
+2. Consumidores: `process-detail` (también su estado de carga), `macroprocess-detail`, `units` y `process-types`. Contrato descrito en el catálogo; contenido largo se envuelve dentro de `.ui-hero-main` (`min-width: 0`) y la descripción ausente se omite como antes.
+3. Tokens: superficies, bordes, radios, sombra y tipografía del kit; se unifica título con `--ui-space-3`, rótulo con `--ui-space-2` y descripción con máximo de 65ch. La columna lateral pasa debajo bajo 960px.
+4. Comprobación: regresión Angular existente (actualiza el selector de descripción), políticas de fuente, compilación y revisión visual de las fichas.
+5. Estado: piloto del kit; mantenimiento con la base. `.hero-status`, `.accent-bar` y `.processes-panel` permanecen locales por pertenecer a una sola pantalla.
+
+| Comprobación | Estado y evidencia |
+| --- | --- |
+| Políticas de fuente | Aprobado: `npm run check:source --workspace frontend`. |
+| Regresión Angular | Aprobado: `npm test --workspace frontend`, 12 archivos y 126/126 pruebas; la regresión de descripción del macroproceso usa `.ui-hero-desc`. |
+| Generador de la base | Aprobado: `npm run test:base --workspace frontend`, 1/1. |
+| Compilación | Aprobado: 566,97 kB iniciales (antes 565,64 kB); los estilos pasan de las pantallas diferidas al kit global, con el aviso de presupuesto existente. |
+| Revisión visual | Aprobado en su alcance: servidor de fixtures genérico y navegador integrado. Ficha de proceso y detalle de macroproceso con columna lateral a ancho de escritorio; a 700px la columna pasa debajo sin desborde del documento. Editor de unidades abierto: marco de 1px, radio 8px, relleno y margen de 16px, alineación inferior. Tipos de proceso no se abrió en navegador; comparte plantilla y clase. Revisión por la IA, sin personas. |
+
+**Revisión:** IA autora, no independiente. No cambian textos, estructura semántica, `aria-labelledby` ni comportamiento.

@@ -106,10 +106,10 @@
         </ui-message>
       }
 
-      <header class="hero-card" aria-labelledby="process-title">
-        <div class="hero-main">
-          <span class="hero-eyebrow">PROCESO</span>
-          <h1 id="process-title" class="hero-title">{{ d.name }}</h1>
+      <header class="ui-hero" aria-labelledby="process-title">
+        <div class="ui-hero-main">
+          <span class="ui-hero-eyebrow">PROCESO</span>
+          <h1 id="process-title" class="ui-hero-title">{{ d.name }}</h1>
           <div class="accent-bar" aria-hidden="true"></div>
           <div class="hero-status">
             <ui-badge [tone]="statusTone(d.status)">{{ d.status }}</ui-badge>
@@ -118,7 +118,7 @@
               <span class="helper">({{ d.versions.length }} versiones registradas)</span>
             }
           </div>
-          <p class="hero-desc">{{ d.description || 'Sin descripción registrada.' }}</p>
+          <p class="ui-hero-desc">{{ d.description || 'Sin descripción registrada.' }}</p>
 
           <div class="trio-box" aria-label="Clasificación institucional">
             <div class="trio-item">
@@ -291,7 +291,7 @@
         } @empty { <p class="helper">Sin relaciones entrantes.</p> }
       </ui-section>
     } @else if (loading()) {
-      <header class="hero-card">
+      <header class="ui-hero">
         <p class="helper" role="status">Cargando información…</p>
       </header>
     }

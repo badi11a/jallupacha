@@ -1,11 +1,5 @@
 
     .top-nav-bar { display: flex; align-items: center; justify-content: space-between; margin-bottom: var(--ui-space-3); gap: var(--ui-space-4); }
-    .hero-card { display: grid; grid-template-columns: 1fr 340px; gap: var(--ui-space-6); align-items: start; padding: 1.75rem 2rem; background: var(--ui-color-surface); border: 1px solid var(--ui-color-border); border-radius: var(--ui-radius-xl); box-shadow: var(--ui-shadow-panel); margin-bottom: var(--ui-space-5); }
-    @media (max-width: 960px) { .hero-card { grid-template-columns: 1fr; gap: var(--ui-space-5); padding: var(--ui-space-5); } }
-    .hero-main { min-width: 0; }
-    .hero-eyebrow { display: inline-block; padding: var(--ui-space-1) .65rem; border-radius: var(--ui-radius-sm); background: var(--ui-color-surface-accent); color: var(--ui-color-eyebrow); font-size: var(--ui-font-size-xs); font-weight: var(--ui-font-weight-heavy); letter-spacing: .05em; text-transform: uppercase; margin-bottom: var(--ui-space-2); }
-    .hero-title { margin: 0 0 .75rem; font-size: var(--ui-font-size-display); font-weight: var(--ui-font-weight-heavy); color: var(--ui-color-heading); line-height: 1.25; }
-    .hero-desc { color: var(--ui-color-text-muted); font-size: var(--ui-font-size-md); line-height: 1.55; margin: 0 0 1.5rem; max-width: 65ch; }
     .stats-row { display: flex; flex-wrap: wrap; gap: .75rem; }
     .stat-box { display: inline-flex; align-items: baseline; gap: .45rem; padding: var(--ui-space-2) 1rem; border-radius: var(--ui-radius-lg); background: var(--ui-color-background); border: 1px solid var(--ui-color-border); }
     .stat-box strong { font-size: 1.15rem; font-weight: var(--ui-font-weight-heavy); color: var(--ui-color-heading); }
