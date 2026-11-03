@@ -635,6 +635,12 @@ Entorno: 2026-10-27, America/Santiago; Node 24.15.0, npm disponible 12.2.0 y Chr
 - `.risk-gauge-seg` y el fondo de `.risk-bar` consumen `risk-track`. La búsqueda de plantilla confirma que el detalle de macroproceso actualmente no renderiza `.risk-bar` ni `.risk-seg`; por tanto, allí no hay segmentos que puedan sumar menos de 100 % ni riel visible junto a uno. El estilo se mantiene preparado para ese patrón y queda cubierto por el contraste de riel.
 - `check-contrast.mjs` añade cuatro pares no textuales de cada nivel activo contra `risk-track`, la regresión que faltaba en la primera versión.
 
+**Segunda revisión (revisión visual):** con `risk-track` igual a `surface` (#ffffff) sobre el fondo del panel (`background`, #f4f7f9), los segmentos inactivos quedaron a 1,07:1 del fondo y la escala de cuatro pasos dejó de percibirse; las cifras de contraste del riel coincidían con las de `surface`. Corrección:
+
+- `--ui-color-risk-track: var(--ui-color-border)` (#dde2eb), riel gris visible y decorativo.
+- `--ui-color-risk-medium` pasa de `#A67C00` a `#9A7300`, porque el valor anterior quedaba en 2,93:1 frente al riel gris. Contra el riel, Bajo/Medio/Alto/Crítico alcanzan 4,41/3,35/3,05/5,10:1; Medio, 4,35/4,04:1 sobre `surface/background`.
+- Se retiran `--ui-color-risk-none`, sus dos pares de contraste y las reglas `.risk-bar`, `.risk-seg*` y `.risk-legend*` de `macroprocess-detail.component.css`, porque ninguna plantilla las renderiza. Se reintroducirán con su contrato si el patrón vuelve a usarse.
+
 **Archivos cambiados:** `frontend/src/app/shared/ui/styles/tokens.css`, `frontend/scripts/check-contrast.mjs`, estilos de detalle de proceso y macroproceso, plantilla y regresión de interfaz de proceso, y este registro.
 
 **Matriz de verificación (2026-11-03, entorno local):**
@@ -647,7 +653,8 @@ Entorno: 2026-10-27, America/Santiago; Node 24.15.0, npm disponible 12.2.0 y Chr
 | Políticas de fuente | Aprobado: ejecución posterior de `npm run check:source --workspace frontend`; límites de capas, imports y tokens aprobados. |
 | Regresión Angular y contrato ARIA | Aprobado: ejecución posterior de `npm test --workspace frontend`; precomprobación de compatibilidad 3/3 y Angular 12 archivos/126 pruebas. La regresión comprueba que la barra no tiene rol de medidor, es decorativa y que las insignias anuncian `Crítico` y `Sin clasificar`. |
 | Compilación | Aprobado con advertencia preexistente de presupuesto: ejecución posterior de `npm run build --workspace frontend` termina correctamente con 565,71 kB iniciales; mantiene el aviso de 450 kB y no supera el límite de error de 600 kB. |
-| Revisión visual de ficha y macroproceso con cuatro niveles y sin riesgos | No probado: no se dispuso de una sesión de navegador conectada a datos locales representativos durante este cambio. Se requiere comprobar los cinco estados, textos visibles y recorrido antes de declarar conformidad visual integral. |
+| Revisión visual de ficha y macroproceso con cuatro niveles y sin riesgos | No probado en la primera versión ni en la primera revisión. En la segunda revisión, aprobado en su alcance: navegador local con datos genéricos de semilla y sesión de demostración del perfil de riesgos; fichas con niveles Bajo, Medio, Alto y Crítico y una ficha sin riesgos («Sin clasificar») a 1000 px CSS; la escala de cuatro segmentos es visible y el activo se distingue en todos los casos. El detalle de macroproceso conserva su panel de riesgos textual tras retirar los estilos sin uso. Revisión visual por la IA, sin participación de personas. |
+| Segunda revisión: contraste, fuente, pruebas y compilación | Aprobado: `check:contrast` con 56 pares; `check:source`; `npm test` con compatibilidad 3/3 y 126/126 pruebas; `npm run build` con 565,66 kB iniciales y la advertencia preexistente de 450 kB. |
 | R-08: teclado, foco, zoom 200 % y tecnologías de asistencia | No probado para este cambio: la comprobación automática de atributos no sustituye una revisión asistiva ni de ampliación real. |
 
-**Revisión registrada:** revisión por la IA autora, no independiente. Se cotejaron los tokens, consumidores directos, plantilla, regresión y los valores calculados por el script; no se amplió el alcance ni se modificaron controles Material. La revisión visual y asistiva indicada permanece explícitamente no probada.
+**Revisión registrada:** revisión por la IA autora, no independiente. Se cotejaron los tokens, consumidores directos, plantilla, regresión y los valores calculados por el script; no se amplió el alcance ni se modificaron controles Material. La segunda revisión, hecha por otra IA, ejecutó la revisión visual; teclado, zoom real y tecnologías de asistencia permanecen no probados.

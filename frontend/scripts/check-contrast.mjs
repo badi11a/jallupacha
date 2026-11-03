@@ -41,8 +41,6 @@ const PAIRS = [
   ['risk-high', 'background', NON_TEXT, 'indicador de nivel de riesgo alto'],
   ['risk-critical', 'surface', NON_TEXT, 'indicador de nivel de riesgo crítico'],
   ['risk-critical', 'background', NON_TEXT, 'indicador de nivel de riesgo crítico'],
-  ['risk-none', 'surface', NON_TEXT, 'indicador sin nivel de riesgo'],
-  ['risk-none', 'background', NON_TEXT, 'indicador sin nivel de riesgo'],
   ['risk-low', 'risk-track', NON_TEXT, 'segmento activo de riesgo bajo frente al riel'],
   ['risk-medium', 'risk-track', NON_TEXT, 'segmento activo de riesgo medio frente al riel'],
   ['risk-high', 'risk-track', NON_TEXT, 'segmento activo de riesgo alto frente al riel'],
