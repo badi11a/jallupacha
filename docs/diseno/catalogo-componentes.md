@@ -6,7 +6,7 @@ La API se coteja con [el punto de entrada público](../../frontend/src/app/share
 
 ## 1. Consumo y compatibilidad
 
-1. Importar componentes, tipos y auxiliares desde `shared/ui/index.ts`; no acceder a miembros protegidos ni a la estructura interna de componentes.
+1. Importar componentes, tipos y auxiliares desde `shared/ui/index.ts`, y `UiMaterialInputDirective` desde `shared/ui/material-forms.ts` (C-064), para que la entrada principal no cargue controles de formulario en la composición raíz; no acceder a miembros protegidos ni a la estructura interna de componentes.
 2. Cargar `styles/tokens.css` y después `styles/base.css`, una sola vez en la entrada visual; activar ambos con `class="ui-root"` en el contenedor consumidor. Para una aplicación de página completa, cargar opcionalmente `styles/page.css` y añadir `ui-page` a `body`. El kit no debe aplicar estilos fuera de `ui-root`; el CSS del anfitrión puede entrar y debe comprobarse. Añadir styles/material.scss a angular.json después de la entrada CSS. Mantener el host de diálogos dentro del ámbito; su panel Material recibe las variables del consumidor y el ámbito ui-overlay-root, sin modificar otros overlays. Migración C-046: los consumidores anteriores sin `ui-root` deben añadirlo; no activar toda la página en una integración embebida.
 3. Usar tokens semánticos `--ui-*` y conservar los siete HEX `--brand-*`. No copiar CSS de componentes ni redefinir sus selectores internos desde el consumidor.
 4. Componer mediante contenido proyectado, opciones públicas y clases compartidas antes de extender. El producto decide qué se muestra y qué acción ejecuta.

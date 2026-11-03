@@ -1,7 +1,7 @@
 import { MatButtonModule } from '@angular/material/button';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
-import { UiMaterialInputDirective } from '../../shared/ui';
+import { UiMaterialInputDirective } from '../../shared/ui/material-forms';
 import { NgTemplateOutlet } from '@angular/common';
 import { Component, DestroyRef, OnInit, inject, signal } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';

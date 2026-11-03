@@ -726,3 +726,28 @@ Entorno: 2026-10-27, America/Santiago; Node 24.15.0, npm disponible 12.2.0 y Chr
 | Revisión visual | Aprobado en su alcance: servidor de fixtures genérico y navegador integrado. Ficha de proceso y detalle de macroproceso con columna lateral a ancho de escritorio; a 700px la columna pasa debajo sin desborde del documento. Editor de unidades abierto: marco de 1px, radio 8px, relleno y margen de 16px, alineación inferior. Tipos de proceso no se abrió en navegador; comparte plantilla y clase. Revisión por la IA, sin personas. |
 
 **Revisión:** IA autora, no independiente. No cambian textos, estructura semántica, `aria-labelledby` ni comportamiento.
+
+## C-064 — Entrada separada de formularios Material en el kit y acceso diferido
+
+**Clasificación SDD:** cambio de diseño de la base (STD-FE-001 §8.2, eficiencia técnica), solicitado por el responsable. Cambio incompatible de la API del kit: base 0.4.0. Sin cambio de producto, textos, rutas visibles, permisos, datos ni backend.
+
+**Hallazgo (medición del 2026-11-03):** la carga inicial era de 566,97 kB (135,61 kB de transferencia estimada), sobre el aviso de presupuesto de 450 kB. El fragmento compartido inicial incluía el campo de formulario de Material (71 kB), Angular Forms (56 kB) e input de Material por dos causas: la ruta de acceso se cargaba de forma inmediata, y `shared/ui/index.ts` reexportaba `UiMaterialInputDirective`, que importa `MatInput`, de modo que la composición raíz arrastraba esos módulos al importar la entrada principal. Cada causa por separado apenas cambiaba el tamaño (acceso diferido solo: 562,31 kB).
+
+**Diseño:**
+
+- Nueva entrada pública `shared/ui/material-forms.ts` con `UiMaterialInputDirective`; se retira de `index.ts`. El manifiesto la declara en `publicEntries`.
+- La ruta `login` usa `loadComponent`, como el resto de las rutas; guardas y título se conservan.
+- `check:source` rechaza que `shared/ui/index.ts` reexporte módulos que importen `@angular/forms` o el campo/input de Material.
+- Consumidores migrados: acceso, auditoría, unidades, tipos de proceso, mapa, listado, formulario, ficha y detalle de macroproceso; en la plantilla, acceso y ejemplo. Migración para consumidores 0.3.x documentada en `frontend/base/README.md`.
+
+**Matriz de verificación (2026-11-03, entorno local):**
+
+| Comprobación | Estado y evidencia |
+| --- | --- |
+| Carga inicial | Aprobado: `ng build` 442,80 kB (114,72 kB estimados), sin aviso de presupuesto. JavaScript total al entrar por acceso 493,9 kB, mapa 507,4 kB y listado 501,3 kB, prácticamente igual que antes: la mejora es la carga previa a la primera ruta, no el total de la primera pantalla. |
+| Políticas de fuente | Aprobado: `check:source`; comprobación negativa: reexportar la directiva desde `index.ts` es rechazado. |
+| Regresión Angular | Aprobado: `npm test --workspace frontend`, 12 archivos y 126/126 pruebas. |
+| Generador de la base | Aprobado: `npm run test:base --workspace frontend`, 1/1, con versión 0.4.0 y la nueva entrada. No se instaló ni compiló un consumidor generado nuevo. |
+| Recorrido de acceso | Aprobado en su alcance: servidor de fixtures genérico; entrar sin sesión a `/procesos` redirige al acceso diferido, que se muestra con sus campos; el ingreso vuelve a `/procesos` y cerrar sesión regresa al acceso. Revisión por la IA. |
+
+**Revisión:** IA autora, no independiente. No cambian textos, guardas, permisos ni comportamiento de formularios.

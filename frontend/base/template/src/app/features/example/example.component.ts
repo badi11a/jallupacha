@@ -1,7 +1,7 @@
 import { MatButtonModule } from '@angular/material/button';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
-import { UiMaterialInputDirective } from '../../shared/ui';
+import { UiMaterialInputDirective } from '../../shared/ui/material-forms';
 import { Component, ElementRef, inject, signal } from '@angular/core';
 import { FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { LeavesWithConfirmation, PendingChanges } from '../../core/platform';

@@ -1,7 +1,7 @@
 import { MatButtonModule } from '@angular/material/button';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
-import { UiMaterialInputDirective } from '../../shared/ui';
+import { UiMaterialInputDirective } from '../../shared/ui/material-forms';
 import { Component, ElementRef, OnInit, inject, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { ProcessApi, UnitItem, errorMessage } from '../processes/process-api.service';

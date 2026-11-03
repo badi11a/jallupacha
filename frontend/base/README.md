@@ -6,7 +6,9 @@ C-050: versión 0.2.0 por API aditiva de paginación (`summaryMode` y nombre acc
 
 C-052: versión **0.2.1**, corrección compatible de instalación independiente. `@types/node` se declara como dependencia de desarrollo para los tipos que exige `tsconfig.spec.json`. Los consumidores 0.2.0 revisan paquete y lockfile, incorporan la dependencia y verifican instalación/pruebas/compilación fuera del árbol del producto; el generador no los sobrescribe. No cambia la API del núcleo o del kit. Las verificaciones anteriores dentro de directorios descendientes podían resolver tipos del backend desde un ancestro y no acreditan esa independencia.
 
-C-056: versión actual **0.3.0**, migración a Angular Material/CDK 22.2.1. Para consumidores 0.2.x: revisar paquete y lockfile; incorporar el tema Sass en angular.json después de styles.css; migrar botones y campos con imports explícitos; actualizar el host de diálogos y su carga diferida. Conservar estilos de composición y contratos de formularios. No usar CSS interno de Material ni fuentes o iconos remotos. Verificar el propio consumidor antes de integrar, sin sobrescribirlo con el generador.
+C-056: versión 0.3.0, migración a Angular Material/CDK 22.2.1. Para consumidores 0.2.x: revisar paquete y lockfile; incorporar el tema Sass en angular.json después de styles.css; migrar botones y campos con imports explícitos; actualizar el host de diálogos y su carga diferida. Conservar estilos de composición y contratos de formularios. No usar CSS interno de Material ni fuentes o iconos remotos. Verificar el propio consumidor antes de integrar, sin sobrescribirlo con el generador.
+
+C-064: versión actual **0.4.0**. `UiMaterialInputDirective` sale de `shared/ui/index.ts` y se importa desde `shared/ui/material-forms.ts`, para que la composición raíz no cargue el campo de formulario de Material antes de la primera ruta. Migración de consumidores 0.3.x: cambiar ese import en cada componente que use la directiva; `check:source` rechaza volver a exportar controles de formulario desde la entrada principal. Sin otros cambios de API.
 
 Desde la raíz del repositorio:
 

@@ -1,6 +1,5 @@
 import { Routes } from '@angular/router';
 import { adminGuard, authGuard, guestGuard } from './core/auth/auth.guard';
-import { LoginComponent } from './core/auth/login.component';
 import { NotFoundComponent } from './not-found.component';
 import { unsavedChangesGuard } from './core/auth/unsaved-changes.guard';
 
@@ -13,7 +12,7 @@ export const APP_NAME = 'Sistema de Procesos Institucionales';
 // Arquitectura v15 (REQ-25): Autenticación local institucional y control de acceso.
 export const routes: Routes = [
   { path: '', pathMatch: 'full', redirectTo: 'mapa' },
-  { title: 'Acceso Institucional', path: 'login', component: LoginComponent, canActivate: [guestGuard], canDeactivate: [unsavedChangesGuard] },
+  { title: 'Acceso Institucional', path: 'login', loadComponent: () => import('./core/auth/login.component').then(module => module.LoginComponent), canActivate: [guestGuard], canDeactivate: [unsavedChangesGuard] },
   { title: 'Mapa de procesos', path: 'mapa', loadComponent: () => import('./features/processes/process-map.component').then(module => module.ProcessMapComponent), canActivate: [authGuard] },
   { title: 'Detalle de macroproceso', path: 'mapa/macroprocesos/:id', loadComponent: () => import('./features/processes/macroprocess-detail.component').then(module => module.MacroprocessDetailComponent), canActivate: [authGuard] },
   { title: 'Procesos', path: 'procesos', loadComponent: () => import('./features/processes/process-list.component').then(module => module.ProcessListComponent), canActivate: [authGuard] },

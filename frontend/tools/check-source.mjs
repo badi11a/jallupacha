@@ -26,6 +26,14 @@ for (const file of walk(root).filter(file => !file.endsWith('.spec.ts') && /\.(t
     if (/\b(?:primary|quiet|text|danger)-button\b/.test(tag) && !/\bmatButton\b/.test(tag)) fail('Button role classes require matButton (DEC-FE-001)');
   }
   if (!file.endsWith('.ts')) continue;
+  if (name === 'shared/ui/index.ts') {
+    for (const [, spec] of source.matchAll(/from '(\.\/[^']+)'/g)) {
+      const target = resolve(dirname(file), spec + '.ts');
+      if (existsSync(target) && /@angular\/forms|@angular\/material\/(?:form-field|input)/.test(readFileSync(target, 'utf8'))) {
+        fail('Main kit entry must not export form controls; use shared/ui/material-forms (C-064): ' + spec);
+      }
+    }
+  }
   const ast = ts.createSourceFile(file, source, ts.ScriptTarget.Latest, true);
   function visit(node) {
     if (ts.isImportDeclaration(node) && ts.isStringLiteral(node.moduleSpecifier)) {
